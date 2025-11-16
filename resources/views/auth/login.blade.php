@@ -197,7 +197,8 @@
                 </button>
             </form>
 
-            <div class="divider">
+            {{-- Social login buttons hidden for now --}}
+            {{-- <div class="divider">
                 <span>or continue with</span>
             </div>
 
@@ -214,7 +215,7 @@
                     <i class="fab fa-linkedin-in"></i>
                     Continue with LinkedIn
                 </a>
-            </div>
+            </div> --}}
 
             <div class="auth-links">
                 @if (Route::has('password.request'))

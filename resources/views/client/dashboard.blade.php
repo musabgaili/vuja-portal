@@ -80,7 +80,7 @@
     </div>
 
     <!-- AI Tools Widget -->
-    <div class="widget">
+    {{-- <div class="widget">
         <div class="widget-header">
             <h3 class="widget-title">AI Assessment Tools</h3>
             <div class="widget-icon info">
@@ -100,7 +100,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <!-- Recent Activity Card -->
