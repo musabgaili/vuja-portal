@@ -24,7 +24,7 @@ Route::get('/test12345678', function () {
     return 'test12345678';
 });
 
-Route:: prefix('internal')->middleware(['auth', 'verified'])->group(function () {
+Route:: prefix('internal')->middleware(['auth', ])->group(function () {
     
     // Internal Dashboard
     Route::get('/', [DashboardController::class, 'internalDashboard'])->name('internal.dashboard');

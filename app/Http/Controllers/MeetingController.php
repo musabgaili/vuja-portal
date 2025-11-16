@@ -17,7 +17,8 @@ class MeetingController extends Controller
 
     public function __construct(MeetingService $meetingService, TimeSlotService $timeSlotService)
     {
-        $this->middleware(['auth', 'verified']);
+        $this->middleware(['auth', ]);
+ 
         $this->meetingService = $meetingService;
         $this->timeSlotService = $timeSlotService;
     }

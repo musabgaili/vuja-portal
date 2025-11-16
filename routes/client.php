@@ -17,7 +17,7 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-Route::prefix('client')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('client')->middleware(['auth', ])->group(function () {
     
     // Client Dashboard
     Route::get('/dashboard', [DashboardController::class, 'clientDashboard'])->name('client.dashboard');

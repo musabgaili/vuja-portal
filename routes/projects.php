@@ -17,7 +17,7 @@ use App\Http\Controllers\Projects\FeedbackController;
 |
 */
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', ])->group(function () {
     
     // ============================================
     // CLIENT PROJECT ROUTES
