@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('service_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_request_type_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('service_request_type_id')->nullable();
             $table->string('type'); // idea, consultation, research, copyright
             $table->string('title');
             $table->text('description');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->text('timeline')->nullable();
             $table->text('additional_info')->nullable();
             $table->json('step_data')->nullable(); // Store all step form data
-            $table->foreignId('current_step_id')->nullable()->constrained('service_request_steps')->onDelete('set null');
+            $table->unsignedBigInteger('current_step_id')->nullable();
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('reviewed_at')->nullable();
