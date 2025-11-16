@@ -1,0 +1,187 @@
+{
+    "project_name": "VujaDe Platform MVP & Future Scope",
+    "build_instruction": "Build features within each milestone sequentially. Client-side and Internal-side features within the same milestone can be built in parallel as they represent different user interfaces and access roles.",
+    "milestones": [
+      {
+        "name": "Foundation & Intake Live",
+        "description": "Establish user access, foundational roles, and the complete ability to receive and triage all client service requests.",
+        "client_side": [
+          {
+            "id": "C-1",
+            "description": "Client registration with email and phone number."
+          },
+          {
+            "id": "C-2",
+            "description": "Email OTP verification flow for new client accounts."
+          },
+          {
+            "id": "C-10",
+            "description": "Submit form for Consultation request (category-based)."
+          },
+          {
+            "id": "C-13",
+            "description": "Submit form for Idea Generation request."
+          },
+          {
+            "id": "C-20",
+            "description": "Book preliminary meeting time (for Research/IP/Copyright models)."
+          },
+          {
+            "id": "C-19",
+            "description": "Digitally Sign the required NDA and SLA documents (Non-MVP E-Sign Integration required)."
+          }
+        ],
+        "internal_side": [
+          {
+            "id": "T-4",
+            "description": "Manager's centralized review queue for all new service requests."
+          },
+          {
+            "id": "T-5",
+            "description": "Employee action to send a direct Meeting Invitation (Model 3 flow)."
+          },
+          {
+            "id": "T-20",
+            "description": "Employee review and confirmation of client-booked calendar slots."
+          },
+          {
+            "id": "T-21",
+            "description": "Automatic triage/filtering logic to route requests to the most appropriate employee."
+          },
+          {
+            "id": "T-18",
+            "description": "Manager view for the status of client NDA and SLA signings (Non-MVP E-Sign Integration required)."
+          }
+        ]
+      },
+      {
+        "name": "Execution Core Complete",
+        "description": "Deploy tools for internal execution, implement collaboration, and launch read-only transparency for the client.",
+        "client_side": [
+          {
+            "id": "C-3",
+            "description": "Client Dashboard overview (summary of all projects)."
+          },
+          {
+            "id": "C-4",
+            "description": "Client view of current and historical request/project statuses."
+          },
+          {
+            "id": "C-5",
+            "description": "Client read-only view of Project Scope, Timeline, Milestones, and Completion Percentage."
+          },
+          {
+            "id": "C-6",
+            "description": "Client view of the next scheduled meeting details."
+          },
+          {
+            "id": "C-7",
+            "description": "Client submission of a formal scope change request."
+          },
+          {
+            "id": "C-8",
+            "description": "Client ability to add comments to a project or milestone thread."
+          },
+          {
+            "id": "C-11",
+            "description": "Client view of current and pending quotes/agreements status."
+          },
+          {
+            "id": "C-12",
+            "description": "Client access to view NDA/SLA documents."
+          },
+          {
+            "id": "C-14",
+            "description": "Client participation in comment-based negotiation for Idea track (Non-MVP, depends on T-10)."
+          }
+        ],
+        "internal_side": [
+          {
+            "id": "T-1",
+            "description": "Team Member view of all assigned tasks across all projects."
+          },
+          {
+            "id": "T-2",
+            "description": "Team Member CRUD for granular internal Tasks."
+          },
+          {
+            "id": "T-3",
+            "description": "Team Member ability to comment on any milestone or task."
+          },
+          {
+            "id": "T-8",
+            "description": "Manager approval/rejection of client-submitted Scope Change Requests."
+          },
+          {
+            "id": "T-9",
+            "description": "Manager ability to log new project-related purchases or expenses."
+          },
+          {
+            "id": "T-15",
+            "description": "Project Manager view of their assigned project's internal data (Tasks, Expenses, Team)."
+          },
+          {
+            "id": "T-16",
+            "description": "Project Manager ability to add/remove Employee Tasks on their projects."
+          },
+          {
+            "id": "T-10",
+            "description": "Manager view of the negotiation history thread (comments) for Idea track requests (Non-MVP, UI required)."
+          }
+        ]
+      },
+      {
+        "name": "Quotation Gate Ready",
+        "description": "Implement the financial tools and formal actions required to close the sale and move requests into active projects.",
+        "client_side": [
+          {
+            "id": "C-9",
+            "description": "Client form to rate the experience and provide feedback on project closure."
+          },
+          {
+            "id": "C-15",
+            "description": "Client action to accept or reject a Formal Quote/Agreement (Non-MVP E-Sign/Contract logic required)."
+          },
+          {
+            "id": "C-16",
+            "description": "Client upload of a payment confirmation file (Non-MVP file handling required)."
+          },
+          {
+            "id": "C-17",
+            "description": "Client ability to recharge their token wallet balance (Non-MVP Payment/Wallet required)."
+          },
+          {
+            "id": "C-18",
+            "description": "Client access to the AI Assessment module using tokens (Non-MVP AI integration required)."
+          }
+        ],
+        "internal_side": [
+          {
+            "id": "T-17",
+            "description": "Employee/Manager access to the **Unified Metrics & Quotation Tool** calculation engine."
+          },
+          {
+            "id": "T-6",
+            "description": "Manager action to formally **Approve or Reject a new Service Request** (pipeline gate)."
+          },
+          {
+            "id": "T-7",
+            "description": "Manager action to assign the core team (Employees, PMs) to the approved project."
+          },
+          {
+            "id": "T-11",
+            "description": "Manager ability to issue a formal Quote or Agreement document to the client (Non-MVP Contract generation required)."
+          },
+          {
+            "id": "T-14",
+            "description": "Manager controls for the client's token wallet (recharge/view balance/refund) (Non-MVP Wallet system required)."
+          },
+          {
+            "id": "T-19",
+            "description": "Manager verification and approval of the client's payment confirmation file (Non-MVP file handling required)."
+          }
+        ]
+      }
+    ]
+  }
+  
