@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1C575F 0%, #153d44 100%);
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
@@ -20,27 +20,28 @@
             padding: 20px;
         }
         .auth-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 60px rgba(28, 87, 95, 0.3);
             padding: 40px;
             width: 100%;
             max-width: 450px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(28, 87, 95, 0.1);
         }
         .logo {
             text-align: center;
             margin-bottom: 30px;
         }
         .logo h1 {
-            color: #2563eb;
+            color: #1C575F;
             font-weight: 700;
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 5px;
+            letter-spacing: -0.5px;
         }
         .logo p {
-            color: #6b7280;
+            color: #64748b;
             font-size: 14px;
         }
         .form-floating {
@@ -54,11 +55,11 @@
             transition: all 0.3s ease;
         }
         .form-control:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+            border-color: #1C575F;
+            box-shadow: 0 0 0 0.2rem rgba(28, 87, 95, 0.25);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #1C575F 0%, #153d44 100%);
             border: none;
             border-radius: 12px;
             padding: 12px 24px;
@@ -70,7 +71,8 @@
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 10px 20px rgba(28, 87, 95, 0.4);
+            background: linear-gradient(135deg, #0BABB5 0%, #1C575F 100%);
         }
         .social-login {
             margin: 20px 0;
@@ -91,8 +93,8 @@
             transition: all 0.3s ease;
         }
         .social-btn:hover {
-            border-color: #2563eb;
-            color: #2563eb;
+            border-color: #1C575F;
+            color: #1C575F;
             transform: translateY(-1px);
         }
         .social-btn i {
@@ -114,7 +116,7 @@
             background: #e5e7eb;
         }
         .divider span {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             padding: 0 15px;
             color: #6b7280;
             font-size: 14px;
@@ -124,12 +126,13 @@
             margin-top: 20px;
         }
         .auth-links a {
-            color: #2563eb;
+            color: #1C575F;
             text-decoration: none;
             font-weight: 500;
         }
         .auth-links a:hover {
             text-decoration: underline;
+            color: #0BABB5;
         }
         .password-requirements {
             background: #f8fafc;
@@ -139,6 +142,9 @@
             margin-top: 10px;
             font-size: 14px;
             color: #64748b;
+        }
+        .password-requirements strong {
+            color: #1C575F;
         }
         .password-requirements ul {
             margin: 0;

@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
             'password' => '12345678',
             'role' => UserRole::CLIENT,
             'status' => UserStatus::ACTIVE,
+            'type' => 'client',
             'email_verified_at' => now(),
         ]);
         // $client->assignRole('client');
@@ -36,6 +37,7 @@ class UserSeeder extends Seeder
             'password' => '12345678',
             'role' => UserRole::EMPLOYEE,
             'status' => UserStatus::ACTIVE,
+            'type' => 'internal',
             'email_verified_at' => now(),
         ]);
         // $employee->assignRole('employee');
@@ -48,6 +50,7 @@ class UserSeeder extends Seeder
             'password' => '12345678',
             'role' => UserRole::MANAGER,
             'status' => UserStatus::ACTIVE,
+            'type' => 'internal',
             'email_verified_at' => now(),
         ]);
         // $manager->assignRole('manager');
@@ -60,6 +63,7 @@ class UserSeeder extends Seeder
             'password' => '12345678',
             'role' => UserRole::MANAGER,
             'status' => UserStatus::ACTIVE,
+            'type' => 'internal',
             'email_verified_at' => now(),
         ]);
         // $projectManager->assignRole('project_manager');

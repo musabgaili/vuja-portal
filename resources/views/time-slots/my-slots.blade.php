@@ -8,7 +8,7 @@
 @section('content')
 <style>
 .slots-header {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     color: white;
     padding: 2rem;
     border-radius: 12px;

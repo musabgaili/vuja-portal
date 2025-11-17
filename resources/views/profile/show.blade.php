@@ -177,7 +177,7 @@ function showDeleteModal() {
 }
 
 .card-header.bg-gradient-primary {
-    background: linear-gradient(135deg, #198754 0%, #0d6e3f 100%) !important;
+    background: linear-gradient(135deg, #1C575F 0%, #153d44 100%) !important;
 }
 
 .btn-outline-primary:hover,

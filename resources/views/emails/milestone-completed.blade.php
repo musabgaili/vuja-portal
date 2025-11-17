@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container">
-        <div style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
+        <div style="background:linear-gradient(135deg,#10b981 0%,#1C575F 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
             <h1 style="margin:0;">✨ Milestone Completed!</h1>
         </div>
         <div style="background:#f0fdf4;padding:30px;border-radius:0 0 8px 8px;">

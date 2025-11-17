@@ -33,9 +33,9 @@ class PricingToolController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
-            abort(403);
-        }
+        // if (!$user->isManager()) {
+        //     abort(403);
+        // }
 
         $rules = PricingRule::orderBy('item')->orderBy('level')->get();
 

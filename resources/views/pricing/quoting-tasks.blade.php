@@ -33,7 +33,7 @@ body { font-family: 'Inter', sans-serif; }
     transform: translateY(-2px);
 }
 .quote-badge {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;

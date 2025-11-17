@@ -205,8 +205,8 @@
 }
 
 .form-control:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    border-color: #1C575F;
+    box-shadow: 0 0 0 0.2rem rgba(28, 87, 95, 0.25);
 }
 
 .btn:hover {

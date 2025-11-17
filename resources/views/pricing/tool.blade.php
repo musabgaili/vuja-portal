@@ -12,7 +12,7 @@
 <style>
 body { font-family: 'Inter', sans-serif; }
 .pricing-header {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     color: white;
     padding: 2rem;
     border-radius: 16px;
@@ -46,7 +46,7 @@ body { font-family: 'Inter', sans-serif; }
     box-shadow: 0 1px 4px rgba(16, 185, 129, 0.1);
 }
 .grand-total {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     color: white;
     padding: 1.5rem;
     border-radius: 12px;
@@ -61,6 +61,9 @@ body { font-family: 'Inter', sans-serif; }
             <i class="fas fa-calculator"></i> Internal Pricing Tool
         </h1>
         <p class="opacity-90">Build accurate quotes using standardized pricing rules</p>
+        <a href="{{ route('pricing.admin') }}" class="btn btn-light btn-sm mt-3" style="background: white; color: #1C575F; border: 1px solid #1C575F;">
+            <i class="fas fa-cogs"></i> Pricing Admin
+        </a>
     </div>
 </div>
 

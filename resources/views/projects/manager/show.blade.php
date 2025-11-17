@@ -635,7 +635,7 @@
             </div>
             @if($req->response)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
-                <strong style="color:#059669;">Response:</strong>
+                <strong style="color:#1C575F;">Response:</strong>
                 <p style="margin:0.5rem 0 0 0;color:#065f46;">{{ $req->response }}</p>
                 <small class="text-muted">By {{ $req->handledBy->name }} • {{ $req->handled_at->format('M d, Y') }}</small>
             </div>
@@ -671,7 +671,7 @@
             </div>
             @if($complaint->resolution_note)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
-                <strong style="color:#059669;">Resolution:</strong>
+                <strong style="color:#1C575F;">Resolution:</strong>
                 <p style="margin:0.5rem 0 0 0;color:#065f46;">{{ $complaint->resolution_note }}</p>
                 <small class="text-muted">By {{ $complaint->resolvedBy->name }} • {{ $complaint->resolved_at->format('M d, Y') }}</small>
             </div>

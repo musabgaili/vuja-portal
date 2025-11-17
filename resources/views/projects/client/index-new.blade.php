@@ -104,7 +104,7 @@
     </div>
     <div class="col-md-4">
         <div class="stat-card-modern">
-            <div class="stat-card-value" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <div class="stat-card-value" style="background: linear-gradient(135deg, #10b981 0%, #1C575F 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 {{ $stats['active'] }}
             </div>
             <div class="stat-card-label">Active</div>
