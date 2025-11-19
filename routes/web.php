@@ -30,9 +30,9 @@ use Spatie\Permission\Models\Role;
 // ============================================
 
 Route::get('/', function () {
-    return Auth::user()->isInternal();
-    // $x= User::find(Auth::user()->id)->update(['type' => 'internal']);
-    return $x;
+    // return Auth::user()->isInternal();
+    // // $x= User::find(Auth::user()->id)->update(['type' => 'internal']);
+    // return $x;
     if (Auth::check()) {
         return redirect()->route('dashboard');
     }
