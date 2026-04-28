@@ -82,6 +82,18 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | Used by session-based language switching (see Localization middleware
+    | and the language/{locale} route).
+    |
+    */
+
+    'supported_locales' => ['en', 'ar'],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

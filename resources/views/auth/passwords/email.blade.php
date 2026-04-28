@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - VujaDe Platform</title>
+    <title>{{ __('portal.auth.reset_password_page_title') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -103,14 +103,20 @@
             margin-bottom: 30px;
             line-height: 1.6;
         }
+        .auth-card .locale-switcher .btn {
+            min-width: 2.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
+            <div class="d-flex justify-content-end mb-2">
+                @include('partials.locale-switcher')
+            </div>
             <div class="logo">
                 <h1>VujaDe</h1>
-                <p>Reset your password</p>
+                <p>{{ __('portal.auth.reset_tagline_request') }}</p>
             </div>
 
             <div class="reset-icon">
@@ -124,7 +130,7 @@
             @endif
 
             <p class="info-text">
-                Enter your email address and we'll send you a link to reset your password.
+                {{ __('portal.auth.reset_email_instructions') }}
             </p>
 
             @if ($errors->any())
@@ -141,9 +147,9 @@
                 <div class="form-floating">
                     <input type="email" class="form-control @error('email') is-invalid @enderror" 
                            id="email" name="email" value="{{ old('email') }}" 
-                           placeholder="Email Address" required autofocus>
+                           placeholder="{{ __('portal.email_address') }}" required autofocus>
                     <label for="email">
-                        <i class="fas fa-envelope me-2"></i>Email Address
+                        <i class="fas fa-envelope me-2"></i>{{ __('portal.email_address') }}
                     </label>
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -151,13 +157,13 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-paper-plane me-2"></i>Send Reset Link
+                    <i class="fas fa-paper-plane me-2"></i>{{ __('portal.auth.send_reset_link') }}
                 </button>
             </form>
 
             <div class="auth-links">
                 <a href="{{ route('login') }}">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Login
+                    <i class="fas fa-arrow-left me-2"></i>{{ __('portal.auth.back_to_login') }}
                 </a>
             </div>
         </div>

@@ -1,9 +1,9 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Pricing Rules Management')
+@section('title', __('portal.pricing.rules_management_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item">Quote System</li>
-<li class="breadcrumb-item active">Pricing Admin</li>
+<li class="breadcrumb-item">{{ __('portal.pricing.quote_system') }}</li>
+<li class="breadcrumb-item active">{{ __('portal.pricing.pricing_admin') }}</li>
 @endsection
 
 @section('content')
@@ -31,16 +31,16 @@ body { font-family: 'Inter', sans-serif; }
 <div class="admin-header">
     <div class="text-center">
         <h1 class="text-3xl font-bold mb-2">
-            <i class="fas fa-cogs"></i> Pricing Rules Management
+            <i class="fas fa-cogs"></i> {{ __('portal.pricing.rules_management_heading') }}
         </h1>
-        <p class="opacity-90">Define and manage pricing rules for the quotation tool</p>
+        <p class="opacity-90">{{ __('portal.pricing.rules_management_subtitle') }}</p>
     </div>
 </div>
 
 <!-- Add Rule Form -->
 <div class="admin-card">
     <h3 class="text-xl font-semibold mb-4" style="color: #1e293b;">
-        <i class="fas fa-plus-circle"></i> Add New Pricing Rule
+        <i class="fas fa-plus-circle"></i> {{ __('portal.pricing.add_new_rule') }}
     </h3>
     
     <form method="POST" action="{{ route('pricing.store') }}">
@@ -48,37 +48,37 @@ body { font-family: 'Inter', sans-serif; }
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>Item *</label>
-                    <input type="text" name="item" class="form-control" placeholder="e.g., 3D Design" required>
+                    <label>{{ __('portal.pricing.item') }} *</label>
+                    <input type="text" name="item" class="form-control" placeholder="{{ __('portal.pricing.item_placeholder') }}" required>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    <label>Rate ($) *</label>
+                    <label>{{ __('portal.pricing.rate') }} *</label>
                     <input type="number" name="rate" class="form-control" step="0.01" min="0" placeholder="100.00" required>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    <label>Unit *</label>
-                    <input type="text" name="unit" class="form-control" placeholder="hour" required>
+                    <label>{{ __('portal.pricing.unit') }} *</label>
+                    <input type="text" name="unit" class="form-control" placeholder="{{ __('portal.pricing.unit_placeholder') }}" required>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    <label>Level *</label>
-                    <input type="text" name="level" class="form-control" placeholder="expert" required>
+                    <label>{{ __('portal.pricing.level') }} *</label>
+                    <input type="text" name="level" class="form-control" placeholder="{{ __('portal.pricing.level_placeholder') }}" required>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>Note *</label>
-                    <input type="text" name="note" class="form-control" placeholder="Details..." required>
+                    <label>{{ __('portal.pricing.note') }} *</label>
+                    <input type="text" name="note" class="form-control" placeholder="{{ __('portal.pricing.note_placeholder') }}" required>
                 </div>
             </div>
         </div>
         <button type="submit" class="btn btn-success">
-            <i class="fas fa-plus"></i> Add Rule
+            <i class="fas fa-plus"></i> {{ __('portal.pricing.add_rule') }}
         </button>
     </form>
 </div>
@@ -86,20 +86,20 @@ body { font-family: 'Inter', sans-serif; }
 <!-- Rules List -->
 <div class="admin-card">
     <h3 class="text-xl font-semibold mb-4" style="color: #1e293b;">
-        <i class="fas fa-list"></i> All Pricing Rules ({{ $rules->count() }})
+        <i class="fas fa-list"></i> {{ __('portal.pricing.all_rules') }} ({{ $rules->count() }})
     </h3>
     
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Item</th>
-                    <th>Rate</th>
-                    <th>Unit</th>
-                    <th>Level</th>
-                    <th>Note</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
+                    <th>{{ __('portal.pricing.item') }}</th>
+                    <th>{{ __('portal.pricing.rate') }}</th>
+                    <th>{{ __('portal.pricing.unit') }}</th>
+                    <th>{{ __('portal.pricing.level') }}</th>
+                    <th>{{ __('portal.pricing.note') }}</th>
+                    <th>{{ __('portal.pricing.status') }}</th>
+                    <th class="text-end">{{ __('portal.team.col_actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -112,16 +112,16 @@ body { font-family: 'Inter', sans-serif; }
                     <td><small class="text-muted">{{ Str::limit($rule->note, 60) }}</small></td>
                     <td>
                         @if($rule->is_active)
-                        <span class="badge bg-success">Active</span>
+                        <span class="badge bg-success">{{ __('portal.pricing.active') }}</span>
                         @else
-                        <span class="badge bg-secondary">Inactive</span>
+                        <span class="badge bg-secondary">{{ __('portal.pricing.inactive') }}</span>
                         @endif
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-warning" onclick="editRule({{ $rule->id }}, '{{ $rule->item }}', {{ $rule->rate }}, '{{ $rule->unit }}', '{{ $rule->level }}', '{{ addslashes($rule->note) }}', {{ $rule->is_active ? 'true' : 'false' }})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <form method="POST" action="{{ route('pricing.destroy', $rule) }}" style="display: inline;" onsubmit="return confirm('Delete this rule?')">
+                        <form method="POST" action="{{ route('pricing.destroy', $rule) }}" style="display: inline;" onsubmit="return confirm('{{ __('portal.pricing.delete_rule_confirm') }}')">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">
                                 <i class="fas fa-trash"></i>
@@ -132,7 +132,7 @@ body { font-family: 'Inter', sans-serif; }
                 @empty
                 <tr>
                     <td colspan="7" class="text-center text-muted py-4">
-                        No pricing rules yet. Add your first rule above.
+                        {{ __('portal.pricing.empty_rules') }}
                     </td>
                 </tr>
                 @endforelse
@@ -146,7 +146,7 @@ body { font-family: 'Inter', sans-serif; }
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Edit Pricing Rule</h5>
+                <h5>{{ __('portal.pricing.edit_rule') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="editRuleForm">
@@ -155,13 +155,13 @@ body { font-family: 'Inter', sans-serif; }
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Item *</label>
+                                <label>{{ __('portal.pricing.item') }} *</label>
                                 <input type="text" name="item" id="edit_item" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Level *</label>
+                                <label>{{ __('portal.pricing.level') }} *</label>
                                 <input type="text" name="level" id="edit_level" class="form-control" required>
                             </div>
                         </div>
@@ -169,31 +169,31 @@ body { font-family: 'Inter', sans-serif; }
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Rate ($) *</label>
+                                <label>{{ __('portal.pricing.rate') }} *</label>
                                 <input type="number" name="rate" id="edit_rate" class="form-control" step="0.01" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Unit *</label>
+                                <label>{{ __('portal.pricing.unit') }} *</label>
                                 <input type="text" name="unit" id="edit_unit" class="form-control" required>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Note *</label>
+                        <label>{{ __('portal.pricing.note') }} *</label>
                         <textarea name="note" id="edit_note" class="form-control" rows="2" required></textarea>
                     </div>
                     <div class="form-group">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="edit_is_active" name="is_active" value="1">
-                            <label class="form-check-label" for="edit_is_active">Active (visible to employees)</label>
+                            <label class="form-check-label" for="edit_is_active">{{ __('portal.pricing.active_visible_to_employees') }}</label>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update Rule
+                        <i class="fas fa-save"></i> {{ __('portal.pricing.update_rule') }}
                     </button>
                 </div>
             </form>

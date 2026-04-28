@@ -1,5 +1,6 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Manager Dashboard')
+@section('title', __('portal.internal.manager_page_title'))
+@section('page-title', __('portal.internal.manager_page_title'))
 @section('content')
 
 <style>
@@ -94,45 +95,45 @@
 </style>
 
 <div class="manager-hero">
-    <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">Manager Dashboard 🎯</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.95; font-size: 1.1rem;">Command center for all operations</p>
+    <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">{{ __('portal.internal.manager_hero_title') }}</h1>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.95; font-size: 1.1rem;">{{ __('portal.internal.manager_hero_subtitle') }}</p>
 </div>
 
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="stat-card-manager" style="border-color: #f59e0b;">
             <div class="stat-number-manager" style="color: #f59e0b;">{{ $stats['new_requests'] }}</div>
-            <div class="stat-label-manager">New Requests</div>
+            <div class="stat-label-manager">{{ __('portal.internal.stat_new_requests') }}</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card-manager" style="border-color: #10b981;">
             <div class="stat-number-manager" style="color: #10b981;">{{ $stats['active_projects'] }}</div>
-            <div class="stat-label-manager">Active Projects</div>
+            <div class="stat-label-manager">{{ __('portal.active_projects') }}</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card-manager" style="border-color: #3b82f6;">
             <div class="stat-number-manager" style="color: #3b82f6;">{{ $stats['team_count'] }}</div>
-            <div class="stat-label-manager">Team Members</div>
+            <div class="stat-label-manager">{{ __('portal.internal.stat_team_members') }}</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card-manager" style="border-color: #8b5cf6;">
             <div class="stat-number-manager" style="color: #8b5cf6;">{{ $stats['meetings_today'] }}</div>
-            <div class="stat-label-manager">Meetings Today</div>
+            <div class="stat-label-manager">{{ __('portal.internal.stat_meetings_today') }}</div>
         </div>
     </div>
 </div>
 
-<h4 class="mb-3" style="color: #1e293b; font-weight: 600;"><i class="fas fa-bell"></i> New Service Requests</h4>
+<h4 class="mb-3" style="color: #1e293b; font-weight: 600;"><i class="fas fa-bell"></i> {{ __('portal.internal.section_new_service_requests') }}</h4>
 
 <div class="row">
     <div class="col-lg-6">
         <div class="service-card-modern">
             <div class="service-header-modern">
-                <h3>💡 Idea Generation</h3>
-                <a href="{{ route('ideas.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3>💡 {{ __('portal.internal.service_idea_generation') }}</h3>
+                <a href="{{ route('ideas.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="service-content-modern">
                 @forelse($newIdeas as $idea)
@@ -145,20 +146,20 @@
                         <div class="text-end">
                             <span class="badge bg-{{ $idea->getStatusBadgeColor() }}">{{ $idea->getStatusLabel() }}</span>
                             <br>
-                            <a href="{{ route('ideas.manager.show', $idea) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> View</a>
+                            <a href="{{ route('ideas.manager.show', $idea) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No new ideas.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_no_ideas') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="service-card-modern">
             <div class="service-header-modern">
-                <h3>💬 Consultations</h3>
-                <a href="{{ route('consultations.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3>💬 {{ __('portal.internal.service_consultations') }}</h3>
+                <a href="{{ route('consultations.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="service-content-modern">
                 @forelse($newConsultations as $consultation)
@@ -171,20 +172,20 @@
                         <div class="text-end">
                             <span class="badge bg-info">{{ $consultation->category }}</span>
                             <br>
-                            <a href="{{ route('consultations.manager.show', $consultation) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> View</a>
+                            <a href="{{ route('consultations.manager.show', $consultation) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No new consultations.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_no_consultations') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="service-card-modern">
             <div class="service-header-modern">
-                <h3>🔍 Research & IP</h3>
-                <a href="{{ route('research.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3>🔍 {{ __('portal.internal.service_research_ip') }}</h3>
+                <a href="{{ route('research.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="service-content-modern">
                 @forelse($newResearch as $research)
@@ -197,12 +198,12 @@
                         <div class="text-end">
                             <span class="badge bg-{{ $research->getStatusBadgeColor() }}">{{ $research->getStatusLabel() }}</span>
                             <br>
-                            <a href="{{ route('research.manager.show', $research) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> View</a>
+                            <a href="{{ route('research.manager.show', $research) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No new research requests.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_no_research') }}</p>
                 @endforelse
             </div>
         </div>
@@ -211,8 +212,8 @@
     <div class="col-lg-6">
         <div class="service-card-modern">
             <div class="service-header-modern">
-                <h3>📄 IP Registration</h3>
-                <a href="{{ route('ip.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3>📄 {{ __('portal.internal.service_ip_registration') }}</h3>
+                <a href="{{ route('ip.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="service-content-modern">
                 @forelse($newIpRegistrations as $ip)
@@ -225,20 +226,20 @@
                         <div class="text-end">
                             <span class="badge bg-primary">{{ $ip->ip_type }}</span>
                             <br>
-                            <a href="{{ route('ip.manager.show', $ip) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> View</a>
+                            <a href="{{ route('ip.manager.show', $ip) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No new IP registrations.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_no_ip') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="service-card-modern">
             <div class="service-header-modern">
-                <h3>©️ Copyright</h3>
-                <a href="{{ route('copyright.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3>©️ {{ __('portal.internal.service_copyright') }}</h3>
+                <a href="{{ route('copyright.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="service-content-modern">
                 @forelse($newCopyrights as $copyright)
@@ -251,32 +252,32 @@
                         <div class="text-end">
                             <span class="badge bg-danger">{{ $copyright->work_type }}</span>
                             <br>
-                            <a href="{{ route('copyright.manager.show', $copyright) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> View</a>
+                            <a href="{{ route('copyright.manager.show', $copyright) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No new copyright requests.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_no_copyright') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="quick-stats-modern">
-            <h4 style="margin: 0 0 1rem 0; font-weight: 600;"><i class="fas fa-chart-line"></i> Quick Stats</h4>
+            <h4 style="margin: 0 0 1rem 0; font-weight: 600;"><i class="fas fa-chart-line"></i> {{ __('portal.internal.quick_stats') }}</h4>
             <div class="stat-row-modern">
-                <strong>Total Clients:</strong>
+                <strong>{{ __('portal.internal.total_clients') }}:</strong>
                 <span style="font-size: 1.25rem; font-weight: 700;">{{ $stats['total_clients'] }}</span>
             </div>
             <div class="stat-row-modern">
-                <strong>Active Projects:</strong>
+                <strong>{{ __('portal.active_projects') }}:</strong>
                 <span style="font-size: 1.25rem; font-weight: 700;">{{ $stats['active_projects'] }}</span>
             </div>
             <div class="stat-row-modern">
-                <strong>Pending Reviews:</strong>
+                <strong>{{ __('portal.internal.pending_reviews') }}:</strong>
                 <span style="font-size: 1.25rem; font-weight: 700;">{{ $stats['new_requests'] }}</span>
             </div>
             <div class="stat-row-modern">
-                <strong>Completed This Month:</strong>
+                <strong>{{ __('portal.internal.completed_this_month') }}:</strong>
                 <span style="font-size: 1.25rem; font-weight: 700;">{{ $stats['completed_month'] }}</span>
             </div>
         </div>

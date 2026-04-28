@@ -1,7 +1,7 @@
 @extends('layouts.internal-dashboard')
 
-@section('title', 'Internal Dashboard')
-@section('page-title', 'Internal Dashboard')
+@section('title', __('portal.internal.page_title'))
+@section('page-title', __('portal.internal.page_heading'))
 
 @section('content')
 <!-- Dashboard Grid -->
@@ -9,25 +9,25 @@
     <!-- Task Overview Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">My Tasks</h3>
+            <h3 class="widget-title">{{ __('portal.internal.my_tasks') }}</h3>
             <div class="widget-icon primary">
                 <i class="fas fa-tasks"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Track your assigned tasks and progress</p>
+            <p>{{ __('portal.internal.track_tasks_assigned') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">8</span>
-                    <span class="stat-label">Assigned</span>
+                    <span class="stat-label">{{ __('portal.internal.label_assigned') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">5</span>
-                    <span class="stat-label">In Progress</span>
+                    <span class="stat-label">{{ __('portal.client.requests.in_progress') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">12</span>
-                    <span class="stat-label">Completed</span>
+                    <span class="stat-label">{{ __('portal.stat_completed') }}</span>
                 </div>
             </div>
         </div>
@@ -36,26 +36,26 @@
     <!-- Service Requests Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Service Requests</h3>
+            <h3 class="widget-title">{{ __('portal.service_requests') }}</h3>
             <div class="widget-icon success">
                 <i class="fas fa-inbox"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Manage incoming service requests</p>
+            <p>{{ __('portal.internal.manage_incoming_requests') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">3</span>
-                    <span class="stat-label">New</span>
+                    <span class="stat-label">{{ __('portal.internal.label_new') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">7</span>
-                    <span class="stat-label">In Review</span>
+                    <span class="stat-label">{{ __('portal.stat_in_review') }}</span>
                 </div>
                 @if(auth()->user()->isManager())
                 <div class="stat-item">
                     <span class="stat-number">2</span>
-                    <span class="stat-label">Pending Approval</span>
+                    <span class="stat-label">{{ __('portal.internal.pending_approval') }}</span>
                 </div>
                 @endif
             </div>
@@ -65,25 +65,25 @@
     <!-- Project Status Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Project Status</h3>
+            <h3 class="widget-title">{{ __('portal.internal.project_status') }}</h3>
             <div class="widget-icon warning">
                 <i class="fas fa-folder-open"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Overview of your project involvement</p>
+            <p>{{ __('portal.internal.overview_project_involvement') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">4</span>
-                    <span class="stat-label">Active</span>
+                    <span class="stat-label">{{ __('portal.stat_active') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">2</span>
-                    <span class="stat-label">Planning</span>
+                    <span class="stat-label">{{ __('portal.internal.label_planning') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">6</span>
-                    <span class="stat-label">Completed</span>
+                    <span class="stat-label">{{ __('portal.stat_completed') }}</span>
                 </div>
             </div>
         </div>
@@ -93,25 +93,25 @@
     @if(auth()->user()->isManager() )
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Team Performance</h3>
+            <h3 class="widget-title">{{ __('portal.internal.team_performance') }}</h3>
             <div class="widget-icon info">
                 <i class="fas fa-users"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Monitor team productivity and metrics</p>
+            <p>{{ __('portal.internal.monitor_team_metrics') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">8</span>
-                    <span class="stat-label">Team Members</span>
+                    <span class="stat-label">{{ __('portal.internal.label_team_members') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">95%</span>
-                    <span class="stat-label">On Time</span>
+                    <span class="stat-label">{{ __('portal.internal.on_time') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">4.8</span>
-                    <span class="stat-label">Rating</span>
+                    <span class="stat-label">{{ __('portal.internal.rating') }}</span>
                 </div>
             </div>
         </div>
@@ -120,25 +120,25 @@
     <!-- Personal Performance Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">My Performance</h3>
+            <h3 class="widget-title">{{ __('portal.internal.my_performance') }}</h3>
             <div class="widget-icon info">
                 <i class="fas fa-chart-line"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Track your productivity and achievements</p>
+            <p>{{ __('portal.internal.track_productivity') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">98%</span>
-                    <span class="stat-label">On Time</span>
+                    <span class="stat-label">{{ __('portal.internal.on_time') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">4.9</span>
-                    <span class="stat-label">Rating</span>
+                    <span class="stat-label">{{ __('portal.internal.rating') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">25</span>
-                    <span class="stat-label">Tasks Done</span>
+                    <span class="stat-label">{{ __('portal.internal.tasks_done') }}</span>
                 </div>
             </div>
         </div>
@@ -149,8 +149,8 @@
 <!-- Recent Activity Card -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Recent Activity</h3>
-        <a href="#" class="btn btn-secondary btn-sm">View All</a>
+        <h3 class="card-title">{{ __('portal.internal.recent_activity') }}</h3>
+        <a href="#" class="btn btn-secondary btn-sm">{{ __('portal.internal.view_all') }}</a>
     </div>
     <div class="card-content">
         <div class="activity-list">
@@ -159,8 +159,8 @@
                     <i class="fas fa-check"></i>
                 </div>
                 <div class="activity-content">
-                    <p class="mb-1"><strong>Task "UI Design Review"</strong> completed</p>
-                    <small class="text-muted">1 hour ago</small>
+                    <p class="mb-1">{{ __('portal.internal.activity_line_1') }}</p>
+                    <small class="text-muted">{{ __('portal.internal.time_1_hour_ago') }}</small>
                 </div>
             </div>
             <div class="activity-item d-flex align-center mb-3">
@@ -168,8 +168,8 @@
                     <i class="fas fa-comment"></i>
                 </div>
                 <div class="activity-content">
-                    <p class="mb-1"><strong>New comment</strong> on Project "Mobile App"</p>
-                    <small class="text-muted">3 hours ago</small>
+                    <p class="mb-1">{{ __('portal.internal.activity_line_2') }}</p>
+                    <small class="text-muted">{{ __('portal.internal.time_3_hours_ago') }}</small>
                 </div>
             </div>
             <div class="activity-item d-flex align-center mb-3">
@@ -177,8 +177,8 @@
                     <i class="fas fa-inbox"></i>
                 </div>
                 <div class="activity-content">
-                    <p class="mb-1"><strong>New service request</strong> assigned to you</p>
-                    <small class="text-muted">5 hours ago</small>
+                    <p class="mb-1">{{ __('portal.internal.activity_line_3') }}</p>
+                    <small class="text-muted">{{ __('portal.internal.time_5_hours_ago') }}</small>
                 </div>
             </div>
             <div class="activity-item d-flex align-center mb-3">
@@ -186,8 +186,8 @@
                     <i class="fas fa-calendar"></i>
                 </div>
                 <div class="activity-content">
-                    <p class="mb-1"><strong>Meeting scheduled</strong> for tomorrow at 10:00 AM</p>
-                    <small class="text-muted">1 day ago</small>
+                    <p class="mb-1">{{ __('portal.internal.activity_line_4') }}</p>
+                    <small class="text-muted">{{ __('portal.internal.time_1_day_ago') }}</small>
                 </div>
             </div>
         </div>
@@ -197,26 +197,26 @@
 <!-- Quick Actions Card -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Quick Actions</h3>
+        <h3 class="card-title">{{ __('portal.internal.quick_actions') }}</h3>
     </div>
     <div class="card-content">
         <div class="d-flex gap-2 flex-wrap">
             <a href="#" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
-                Create Task
+                {{ __('portal.internal.create_task') }}
             </a>
             <a href="#" class="btn btn-secondary">
                 <i class="fas fa-calendar-plus"></i>
-                Schedule Meeting
+                {{ __('portal.internal.schedule_meeting') }}
             </a>
             <a href="#" class="btn btn-secondary">
                 <i class="fas fa-comment"></i>
-                Add Comment
+                {{ __('portal.internal.add_comment') }}
             </a>
             @if(auth()->user()->isManager())
             <a href="{{ route('service-requests.review-queue') }}" class="btn btn-secondary">
                 <i class="fas fa-check-circle"></i>
-                Review Requests
+                {{ __('portal.internal.review_requests') }}
             </a>
             @endif
         </div>
@@ -226,8 +226,8 @@
 <!-- Task List -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Recent Tasks</h3>
-        <a href="#" class="btn btn-secondary btn-sm">View All Tasks</a>
+        <h3 class="card-title">{{ __('portal.internal.recent_tasks') }}</h3>
+        <a href="#" class="btn btn-secondary btn-sm">{{ __('portal.internal.view_all_tasks') }}</a>
     </div>
     <div class="card-content">
         <div class="task-list">
@@ -237,12 +237,12 @@
                         <i class="fas fa-code"></i>
                     </div>
                     <div class="task-info">
-                        <h4 class="mb-1">Frontend Development</h4>
-                        <p class="text-muted mb-0">Mobile App Project</p>
+                        <h4 class="mb-1">{{ __('portal.internal.demo_task_frontend') }}</h4>
+                        <p class="text-muted mb-0">{{ __('portal.internal.demo_proj_mobile') }}</p>
                     </div>
                 </div>
                 <div class="task-status">
-                    <span class="status-badge success">In Progress</span>
+                    <span class="status-badge success">{{ __('portal.client.requests.in_progress') }}</span>
                     <div class="progress-bar mt-2">
                         <div class="progress-fill" style="width: 60%;"></div>
                     </div>
@@ -255,12 +255,12 @@
                         <i class="fas fa-palette"></i>
                     </div>
                     <div class="task-info">
-                        <h4 class="mb-1">UI Design Review</h4>
-                        <p class="text-muted mb-0">Website Project</p>
+                        <h4 class="mb-1">{{ __('portal.internal.demo_task_ui_design') }}</h4>
+                        <p class="text-muted mb-0">{{ __('portal.internal.demo_proj_website') }}</p>
                     </div>
                 </div>
                 <div class="task-status">
-                    <span class="status-badge success">Completed</span>
+                    <span class="status-badge success">{{ __('portal.stat_completed') }}</span>
                     <div class="progress-bar mt-2">
                         <div class="progress-fill" style="width: 100%;"></div>
                     </div>
@@ -273,12 +273,12 @@
                         <i class="fas fa-search"></i>
                     </div>
                     <div class="task-info">
-                        <h4 class="mb-1">Research & Analysis</h4>
-                        <p class="text-muted mb-0">Market Research Project</p>
+                        <h4 class="mb-1">{{ __('portal.internal.demo_task_research') }}</h4>
+                        <p class="text-muted mb-0">{{ __('portal.internal.demo_proj_market') }}</p>
                     </div>
                 </div>
                 <div class="task-status">
-                    <span class="status-badge warning">Pending</span>
+                    <span class="status-badge warning">{{ __('portal.stat_pending') }}</span>
                     <div class="progress-bar mt-2">
                         <div class="progress-fill" style="width: 30%;"></div>
                     </div>
@@ -292,8 +292,8 @@
 <!-- Service Request Queue -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Service Request Queue</h3>
-        <a href="#" class="btn btn-secondary btn-sm">View All Requests</a>
+        <h3 class="card-title">{{ __('portal.internal.service_request_queue') }}</h3>
+        <a href="#" class="btn btn-secondary btn-sm">{{ __('portal.internal.view_all_requests') }}</a>
     </div>
     <div class="card-content">
         <div class="request-list">
@@ -303,13 +303,13 @@
                         <i class="fas fa-lightbulb"></i>
                     </div>
                     <div class="request-info">
-                        <h4 class="mb-1">Idea Generation Request</h4>
-                        <p class="text-muted mb-0">Client: John Smith • Submitted 2 hours ago</p>
+                        <h4 class="mb-1">{{ __('portal.internal.demo_idea_gen_title') }}</h4>
+                        <p class="text-muted mb-0">{{ __('portal.internal.demo_meta_smith') }}</p>
                     </div>
                 </div>
                 <div class="request-actions">
-                    <a href="#" class="btn btn-success btn-sm">Approve</a>
-                    <a href="#" class="btn btn-error btn-sm">Reject</a>
+                    <a href="#" class="btn btn-success btn-sm">{{ __('portal.internal.approve') }}</a>
+                    <a href="#" class="btn btn-error btn-sm">{{ __('portal.internal.reject') }}</a>
                 </div>
             </div>
             
@@ -319,13 +319,13 @@
                         <i class="fas fa-comments"></i>
                     </div>
                     <div class="request-info">
-                        <h4 class="mb-1">Consultation Request</h4>
-                        <p class="text-muted mb-0">Client: Sarah Johnson • Submitted 1 day ago</p>
+                        <h4 class="mb-1">{{ __('portal.internal.demo_consultation_title') }}</h4>
+                        <p class="text-muted mb-0">{{ __('portal.internal.demo_meta_johnson') }}</p>
                     </div>
                 </div>
                 <div class="request-actions">
-                    <a href="#" class="btn btn-success btn-sm">Approve</a>
-                    <a href="#" class="btn btn-error btn-sm">Reject</a>
+                    <a href="#" class="btn btn-success btn-sm">{{ __('portal.internal.approve') }}</a>
+                    <a href="#" class="btn btn-error btn-sm">{{ __('portal.internal.reject') }}</a>
                 </div>
             </div>
         </div>

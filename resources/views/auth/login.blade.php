@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - VujaDe Platform</title>
+    <title>{{ __('portal.login_page_title') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -146,14 +146,20 @@
             color: #6b7280;
             font-size: 14px;
         }
+        .auth-card .locale-switcher .btn {
+            min-width: 2.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
+            <div class="d-flex justify-content-end mb-2">
+                @include('partials.locale-switcher')
+            </div>
             <div class="logo">
                 <h1>VujaDe</h1>
-                <p>Welcome back to your platform</p>
+                <p>{{ __('portal.welcome_back') }}</p>
             </div>
 
             @if ($errors->any())
@@ -170,9 +176,9 @@
                 <div class="form-floating">
                     <input type="email" class="form-control @error('email') is-invalid @enderror" 
                            id="email" name="email" value="{{ old('email') }}" 
-                           placeholder="Email Address" required autofocus>
+                           placeholder="{{ __('portal.email_address') }}" required autofocus>
                     <label for="email">
-                        <i class="fas fa-envelope me-2"></i>Email Address
+                        <i class="fas fa-envelope me-2"></i>{{ __('portal.email_address') }}
                     </label>
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -181,9 +187,9 @@
 
                 <div class="form-floating">
                     <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                           id="password" name="password" placeholder="Password" required>
+                           id="password" name="password" placeholder="{{ __('portal.password') }}" required>
                     <label for="password">
-                        <i class="fas fa-lock me-2"></i>Password
+                        <i class="fas fa-lock me-2"></i>{{ __('portal.password') }}
                     </label>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -192,11 +198,11 @@
 
                 <div class="remember-me">
                     <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                    <label class="form-check-label" for="remember">Remember me</label>
+                    <label class="form-check-label" for="remember">{{ __('portal.remember_me') }}</label>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    <i class="fas fa-sign-in-alt me-2"></i>{{ __('portal.sign_in') }}
                 </button>
             </form>
 
@@ -222,11 +228,11 @@
 
             <div class="auth-links">
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}">Forgot your password?</a>
+                    <a href="{{ route('password.request') }}">{{ __('portal.forgot_password') }}</a>
                 @endif
                 <br>
-                <span style="color: #6b7280;">Don't have an account?</span>
-                <a href="{{ route('register') }}">Sign up</a>
+                <span style="color: #6b7280;">{{ __('portal.no_account') }}</span>
+                <a href="{{ route('register') }}">{{ __('portal.sign_up') }}</a>
             </div>
         </div>
     </div>

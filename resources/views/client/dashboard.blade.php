@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Client Dashboard')
-@section('page-title', 'Dashboard')
+@section('title', __('portal.client_dashboard'))
+@section('page-title', __('portal.dashboard'))
 
 @section('content')
 <!-- Dashboard Grid -->
@@ -9,25 +9,25 @@
     <!-- Active Projects Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Active Projects</h3>
+            <h3 class="widget-title">{{ __('portal.active_projects') }}</h3>
             <div class="widget-icon primary">
                 <i class="fas fa-folder-open"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Track your ongoing projects and their progress</p>
+            <p>{{ __('portal.active_projects_desc') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['active_projects'] }}</span>
-                    <span class="stat-label">Active</span>
+                    <span class="stat-label">{{ __('portal.stat_active') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['pending_projects'] }}</span>
-                    <span class="stat-label">Pending</span>
+                    <span class="stat-label">{{ __('portal.stat_pending') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['completed_projects'] }}</span>
-                    <span class="stat-label">Completed</span>
+                    <span class="stat-label">{{ __('portal.stat_completed') }}</span>
                 </div>
             </div>
         </div>
@@ -36,21 +36,21 @@
     <!-- Service Requests Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Service Requests</h3>
+            <h3 class="widget-title">{{ __('portal.service_requests') }}</h3>
             <div class="widget-icon success">
                 <i class="fas fa-lightbulb"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Submit new service requests or track existing ones</p>
+            <p>{{ __('portal.service_requests_desc') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['requests_in_review'] }}</span>
-                    <span class="stat-label">In Review</span>
+                    <span class="stat-label">{{ __('portal.stat_in_review') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['requests_approved'] }}</span>
-                    <span class="stat-label">Approved</span>
+                    <span class="stat-label">{{ __('portal.stat_approved') }}</span>
                 </div>
             </div>
         </div>
@@ -59,21 +59,21 @@
     <!-- Upcoming Meetings Widget -->
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Upcoming Meetings</h3>
+            <h3 class="widget-title">{{ __('portal.upcoming_meetings') }}</h3>
             <div class="widget-icon warning">
                 <i class="fas fa-calendar-alt"></i>
             </div>
         </div>
         <div class="widget-content">
-            <p>Your scheduled meetings and consultations</p>
+            <p>{{ __('portal.upcoming_meetings_desc') }}</p>
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['meetings_this_week'] }}</span>
-                    <span class="stat-label">This Week</span>
+                    <span class="stat-label">{{ __('portal.stat_this_week') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['meetings_today'] }}</span>
-                    <span class="stat-label">Today</span>
+                    <span class="stat-label">{{ __('portal.stat_today') }}</span>
                 </div>
             </div>
         </div>

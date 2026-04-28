@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Email - VujaDe Platform</title>
+    <title>{{ __('portal.auth.verify_page_title') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -111,14 +111,20 @@
             color: #2563eb;
             margin-right: 10px;
         }
+        .auth-card .locale-switcher .btn {
+            min-width: 2.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
+            <div class="d-flex justify-content-end mb-2">
+                @include('partials.locale-switcher')
+            </div>
             <div class="logo">
                 <h1>VujaDe</h1>
-                <p>Email verification required</p>
+                <p>{{ __('portal.auth.verify_tagline') }}</p>
             </div>
 
             <div class="verify-icon">
@@ -127,33 +133,33 @@
 
             @if (session('resent'))
                 <div class="success-message">
-                    <i class="fas fa-check-circle me-2"></i>A fresh verification link has been sent to your email address.
+                    <i class="fas fa-check-circle me-2"></i>{{ __('portal.auth.verify_resent_message') }}
                 </div>
             @endif
 
             <p class="info-text">
-                Before proceeding, please check your email for a verification link. We've sent a verification email to your registered email address.
+                {{ __('portal.auth.verify_intro') }}
             </p>
 
             <div class="d-flex align-items-center justify-content-center mb-4">
                 <i class="email-icon fas fa-envelope"></i>
-                <span style="color: #374151; font-weight: 500;">Check your inbox</span>
+                <span style="color: #374151; font-weight: 500;">{{ __('portal.auth.verify_check_inbox') }}</span>
             </div>
 
             <p class="info-text">
-                If you did not receive the email, you can request another verification link.
+                {{ __('portal.auth.verify_resend_hint') }}
             </p>
 
             <form method="POST" action="{{ route('verification.resend') }}">
                 @csrf
                 <button type="submit" class="btn btn-outline-primary">
-                    <i class="fas fa-paper-plane me-2"></i>Resend Verification Email
+                    <i class="fas fa-paper-plane me-2"></i>{{ __('portal.auth.resend_verification') }}
                 </button>
             </form>
 
             <div class="auth-links">
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+                    <i class="fas fa-sign-out-alt me-2"></i>{{ __('portal.auth.sign_out') }}
                 </a>
             </div>
 

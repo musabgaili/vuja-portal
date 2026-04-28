@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome | Vujade Project System</title>
+    <title>{{ __('portal.welcome.page_title') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://vujadesa.com/img/favicon.png"/>
     <style>
@@ -90,6 +90,22 @@
             color: #fff3d1;
             text-shadow: 0 1px 5px #a770ef88;
         }
+        .locale-switch-welcome {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .locale-switch-welcome a {
+            color: #d4ceef;
+            text-decoration: none;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        .locale-switch-welcome a:hover { color: #fff; opacity: 1; }
         .bubbles {
             position: absolute;
             left: 0; top: 0;
@@ -113,6 +129,11 @@
     </style>
 </head>
 <body>
+    <div class="locale-switch-welcome">
+        <a href="{{ route('locale', ['locale' => 'en']) }}">{{ __('portal.language_en') }}</a>
+        <span style="color:#d4ceef;opacity:0.6;">|</span>
+        <a href="{{ route('locale', ['locale' => 'ar']) }}">{{ __('portal.language_ar') }}</a>
+    </div>
     <div class="bubbles">
         <div class="bubble" style="width:130px;height:130px;left:12vw;top:60vh;background:#a770ef;animation-delay:0s;"></div>
         <div class="bubble" style="width:90px;height:90px;left:55vw;top:72vh;background:#34e8f7;animation-delay:2s;"></div>
@@ -121,19 +142,19 @@
         <div class="bubble" style="width:80px;height:80px;left:87vw;top:85vh;background:#a770ef;animation-delay:5s;"></div>
     </div>
     <main style="z-index:2;position:relative;text-align:center;">
-        <img class="vujade-logo" src="https://vujadesa.com/img/vujade-logo.svg" alt="Vujade Logo" />
-        <h1>Welcome to Vujade</h1>
+        <img class="vujade-logo" src="https://vujadesa.com/img/vujade-logo.svg" alt="{{ __('portal.welcome.logo_alt') }}" />
+        <h1>{{ __('portal.welcome.heading') }}</h1>
         <div class="subtitle">
-            Reimagining project collaboration.<br>
-            The next generation project and idea platform by <a href="https://vujadesa.com" style="color:#34e8f7;font-weight:700;text-decoration:none;" target="_blank">Vujadesa</a>.
+            {{ __('portal.welcome.subtitle_line1') }}<br>
+            {{ __('portal.welcome.subtitle_line2') }} <a href="https://vujadesa.com" style="color:#34e8f7;font-weight:700;text-decoration:none;" target="_blank">Vujadesa</a>.
         </div>
         <div class="cta-buttons">
-            <a href="{{ route('login') }}" class="btn">Sign In</a>
-            <a href="{{ route('register') }}" class="btn" style="background:linear-gradient(90deg,#fccb90 0%,#a770ef 100%);color:#432b67;">Get Started</a>
-            <a href="https://vujadesa.com" class="btn" style="background:linear-gradient(100deg,#f6d365,#fccb90);color:#634f25;" target="_blank">Learn More</a>
+            <a href="{{ route('login') }}" class="btn">{{ __('portal.sign_in') }}</a>
+            <a href="{{ route('register') }}" class="btn" style="background:linear-gradient(90deg,#fccb90 0%,#a770ef 100%);color:#432b67;">{{ __('portal.welcome.get_started') }}</a>
+            <a href="https://vujadesa.com" class="btn" style="background:linear-gradient(100deg,#f6d365,#fccb90);color:#634f25;" target="_blank">{{ __('portal.welcome.learn_more') }}</a>
         </div>
         <a class="footer-link" href="https://vujadesa.com" target="_blank">
-            &copy; {{ date('Y') }} Vujadesa — Explore ideas. Unlock progress.
+            &copy; {{ date('Y') }} Vujadesa — {{ __('portal.welcome.footer_tagline') }}
         </a>
     </main>
 </body>

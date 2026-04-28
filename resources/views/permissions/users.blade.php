@@ -1,14 +1,14 @@
 @extends('layouts.internal-dashboard')
 
-@section('title', 'User Roles')
-@section('page-title', 'Assign User Roles & Permissions')
+@section('title', __('portal.permissions.user_roles_title'))
+@section('page-title', __('portal.permissions.assign_user_roles_permissions'))
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">User Role Management</h3>
+        <h3 class="card-title">{{ __('portal.permissions.user_role_management') }}</h3>
         <a href="{{ route('permissions.index') }}" class="btn btn-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Back
+            <i class="fas fa-arrow-left"></i> {{ __('portal.permissions.back') }}
         </a>
     </div>
     <div class="card-content">
@@ -16,11 +16,11 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Current Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>{{ __('portal.permissions.user') }}</th>
+                        <th>{{ __('portal.email_address') }}</th>
+                        <th>{{ __('portal.permissions.current_role') }}</th>
+                        <th>{{ __('portal.permissions.status') }}</th>
+                        <th>{{ __('portal.team.col_actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +66,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Change Role for <span id="userName"></span></h5>
+                <h5 class="modal-title">{{ __('portal.permissions.change_role_for') }} <span id="userName"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('permissions.assign-role') }}">
@@ -74,7 +74,7 @@
                 <input type="hidden" name="user_id" id="userId">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Select New Role *</label>
+                        <label class="form-label">{{ __('portal.permissions.select_new_role') }} *</label>
                         <select name="role_name" class="form-control" id="roleSelect" required>
                             @foreach($roles as $role)
                             <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
@@ -84,19 +84,19 @@
                     
                     <div class="alert alert-info mt-3">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Role Descriptions:</strong>
+                        <strong>{{ __('portal.permissions.role_descriptions') }}</strong>
                         <ul class="mb-0 mt-2">
-                            <li><strong>Client:</strong> Can submit requests, view their own data</li>
-                            <li><strong>Employee:</strong> Can view assigned tasks, send meeting invites</li>
-                            <li><strong>Manager:</strong> Full access to manage all requests and users</li>
-                            <li><strong>Project Manager:</strong> Can manage assigned projects and teams</li>
+                            <li><strong>{{ __('portal.permissions.client') }}:</strong> {{ __('portal.permissions.client_desc_short') }}</li>
+                            <li><strong>{{ __('portal.permissions.employee') }}:</strong> {{ __('portal.permissions.employee_desc_short') }}</li>
+                            <li><strong>{{ __('portal.permissions.manager') }}:</strong> {{ __('portal.permissions.manager_desc_short') }}</li>
+                            <li><strong>{{ __('portal.permissions.project_manager') }}:</strong> {{ __('portal.permissions.project_manager_desc_short') }}</li>
                         </ul>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update Role
+                        <i class="fas fa-save"></i> {{ __('portal.permissions.update_role') }}
                     </button>
                 </div>
             </form>

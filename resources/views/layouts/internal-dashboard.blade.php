@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -160,12 +160,13 @@
                 <div class="header-left">
                     <h1>@yield('title', 'Dashboard')</h1>
                 </div>
-                <div class="header-right">
+                <div class="header-right d-flex align-items-center gap-2">
+                    @include('partials.locale-switcher')
                     <div class="user-menu">
                         <span class="user-name">{{ auth()->user()->name }}</span>
                         {{-- <span class="user-role">{{ ucfirst(auth()->user()->role->value) }}</span> --}}
                         <i class="fas fa-user"></i>
-                    </a>
+                    </div>
                 </div>
             </header>
 

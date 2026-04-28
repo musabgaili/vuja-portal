@@ -1,9 +1,9 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Quoting Tasks')
+@section('title', __('portal.pricing.quoting_tasks_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item">Quote System</li>
-<li class="breadcrumb-item active">Quoting Tasks</li>
+<li class="breadcrumb-item">{{ __('portal.pricing.quote_system') }}</li>
+<li class="breadcrumb-item active">{{ __('portal.pricing.quoting_tasks_breadcrumb') }}</li>
 @endsection
 
 @section('content')
@@ -45,9 +45,9 @@ body { font-family: 'Inter', sans-serif; }
 <div class="quote-header">
     <div class="text-center">
         <h1 class="text-3xl font-bold mb-2">
-            <i class="fas fa-file-invoice-dollar"></i> Quoting Tasks
+            <i class="fas fa-file-invoice-dollar"></i> {{ __('portal.pricing.quoting_tasks_heading') }}
         </h1>
-        <p class="opacity-90">Projects awaiting quotation - Upload quote documents for planning phase projects</p>
+        <p class="opacity-90">{{ __('portal.pricing.quoting_tasks_subtitle') }}</p>
     </div>
 </div>
 
@@ -61,7 +61,7 @@ body { font-family: 'Inter', sans-serif; }
                     <h5 class="mb-1"><strong>{{ $project->title }}</strong></h5>
                     <small class="text-muted">#{{ $project->id }}</small>
                 </div>
-                <span class="badge bg-warning">Planning</span>
+                <span class="badge bg-warning">{{ __('portal.pricing.planning') }}</span>
             </div>
 
             @if($project->client)
@@ -80,9 +80,9 @@ body { font-family: 'Inter', sans-serif; }
             @if($project->quote_file)
             <div class="mb-3 p-2 bg-light rounded">
                 <i class="fas fa-file-pdf text-danger"></i>
-                <span class="ms-2 small">Quote uploaded</span>
+                <span class="ms-2 small">{{ __('portal.pricing.quote_uploaded') }}</span>
                 @if($project->quotedBy)
-                <br><small class="text-muted ms-3">by {{ $project->quotedBy->name }}</small>
+                <br><small class="text-muted ms-3">{{ __('portal.pricing.by') }} {{ $project->quotedBy->name }}</small>
                 @endif
                 @if($project->quoted_at)
                 <br><small class="text-muted ms-3">{{ $project->quoted_at->format('M d, Y H:i') }}</small>
@@ -92,18 +92,18 @@ body { font-family: 'Inter', sans-serif; }
 
             <div class="d-grid gap-2">
                 <a href="{{ route('projects.manager.show', $project) }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-eye"></i> View Project
+                    <i class="fas fa-eye"></i> {{ __('portal.pricing.view_project') }}
                 </a>
                 @if($project->quote_file)
                 <button class="btn btn-sm btn-success" onclick="updateQuote({{ $project->id }})">
-                    <i class="fas fa-edit"></i> Update Quote
+                    <i class="fas fa-edit"></i> {{ __('portal.pricing.update_quote') }}
                 </button>
                 <a href="{{ route('projects.quote.download', $project) }}" class="btn btn-sm btn-secondary">
-                    <i class="fas fa-download"></i> Download
+                    <i class="fas fa-download"></i> {{ __('portal.pricing.download') }}
                 </a>
                 @else
                 <button class="btn btn-sm btn-primary" onclick="uploadQuote({{ $project->id }})">
-                    <i class="fas fa-upload"></i> Upload Quote
+                    <i class="fas fa-upload"></i> {{ __('portal.pricing.upload_quote') }}
                 </button>
                 @endif
             </div>
@@ -118,8 +118,8 @@ body { font-family: 'Inter', sans-serif; }
 @else
 <div class="text-center py-5">
     <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
-    <h4>No Projects in Planning Phase</h4>
-    <p class="text-muted">Projects assigned to you in planning phase will appear here for quotation.</p>
+    <h4>{{ __('portal.pricing.empty_planning_projects_title') }}</h4>
+    <p class="text-muted">{{ __('portal.pricing.empty_planning_projects_body') }}</p>
 </div>
 @endif
 
@@ -135,18 +135,18 @@ body { font-family: 'Inter', sans-serif; }
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Quote Document *</label>
+                        <label>{{ __('portal.pricing.quote_document') }} *</label>
                         <input type="file" name="quote_file" class="form-control" accept=".pdf,.doc,.docx" required>
-                        <small class="text-muted">Accepted: PDF, DOC, DOCX (Max: 10MB)</small>
+                        <small class="text-muted">{{ __('portal.pricing.quote_document_help') }}</small>
                     </div>
                     <div class="form-group">
-                        <label>Notes (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Any additional notes..."></textarea>
+                        <label>{{ __('portal.pricing.notes_optional') }}</label>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="{{ __('portal.pricing.notes_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Quote
+                        <i class="fas fa-upload"></i> {{ __('portal.pricing.upload_quote') }}
                     </button>
                 </div>
             </form>
@@ -158,13 +158,13 @@ body { font-family: 'Inter', sans-serif; }
 @push('scripts')
 <script>
 function uploadQuote(projectId) {
-    document.getElementById('modalTitle').textContent = 'Upload Quote';
+    document.getElementById('modalTitle').textContent = @js(__('portal.pricing.upload_quote'));
     document.getElementById('quoteForm').action = `/internal/projects/${projectId}/upload-quote`;
     new bootstrap.Modal(document.getElementById('uploadQuoteModal')).show();
 }
 
 function updateQuote(projectId) {
-    document.getElementById('modalTitle').textContent = 'Update Quote';
+    document.getElementById('modalTitle').textContent = @js(__('portal.pricing.update_quote'));
     document.getElementById('quoteForm').action = `/internal/projects/${projectId}/upload-quote`;
     new bootstrap.Modal(document.getElementById('uploadQuoteModal')).show();
 }

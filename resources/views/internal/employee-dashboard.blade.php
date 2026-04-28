@@ -1,5 +1,6 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'My Dashboard')
+@section('title', __('portal.internal.employee_page_title'))
+@section('page-title', __('portal.internal.employee_page_title'))
 @section('content')
 
 <style>
@@ -82,33 +83,33 @@
 </style>
 
 <div class="modern-hero">
-    <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">Welcome back, {{ auth()->user()->name }}! 👋</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.95; font-size: 1.1rem;">Here's what's on your plate today</p>
+    <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">{{ __('portal.internal.employee_welcome', ['name' => auth()->user()->name]) }}</h1>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.95; font-size: 1.1rem;">{{ __('portal.internal.employee_subtitle') }}</p>
 </div>
 
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="stat-card-modern" style="border-color: #3b82f6;">
             <div class="stat-number-modern">{{ $stats['total_assigned'] }}</div>
-            <div class="stat-label-modern">Assigned to Me</div>
+            <div class="stat-label-modern">{{ __('portal.internal.assigned_to_me') }}</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card-modern" style="border-color: #f59e0b;">
             <div class="stat-number-modern">{{ $stats['in_progress'] }}</div>
-            <div class="stat-label-modern">In Progress</div>
+            <div class="stat-label-modern">{{ __('portal.client.requests.in_progress') }}</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card-modern" style="border-color: #10b981;">
             <div class="stat-number-modern">{{ $stats['meetings_today'] }}</div>
-            <div class="stat-label-modern">Meetings Today</div>
+            <div class="stat-label-modern">{{ __('portal.internal.stat_meetings_today') }}</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card-modern" style="border-color: #8b5cf6;">
             <div class="stat-number-modern">{{ $stats['assigned_projects'] ?? 0 }}</div>
-            <div class="stat-label-modern">Active Projects</div>
+            <div class="stat-label-modern">{{ __('portal.active_projects') }}</div>
         </div>
     </div>
 </div>
@@ -117,8 +118,8 @@
     <div class="col-lg-6">
         <div class="card-modern">
             <div class="card-modern-header">
-                <h3><i class="fas fa-lightbulb text-warning"></i> My Assigned Ideas</h3>
-                <a href="{{ route('ideas.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3><i class="fas fa-lightbulb text-warning"></i> {{ __('portal.internal.my_assigned_ideas') }}</h3>
+                <a href="{{ route('ideas.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="card-modern-content">
                 @forelse($assignedIdeas as $idea)
@@ -132,15 +133,15 @@
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No ideas assigned to you.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_ideas') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="card-modern">
             <div class="card-modern-header">
-                <h3><i class="fas fa-comments text-info"></i> My Consultations</h3>
-                <a href="{{ route('consultations.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3><i class="fas fa-comments text-info"></i> {{ __('portal.internal.my_consultations') }}</h3>
+                <a href="{{ route('consultations.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="card-modern-content">
                 @forelse($assignedConsultations as $consultation)
@@ -154,7 +155,7 @@
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No consultations assigned to you.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_consultations') }}</p>
                 @endforelse
             </div>
         </div>
@@ -163,8 +164,8 @@
     <div class="col-lg-6">
         <div class="card-modern">
             <div class="card-modern-header">
-                <h3><i class="fas fa-search text-success"></i> My Research Projects</h3>
-                <a href="{{ route('research.manager.index') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3><i class="fas fa-search text-success"></i> {{ __('portal.internal.my_research_projects') }}</h3>
+                <a href="{{ route('research.manager.index') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="card-modern-content">
                 @forelse($assignedResearch as $research)
@@ -178,15 +179,15 @@
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> No research projects assigned to you.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-inbox"></i> {{ __('portal.internal.empty_research') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="card-modern">
             <div class="card-modern-header">
-                <h3><i class="fas fa-calendar-alt text-primary"></i> My Meetings This Week</h3>
-                <a href="{{ route('meetings.internal.my-meetings') }}" class="btn btn-sm btn-primary">View All</a>
+                <h3><i class="fas fa-calendar-alt text-primary"></i> {{ __('portal.internal.my_meetings_week') }}</h3>
+                <a href="{{ route('meetings.internal.my-meetings') }}" class="btn btn-sm btn-primary">{{ __('portal.internal.view_all') }}</a>
             </div>
             <div class="card-modern-content">
                 @forelse($upcomingMeetings as $meeting)
@@ -201,7 +202,7 @@
                     </div>
                 </div>
                 @empty
-                <p class="text-muted text-center py-4"><i class="fas fa-calendar-times"></i> No meetings this week.</p>
+                <p class="text-muted text-center py-4"><i class="fas fa-calendar-times"></i> {{ __('portal.internal.empty_meetings_week') }}</p>
                 @endforelse
             </div>
         </div>

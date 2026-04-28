@@ -1,14 +1,14 @@
 @extends('layouts.dashboard')
 
-@section('title', 'My Requests')
-@section('page-title', 'My Service Requests')
+@section('title', __('portal.client.requests.page_title'))
+@section('page-title', __('portal.client.requests.page_heading'))
 
 @section('content')
 <!-- Summary Stats -->
 <div class="dashboard-grid mb-4">
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Total Requests</h3>
+            <h3 class="widget-title">{{ __('portal.client.requests.total_requests') }}</h3>
             <div class="widget-icon primary">
                 <i class="fas fa-list"></i>
             </div>
@@ -17,7 +17,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $summary['total'] }}</span>
-                    <span class="stat-label">All Time</span>
+                    <span class="stat-label">{{ __('portal.client.requests.all_time') }}</span>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Pending</h3>
+            <h3 class="widget-title">{{ __('portal.client.requests.pending') }}</h3>
             <div class="widget-icon warning">
                 <i class="fas fa-clock"></i>
             </div>
@@ -34,7 +34,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $summary['pending'] }}</span>
-                    <span class="stat-label">Awaiting Review</span>
+                    <span class="stat-label">{{ __('portal.client.requests.awaiting_review') }}</span>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">In Progress</h3>
+            <h3 class="widget-title">{{ __('portal.client.requests.in_progress') }}</h3>
             <div class="widget-icon info">
                 <i class="fas fa-spinner"></i>
             </div>
@@ -51,7 +51,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $summary['in_progress'] }}</span>
-                    <span class="stat-label">Active</span>
+                    <span class="stat-label">{{ __('portal.stat_active') }}</span>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Completed</h3>
+            <h3 class="widget-title">{{ __('portal.stat_completed') }}</h3>
             <div class="widget-icon success">
                 <i class="fas fa-check-circle"></i>
             </div>
@@ -68,7 +68,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $summary['completed'] }}</span>
-                    <span class="stat-label">Finished</span>
+                    <span class="stat-label">{{ __('portal.client.requests.finished') }}</span>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
 <!-- Service Type Breakdown -->
 <div class="card mb-4">
     <div class="card-header">
-        <h3 class="card-title">Requests by Service Type</h3>
+        <h3 class="card-title">{{ __('portal.client.requests.by_service_type') }}</h3>
     </div>
     <div class="card-content">
         <div class="service-breakdown">
@@ -86,35 +86,35 @@
                 <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
                 <div>
                     <strong>{{ $summary['ideas'] }}</strong>
-                    <span>Ideas</span>
+                    <span>{{ __('portal.client.requests.ideas') }}</span>
                 </div>
             </div>
             <div class="service-stat" style="border-left-color: #10b981;">
                 <i class="fas fa-comments" style="color: #10b981;"></i>
                 <div>
                     <strong>{{ $summary['consultations'] }}</strong>
-                    <span>Consultations</span>
+                    <span>{{ __('portal.client.requests.consultations') }}</span>
                 </div>
             </div>
             <div class="service-stat" style="border-left-color: #3b82f6;">
                 <i class="fas fa-search" style="color: #3b82f6;"></i>
                 <div>
                     <strong>{{ $summary['research'] }}</strong>
-                    <span>Research</span>
+                    <span>{{ __('portal.client.requests.research') }}</span>
                 </div>
             </div>
             <div class="service-stat" style="border-left-color: #8b5cf6;">
                 <i class="fas fa-file-contract" style="color: #8b5cf6;"></i>
                 <div>
                     <strong>{{ $summary['ip'] }}</strong>
-                    <span>IP Registration</span>
+                    <span>{{ __('portal.client.requests.ip_registration') }}</span>
                 </div>
             </div>
             <div class="service-stat" style="border-left-color: #ec4899;">
                 <i class="fas fa-copyright" style="color: #ec4899;"></i>
                 <div>
                     <strong>{{ $summary['copyright'] }}</strong>
-                    <span>Copyright</span>
+                    <span>{{ __('portal.client.requests.copyright') }}</span>
                 </div>
             </div>
         </div>
@@ -124,23 +124,23 @@
 <!-- All Requests Table -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">All My Requests</h3>
+        <h3 class="card-title">{{ __('portal.client.requests.all_my_requests') }}</h3>
         <div class="d-flex gap-2">
             <select class="form-control" style="width: auto;" onchange="filterByType(this.value)">
-                <option value="">All Services</option>
-                <option value="idea" {{ $typeFilter === 'idea' ? 'selected' : '' }}>Ideas</option>
-                <option value="consultation" {{ $typeFilter === 'consultation' ? 'selected' : '' }}>Consultations</option>
-                <option value="research" {{ $typeFilter === 'research' ? 'selected' : '' }}>Research</option>
-                <option value="ip" {{ $typeFilter === 'ip' ? 'selected' : '' }}>IP Registration</option>
-                <option value="copyright" {{ $typeFilter === 'copyright' ? 'selected' : '' }}>Copyright</option>
+                <option value="">{{ __('portal.client.requests.all_services') }}</option>
+                <option value="idea" {{ $typeFilter === 'idea' ? 'selected' : '' }}>{{ __('portal.client.requests.ideas') }}</option>
+                <option value="consultation" {{ $typeFilter === 'consultation' ? 'selected' : '' }}>{{ __('portal.client.requests.consultations') }}</option>
+                <option value="research" {{ $typeFilter === 'research' ? 'selected' : '' }}>{{ __('portal.client.requests.research') }}</option>
+                <option value="ip" {{ $typeFilter === 'ip' ? 'selected' : '' }}>{{ __('portal.client.requests.ip_registration') }}</option>
+                <option value="copyright" {{ $typeFilter === 'copyright' ? 'selected' : '' }}>{{ __('portal.client.requests.copyright') }}</option>
             </select>
             <select class="form-control" style="width: auto;" onchange="filterByStatus(this.value)">
-                <option value="">All Status</option>
-                <option value="submitted">Submitted</option>
-                <option value="negotiation">Negotiation</option>
-                <option value="approved">Approved</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
+                <option value="">{{ __('portal.client.requests.all_status') }}</option>
+                <option value="submitted">{{ __('portal.client.requests.status_submitted') }}</option>
+                <option value="negotiation">{{ __('portal.client.requests.status_negotiation') }}</option>
+                <option value="approved">{{ __('portal.client.requests.status_approved') }}</option>
+                <option value="in_progress">{{ __('portal.client.requests.status_in_progress') }}</option>
+                <option value="completed">{{ __('portal.client.requests.status_completed') }}</option>
             </select>
         </div>
     </div>
@@ -160,9 +160,9 @@
                                     <span class="badge" style="background: {{ $req['type_color'] }}; color: white;">
                                         {{ $req['type_label'] }}
                                     </span>
-                                    • Submitted {{ $req['created_at']->format('M d, Y') }}
+                                    • {{ __('portal.client.requests.submitted') }} {{ $req['created_at']->format('M d, Y') }}
                                     @if($req['assigned_to'])
-                                        • Assigned to {{ $req['assigned_to'] }}
+                                        • {{ __('portal.client.requests.assigned_to') }} {{ $req['assigned_to'] }}
                                     @endif
                                 </p>
                                 <p class="request-description">{{ Str::limit($req['description'], 120) }}</p>
@@ -193,9 +193,9 @@
                         </div>
                     </div>
                     <div class="request-footer">
-                        <span class="text-muted">Last updated {{ $req['updated_at']->diffForHumans() }}</span>
+                        <span class="text-muted">{{ __('portal.client.requests.last_updated') }} {{ $req['updated_at']->diffForHumans() }}</span>
                         <a href="{{ $req['view_url'] }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i> View Details
+                            <i class="fas fa-eye"></i> {{ __('portal.client.requests.view_details') }}
                         </a>
                     </div>
                 </div>
@@ -204,10 +204,10 @@
         @else
             <div class="text-center py-5">
                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <h4>No Service Requests Yet</h4>
-                <p class="text-muted">You haven't submitted any service requests yet. Start by requesting a service!</p>
+                <h4>{{ __('portal.client.requests.empty_title') }}</h4>
+                <p class="text-muted">{{ __('portal.client.requests.empty_body') }}</p>
                 <a href="{{ route('services.index') }}" class="btn btn-primary mt-3">
-                    <i class="fas fa-plus"></i> Request New Service
+                    <i class="fas fa-plus"></i> {{ __('portal.client.requests.request_new_service') }}
                 </a>
             </div>
         @endif

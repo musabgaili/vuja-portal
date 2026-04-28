@@ -1,9 +1,9 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Pricing Tool')
+@section('title', __('portal.pricing.tool_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item">Quote System</li>
-<li class="breadcrumb-item active">Pricing Tool</li>
+<li class="breadcrumb-item">{{ __('portal.pricing.quote_system') }}</li>
+<li class="breadcrumb-item active">{{ __('portal.pricing.tool_breadcrumb') }}</li>
 @endsection
 
 @section('content')
@@ -58,11 +58,11 @@ body { font-family: 'Inter', sans-serif; }
 <div class="pricing-header">
     <div class="text-center">
         <h1 class="text-3xl font-bold mb-2">
-            <i class="fas fa-calculator"></i> Internal Pricing Tool
+            <i class="fas fa-calculator"></i> {{ __('portal.pricing.internal_tool_heading') }}
         </h1>
-        <p class="opacity-90">Build accurate quotes using standardized pricing rules</p>
+        <p class="opacity-90">{{ __('portal.pricing.internal_tool_subtitle') }}</p>
         <a href="{{ route('pricing.admin') }}" class="btn btn-light btn-sm mt-3" style="background: white; color: #1C575F; border: 1px solid #1C575F;">
-            <i class="fas fa-cogs"></i> Pricing Admin
+            <i class="fas fa-cogs"></i> {{ __('portal.pricing.pricing_admin') }}
         </a>
     </div>
 </div>
@@ -72,19 +72,19 @@ body { font-family: 'Inter', sans-serif; }
     <div class="col-lg-8">
         <div class="pricing-card">
             <h3 class="text-xl font-semibold mb-4" style="color: #1e293b;">
-                <i class="fas fa-list"></i> Available Pricing Rules
+                <i class="fas fa-list"></i> {{ __('portal.pricing.available_rules') }}
             </h3>
-            <p class="text-sm text-muted mb-4">Click "Add to Quote" to add items. Edit quantities in the quote summary. Each click adds one item.</p>
+            <p class="text-sm text-muted mb-4">{{ __('portal.pricing.add_to_quote_help') }}</p>
             
             <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <table class="table table-hover">
                     <thead style="position: sticky; top: 0; background: white; z-index: 10;">
                         <tr>
-                            <th>Item / Level</th>
-                            <th>Rate</th>
-                            <th>Unit</th>
-                            <th>Note</th>
-                            <th class="text-end">Action</th>
+                            <th>{{ __('portal.pricing.item_level') }}</th>
+                            <th>{{ __('portal.pricing.rate') }}</th>
+                            <th>{{ __('portal.pricing.unit') }}</th>
+                            <th>{{ __('portal.pricing.note') }}</th>
+                            <th class="text-end">{{ __('portal.pricing.action') }}</th>
                         </tr>
                     </thead>
                     <tbody id="rulesTableBody">
@@ -97,7 +97,7 @@ body { font-family: 'Inter', sans-serif; }
                             <td class="text-end">
                                 <button onclick="addToCart({{ $rule->id }}, '{{ $rule->item }}', {{ $rule->rate }}, '{{ $rule->unit }}', '{{ $rule->level }}', '{{ addslashes($rule->note) }}')" 
                                     class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus"></i> Add
+                                    <i class="fas fa-plus"></i> {{ __('portal.pricing.add') }}
                                 </button>
                             </td>
                         </tr>
@@ -112,7 +112,7 @@ body { font-family: 'Inter', sans-serif; }
     <div class="col-lg-4">
         <div class="cart-card" style="position: sticky; top: 20px;">
             <h3 class="text-xl font-semibold mb-4" style="color: #1e293b;">
-                <i class="fas fa-list-alt"></i> Quote Summary
+                <i class="fas fa-list-alt"></i> {{ __('portal.pricing.quote_summary') }}
             </h3>
             
             <div id="cartContainer" class="mb-3" style="max-height: 400px; overflow-y: auto;">
@@ -120,7 +120,7 @@ body { font-family: 'Inter', sans-serif; }
             </div>
 
             <div class="grand-total text-center">
-                <p class="mb-0 opacity-90">Total</p>
+                <p class="mb-0 opacity-90">{{ __('portal.pricing.total') }}</p>
                 <h2 id="grandTotal" class="text-3xl font-bold mb-0">$0.00</h2>
             </div>
         </div>
@@ -160,7 +160,7 @@ function updateCart() {
     const totalEl = document.getElementById('grandTotal');
     
     if (cart.length === 0) {
-        container.innerHTML = '<p class="text-muted text-center py-3"><i class="fas fa-inbox"></i><br><small>Add items to build your quote</small></p>';
+        container.innerHTML = @js('<p class="text-muted text-center py-3"><i class="fas fa-inbox"></i><br><small>' . __('portal.pricing.empty_cart') . '</small></p>');
         totalEl.textContent = '$0.00';
         return;
     }

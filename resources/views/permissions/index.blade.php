@@ -1,21 +1,21 @@
 @extends('layouts.internal-dashboard')
 
-@section('title', 'Permissions Management')
-@section('page-title', 'Roles & Permissions Management')
+@section('title', __('portal.permissions.management_title'))
+@section('page-title', __('portal.permissions.roles_and_permissions_management'))
 
 @section('content')
 <!-- Quick Stats -->
 <div class="dashboard-grid mb-4">
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Total Roles</h3>
+            <h3 class="widget-title">{{ __('portal.permissions.total_roles') }}</h3>
             <div class="widget-icon primary"><i class="fas fa-user-tag"></i></div>
         </div>
         <div class="widget-content">
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $roles->count() }}</span>
-                    <span class="stat-label">Active Roles</span>
+                    <span class="stat-label">{{ __('portal.permissions.active_roles') }}</span>
                 </div>
             </div>
         </div>
@@ -23,14 +23,14 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Total Permissions</h3>
+            <h3 class="widget-title">{{ __('portal.permissions.total_permissions') }}</h3>
             <div class="widget-icon success"><i class="fas fa-key"></i></div>
         </div>
         <div class="widget-content">
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $permissions->flatten()->count() }}</span>
-                    <span class="stat-label">Permissions</span>
+                    <span class="stat-label">{{ __('portal.permissions.permissions') }}</span>
                 </div>
             </div>
         </div>
@@ -38,14 +38,14 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Total Users</h3>
+            <h3 class="widget-title">{{ __('portal.permissions.total_users') }}</h3>
             <div class="widget-icon info"><i class="fas fa-users"></i></div>
         </div>
         <div class="widget-content">
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $users->count() }}</span>
-                    <span class="stat-label">System Users</span>
+                    <span class="stat-label">{{ __('portal.permissions.system_users') }}</span>
                 </div>
             </div>
         </div>
@@ -55,21 +55,21 @@
 <!-- Quick Links -->
 <div class="card mb-4">
     <div class="card-header">
-        <h3 class="card-title">Quick Actions</h3>
+        <h3 class="card-title">{{ __('portal.internal.quick_actions') }}</h3>
     </div>
     <div class="card-content">
         <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('permissions.roles') }}" class="btn btn-primary">
-                <i class="fas fa-user-tag"></i> Manage Roles
+                <i class="fas fa-user-tag"></i> {{ __('portal.permissions.manage_roles') }}
             </a>
             <a href="{{ route('permissions.permissions') }}" class="btn btn-secondary">
-                <i class="fas fa-key"></i> Manage Permissions
+                <i class="fas fa-key"></i> {{ __('portal.permissions.manage_permissions') }}
             </a>
             <a href="{{ route('permissions.users') }}" class="btn btn-secondary">
-                <i class="fas fa-users"></i> Assign User Roles
+                <i class="fas fa-users"></i> {{ __('portal.permissions.assign_user_roles') }}
             </a>
             <button class="btn btn-success" onclick="showCreatePermissionModal()">
-                <i class="fas fa-plus"></i> Create Permission
+                <i class="fas fa-plus"></i> {{ __('portal.permissions.create_permission') }}
             </button>
         </div>
     </div>
@@ -78,17 +78,17 @@
 <!-- Roles & Their Permissions -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Roles & Permissions Matrix</h3>
+        <h3 class="card-title">{{ __('portal.permissions.roles_permissions_matrix') }}</h3>
     </div>
     <div class="card-content">
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Role</th>
-                        <th>Users</th>
-                        <th>Permissions</th>
-                        <th>Actions</th>
+                        <th>{{ __('portal.team.col_role') }}</th>
+                        <th>{{ __('portal.permissions.users') }}</th>
+                        <th>{{ __('portal.permissions.permissions') }}</th>
+                        <th>{{ __('portal.team.col_actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,7 +97,7 @@
                         <td>
                             <strong>{{ ucfirst($role->name) }}</strong>
                             <br>
-                            <small class="text-muted">{{ $role->users->count() }} users</small>
+                            <small class="text-muted">{{ $role->users->count() }} {{ __('portal.permissions.users') }}</small>
                         </td>
                         <td>
                             <div class="user-avatars">
@@ -112,11 +112,11 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-primary">{{ $role->permissions->count() }} permissions</span>
+                            <span class="badge bg-primary">{{ $role->permissions->count() }} {{ __('portal.permissions.permissions') }}</span>
                         </td>
                         <td>
                             <button class="btn btn-sm btn-primary" onclick="editRolePermissions({{ $role->id }}, '{{ $role->name }}')">
-                                <i class="fas fa-edit"></i> Edit Permissions
+                                <i class="fas fa-edit"></i> {{ __('portal.permissions.edit_permissions') }}
                             </button>
                         </td>
                     </tr>
@@ -130,13 +130,13 @@
 <!-- Permissions by Category -->
 <div class="card mt-4">
     <div class="card-header">
-        <h3 class="card-title">Permissions by Category</h3>
+        <h3 class="card-title">{{ __('portal.permissions.permissions_by_category') }}</h3>
     </div>
     <div class="card-content">
         @foreach($permissions as $category => $perms)
         <div class="permission-category mb-4">
             <h5 class="category-title">
-                <i class="fas fa-folder"></i> {{ ucfirst($category) }} Permissions
+                <i class="fas fa-folder"></i> {{ ucfirst($category) }} {{ __('portal.permissions.permissions') }}
             </h5>
             <div class="permissions-grid">
                 @foreach($perms as $permission)
@@ -162,7 +162,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Permissions for <span id="roleName"></span></h5>
+                <h5 class="modal-title">{{ __('portal.permissions.edit_permissions_for') }} <span id="roleName"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="editPermissionsForm">
@@ -188,9 +188,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Permissions
+                    <i class="fas fa-save"></i> {{ __('portal.permissions.save_permissions') }}
                     </button>
                 </div>
             </form>
@@ -203,23 +203,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create New Permission</h5>
+                <h5 class="modal-title">{{ __('portal.permissions.create_new_permission') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('permissions.create-permission') }}">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Permission Name *</label>
+                        <label class="form-label">{{ __('portal.permissions.permission_name') }} *</label>
                         <input type="text" name="name" class="form-control" 
-                               placeholder="e.g., view projects, edit tasks" required>
-                        <small class="text-muted">Use format: "action resource" (e.g., view users, edit projects)</small>
+                               placeholder="{{ __('portal.permissions.permission_name_placeholder') }}" required>
+                        <small class="text-muted">{{ __('portal.permissions.permission_name_help') }}</small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Create Permission
+                        <i class="fas fa-plus"></i> {{ __('portal.permissions.create_permission') }}
                     </button>
                 </div>
             </form>

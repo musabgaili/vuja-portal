@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Password - VujaDe Platform</title>
+    <title>{{ __('portal.auth.confirm_password_page_title') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -95,14 +95,20 @@
             margin-bottom: 30px;
             line-height: 1.6;
         }
+        .auth-card .locale-switcher .btn {
+            min-width: 2.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
+            <div class="d-flex justify-content-end mb-2">
+                @include('partials.locale-switcher')
+            </div>
             <div class="logo">
                 <h1>VujaDe</h1>
-                <p>Security confirmation</p>
+                <p>{{ __('portal.auth.security_confirmation') }}</p>
             </div>
 
             <div class="security-icon">
@@ -110,7 +116,7 @@
             </div>
 
             <p class="info-text">
-                Please confirm your password before continuing to access this secure area.
+                {{ __('portal.auth.confirm_secure_area') }}
             </p>
 
             @if ($errors->any())
@@ -126,9 +132,9 @@
                 
                 <div class="form-floating">
                     <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                           id="password" name="password" placeholder="Password" required autofocus>
+                           id="password" name="password" placeholder="{{ __('portal.password') }}" required autofocus>
                     <label for="password">
-                        <i class="fas fa-lock me-2"></i>Password
+                        <i class="fas fa-lock me-2"></i>{{ __('portal.password') }}
                     </label>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -136,14 +142,14 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check-circle me-2"></i>Confirm Password
+                    <i class="fas fa-check-circle me-2"></i>{{ __('portal.auth.confirm_password_button') }}
                 </button>
             </form>
 
             <div class="auth-links">
                 @if (Route::has('password.request'))
                     <a href="{{ route('password.request') }}">
-                        <i class="fas fa-key me-2"></i>Forgot Your Password?
+                        <i class="fas fa-key me-2"></i>{{ __('portal.forgot_password') }}
                     </a>
                 @endif
             </div>

@@ -1,17 +1,12 @@
 <?php
 
-use App\Enums\UserRole;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceRequestController;
-use App\Models\CopyrightRegistration;
-use App\Models\IpRegistration;
 use App\Models\Project;
-use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 
 /*
@@ -29,6 +24,17 @@ use Spatie\Permission\Models\Role;
 // PUBLIC ROUTES
 // ============================================
 
+Route::get('language/{locale}', function (string $locale) {
+    if (! in_array($locale, config('app.supported_locales', ['en', 'ar']), true)) {
+        return redirect()->back();
+    }
+
+    session(['locale' => $locale]);
+    app()->setLocale($locale);
+
+    return redirect()->back();
+})->name('locale');
+
 Route::get('/', function () {
     // return Auth::user()->isInternal();
     // // $x= User::find(Auth::user()->id)->update(['type' => 'internal']);
@@ -36,6 +42,7 @@ Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('dashboard');
     }
+
     return redirect()->route('login');
 });
 
@@ -53,16 +60,16 @@ Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'
 // AUTHENTICATED ROUTES
 // ============================================
 
-Route::middleware(['auth',])->group(function () {
-    
+Route::middleware(['auth'])->group(function () {
+
     // Main dashboard route - redirects based on role
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Home route redirects to main dashboard
     Route::get('/home', function () {
         return redirect()->route('dashboard');
     })->name('home');
-    
+
     // PROFILE MANAGEMENT (All authenticated users)
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
@@ -72,10 +79,10 @@ Route::middleware(['auth',])->group(function () {
     Route::put('/profile/phone', [\App\Http\Controllers\ProfileController::class, 'updatePhone'])->name('profile.update-phone');
     Route::get('/profile/security', [\App\Http\Controllers\ProfileController::class, 'security'])->name('profile.security');
     Route::delete('/profile/delete-account', [\App\Http\Controllers\ProfileController::class, 'deleteAccount'])->name('profile.delete-account');
-    
+
     // Service Request Routes (Legacy - can be removed later)
     Route::resource('service-requests', ServiceRequestController::class);
-    
+
 });
 
 // ============================================

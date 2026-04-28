@@ -1,16 +1,17 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Team Members')
+@section('title', __('portal.team.members_title'))
+@section('page-title', __('portal.team.members_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item active">Team Members</li>
+<li class="breadcrumb-item active">{{ __('portal.team.members_title') }}</li>
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3>Team Members</h3>
+        <h3>{{ __('portal.team.members_title') }}</h3>
         <a href="{{ route('team.invite') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-user-plus"></i> Invite Member
+            <i class="fas fa-user-plus"></i> {{ __('portal.team.invite_member') }}
         </a>
     </div>
     <div class="card-content">
@@ -18,13 +19,13 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
+                    <th>{{ __('portal.team.col_name') }}</th>
+                    <th>{{ __('portal.team.col_email') }}</th>
+                    <th>{{ __('portal.team.col_phone') }}</th>
+                    <th>{{ __('portal.team.col_role') }}</th>
+                    <th>{{ __('portal.team.col_status') }}</th>
+                    <th>{{ __('portal.team.col_joined') }}</th>
+                    <th>{{ __('portal.team.col_actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,7 +57,7 @@
                     <td>{{ $member->created_at->format('M d, Y') }}</td>
                     <td>
                         @if($member->id !== auth()->id())
-                        <form method="POST" action="{{ route('team.destroy', $member) }}" style="display: inline;" onsubmit="return confirm('Remove this team member?')">
+                        <form method="POST" action="{{ route('team.destroy', $member) }}" style="display: inline;" onsubmit="return confirm('{{ __('portal.team.confirm_remove_member') }}')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">
@@ -73,10 +74,10 @@
         @else
         <div class="text-center py-5">
             <i class="fas fa-users fa-3x text-muted mb-3"></i>
-            <h4>No Team Members</h4>
-            <p>Start by inviting your first team member.</p>
+            <h4>{{ __('portal.team.empty_title') }}</h4>
+            <p>{{ __('portal.team.empty_body') }}</p>
             <a href="{{ route('team.invite') }}" class="btn btn-primary">
-                <i class="fas fa-user-plus"></i> Invite Team Member
+                <i class="fas fa-user-plus"></i> {{ __('portal.team.invite_team_member') }}
             </a>
         </div>
         @endif

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - VujaDe Platform</title>
+    <title>{{ __('portal.auth.register_page_title') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -153,14 +153,20 @@
         .password-requirements li {
             margin-bottom: 5px;
         }
+        .auth-card .locale-switcher .btn {
+            min-width: 2.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
+            <div class="d-flex justify-content-end mb-2">
+                @include('partials.locale-switcher')
+            </div>
             <div class="logo">
                 <h1>VujaDe</h1>
-                <p>Create your account to get started</p>
+                <p>{{ __('portal.auth.register_tagline') }}</p>
             </div>
 
             @if ($errors->any())
@@ -177,9 +183,9 @@
                 <div class="form-floating">
                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
                            id="name" name="name" value="{{ old('name') }}" 
-                           placeholder="Full Name" required autofocus>
+                           placeholder="{{ __('portal.auth.full_name') }}" required autofocus>
                     <label for="name">
-                        <i class="fas fa-user me-2"></i>Full Name
+                        <i class="fas fa-user me-2"></i>{{ __('portal.auth.full_name') }}
                     </label>
                     @error('name')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -189,9 +195,9 @@
                 <div class="form-floating">
                     <input type="email" class="form-control @error('email') is-invalid @enderror" 
                            id="email" name="email" value="{{ old('email') }}" 
-                           placeholder="Email Address" required>
+                           placeholder="{{ __('portal.email_address') }}" required>
                     <label for="email">
-                        <i class="fas fa-envelope me-2"></i>Email Address
+                        <i class="fas fa-envelope me-2"></i>{{ __('portal.email_address') }}
                     </label>
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -201,9 +207,9 @@
                 <div class="form-floating">
                     <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
                            id="phone" name="phone" value="{{ old('phone') }}" 
-                           placeholder="Phone Number" required>
+                           placeholder="{{ __('portal.auth.phone_number') }}" required>
                     <label for="phone">
-                        <i class="fas fa-phone me-2"></i>Phone Number
+                        <i class="fas fa-phone me-2"></i>{{ __('portal.auth.phone_number') }}
                     </label>
                     @error('phone')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -212,9 +218,9 @@
 
                 <div class="form-floating">
                     <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                           id="password" name="password" placeholder="Password" required>
+                           id="password" name="password" placeholder="{{ __('portal.password') }}" required>
                     <label for="password">
-                        <i class="fas fa-lock me-2"></i>Password
+                        <i class="fas fa-lock me-2"></i>{{ __('portal.password') }}
                     </label>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -224,23 +230,23 @@
                 <div class="form-floating">
                     <input type="password" class="form-control" 
                            id="password-confirm" name="password_confirmation" 
-                           placeholder="Confirm Password" required>
+                           placeholder="{{ __('portal.auth.confirm_password') }}" required>
                     <label for="password-confirm">
-                        <i class="fas fa-lock me-2"></i>Confirm Password
+                        <i class="fas fa-lock me-2"></i>{{ __('portal.auth.confirm_password') }}
                     </label>
                 </div>
 
                 <div class="password-requirements">
-                    <strong>Password Requirements:</strong>
+                    <strong>{{ __('portal.auth.password_requirements_title') }}</strong>
                     <ul>
-                        <li>At least 8 characters long</li>
-                        <li>Contains uppercase and lowercase letters</li>
-                        <li>Contains at least one number</li>
+                        <li>{{ __('portal.auth.pw_req_length') }}</li>
+                        <li>{{ __('portal.auth.pw_req_case') }}</li>
+                        <li>{{ __('portal.auth.pw_req_number') }}</li>
                     </ul>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-user-plus me-2"></i>Create Account
+                    <i class="fas fa-user-plus me-2"></i>{{ __('portal.auth.create_account') }}
                 </button>
             </form>
 
@@ -265,8 +271,8 @@
             </div> --}}
 
             <div class="auth-links">
-                <span style="color: #6b7280;">Already have an account?</span>
-                <a href="{{ route('login') }}">Sign in</a>
+                <span style="color: #6b7280;">{{ __('portal.auth.already_have_account') }}</span>
+                <a href="{{ route('login') }}">{{ __('portal.sign_in') }}</a>
             </div>
         </div>
     </div>

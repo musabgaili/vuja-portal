@@ -1,19 +1,20 @@
 @extends(auth()->user()->isClient() ? 'layouts.dashboard' : 'layouts.internal-dashboard')
-@section('title', 'My Meetings')
+@section('title', __('portal.meetings.my_meetings'))
+@section('page-title', __('portal.meetings.my_meetings'))
 
 @if(!auth()->user()->isClient())
 @section('breadcrumbs')
-<li class="breadcrumb-item active">My Meetings</li>
+<li class="breadcrumb-item active">{{ __('portal.meetings.my_meetings') }}</li>
 @endsection
 @endif
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3>My Meetings</h3>
+        <h3>{{ __('portal.meetings.my_meetings') }}</h3>
         @if(auth()->user()->isClient())
         <a href="{{ route('meetings.available-slots') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> Book New Meeting
+            <i class="fas fa-plus"></i> {{ __('portal.meetings.book_new_meeting') }}
         </a>
         @endif
     </div>
@@ -22,16 +23,16 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Title</th>
+                    <th>{{ __('portal.manager_legacy.col_title') }}</th>
                     @if(auth()->user()->isClient())
-                    <th>With</th>
+                    <th>{{ __('portal.meetings.with') }}</th>
                     @else
-                    <th>Client</th>
+                    <th>{{ __('portal.manager_legacy.col_client') }}</th>
                     @endif
-                    <th>Date & Time</th>
-                    <th>Duration</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{{ __('portal.meetings.date_time') }}</th>
+                    <th>{{ __('portal.meetings.duration') }}</th>
+                    <th>{{ __('portal.manager_legacy.col_status') }}</th>
+                    <th>{{ __('portal.manager_legacy.col_actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,28 +60,28 @@
                         {{ $meeting->scheduled_at->format('M d, Y') }}
                         <br><small class="text-muted">{{ $meeting->scheduled_at->format('g:i A') }}</small>
                     </td>
-                    <td>{{ $meeting->duration_minutes }} min</td>
+                    <td>{{ $meeting->duration_minutes }} {{ __('portal.meetings.min') }}</td>
                     <td>
                         <span class="status-badge {{ $meeting->getStatusBadgeColor() }}">
                             {{ ucfirst($meeting->status) }}
                         </span>
                         @if($meeting->meeting_link)
                         <br><a href="{{ $meeting->meeting_link }}" target="_blank" class="btn btn-sm btn-primary mt-1">
-                            <i class="fas fa-video"></i> Join
+                            <i class="fas fa-video"></i> {{ __('portal.meetings.join') }}
                         </a>
                         @endif
                     </td>
                     <td>
                         @if(auth()->user()->isInternal() && $meeting->isScheduled())
                         <button class="btn btn-sm btn-success" onclick="confirmMeeting({{ $meeting->id }})">
-                            <i class="fas fa-check"></i> Confirm
+                            <i class="fas fa-check"></i> {{ __('portal.meetings.confirm') }}
                         </button>
                         @endif
                         @if(!$meeting->isCompleted() && !$meeting->isCancelled())
-                        <form method="POST" action="{{ route('meetings.cancel', $meeting) }}" style="display:inline;" onsubmit="return confirm('Cancel this meeting?')">
+                        <form method="POST" action="{{ route('meetings.cancel', $meeting) }}" style="display:inline;" onsubmit="return confirm('{{ __('portal.meetings.confirm_cancel') }}')">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">
-                                <i class="fas fa-times"></i> Cancel
+                                <i class="fas fa-times"></i> {{ __('portal.team.cancel') }}
                             </button>
                         </form>
                         @endif
@@ -93,14 +94,14 @@
         @else
         <div class="text-center py-5">
             <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-            <h4>No Meetings</h4>
+            <h4>{{ __('portal.meetings.no_meetings') }}</h4>
             @if(auth()->user()->isClient())
-            <p>Book your first meeting with our team.</p>
+            <p>{{ __('portal.meetings.book_first_meeting') }}</p>
             <a href="{{ route('meetings.available-slots') }}" class="btn btn-primary">
-                <i class="fas fa-calendar-check"></i> View Available Slots
+                <i class="fas fa-calendar-check"></i> {{ __('portal.meetings.view_available_slots') }}
             </a>
             @else
-            <p>No meetings scheduled yet.</p>
+            <p>{{ __('portal.meetings.no_meetings_scheduled') }}</p>
             @endif
         </div>
         @endif
@@ -108,7 +109,7 @@
 </div>
 
 @if(auth()->user()->isInternal())
-<div class="modal fade" id="confirmModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>Confirm Meeting</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form method="POST" id="confirmForm">@csrf<div class="modal-body"><div class="form-group"><label>Meeting Link (Optional)</label><input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/..."></div></div><div class="modal-footer"><button type="submit" class="btn btn-success">Confirm</button></div></form></div></div></div>
+<div class="modal fade" id="confirmModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>{{ __('portal.meetings.confirm_meeting') }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form method="POST" id="confirmForm">@csrf<div class="modal-body"><div class="form-group"><label>{{ __('portal.meetings.meeting_link_optional') }}</label><input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/..."></div></div><div class="modal-footer"><button type="submit" class="btn btn-success">{{ __('portal.meetings.confirm') }}</button></div></form></div></div></div>
 @endif
 @endsection
 @if(auth()->user()->isInternal())

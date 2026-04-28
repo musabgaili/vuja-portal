@@ -1,8 +1,8 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'IP Registrations')
+@section('title', __('portal.ip.registrations'))
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('ip.manager.index') }}">IP Registration</a></li>
-<li class="breadcrumb-item active">All Requests</li>
+<li class="breadcrumb-item"><a href="{{ route('ip.manager.index') }}">{{ __('portal.ip.registration') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.ip.all_requests') }}</li>
 @endsection
 
 @section('content')
@@ -19,15 +19,15 @@
 
 <div class="ip-header">
     <div class="d-flex justify-content-between align-items-center">
-        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-file-contract"></i> IP Registrations</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">Manage IP registration requests</p></div>
-        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $registrations->total() }}</h2><small style="opacity:0.9;">Total</small></div>
+        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-file-contract"></i> {{ __('portal.ip.registrations') }}</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">{{ __('portal.ip.manage_registration_requests') }}</p></div>
+        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $registrations->total() }}</h2><small style="opacity:0.9;">{{ __('portal.ip.total') }}</small></div>
     </div>
 </div>
 
 @if($registrations->count() > 0)
 <div class="table-modern">
     <table class="table mb-0">
-        <thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Client</th><th>Status</th><th>Reg#</th><th>Actions</th></tr></thead>
+        <thead><tr><th>{{ __('portal.ip.id') }}</th><th>{{ __('portal.ip.title') }}</th><th>{{ __('portal.ip.type') }}</th><th>{{ __('portal.ip.client') }}</th><th>{{ __('portal.ip.status') }}</th><th>{{ __('portal.ip.reg_number_short') }}</th><th>{{ __('portal.team.col_actions') }}</th></tr></thead>
         <tbody>
             @foreach($registrations as $ip)
             <tr>
@@ -45,13 +45,13 @@
 </div>
 <div class="d-flex justify-content-center mt-4">{{ $registrations->links('pagination::bootstrap-5') }}</div>
 @else
-<div class="empty-state"><i class="fas fa-file-contract"></i><h4 style="color:#1e293b;font-weight:600;">No IP Registrations</h4><p class="text-muted">No IP registration requests yet.</p></div>
+<div class="empty-state"><i class="fas fa-file-contract"></i><h4 style="color:#1e293b;font-weight:600;">{{ __('portal.ip.no_registrations_title') }}</h4><p class="text-muted">{{ __('portal.ip.no_registrations_body') }}</p></div>
 @endif
 @endsection
 
 @push('scripts')
 <script>
-function confirmMeeting(id){if(confirm('Confirm?'))fetch(`/internal/ip/${id}/confirm-meeting`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+function confirmMeeting(id){if(confirm('{{ __('portal.ip.confirm_meeting_question') }}'))fetch(`/internal/ip/${id}/confirm-meeting`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
 function updateStatus(id){window.location.href=`/internal/ip/${id}`;}
 </script>
 @endpush
