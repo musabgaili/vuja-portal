@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\ConsultationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class ConsultationRequestController extends Controller
 {
     // CLIENT SIDE
-    
+
     public function create()
     {
         $categories = [
@@ -22,9 +21,9 @@ class ConsultationRequestController extends Controller
             'Legal Advice',
             'Financial Planning',
             'Product Development',
-            'Other'
+            'Other',
         ];
-        
+
         return view('consultations.create', compact('categories'));
     }
 
@@ -53,28 +52,28 @@ class ConsultationRequestController extends Controller
     public function show(ConsultationRequest $consultation)
     {
         $user = Auth::user();
-        
+
         if ($user->isClient() && $consultation->user_id !== $user->id) {
             abort(403);
         }
 
         $consultation->load(['user', 'assignedTo']);
-        
+
         return view('consultations.show', compact('consultation'));
     }
 
     // MANAGER/EMPLOYEE SIDE
-    
+
     public function managerIndex()
     {
         $user = Auth::user();
-        
-        if (!$user->isManager() && !$user->isEmployee()) {
+
+        if (! $user->isManager() && ! $user->isEmployee()) {
             abort(403);
         }
 
         $query = ConsultationRequest::with(['user', 'assignedTo']);
-        
+
         if ($user->isEmployee()) {
             $query->where('assigned_to', $user->id);
         }
@@ -87,8 +86,8 @@ class ConsultationRequestController extends Controller
     public function managerShow(ConsultationRequest $consultation)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -115,8 +114,8 @@ class ConsultationRequestController extends Controller
     public function sendMeetingInvite(Request $request, ConsultationRequest $consultation)
     {
         $user = Auth::user();
-        
-        if (!$user->isEmployee() && !$user->isManager()) {
+
+        if (! $user->isEmployee() && ! $user->isManager()) {
             abort(403);
         }
 
@@ -127,20 +126,20 @@ class ConsultationRequestController extends Controller
 
         // Get the selected time slot
         $timeSlot = \App\Models\TimeSlot::findOrFail($validated['time_slot_id']);
-        
+
         // Verify the time slot belongs to the assigned employee
         if ($timeSlot->user_id !== $consultation->assigned_to) {
             return back()->withErrors(['error' => 'Selected time slot does not belong to the assigned employee.']);
         }
 
         // Check if slot is still available
-        if (!$timeSlot->isAvailable()) {
+        if (! $timeSlot->isAvailable()) {
             return back()->withErrors(['error' => 'Selected time slot is no longer available.']);
         }
 
         // Create the meeting
         $meetingService = app(\App\Services\ServiceRequests\MeetingService::class);
-        
+
         try {
             $meeting = $meetingService->bookMeeting($consultation->user, $timeSlot, [
                 'title' => $consultation->title,
@@ -156,7 +155,7 @@ class ConsultationRequestController extends Controller
             ]);
 
             return back()->with('success', 'Meeting scheduled and invitation sent to client!');
-            
+
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -177,14 +176,14 @@ class ConsultationRequestController extends Controller
     }
 
     // PRIVATE METHODS
-    
+
     private function autoAssign(ConsultationRequest $consultation)
     {
         // Simple auto-assignment based on category
         // In production, this could be more sophisticated
-        
+
         $employee = User::where('role', 'employee')
-            ->whereHas('permissions', function($q) use ($consultation) {
+            ->whereHas('permissions', function ($q) {
                 // Could check for category-specific permissions
             })
             ->inRandomOrder()

@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Request Services')
-@section('page-title', 'Request Services')
+@section('title', __('portal.stepper.client.index.page_title'))
+@section('page-title', __('portal.stepper.client.index.page_heading'))
 
 @section('content')
 <!-- Service Types Grid -->
@@ -24,17 +24,17 @@
             <div class="service-type-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $serviceType->steps->count() }}</span>
-                    <span class="stat-label">Steps</span>
+                    <span class="stat-label">{{ __('portal.stepper.client.index.stat_steps') }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number">{{ $serviceType->serviceRequests->count() }}</span>
-                    <span class="stat-label">Requests</span>
+                    <span class="stat-label">{{ __('portal.stepper.client.index.stat_requests') }}</span>
                 </div>
             </div>
             
             <div class="service-type-actions">
                 <a href="{{ route('stepper.client.create', $serviceType) }}" class="btn btn-primary btn-block">
-                    <i class="fas fa-arrow-right"></i> Start Request
+                    <i class="fas fa-arrow-right"></i> {{ __('portal.stepper.client.index.start_request') }}
                 </a>
             </div>
         </div>
@@ -42,8 +42,8 @@
     @else
         <div class="empty-state">
             <i class="fas fa-cogs fa-3x text-muted mb-3"></i>
-            <h4>No Services Available</h4>
-            <p class="text-muted">No service request types are currently available. Please check back later.</p>
+            <h4>{{ __('portal.stepper.client.index.empty_title') }}</h4>
+            <p class="text-muted">{{ __('portal.stepper.client.index.empty_body') }}</p>
         </div>
     @endif
 </div>
@@ -51,36 +51,36 @@
 <!-- How It Works -->
 <div class="card mt-4">
     <div class="card-header">
-        <h3 class="card-title">How It Works</h3>
+        <h3 class="card-title">{{ __('portal.stepper.client.index.how_title') }}</h3>
     </div>
     <div class="card-content">
         <div class="row">
             <div class="col-md-3">
                 <div class="step-item">
                     <div class="step-number">1</div>
-                    <h5>Select Service</h5>
-                    <p>Choose the type of service you need from our available options.</p>
+                    <h5>{{ __('portal.stepper.client.index.how1_title') }}</h5>
+                    <p>{{ __('portal.stepper.client.index.how1_body') }}</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="step-item">
                     <div class="step-number">2</div>
-                    <h5>Complete Steps</h5>
-                    <p>Follow the guided process to provide all necessary information.</p>
+                    <h5>{{ __('portal.stepper.client.index.how2_title') }}</h5>
+                    <p>{{ __('portal.stepper.client.index.how2_body') }}</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="step-item">
                     <div class="step-number">3</div>
-                    <h5>Review & Submit</h5>
-                    <p>Review your request and submit it for our team to process.</p>
+                    <h5>{{ __('portal.stepper.client.index.how3_title') }}</h5>
+                    <p>{{ __('portal.stepper.client.index.how3_body') }}</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="step-item">
                     <div class="step-number">4</div>
-                    <h5>Track Progress</h5>
-                    <p>Monitor your request status and communicate with our team.</p>
+                    <h5>{{ __('portal.stepper.client.index.how4_title') }}</h5>
+                    <p>{{ __('portal.stepper.client.index.how4_body') }}</p>
                 </div>
             </div>
         </div>
@@ -231,4 +231,3 @@
 }
 </style>
 @endpush
-

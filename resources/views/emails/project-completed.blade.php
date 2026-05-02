@@ -13,24 +13,24 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0;">🎉 Project Completed!</h1>
+            <h1 style="margin: 0;">🎉 {{ __('portal.emails.project_completed.title') }}</h1>
         </div>
         <div class="content">
-            <p><strong>Congratulations, {{ $client->name }}!</strong></p>
+            <p><strong>{{ __('portal.emails.project_completed.congrats', ['name' => $client->name]) }}</strong></p>
             
-            <p>Your project <strong>"{{ $project->title }}"</strong> has been successfully completed.</p>
+            <p>{!! __('portal.emails.project_completed.intro', ['project' => e($project->title)]) !!}</p>
 
-            <p>Thank you for confirming receipt of all deliverables. We hope you're satisfied with the results!</p>
+            <p>{{ __('portal.emails.project_completed.body') }}</p>
 
             <p style="margin-top: 30px;">
                 <a href="{{ route('projects.client.show', $project) }}" 
                    style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    View Project
+                    {{ __('portal.emails.view_project') }}
                 </a>
             </p>
         </div>
         <div class="footer">
-            <p>VujaDe Platform - Thank you for your business!</p>
+            <p>{{ __('portal.emails.project_completed.footer') }}</p>
         </div>
     </div>
 </body>

@@ -15,7 +15,7 @@ class MeetingService
     public function bookMeeting(User $client, TimeSlot $timeSlot, array $data): Meeting
     {
         // Double-check availability before booking
-        if (!$timeSlot->isAvailable()) {
+        if (! $timeSlot->isAvailable()) {
             throw new \Exception('Time slot is no longer available. It may have been booked by someone else.');
         }
 
@@ -26,13 +26,13 @@ class MeetingService
 
         // Validate meeting duration doesn't exceed slot duration
         $slotDuration = Carbon::parse($timeSlot->start_time)->diffInMinutes(Carbon::parse($timeSlot->end_time));
-        $meetingDuration = (int)($data['duration_minutes'] ?? 60);
-        
+        $meetingDuration = (int) ($data['duration_minutes'] ?? 60);
+
         if ($meetingDuration > $slotDuration) {
             throw new \Exception("Meeting duration ({$meetingDuration} minutes) cannot exceed slot duration ({$slotDuration} minutes).");
         }
 
-        $scheduledAt = Carbon::parse($timeSlot->date->format('Y-m-d') . ' ' . $timeSlot->start_time);
+        $scheduledAt = Carbon::parse($timeSlot->date->format('Y-m-d').' '.$timeSlot->start_time);
 
         $meeting = Meeting::create([
             'time_slot_id' => $timeSlot->id,
@@ -107,4 +107,3 @@ class MeetingService
         ]);
     }
 }
-

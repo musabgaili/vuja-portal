@@ -78,20 +78,59 @@ class IdeaRequest extends Model
     }
 
     // Status helper methods
-    public function isDraft(): bool { return $this->status === 'draft'; }
-    public function isSubmitted(): bool { return $this->status === 'submitted'; }
-    public function isInNegotiation(): bool { return $this->status === 'negotiation'; }
-    public function isQuoted(): bool { return $this->status === 'quoted'; }
-    public function isAccepted(): bool { return $this->status === 'accepted'; }
-    public function isRejected(): bool { return $this->status === 'rejected'; }
-    public function isPaymentPending(): bool { return $this->status === 'payment_pending'; }
-    public function isApproved(): bool { return $this->status === 'approved'; }
-    public function isInProgress(): bool { return $this->status === 'in_progress'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
+    public function isDraft(): bool
+    {
+        return $this->status === 'draft';
+    }
+
+    public function isSubmitted(): bool
+    {
+        return $this->status === 'submitted';
+    }
+
+    public function isInNegotiation(): bool
+    {
+        return $this->status === 'negotiation';
+    }
+
+    public function isQuoted(): bool
+    {
+        return $this->status === 'quoted';
+    }
+
+    public function isAccepted(): bool
+    {
+        return $this->status === 'accepted';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
+    }
+
+    public function isPaymentPending(): bool
+    {
+        return $this->status === 'payment_pending';
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    public function isInProgress(): bool
+    {
+        return $this->status === 'in_progress';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'secondary',
             'submitted' => 'info',
             'ai_assessment' => 'primary',
@@ -109,7 +148,7 @@ class IdeaRequest extends Model
 
     public function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'Draft',
             'submitted' => 'Submitted',
             'ai_assessment' => 'AI Assessment',

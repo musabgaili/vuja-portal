@@ -55,17 +55,44 @@ class ResearchRequest extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
-    public function isSubmitted(): bool { return $this->status === 'submitted'; }
-    public function isNdaPending(): bool { return $this->status === 'nda_pending'; }
-    public function isNdaSigned(): bool { return $this->status === 'nda_signed'; }
-    public function isDetailsProvided(): bool { return $this->status === 'details_provided'; }
-    public function isMeetingScheduled(): bool { return $this->status === 'meeting_scheduled'; }
-    public function isInProgress(): bool { return $this->status === 'in_progress'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
+    public function isSubmitted(): bool
+    {
+        return $this->status === 'submitted';
+    }
+
+    public function isNdaPending(): bool
+    {
+        return $this->status === 'nda_pending';
+    }
+
+    public function isNdaSigned(): bool
+    {
+        return $this->status === 'nda_signed';
+    }
+
+    public function isDetailsProvided(): bool
+    {
+        return $this->status === 'details_provided';
+    }
+
+    public function isMeetingScheduled(): bool
+    {
+        return $this->status === 'meeting_scheduled';
+    }
+
+    public function isInProgress(): bool
+    {
+        return $this->status === 'in_progress';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'submitted' => 'info',
             'nda_pending' => 'warning',
             'nda_signed' => 'success',
@@ -80,7 +107,7 @@ class ResearchRequest extends Model
 
     public function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'submitted' => 'Submitted',
             'nda_pending' => 'NDA Pending',
             'nda_signed' => 'NDA Signed',

@@ -13,12 +13,12 @@ class FeedbackController extends Controller
     public function create(Project $project)
     {
         $user = Auth::user();
-        
+
         if ($project->client_id !== $user->id) {
             abort(403);
         }
 
-        if (!$project->isCompleted()) {
+        if (! $project->isCompleted()) {
             return redirect()->route('projects.client.show', $project)
                 ->withErrors(['error' => 'Can only provide feedback for completed projects.']);
         }
@@ -35,7 +35,7 @@ class FeedbackController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         if ($project->client_id !== $user->id) {
             abort(403);
         }

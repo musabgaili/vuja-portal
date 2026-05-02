@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\IdeaRequest;
 use App\Models\ConsultationRequest;
-use App\Models\ResearchRequest;
-use App\Models\IpRegistration;
 use App\Models\CopyrightRegistration;
+use App\Models\IdeaRequest;
+use App\Models\IpRegistration;
+use App\Models\ResearchRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,18 +18,18 @@ class ClientRequestsController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         // if (!$user->isClient()) {
         //     abort(403);
         // }
-        
+
         // Get filter parameters
         $statusFilter = $request->get('status');
         $typeFilter = $request->get('type');
-        
+
         // Collect all requests from all services
         $allRequests = collect();
-        
+
         // Get Ideas
         $ideasQuery = IdeaRequest::where('user_id', $user->id);
         if ($statusFilter) {
@@ -55,7 +55,7 @@ class ClientRequestsController extends Controller
                 'assigned_to' => $idea->assignedTo?->name,
             ]);
         }
-        
+
         // Get Consultations
         $consultationsQuery = ConsultationRequest::where('user_id', $user->id);
         if ($statusFilter) {
@@ -82,7 +82,7 @@ class ClientRequestsController extends Controller
                 'meeting_date' => $consultation->meeting_scheduled_at,
             ]);
         }
-        
+
         // Get Research
         $researchQuery = ResearchRequest::where('user_id', $user->id);
         if ($statusFilter) {
@@ -109,7 +109,7 @@ class ClientRequestsController extends Controller
                 'meeting_date' => $research->meeting_scheduled_at,
             ]);
         }
-        
+
         // Get IP Registrations
         $ipQuery = IpRegistration::where('user_id', $user->id);
         if ($statusFilter) {
@@ -137,7 +137,7 @@ class ClientRequestsController extends Controller
                 'registration_number' => $ip->registration_number,
             ]);
         }
-        
+
         // Get Copyrights
         $copyrightQuery = CopyrightRegistration::where('user_id', $user->id);
         if ($statusFilter) {
@@ -165,15 +165,15 @@ class ClientRequestsController extends Controller
                 'registration_number' => $copyright->copyright_number,
             ]);
         }
-        
+
         // Filter by type if specified
         if ($typeFilter) {
             $allRequests = $allRequests->where('type', $typeFilter);
         }
-        
+
         // Sort by most recent
         $allRequests = $allRequests->sortByDesc('updated_at');
-        
+
         // Calculate summary stats
         $summary = [
             'total' => $allRequests->count(),
@@ -186,7 +186,7 @@ class ClientRequestsController extends Controller
             'in_progress' => $allRequests->whereIn('status', ['negotiation', 'assigned', 'in_progress', 'meeting_scheduled'])->count(),
             'completed' => $allRequests->where('status', 'completed')->count(),
         ];
-        
+
         return view('client.requests', compact('allRequests', 'summary', 'statusFilter', 'typeFilter'));
     }
 }

@@ -11,19 +11,19 @@ return new class extends Migration
         Schema::create('time_slots', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Internal team member
-            
+
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            
+
             $table->enum('status', ['available', 'booked', 'blocked'])->default('available');
             $table->boolean('is_recurring')->default(false);
             $table->string('recurring_pattern')->nullable(); // e.g., 'weekly', 'daily'
-            
+
             $table->text('notes')->nullable();
-            
+
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'date', 'start_time']); // Prevent overlapping slots
         });
     }

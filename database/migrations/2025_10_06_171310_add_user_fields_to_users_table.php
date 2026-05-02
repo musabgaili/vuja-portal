@@ -37,7 +37,7 @@ return new class extends Migration
                 'provider_id',
                 'otp_verified_at',
                 'otp_code',
-                'otp_expires_at'
+                'otp_expires_at',
             ]);
         });
     }

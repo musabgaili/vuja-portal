@@ -1,8 +1,8 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'My Time Slots')
+@section('title', __('portal.time_slots.my_slots.page_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item active">My Time Slots</li>
+<li class="breadcrumb-item active">{{ __('portal.time_slots.my_slots.page_title') }}</li>
 @endsection
 
 @section('content')
@@ -74,11 +74,11 @@
 <div class="slots-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700;"><i class="fas fa-calendar-alt"></i> My Availability Schedule</h1>
-            <p style="margin: 0.5rem 0 0 0; opacity: 0.95;">Manage your time slots for client meetings</p>
+            <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700;"><i class="fas fa-calendar-alt"></i> {{ __('portal.time_slots.my_slots.title') }}</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.95;">{{ __('portal.time_slots.my_slots.subtitle') }}</p>
         </div>
         <a href="{{ route('time-slots.create') }}" class="btn btn-light btn-lg">
-            <i class="fas fa-plus"></i> Add Availability
+            <i class="fas fa-plus"></i> {{ __('portal.time_slots.my_slots.add_availability') }}
         </a>
     </div>
 </div>
@@ -88,11 +88,11 @@
     <table class="table mb-0">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-                <th>Booked By</th>
-                <th>Actions</th>
+                <th>{{ __('portal.time_slots.my_slots.col_date') }}</th>
+                <th>{{ __('portal.time_slots.my_slots.col_time') }}</th>
+                <th>{{ __('portal.time_slots.my_slots.col_status') }}</th>
+                <th>{{ __('portal.time_slots.my_slots.booked_by') }}</th>
+                <th>{{ __('portal.time_slots.my_slots.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -110,9 +110,9 @@
                 <td>
                     <span class="status-badge {{ $slot->getStatusBadgeColor() }}">
                         @if($slot->isPast())
-                            Past
+                            {{ __('portal.time_slots.my_slots.past') }}
                         @else
-                            {{ ucfirst($slot->status) }}
+                            {{ __('portal.time_slots.status.'.$slot->status) }}
                         @endif
                     </span>
                 </td>
@@ -131,10 +131,10 @@
                 <td>
                     <div class="d-flex gap-2">
                         @if(!$slot->isBooked() && !$slot->isPast())
-                        <button class="btn btn-sm btn-warning" onclick="toggleBlock({{ $slot->id }})" title="{{ $slot->isBlocked() ? 'Unblock' : 'Block' }}">
+                        <button class="btn btn-sm btn-warning" onclick="toggleBlock({{ $slot->id }})" title="{{ $slot->isBlocked() ? __('portal.time_slots.my_slots.title_unblock') : __('portal.time_slots.my_slots.title_block') }}">
                             <i class="fas fa-{{ $slot->isBlocked() ? 'unlock' : 'lock' }}"></i>
                         </button>
-                        <form method="POST" action="{{ route('time-slots.destroy', $slot) }}" style="display:inline;" onsubmit="return confirm('Delete this slot?')">
+                        <form method="POST" action="{{ route('time-slots.destroy', $slot) }}" style="display:inline;" onsubmit="return confirm(@json(__('portal.time_slots.my_slots.delete_confirm')))">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                         </form>
@@ -153,10 +153,10 @@
 @else
 <div class="empty-slots">
     <i class="fas fa-calendar-alt"></i>
-    <h4 style="color: #1e293b; font-weight: 600;">No Time Slots</h4>
-    <p class="text-muted">Create your availability schedule so clients can book meetings with you.</p>
+    <h4 style="color: #1e293b; font-weight: 600;">{{ __('portal.time_slots.my_slots.empty_title') }}</h4>
+    <p class="text-muted">{{ __('portal.time_slots.my_slots.empty_body') }}</p>
     <a href="{{ route('time-slots.create') }}" class="btn btn-primary btn-lg mt-3">
-        <i class="fas fa-plus"></i> Add Time Slots
+        <i class="fas fa-plus"></i> {{ __('portal.time_slots.my_slots.add_slots') }}
     </a>
 </div>
 @endif

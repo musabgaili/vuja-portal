@@ -2,9 +2,11 @@
 
 namespace App\Services\Permissions;
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Enums\UserRole;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionsService
 {
@@ -13,7 +15,27 @@ class PermissionsService
      */
     public function assignRoleToUser(User $user, string $roleName): void
     {
-        $user->syncRoles([$roleName]);
+        DB::transaction(function () use ($user, $roleName) {
+            $user->syncRoles([$roleName]);
+            $profile = $this->mapSpatieRoleToUserProfile($roleName);
+            if ($profile !== null) {
+                $user->forceFill($profile)->save();
+            }
+        });
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function mapSpatieRoleToUserProfile(string $roleName): ?array
+    {
+        return match ($roleName) {
+            'client' => ['role' => UserRole::CLIENT, 'type' => 'client'],
+            'employee' => ['role' => UserRole::EMPLOYEE, 'type' => 'internal'],
+            'manager' => ['role' => UserRole::MANAGER, 'type' => 'internal'],
+            'project_manager' => ['role' => UserRole::PROJECT_MANAGER, 'type' => 'internal'],
+            default => null,
+        };
     }
 
     /**
@@ -80,7 +102,7 @@ class PermissionsService
     {
         return Permission::all()
             ->sortBy('name')
-            ->groupBy(function($permission) {
+            ->groupBy(function ($permission) {
                 return explode(' ', $permission->name)[0];
             });
     }
@@ -88,9 +110,11 @@ class PermissionsService
     /**
      * Get all users with their roles
      */
-    public function getUsersWithRoles()
+    public function getUsersWithRoles(bool $clientsOnly = false)
     {
-        return User::with('roles')->paginate(10);
+        return User::with('roles')
+            ->when($clientsOnly, fn ($query) => $query->where('role', UserRole::CLIENT))
+            ->orderBy('name')
+            ->paginate(10);
     }
 }
-

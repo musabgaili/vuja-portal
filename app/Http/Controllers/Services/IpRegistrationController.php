@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\IpRegistration;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,6 +13,7 @@ class IpRegistrationController extends Controller
     public function create()
     {
         $ipTypes = ['Patent', 'Trademark', 'Design', 'Copyright', 'Other'];
+
         return view('ip.create', compact('ipTypes'));
     }
 
@@ -47,20 +47,20 @@ class IpRegistrationController extends Controller
     public function show(IpRegistration $ip)
     {
         $user = Auth::user();
-        
+
         if ($user->isClient() && $ip->user_id !== $user->id) {
             abort(403);
         }
 
         $ip->load(['user', 'assignedTo']);
-        
+
         return view('ip.show', compact('ip'));
     }
 
     public function bookMeeting(Request $request, IpRegistration $ip)
     {
         // Check if consultant is assigned
-        if (!$ip->assigned_to) {
+        if (! $ip->assigned_to) {
             return back()->withErrors(['error' => 'You cannot book a meeting until a consultant is assigned to your IP registration request.']);
         }
 
@@ -79,13 +79,13 @@ class IpRegistrationController extends Controller
     public function managerIndex()
     {
         $user = Auth::user();
-        
-        if (!$user->isManager() && !$user->isEmployee()) {
+
+        if (! $user->isManager() && ! $user->isEmployee()) {
             abort(403);
         }
 
         $query = IpRegistration::with(['user', 'assignedTo']);
-        
+
         if ($user->isEmployee()) {
             $query->where('assigned_to', $user->id);
         }
@@ -98,8 +98,8 @@ class IpRegistrationController extends Controller
     public function managerShow(IpRegistration $ip)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 

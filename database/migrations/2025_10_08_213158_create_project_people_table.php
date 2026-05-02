@@ -15,7 +15,7 @@ return new class extends Migration
             $table->enum('role', ['project_manager', 'employee', 'client']); // Role within THIS project
             $table->boolean('can_edit')->default(false); // Only project_manager can edit
             $table->timestamps();
-            
+
             $table->unique(['project_id', 'user_id']);
         });
     }

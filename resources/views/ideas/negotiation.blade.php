@@ -1,14 +1,14 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Price Negotiation')
-@section('page-title', 'Negotiate Terms')
+@section('title', __('portal.ideas.negotiation.page_title'))
+@section('page-title', __('portal.ideas.negotiation.page_heading'))
 
 @section('content')
 <div class="row">
     <div class="col-lg-8">
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="card-title">💬 Price Negotiation - {{ $idea->title }}</h3>
+                <h3 class="card-title">💬 {{ __('portal.ideas.negotiation.card_title', ['title' => $idea->title]) }}</h3>
                 <span class="status-badge {{ $idea->getStatusBadgeColor() }}">
                     {{ $idea->getStatusLabel() }}
                 </span>
@@ -32,7 +32,7 @@
                             </div>
                             @if($comment->suggested_price)
                             <div class="message-price">
-                                <i class="fas fa-tag"></i> Suggested Price: <strong>${{ number_format($comment->suggested_price, 2) }}</strong>
+                                <i class="fas fa-tag"></i> {{ __('portal.ideas.negotiation.suggested_price_line') }} <strong>${{ number_format($comment->suggested_price, 2) }}</strong>
                             </div>
                             @endif
                         </div>
@@ -40,7 +40,7 @@
                     @empty
                     <div class="empty-state">
                         <i class="fas fa-comments fa-2x text-muted mb-2"></i>
-                        <p>No messages yet. Start the conversation!</p>
+                        <p>{{ __('portal.ideas.negotiation.empty') }}</p>
                     </div>
                     @endforelse
                 </div>
@@ -50,16 +50,16 @@
                     <form method="POST" action="{{ route('ideas.comments.store', $idea) }}">
                         @csrf
                         <div class="form-group">
-                            <label class="form-label">Your Message</label>
+                            <label class="form-label">{{ __('portal.ideas.negotiation.message_label') }}</label>
                             <textarea name="comment" rows="3" class="form-control @error('comment') is-invalid @enderror" 
-                                      placeholder="Type your message or counter-offer..." required></textarea>
+                                      placeholder="{{ __('portal.ideas.negotiation.message_placeholder') }}" required></textarea>
                             @error('comment')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Suggested Price (Optional)</label>
+                            <label class="form-label">{{ __('portal.ideas.negotiation.suggested_price') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" name="suggested_price" class="form-control @error('suggested_price') is-invalid @enderror" 
@@ -71,7 +71,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Send Message
+                            <i class="fas fa-paper-plane"></i> {{ __('portal.ideas.negotiation.send') }}
                         </button>
                     </form>
                 </div>
@@ -82,7 +82,7 @@
     <div class="col-lg-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="card-title">Idea Summary</h3>
+                <h3 class="card-title">{{ __('portal.ideas.negotiation.summary') }}</h3>
             </div>
             <div class="card-content">
                 <h5>{{ $idea->title }}</h5>
@@ -90,7 +90,7 @@
                 
                 @if($idea->final_quote)
                 <div class="current-quote">
-                    <strong>Current Quote:</strong>
+                    <strong>{{ __('portal.ideas.negotiation.current_quote') }}</strong>
                     <div class="quote-amount">${{ number_format($idea->final_quote, 2) }}</div>
                 </div>
                 @endif
@@ -99,14 +99,14 @@
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Tips for Negotiation</h3>
+                <h3 class="card-title">{{ __('portal.ideas.negotiation.tips_title') }}</h3>
             </div>
             <div class="card-content">
                 <ul class="tips-list">
-                    <li><i class="fas fa-check"></i> Be clear about your budget and expectations</li>
-                    <li><i class="fas fa-check"></i> Ask questions if anything is unclear</li>
-                    <li><i class="fas fa-check"></i> Suggest realistic counter-offers</li>
-                    <li><i class="fas fa-check"></i> Response time: typically 24-48 hours</li>
+                    <li><i class="fas fa-check"></i> {{ __('portal.ideas.negotiation.tip1') }}</li>
+                    <li><i class="fas fa-check"></i> {{ __('portal.ideas.negotiation.tip2') }}</li>
+                    <li><i class="fas fa-check"></i> {{ __('portal.ideas.negotiation.tip3') }}</li>
+                    <li><i class="fas fa-check"></i> {{ __('portal.ideas.negotiation.tip4') }}</li>
                 </ul>
             </div>
         </div>
@@ -245,4 +245,3 @@
 }
 </style>
 @endpush
-

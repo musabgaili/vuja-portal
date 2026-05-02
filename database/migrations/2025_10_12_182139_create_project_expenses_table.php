@@ -12,15 +12,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('logged_by')->constrained('users')->onDelete('cascade');
-            
+
             $table->string('title');
             $table->text('description')->nullable();
             $table->decimal('amount', 10, 2);
             $table->string('category')->nullable(); // e.g., 'software', 'hardware', 'service'
-            
+
             $table->date('expense_date');
             $table->string('receipt_file')->nullable();
-            
+
             $table->timestamps();
         });
     }

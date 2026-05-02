@@ -56,14 +56,29 @@ class Meeting extends Model
         return $this->morphTo();
     }
 
-    public function isScheduled(): bool { return $this->status === 'scheduled'; }
-    public function isConfirmed(): bool { return $this->status === 'confirmed'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
-    public function isCancelled(): bool { return $this->status === 'cancelled'; }
+    public function isScheduled(): bool
+    {
+        return $this->status === 'scheduled';
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->status === 'confirmed';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'scheduled' => 'info',
             'confirmed' => 'success',
             'completed' => 'secondary',

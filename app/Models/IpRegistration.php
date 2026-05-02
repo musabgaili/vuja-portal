@@ -55,18 +55,49 @@ class IpRegistration extends Model
     }
 
     // Status helper methods
-    public function isSubmitted(): bool { return $this->status === 'submitted'; }
-    public function isMeetingBooked(): bool { return $this->status === 'meeting_booked'; }
-    public function isMeetingConfirmed(): bool { return $this->status === 'meeting_confirmed'; }
-    public function isDocumentation(): bool { return $this->status === 'documentation'; }
-    public function isFiling(): bool { return $this->status === 'filing'; }
-    public function isRegistered(): bool { return $this->status === 'registered'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
-    public function isCancelled(): bool { return $this->status === 'cancelled'; }
+    public function isSubmitted(): bool
+    {
+        return $this->status === 'submitted';
+    }
+
+    public function isMeetingBooked(): bool
+    {
+        return $this->status === 'meeting_booked';
+    }
+
+    public function isMeetingConfirmed(): bool
+    {
+        return $this->status === 'meeting_confirmed';
+    }
+
+    public function isDocumentation(): bool
+    {
+        return $this->status === 'documentation';
+    }
+
+    public function isFiling(): bool
+    {
+        return $this->status === 'filing';
+    }
+
+    public function isRegistered(): bool
+    {
+        return $this->status === 'registered';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'submitted' => 'info',
             'meeting_booked' => 'warning',
             'meeting_confirmed' => 'success',
@@ -81,7 +112,7 @@ class IpRegistration extends Model
 
     public function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'submitted' => 'Submitted',
             'meeting_booked' => 'Meeting Booked',
             'meeting_confirmed' => 'Meeting Confirmed',

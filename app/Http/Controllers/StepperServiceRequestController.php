@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ServiceRequestType;
-use App\Models\ServiceRequestStep;
 use App\Models\ServiceRequest;
+use App\Models\ServiceRequestStep;
+use App\Models\ServiceRequestType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class StepperServiceRequestController extends Controller
 {
@@ -30,12 +29,12 @@ class StepperServiceRequestController extends Controller
     public function create(ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient()) {
+
+        if (! $user->isClient()) {
             abort(403);
         }
 
-        if (!$serviceType->is_active) {
+        if (! $serviceType->is_active) {
             abort(404);
         }
 
@@ -50,12 +49,12 @@ class StepperServiceRequestController extends Controller
     public function store(Request $request, ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient()) {
+
+        if (! $user->isClient()) {
             abort(403);
         }
 
-        if (!$serviceType->is_active) {
+        if (! $serviceType->is_active) {
             abort(404);
         }
 
@@ -69,7 +68,7 @@ class StepperServiceRequestController extends Controller
             if ($step->isFormStep()) {
                 foreach ($step->formFields as $field) {
                     $fieldRules = $field->getValidationRules();
-                    if (!empty($fieldRules)) {
+                    if (! empty($fieldRules)) {
                         $validationRules["step_{$step->id}.{$field->field_name}"] = $fieldRules;
                         $validationMessages["step_{$step->id}.{$field->field_name}.required"] = $field->getValidationMessage();
                     }
@@ -102,8 +101,8 @@ class StepperServiceRequestController extends Controller
     public function show(ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient() || $serviceRequest->user_id !== $user->id) {
+
+        if (! $user->isClient() || $serviceRequest->user_id !== $user->id) {
             abort(403);
         }
 
@@ -118,8 +117,8 @@ class StepperServiceRequestController extends Controller
     public function showStep(ServiceRequest $serviceRequest, ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient() || $serviceRequest->user_id !== $user->id) {
+
+        if (! $user->isClient() || $serviceRequest->user_id !== $user->id) {
             abort(403);
         }
 
@@ -138,8 +137,8 @@ class StepperServiceRequestController extends Controller
     public function processStep(Request $request, ServiceRequest $serviceRequest, ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient() || $serviceRequest->user_id !== $user->id) {
+
+        if (! $user->isClient() || $serviceRequest->user_id !== $user->id) {
             abort(403);
         }
 
@@ -156,7 +155,7 @@ class StepperServiceRequestController extends Controller
         if ($step->isFormStep()) {
             foreach ($step->formFields as $field) {
                 $fieldRules = $field->getValidationRules();
-                if (!empty($fieldRules)) {
+                if (! empty($fieldRules)) {
                     $validationRules[$field->field_name] = $fieldRules;
                     $validationMessages["{$field->field_name}.required"] = $field->getValidationMessage();
                 }
@@ -168,7 +167,7 @@ class StepperServiceRequestController extends Controller
         // Update service request with step data
         $currentStepData = $serviceRequest->step_data ?? [];
         $currentStepData["step_{$step->id}"] = $validated;
-        
+
         $serviceRequest->update([
             'step_data' => $currentStepData,
             'current_step_id' => $this->getNextStepId($serviceRequest, $step),
@@ -197,7 +196,7 @@ class StepperServiceRequestController extends Controller
         $firstStep = $serviceType->activeSteps->first();
         if ($firstStep && $firstStep->isFormStep()) {
             foreach ($firstStep->formFields as $field) {
-                if (str_contains(strtolower($field->field_name), 'title') || 
+                if (str_contains(strtolower($field->field_name), 'title') ||
                     str_contains(strtolower($field->field_label), 'title')) {
                     $value = data_get($data, "step_{$firstStep->id}.{$field->field_name}");
                     if ($value) {
@@ -216,11 +215,11 @@ class StepperServiceRequestController extends Controller
     private function generateDescription(ServiceRequestType $serviceType, array $data): string
     {
         $description = "Service Request for {$serviceType->name}\n\n";
-        
+
         foreach ($serviceType->activeSteps as $step) {
             if ($step->isFormStep()) {
                 $stepData = data_get($data, "step_{$step->id}", []);
-                if (!empty($stepData)) {
+                if (! empty($stepData)) {
                     $description .= "{$step->name}:\n";
                     foreach ($step->formFields as $field) {
                         $value = data_get($stepData, $field->field_name);
@@ -242,6 +241,7 @@ class StepperServiceRequestController extends Controller
     private function getNextStepId(ServiceRequest $serviceRequest, ServiceRequestStep $currentStep): ?int
     {
         $nextStep = $this->getNextStep($serviceRequest, $currentStep);
+
         return $nextStep?->id;
     }
 

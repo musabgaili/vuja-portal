@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Projects;
 
+use App\Actions\Projects\UpdateProjectProgressAction;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectMilestone;
-use App\Actions\Projects\UpdateProjectProgressAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,8 +14,8 @@ class MilestoneController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserManageMilestones($user)) {
+
+        if (! $project->canUserManageMilestones($user)) {
             abort(403, 'You do not have permission to create milestones.');
         }
 
@@ -39,8 +39,8 @@ class MilestoneController extends Controller
     public function update(Request $request, ProjectMilestone $milestone)
     {
         $user = Auth::user();
-        
-        if (!$milestone->project->canUserManageMilestones($user)) {
+
+        if (! $milestone->project->canUserManageMilestones($user)) {
             abort(403, 'You do not have permission to edit milestones.');
         }
 
@@ -81,8 +81,8 @@ class MilestoneController extends Controller
     public function destroy(ProjectMilestone $milestone)
     {
         $user = Auth::user();
-        
-        if (!$milestone->project->canUserManageMilestones($user)) {
+
+        if (! $milestone->project->canUserManageMilestones($user)) {
             abort(403, 'You do not have permission to delete milestones.');
         }
 
@@ -101,9 +101,9 @@ class MilestoneController extends Controller
     public function clientApprove(Request $request, ProjectMilestone $milestone)
     {
         $user = Auth::user();
-        
+
         // Only client can approve their own project milestones
-        if (!$user->isClient() || $milestone->project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $milestone->project->client_id !== $user->id) {
             abort(403, 'You do not have permission to approve this milestone.');
         }
 
@@ -136,8 +136,8 @@ class MilestoneController extends Controller
     public function markCompleted(ProjectMilestone $milestone)
     {
         $user = Auth::user();
-        
-        if (!$milestone->project->canUserManageMilestones($user)) {
+
+        if (! $milestone->project->canUserManageMilestones($user)) {
             return response()->json(['success' => false, 'message' => 'Permission denied'], 403);
         }
 

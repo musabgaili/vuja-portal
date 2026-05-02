@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -19,7 +19,7 @@ return new class extends Migration
                 $table->enum('role', ['project_manager', 'employee', 'client', 'account_manager']);
                 $table->boolean('can_edit')->default(false);
                 $table->timestamps();
-                
+
                 $table->unique(['project_id', 'user_id']);
             });
 
@@ -47,7 +47,7 @@ return new class extends Migration
                 $table->enum('role', ['project_manager', 'employee', 'client']);
                 $table->boolean('can_edit')->default(false);
                 $table->timestamps();
-                
+
                 $table->unique(['project_id', 'user_id']);
             });
 

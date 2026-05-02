@@ -1,14 +1,14 @@
 @extends('layouts.internal-dashboard')
 
-@section('title', 'Create Service Type')
-@section('page-title', 'Create New Service Request Type')
+@section('title', __('portal.stepper.service_types.create.page_title'))
+@section('page-title', __('portal.stepper.service_types.create.page_heading'))
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Service Request Type Details</h3>
+        <h3 class="card-title">{{ __('portal.stepper.service_types.create.card_title') }}</h3>
         <a href="{{ route('stepper.service-types.index') }}" class="btn btn-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Back to Service Types
+            <i class="fas fa-arrow-left"></i> {{ __('portal.stepper.service_types.create.back_link') }}
         </a>
     </div>
     <div class="card-content">
@@ -17,18 +17,18 @@
             
             <!-- Basic Information -->
             <div class="form-group">
-                <label class="form-label">Service Type Name</label>
+                <label class="form-label">{{ __('portal.stepper.service_types.create.name_label') }}</label>
                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
-                       value="{{ old('name') }}" placeholder="e.g., Idea Generation, Research & IP" required>
+                       value="{{ old('name') }}" placeholder="{{ __('portal.stepper.service_types.create.name_placeholder') }}" required>
                 @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label class="form-label">Description</label>
+                <label class="form-label">{{ __('portal.stepper.service_types.create.description_label') }}</label>
                 <textarea name="description" rows="3" class="form-control @error('description') is-invalid @enderror" 
-                          placeholder="Brief description of this service type...">{{ old('description') }}</textarea>
+                          placeholder="{{ __('portal.stepper.service_types.create.description_placeholder') }}">{{ old('description') }}</textarea>
                 @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -38,13 +38,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="form-label">Icon (FontAwesome)</label>
+                        <label class="form-label">{{ __('portal.stepper.service_types.create.icon_label') }}</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-icons"></i></span>
                             <input type="text" name="icon" class="form-control @error('icon') is-invalid @enderror" 
-                                   value="{{ old('icon', 'fas fa-cog') }}" placeholder="fas fa-lightbulb" required>
+                                   value="{{ old('icon', 'fas fa-cog') }}" placeholder="{{ __('portal.stepper.service_types.create.icon_placeholder') }}" required>
                         </div>
-                        <small class="form-text text-muted">Use FontAwesome icon classes (e.g., fas fa-lightbulb)</small>
+                        <small class="form-text text-muted">{{ __('portal.stepper.service_types.create.icon_help') }}</small>
                         @error('icon')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -52,7 +52,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="form-label">Color</label>
+                        <label class="form-label">{{ __('portal.stepper.service_types.create.color_label') }}</label>
                         <div class="input-group">
                             <input type="color" name="color" class="form-control form-control-color @error('color') is-invalid @enderror" 
                                    value="{{ old('color', '#2563eb') }}" required>
@@ -71,22 +71,22 @@
                     <input type="checkbox" name="is_active" class="form-check-input" id="is_active" 
                            value="1" {{ old('is_active', true) ? 'checked' : '' }}>
                     <label class="form-check-label" for="is_active">
-                        Active (Available to clients)
+                        {{ __('portal.stepper.service_types.create.active_label') }}
                     </label>
                 </div>
             </div>
 
             <!-- Icon Preview -->
             <div class="form-group">
-                <label class="form-label">Preview</label>
+                <label class="form-label">{{ __('portal.stepper.service_types.create.preview_label') }}</label>
                 <div class="preview-box p-3 rounded" style="background: var(--bg-tertiary);">
                     <div class="d-flex align-center">
                         <div class="preview-icon" style="background: {{ old('color', '#2563eb') }};">
                             <i class="{{ old('icon', 'fas fa-cog') }}"></i>
                         </div>
                         <div class="preview-text">
-                            <h5 class="mb-1">{{ old('name', 'Service Type Name') }}</h5>
-                            <p class="text-muted mb-0">{{ old('description', 'Service description will appear here...') }}</p>
+                            <h5 class="mb-1">{{ old('name', __('portal.stepper.service_types.create.preview_name_default')) }}</h5>
+                            <p class="text-muted mb-0">{{ old('description', __('portal.stepper.service_types.create.preview_desc_default')) }}</p>
                         </div>
                     </div>
                 </div>
@@ -95,10 +95,10 @@
             <!-- Submit Button -->
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Create Service Type
+                    <i class="fas fa-save"></i> {{ __('portal.stepper.service_types.create.create_submit') }}
                 </button>
                 <a href="{{ route('stepper.service-types.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancel
+                    <i class="fas fa-times"></i> {{ __('portal.stepper.service_types.create.cancel') }}
                 </a>
             </div>
         </form>
@@ -141,6 +141,10 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const previewDefaults = {
+        name: @json(__('portal.stepper.service_types.create.preview_name_default')),
+        description: @json(__('portal.stepper.service_types.create.preview_desc_default')),
+    };
     const nameInput = document.querySelector('input[name="name"]');
     const descriptionInput = document.querySelector('textarea[name="description"]');
     const iconInput = document.querySelector('input[name="icon"]');
@@ -152,8 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewIconDiv = document.querySelector('.preview-icon');
     
     function updatePreview() {
-        previewName.textContent = nameInput.value || 'Service Type Name';
-        previewDescription.textContent = descriptionInput.value || 'Service description will appear here...';
+        previewName.textContent = nameInput.value || previewDefaults.name;
+        previewDescription.textContent = descriptionInput.value || previewDefaults.description;
         previewIcon.className = iconInput.value || 'fas fa-cog';
         previewIconDiv.style.background = colorInput.value || '#2563eb';
     }
@@ -165,4 +169,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-

@@ -16,7 +16,7 @@ class ScopeChangeController extends Controller
     public function create(Project $project)
     {
         $user = Auth::user();
-        
+
         if ($project->client_id !== $user->id) {
             abort(403);
         }
@@ -30,7 +30,7 @@ class ScopeChangeController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         if ($project->client_id !== $user->id) {
             abort(403);
         }
@@ -58,8 +58,6 @@ class ScopeChangeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-         
 
         $scopeChanges = ProjectScopeChange::with(['project', 'requestedBy'])
             ->where('status', 'pending')
@@ -75,8 +73,6 @@ class ScopeChangeController extends Controller
     public function approve(Request $request, ProjectScopeChange $scopeChange)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'review_notes' => 'nullable|string',
@@ -98,8 +94,6 @@ class ScopeChangeController extends Controller
     public function reject(Request $request, ProjectScopeChange $scopeChange)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'review_notes' => 'required|string',

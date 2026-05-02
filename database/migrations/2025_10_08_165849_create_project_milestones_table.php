@@ -14,14 +14,14 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->integer('milestone_order')->default(0);
-            
+
             $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
-            
+
             $table->date('due_date')->nullable();
             $table->date('completed_at')->nullable();
-            
+
             $table->integer('completion_percentage')->default(0);
-            
+
             $table->timestamps();
         });
     }

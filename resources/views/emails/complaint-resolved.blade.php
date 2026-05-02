@@ -13,30 +13,30 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0;">✅ Complaint Resolved</h1>
+            <h1 style="margin: 0;">✅ {{ __('portal.emails.complaint_resolved.subject') }}</h1>
         </div>
         <div class="content">
-            <p>Dear {{ $complaint->client->name }},</p>
+            <p>{{ __('portal.emails.greeting', ['name' => $complaint->client->name]) }},</p>
             
-            <p>Your complaint regarding <strong>{{ $complaint->project->title }}</strong> has been resolved.</p>
+            <p>{!! __('portal.emails.complaint_resolved.intro', ['project' => e($complaint->project->title)]) !!}</p>
 
-            <h4>Original Complaint:</h4>
+            <h4>{{ __('portal.emails.complaint_resolved.original') }}:</h4>
             <p style="background: white; padding: 15px; border-left: 4px solid #94a3b8;">"{{ $complaint->complaint }}"</p>
 
-            <h4>Resolution:</h4>
+            <h4>{{ __('portal.emails.complaint_resolved.resolution') }}:</h4>
             <p style="background: white; padding: 15px; border-left: 4px solid #10b981;">{{ $complaint->resolution_note }}</p>
 
-            <p>Resolved by {{ $complaint->resolvedBy->name }} on {{ $complaint->resolved_at->format('F j, Y') }}</p>
+            <p>{{ __('portal.emails.complaint_resolved.resolved_by', ['name' => $complaint->resolvedBy->name, 'date' => $complaint->resolved_at->format('F j, Y')]) }}</p>
 
             <p style="margin-top: 30px;">
                 <a href="{{ route('projects.client.show', $complaint->project) }}" 
                    style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    View Project
+                    {{ __('portal.emails.view_project') }}
                 </a>
             </p>
         </div>
         <div class="footer">
-            <p>Thank you for your patience</p>
+            <p>{{ __('portal.emails.complaint_resolved.footer') }}</p>
         </div>
     </div>
 </body>

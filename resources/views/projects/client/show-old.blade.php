@@ -10,21 +10,21 @@
             </div>
             <div class="card-content">
                 <p>{{ $project->description }}</p>
-                @if($project->scope)<div class="mb-3"><strong>Scope:</strong><p>{{ $project->scope }}</p></div>@endif
+                @if($project->scope)<div class="mb-3"><strong>{{ __('portal.projects_client.show_old.scope') }}:</strong><p>{{ $project->scope }}</p></div>@endif
                 <div class="progress-section">
-                    <strong>Overall Progress: {{ $project->completion_percentage }}%</strong>
+                    <strong>{{ __('portal.projects_client.show_old.overall_progress') }}: {{ $project->completion_percentage }}%</strong>
                     <div class="progress-bar mt-2"><div class="progress-fill" style="width:{{ $project->completion_percentage }}%;"></div></div>
                 </div>
                 
                 <div class="mt-3 d-flex gap-2">
                     @if($project->isActive())
                     <a href="{{ route('projects.client.scope-change.create', $project) }}" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i> Request Scope Change
+                        <i class="fas fa-edit"></i> {{ __('portal.projects_client.show_old.request_scope_change') }}
                     </a>
                     @endif
                     @if($project->isCompleted() && !$project->feedback)
                     <a href="{{ route('projects.client.feedback.create', $project) }}" class="btn btn-success btn-sm">
-                        <i class="fas fa-star"></i> Rate Project
+                        <i class="fas fa-star"></i> {{ __('portal.projects_client.show.rate_project') }}
                     </a>
                     @endif
                 </div>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="card mb-4">
-            <div class="card-header"><h3>Milestones & Timeline</h3></div>
+            <div class="card-header"><h3>{{ __('portal.projects_client.show.milestones_timeline') }}</h3></div>
             <div class="card-content">
                 @forelse($project->milestones as $milestone)
                 <div class="milestone-item mb-4">
@@ -55,13 +55,13 @@
                     @endif
                 </div>
                 @empty
-                <p class="text-muted">No milestones defined yet.</p>
+                <p class="text-muted">{{ __('portal.projects_client.show.no_milestones') }}</p>
                 @endforelse
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><h3>Comments & Updates</h3></div>
+            <div class="card-header"><h3>{{ __('portal.projects_client.show_old.comments_updates') }}</h3></div>
             <div class="card-content">
                 @forelse($project->comments()->where('is_internal', false)->latest()->get() as $comment)
                 <div class="comment-item">
@@ -69,14 +69,14 @@
                     <p>{{ $comment->comment }}</p>
                 </div>
                 @empty
-                <p class="text-muted">No comments yet.</p>
+                <p class="text-muted">{{ __('portal.projects_client.show_old.no_comments_yet') }}</p>
                 @endforelse
                 <form method="POST" action="{{ route('projects.add-comment', $project) }}" class="mt-4">
                     @csrf
                     <input type="hidden" name="commentable_type" value="App\Models\Project">
                     <input type="hidden" name="commentable_id" value="{{ $project->id }}">
-                    <textarea name="comment" rows="3" class="form-control mb-2" placeholder="Add a comment..." required></textarea>
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i> Post Comment</button>
+                    <textarea name="comment" rows="3" class="form-control mb-2" placeholder="{{ __('portal.projects_client.show_old.add_comment_placeholder') }}" required></textarea>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.post_comment') }}</button>
                 </form>
             </div>
         </div>
@@ -84,23 +84,23 @@
 
     <div class="col-lg-4">
         <div class="card mb-4">
-            <div class="card-header"><h3>Project Details</h3></div>
+            <div class="card-header"><h3>{{ __('portal.projects_client.show_old.project_details') }}</h3></div>
             <div class="card-content">
-                <div class="detail-item"><strong>Status:</strong><span class="status-badge {{ $project->getStatusBadgeColor() }}">{{ $project->getStatusLabel() }}</span></div>
-                <div class="detail-item"><strong>Start Date:</strong><span>{{ $project->start_date?->format('M d, Y') ?? 'TBD' }}</span></div>
-                <div class="detail-item"><strong>End Date:</strong><span>{{ $project->end_date?->format('M d, Y') ?? 'TBD' }}</span></div>
-                @if($project->projectManager)<div class="detail-item"><strong>PM:</strong><span>{{ $project->projectManager->name }}</span></div>@endif
-                @if($project->budget)<div class="detail-item"><strong>Budget:</strong><span>${{ number_format($project->budget, 2) }}</span></div>@endif
+                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.status') }}:</strong><span class="status-badge {{ $project->getStatusBadgeColor() }}">{{ $project->getStatusLabel() }}</span></div>
+                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.start_date') }}:</strong><span>{{ $project->start_date?->format('M d, Y') ?? __('portal.projects_client.show_old.tbd') }}</span></div>
+                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.end_date') }}:</strong><span>{{ $project->end_date?->format('M d, Y') ?? __('portal.projects_client.show_old.tbd') }}</span></div>
+                @if($project->projectManager)<div class="detail-item"><strong>{{ __('portal.projects_client.show_old.pm') }}:</strong><span>{{ $project->projectManager->name }}</span></div>@endif
+                @if($project->budget)<div class="detail-item"><strong>{{ __('portal.projects_client.show_old.budget') }}:</strong><span>${{ number_format($project->budget, 2) }}</span></div>@endif
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><h3>Team</h3></div>
+            <div class="card-header"><h3>{{ __('portal.projects_client.show_old.team') }}</h3></div>
             <div class="card-content">
                 @forelse($project->getTeamMembers() as $member)
                 <div class="team-member"><div class="user-avatar-sm">{{ strtoupper(substr($member->name, 0, 2)) }}</div><span>{{ $member->name }}</span></div>
                 @empty
-                <p class="text-muted">No team assigned yet.</p>
+                <p class="text-muted">{{ __('portal.projects_client.show_old.no_team_assigned') }}</p>
                 @endforelse
             </div>
         </div>

@@ -17,7 +17,7 @@ return new class extends Migration
     //               ->references('id')
     //               ->on('service_request_types')
     //               ->onDelete('set null');
-            
+
     //         // Add foreign key for current_step_id
     //         $table->foreign('current_step_id')
     //               ->references('id')

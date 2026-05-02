@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
-use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthService
 {

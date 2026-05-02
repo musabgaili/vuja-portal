@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Documents</title>
+    <title>{{ __('portal.projects_documents.page_title') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -194,9 +194,9 @@
     <div class="doc-container">
         <div class="doc-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h4><i class="fas fa-folder-open"></i> Project Documents</h4>
+                <h4><i class="fas fa-folder-open"></i> {{ __('portal.projects_documents.heading') }}</h4>
                 <button class="btn btn-light" onclick="showUploadModal()">
-                    <i class="fas fa-plus"></i> Upload
+                    <i class="fas fa-plus"></i> {{ __('portal.projects_documents.upload_btn') }}
                 </button>
             </div>
         </div>
@@ -211,7 +211,7 @@
                     </div>
                     <div class="doc-meta-row">
                         <span class="doc-tag" style="background: {{ match($doc->tag) { 'initial' => '#a855f7', 'design' => '#3b82f6', 'development' => '#10b981', 'final' => '#f59e0b', default => '#64748b' } }};">
-                            {{ ucfirst($doc->tag) }}
+                            {{ __('portal.projects_documents.tag_' . $doc->tag) }}
                         </span>
                         <span><i class="fas fa-user"></i> {{ $doc->uploadedBy->name }}</span>
                         <span><i class="fas fa-calendar"></i> {{ $doc->created_at->format('M d, Y') }}</span>
@@ -224,16 +224,16 @@
                     @endif
                 </div>
                 <div class="doc-actions">
-                    <a href="{{ route('projects.client.documents.download', $doc) }}" class="btn btn-outline-primary btn-icon" title="Download">
+                    <a href="{{ route('projects.client.documents.download', $doc) }}" class="btn btn-outline-primary btn-icon" title="{{ __('portal.projects_documents.download_title') }}">
                         <i class="fas fa-download"></i>
                     </a>
                     @if($doc->uploaded_by === auth()->id() || auth()->user()->isManager())
-                    <button class="btn btn-outline-warning btn-icon" onclick="editDocument({{ $doc->id }}, '{{ $doc->title }}', '{{ $doc->tag }}', '{{ addslashes($doc->comment) }}')" title="Edit">
+                    <button class="btn btn-outline-warning btn-icon" onclick="editDocument({{ $doc->id }}, '{{ $doc->title }}', '{{ $doc->tag }}', '{{ addslashes($doc->comment) }}')" title="{{ __('portal.projects_documents.edit_title') }}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('projects.documents.destroy', $doc) }}" style="display: inline;" onsubmit="return confirm('Delete this document?')">
+                    <form method="POST" action="{{ route('projects.documents.destroy', $doc) }}" style="display: inline;" onsubmit="return confirm(@json(__('portal.projects_documents.delete_confirm')))">
                         @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger btn-icon" title="Delete">
+                        <button type="submit" class="btn btn-outline-danger btn-icon" title="{{ __('portal.projects_documents.delete_title') }}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
@@ -244,10 +244,10 @@
         @empty
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <h5>No documents uploaded yet</h5>
-            <p>Upload your first document to get started</p>
+            <h5>{{ __('portal.projects_documents.empty_title') }}</h5>
+            <p>{{ __('portal.projects_documents.empty_body') }}</p>
             <button class="btn btn-primary" onclick="showUploadModal()">
-                <i class="fas fa-upload"></i> Upload Document
+                <i class="fas fa-upload"></i> {{ __('portal.projects_documents.empty_upload') }}
             </button>
         </div>
         @endforelse
@@ -258,40 +258,40 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5><i class="fas fa-upload"></i> Upload Document</h5>
+                    <h5><i class="fas fa-upload"></i> {{ __('portal.projects_documents.upload_modal_title') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST" action="{{ route('projects.client.documents.store', $project) }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Title *</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_title') }} *</label>
                             <input type="text" name="title" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Tag *</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_tag') }} *</label>
                             <select name="tag" class="form-control" required>
-                                <option value="">Choose...</option>
-                                <option value="initial">Initial</option>
-                                <option value="design">Design</option>
-                                <option value="development">Development</option>
-                                <option value="final">Final</option>
-                                <option value="other">Other</option>
+                                <option value="">{{ __('portal.projects_documents.tag_choose') }}</option>
+                                <option value="initial">{{ __('portal.projects_documents.tag_initial') }}</option>
+                                <option value="design">{{ __('portal.projects_documents.tag_design') }}</option>
+                                <option value="development">{{ __('portal.projects_documents.tag_development') }}</option>
+                                <option value="final">{{ __('portal.projects_documents.tag_final') }}</option>
+                                <option value="other">{{ __('portal.projects_documents.tag_other') }}</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">File *</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_file') }} *</label>
                             <input type="file" name="file" class="form-control" required>
-                            <small class="text-muted">Max: 20MB</small>
+                            <small class="text-muted">{{ __('portal.projects_documents.max_file_hint') }}</small>
                         </div>
                         <div class="mb-0">
-                            <label class="form-label">Comment</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_comment') }}</label>
                             <textarea name="comment" class="form-control" rows="2"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.projects_documents.cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('portal.projects_documents.upload') }}</button>
                     </div>
                 </form>
             </div>
@@ -303,38 +303,38 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5><i class="fas fa-edit"></i> Update Document</h5>
+                    <h5><i class="fas fa-edit"></i> {{ __('portal.projects_documents.edit_modal_title') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST" id="editForm" enctype="multipart/form-data">
                     @csrf @method('PUT')
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Title *</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_title') }} *</label>
                             <input type="text" name="title" id="edit_title" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Tag *</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_tag') }} *</label>
                             <select name="tag" id="edit_tag" class="form-control" required>
-                                <option value="initial">Initial</option>
-                                <option value="design">Design</option>
-                                <option value="development">Development</option>
-                                <option value="final">Final</option>
-                                <option value="other">Other</option>
+                                <option value="initial">{{ __('portal.projects_documents.tag_initial') }}</option>
+                                <option value="design">{{ __('portal.projects_documents.tag_design') }}</option>
+                                <option value="development">{{ __('portal.projects_documents.tag_development') }}</option>
+                                <option value="final">{{ __('portal.projects_documents.tag_final') }}</option>
+                                <option value="other">{{ __('portal.projects_documents.tag_other') }}</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Replace File</label>
+                            <label class="form-label">{{ __('portal.projects_documents.replace_file') }}</label>
                             <input type="file" name="file" class="form-control">
                         </div>
                         <div class="mb-0">
-                            <label class="form-label">Comment</label>
+                            <label class="form-label">{{ __('portal.projects_documents.label_comment') }}</label>
                             <textarea name="comment" id="edit_comment" class="form-control" rows="2"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-warning">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.projects_documents.cancel') }}</button>
+                        <button type="submit" class="btn btn-warning">{{ __('portal.projects_documents.update') }}</button>
                     </div>
                 </form>
             </div>

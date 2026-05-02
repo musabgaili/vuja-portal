@@ -179,10 +179,10 @@
             <p style="opacity: 0.95; font-size: 1.1rem; margin-bottom: 1.5rem;">{{ $project->description }}</p>
             <div class="d-flex gap-2">
                 <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white;" onclick="showRequestModal()">
-                    <i class="fas fa-hand-paper"></i> Submit Request
+                    <i class="fas fa-hand-paper"></i> {{ __('portal.projects_client.show.submit_request') }}
                 </button>
                 <button class="btn btn-sm" style="background: rgba(255,100,100,0.3); color: white; border: 1px solid white;" onclick="showComplaintModal()">
-                    <i class="fas fa-exclamation-triangle"></i> Submit Complaint
+                    <i class="fas fa-exclamation-triangle"></i> {{ __('portal.projects_client.show.submit_complaint') }}
                 </button>
             </div>
             
@@ -205,7 +205,7 @@
         <div class="col-md-3 text-center">
             <div class="progress-circle mx-auto">
                 <div class="progress-number">{{ $project->completion_percentage }}%</div>
-                <small style="opacity: 0.8;">Complete</small>
+                <small style="opacity: 0.8;">{{ __('portal.projects_client.index.complete') }}</small>
             </div>
         </div>
     </div>
@@ -215,12 +215,12 @@
 <div class="mb-4" style="display: flex; gap: 1rem; flex-wrap: wrap;">
     @if($project->isActive())
     <a href="{{ route('projects.client.scope-change.create', $project) }}" class="action-btn-client">
-        <i class="fas fa-edit"></i> Request Change
+        <i class="fas fa-edit"></i> {{ __('portal.projects_client.show.request_change') }}
     </a>
     @endif
     @if($project->isCompleted() && !$project->feedback)
     <a href="{{ route('projects.client.feedback.create', $project) }}" class="action-btn-client" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);">
-        <i class="fas fa-star"></i> Rate Project
+        <i class="fas fa-star"></i> {{ __('portal.projects_client.show.rate_project') }}
     </a>
     @endif
 </div>
@@ -229,33 +229,33 @@
 <div class="stats-modern">
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->milestones->count() }}</div>
-        <div class="stat-modern-label">Milestones</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.index.milestones') }}</div>
     </div>
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->tasks->count() }}</div>
-        <div class="stat-modern-label">Total Tasks</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.show.total_tasks') }}</div>
     </div>
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->tasks->where('status', 'completed')->count() }}</div>
-        <div class="stat-modern-label">Completed</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.index.completed') }}</div>
     </div>
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->getTeamMembers()->count() }}</div>
-        <div class="stat-modern-label">Team Members</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.index.team_members') }}</div>
     </div>
 </div>
 
 <!-- Project Scope -->
 @if($project->scope)
 <div class="section-modern">
-    <h3><i class="fas fa-bullseye"></i> Project Scope</h3>
+    <h3><i class="fas fa-bullseye"></i> {{ __('portal.projects_client.show.project_scope') }}</h3>
     <p style="white-space: pre-line; color: #4b5563; line-height: 1.8;">{{ $project->scope }}</p>
 </div>
 @endif
 
 <!-- Milestones & Timeline -->
 <div class="section-modern">
-    <h3><i class="fas fa-flag"></i> Milestones & Timeline</h3>
+    <h3><i class="fas fa-flag"></i> {{ __('portal.projects_client.show.milestones_timeline') }}</h3>
     @forelse($project->milestones as $milestone)
     <div class="milestone-card-client">
         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -263,7 +263,7 @@
                 <h5 style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">
                     {{ $milestone->title }}
                     @if($milestone->client_approved)
-                    <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Approved</span>
+                    <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> {{ __('portal.projects_client.show.approved') }}</span>
                     @endif
                 </h5>
                 @if($milestone->description)
@@ -282,21 +282,21 @@
                 @endphp
                 
                 @if($milestone->client_approved === true)
-                    <span class="badge bg-success"><i class="fas fa-check-circle"></i> Approved</span>
+                    <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{ __('portal.projects_client.show.approved') }}</span>
                 @elseif($milestone->client_approved === false)
-                    <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Rejected</span>
+                    <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ __('portal.projects_client.show.rejected') }}</span>
                 @elseif($canReview)
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="approveMilestone({{ $milestone->id }}, 'approve')">
-                            <i class="fas fa-thumbs-up"></i> Approve
+                            <i class="fas fa-thumbs-up"></i> {{ __('portal.projects_client.show.approve') }}
                         </button>
                         <button class="btn btn-sm btn-danger" onclick="approveMilestone({{ $milestone->id }}, 'reject')">
-                            <i class="fas fa-thumbs-down"></i> Reject
+                            <i class="fas fa-thumbs-down"></i> {{ __('portal.projects_client.show.reject') }}
                         </button>
                     </div>
                 @else
-                    <button class="btn btn-sm btn-warning" disabled title="Waiting for tasks">
-                        <i class="fas fa-clock"></i> {{ $completedOrReviewTasks }}/{{ $totalTasks }} ready
+                    <button class="btn btn-sm btn-warning" disabled title="{{ __('portal.projects_client.show.waiting_for_tasks') }}">
+                        <i class="fas fa-clock"></i> {{ $completedOrReviewTasks }}/{{ $totalTasks }} {{ __('portal.projects_client.show.ready') }}
                     </button>
                 @endif
             </div>
@@ -311,11 +311,11 @@
         
         <div class="d-flex justify-content-between align-items-center mb-2">
             <small style="color: #64748b;">
-                <i class="fas fa-tasks"></i> {{ $completedTasks }}/{{ $totalTasks }} tasks completed
+                <i class="fas fa-tasks"></i> {{ $completedTasks }}/{{ $totalTasks }} {{ __('portal.projects_client.show.tasks_completed') }}
             </small>
             @if($milestone->due_date)
             <small style="color: #64748b;">
-                <i class="fas fa-calendar"></i> Due: {{ $milestone->due_date->format('M d, Y') }}
+                <i class="fas fa-calendar"></i> {{ __('portal.projects_client.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}
             </small>
             @endif
         </div>
@@ -323,10 +323,10 @@
         <div class="progress-modern">
             <div class="progress-modern-fill" style="width:{{ $taskProgress }}%;"></div>
         </div>
-        <small style="color: #64748b;">{{ $taskProgress }}% complete</small>
+        <small style="color: #64748b;">{{ $taskProgress }}% {{ __('portal.projects_client.index.complete') }}</small>
     </div>
     @empty
-    <p class="text-muted text-center py-4">No milestones have been set yet.</p>
+    <p class="text-muted text-center py-4">{{ __('portal.projects_client.show.no_milestones') }}</p>
     @endforelse
 </div>
 
@@ -334,7 +334,7 @@
 <div class="row">
     <div class="col-lg-6">
         <div class="section-modern">
-            <h3><i class="fas fa-box-open"></i> Project Deliverables</h3>
+            <h3><i class="fas fa-box-open"></i> {{ __('portal.projects_client.show.project_deliverables') }}</h3>
             @forelse($project->deliverables as $deliverable)
             <div class="doc-card">
                 <div class="d-flex justify-content-between align-items-start">
@@ -342,25 +342,25 @@
                         <h5 class="mb-1">
                             <i class="fas fa-file-archive text-success"></i> {{ $deliverable->title }}
                             @if($deliverable->client_confirmed)
-                            <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Confirmed</span>
+                            <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> {{ __('portal.projects_client.show.confirmed') }}</span>
                             @endif
                         </h5>
                         @if($deliverable->description)
                         <p class="text-muted small">{{ $deliverable->description }}</p>
                         @endif
                         <small class="text-muted">
-                            Uploaded by {{ $deliverable->uploadedBy->name }} • {{ $deliverable->created_at->format('M d, Y') }}
+                            {{ __('portal.projects_client.show.uploaded_by') }} {{ $deliverable->uploadedBy->name }} • {{ $deliverable->created_at->format('M d, Y') }}
                         </small>
                     </div>
                     <div class="d-flex gap-2 flex-column">
                         <a href="{{ route('projects.client.deliverables.download', $deliverable) }}" class="btn btn-sm btn-primary">
-                            <i class="fas fa-download"></i> Download
+                            <i class="fas fa-download"></i> {{ __('portal.pricing.download') }}
                         </a>
                         @if(!$deliverable->client_confirmed)
                         <form method="POST" action="{{ route('projects.client.deliverables.confirm', $deliverable) }}">
                             @csrf
-                            <button type="submit" class="btn btn-sm btn-success w-100" onclick="return confirm('Confirm receipt of this deliverable?')">
-                                <i class="fas fa-check"></i> Confirm
+                            <button type="submit" class="btn btn-sm btn-success w-100" onclick="return confirm('{{ __('portal.projects_client.show.confirm_deliverable_receipt_confirm') }}')">
+                                <i class="fas fa-check"></i> {{ __('portal.projects_client.show.confirm') }}
                             </button>
                         </form>
                         @endif
@@ -368,7 +368,7 @@
                 </div>
             </div>
             @empty
-            <p class="text-center text-muted py-4">No deliverables uploaded yet.</p>
+            <p class="text-center text-muted py-4">{{ __('portal.projects_client.show.no_deliverables') }}</p>
             @endforelse
         </div>
     </div>
@@ -376,9 +376,9 @@
     <div class="col-lg-6">
         <div class="section-modern">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3><i class="fas fa-comments"></i> Comments & Files</h3>
+                <h3><i class="fas fa-comments"></i> {{ __('portal.projects_client.show.comments_files') }}</h3>
                 <button class="btn btn-sm btn-primary" onclick="showUploadFileModal()">
-                    <i class="fas fa-upload"></i> Upload File
+                    <i class="fas fa-upload"></i> {{ __('portal.projects_client.show.upload_file') }}
                 </button>
             </div>
             
@@ -389,14 +389,14 @@
                     <input type="hidden" name="commentable_type" value="App\Models\Project">
                     <input type="hidden" name="commentable_id" value="{{ $project->id }}">
                     <div class="form-group">
-                        <label style="font-weight: 600; color: #1e293b;">Add a Comment</label>
+                        <label style="font-weight: 600; color: #1e293b;">{{ __('portal.projects_client.show.add_comment') }}</label>
                         <textarea name="comment" class="form-control" rows="3" 
-                            placeholder="Share updates, ask questions, or provide feedback..." 
+                            placeholder="{{ __('portal.projects_client.show.comment_placeholder') }}" 
                             required 
                             style="border-radius: 12px; border: 2px solid #e2e8f0;"></textarea>
                     </div>
                     <button type="submit" class="action-btn-client">
-                        <i class="fas fa-paper-plane"></i> Post Comment
+                        <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.post_comment') }}
                     </button>
                 </form>
             </div>
@@ -430,7 +430,7 @@
                 @empty
                 <div class="text-center py-5" style="background: #f8fafc; border-radius: 12px;">
                     <i class="fas fa-comments" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                    <p class="text-muted">No comments yet. Start the conversation!</p>
+                    <p class="text-muted">{{ __('portal.projects_client.show.no_comments') }}</p>
                 </div>
                 @endforelse
             </div>
@@ -440,7 +440,7 @@
 
 <!-- Project Documents -->
 <div class="section-modern">
-    <h3><i class="fas fa-folder-open"></i> Project Documents</h3>
+    <h3><i class="fas fa-folder-open"></i> {{ __('portal.projects_client.show.project_documents') }}</h3>
     @forelse($project->documents as $doc)
     <div class="doc-card">
         <div class="d-flex justify-content-between align-items-start">
@@ -474,13 +474,13 @@
         </div>
     </div>
     @empty
-    <p class="text-center text-muted py-4">No documents uploaded yet.</p>
+    <p class="text-center text-muted py-4">{{ __('portal.projects_client.show.no_documents') }}</p>
     @endforelse
 </div>
 
 <!-- Project Team -->
 <div class="section-modern">
-    <h3><i class="fas fa-users"></i> Project Team</h3>
+    <h3><i class="fas fa-users"></i> {{ __('portal.projects_client.show.project_team') }}</h3>
     <div class="row">
         @foreach($project->projectPeople as $person)
         <div class="col-md-6 mb-3">
@@ -492,21 +492,21 @@
                     <div class="d-flex align-items-center gap-2">
                         <strong style="font-size: 1.1rem; color: #1e293b;">{{ $person->user->name }}</strong>
                         @if($person->user_id === auth()->id())
-                        <span class="badge bg-success">You</span>
+                        <span class="badge bg-success">{{ __('portal.projects_client.show.you') }}</span>
                         @endif
                     </div>
                     <div class="mt-1">
                         @if($person->role === 'project_manager')
                         <span class="badge bg-success" style="font-size: 0.85rem;">
-                            <i class="fas fa-star"></i> Project Manager
+                            <i class="fas fa-star"></i> {{ __('portal.projects_client.show.project_manager') }}
                         </span>
                         @elseif($person->role === 'client')
                         <span class="badge bg-info" style="font-size: 0.85rem;">
-                            <i class="fas fa-user"></i> Client
+                            <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                         </span>
                         @else
                         <span class="badge bg-secondary" style="font-size: 0.85rem;">
-                            <i class="fas fa-user-tie"></i> Team Member
+                            <i class="fas fa-user-tie"></i> {{ __('portal.projects_client.show.team_member') }}
                         </span>
                         @endif
                     </div>
@@ -524,14 +524,14 @@
 <!-- Scope Change Requests (if any) -->
 @if($project->scopeChanges->where('requested_by', auth()->id())->count() > 0)
 <div class="section-modern">
-    <h3><i class="fas fa-exchange-alt"></i> My Scope Change Requests</h3>
+    <h3><i class="fas fa-exchange-alt"></i> {{ __('portal.projects_client.show.my_scope_change_requests') }}</h3>
     @foreach($project->scopeChanges->where('requested_by', auth()->id())->sortByDesc('created_at') as $change)
     <div class="milestone-card-client" style="border-left-color: {{ $change->getStatusBadgeColor() === 'success' ? '#10b981' : ($change->getStatusBadgeColor() === 'danger' ? '#ef4444' : '#f59e0b') }};">
         <div class="d-flex justify-content-between align-items-start">
             <div style="flex: 1;">
                 <h5 style="font-weight: 600; color: #1e293b;">{{ $change->title }}</h5>
                 <p style="color: #64748b; margin-bottom: 0.5rem;">{{ $change->description }}</p>
-                <small style="color: #94a3b8;">Submitted: {{ $change->created_at->format('M d, Y') }}</small>
+                <small style="color: #94a3b8;">{{ __('portal.projects_client.show.submitted') }}: {{ $change->created_at->format('M d, Y') }}</small>
             </div>
             <span class="status-badge {{ $change->getStatusBadgeColor() }}">
                 {{ ucfirst($change->status) }}
@@ -539,7 +539,7 @@
         </div>
         @if($change->review_notes)
         <div class="mt-2 p-2" style="background: rgba(0,0,0,0.05); border-radius: 8px;">
-            <small><strong>Review:</strong> {{ $change->review_notes }}</small>
+            <small><strong>{{ __('portal.projects_client.show.review') }}:</strong> {{ $change->review_notes }}</small>
         </div>
         @endif
     </div>
@@ -560,16 +560,16 @@
                 <input type="hidden" name="action" id="approvalAction" value="approve">
                 <div class="modal-body">
                     <div class="alert alert-info" id="approveAlert">
-                        <i class="fas fa-info-circle"></i> <span id="approveAlertText">Confirm that deliverables meet your expectations.</span>
+                        <i class="fas fa-info-circle"></i> <span id="approveAlertText">{{ __('portal.projects_client.show.confirm_deliverables_expectations') }}</span>
                     </div>
                     <div class="form-group">
-                        <label id="noteLabel">Note (Optional)</label>
-                        <textarea name="approval_note" id="approvalNote" class="form-control" rows="3" placeholder="Any feedback or comments..."></textarea>
+                        <label id="noteLabel">{{ __('portal.projects_client.show.note_optional') }}</label>
+                        <textarea name="approval_note" id="approvalNote" class="form-control" rows="3" placeholder="{{ __('portal.projects_client.show.note_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn" id="approveSubmitBtn">
-                        <i class="fas fa-check"></i> <span id="approveSubmitText">Approve</span>
+                        <i class="fas fa-check"></i> <span id="approveSubmitText">{{ __('portal.projects_client.show.approve') }}</span>
                     </button>
                 </div>
             </form>
@@ -583,27 +583,27 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5><i class="fas fa-exclamation-triangle"></i> Submit Complaint</h5>
+    <h5><i class="fas fa-exclamation-triangle"></i> {{ __('portal.projects_client.show.submit_complaint') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.client.complaints.store', $project) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="alert alert-warning">
-                        <i class="fas fa-info-circle"></i> This will alert the Super Manager, Account Manager, and Project Manager.
+                        <i class="fas fa-info-circle"></i> {{ __('portal.projects_client.show.complaint_alert_recipients') }}
                     </div>
                     <div class="form-group">
-                        <label>Subject *</label>
+                        <label>{{ __('portal.projects_client.show.subject') }} *</label>
                         <input type="text" name="subject" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Complaint Details *</label>
+                        <label>{{ __('portal.projects_client.show.complaint_details') }} *</label>
                         <textarea name="complaint" class="form-control" rows="4" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-paper-plane"></i> Submit Complaint
+                        <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.submit_complaint') }}
                     </button>
                 </div>
             </form>
@@ -616,39 +616,39 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5><i class="fas fa-upload"></i> Upload File</h5>
+    <h5><i class="fas fa-upload"></i> {{ __('portal.projects_client.show.upload_file') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.client.documents.store', $project) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group mb-3">
-                        <label class="fw-bold">Title *</label>
-                        <input type="text" name="title" class="form-control" placeholder="Enter file title..." required>
+                        <label class="fw-bold">{{ __('portal.projects_client.show.title') }} *</label>
+                        <input type="text" name="title" class="form-control" placeholder="{{ __('portal.projects_client.show.enter_file_title') }}" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="fw-bold">File *</label>
+                        <label class="fw-bold">{{ __('portal.projects_client.show.file') }} *</label>
                         <input type="file" name="file" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="fw-bold">Tag *</label>
+                        <label class="fw-bold">{{ __('portal.projects_client.show.tag') }} *</label>
                         <select name="tag" class="form-control" required>
-                            <option value="">Select a tag...</option>
-                            <option value="initial">Initial Draft</option>
-                            <option value="design">Design File</option>
-                            <option value="development">Development</option>
-                            <option value="final">Final Version</option>
-                            <option value="other">Other</option>
+                            <option value="">{{ __('portal.projects_client.show.select_tag') }}</option>
+                            <option value="initial">{{ __('portal.projects_client.show.tag_initial_draft') }}</option>
+                            <option value="design">{{ __('portal.projects_client.show.tag_design_file') }}</option>
+                            <option value="development">{{ __('portal.projects_client.show.tag_development') }}</option>
+                            <option value="final">{{ __('portal.projects_client.show.tag_final_version') }}</option>
+                            <option value="other">{{ __('portal.projects_client.show.tag_other') }}</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="fw-bold">Comment (Optional)</label>
-                        <textarea name="comment" class="form-control" rows="2" placeholder="Add a note about this file..."></textarea>
+                        <label class="fw-bold">{{ __('portal.projects_client.show.comment_optional') }}</label>
+                        <textarea name="comment" class="form-control" rows="2" placeholder="{{ __('portal.projects_client.show.file_comment_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload File
+                        <i class="fas fa-upload"></i> {{ __('portal.projects_client.show.upload_file') }}
                     </button>
                 </div>
             </form>
@@ -661,27 +661,27 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-info text-white">
-                <h5><i class="fas fa-hand-paper"></i> Submit Request</h5>
+    <h5><i class="fas fa-hand-paper"></i> {{ __('portal.projects_client.show.submit_request') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.client.requests.store', $project) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> This will be sent to the Account Manager and Project Manager.
+                        <i class="fas fa-info-circle"></i> {{ __('portal.projects_client.show.request_alert_recipients') }}
                     </div>
                     <div class="form-group mb-3">
-                        <label class="fw-bold">Subject *</label>
-                        <input type="text" name="subject" class="form-control" required placeholder="e.g., Please edit the design">
+                        <label class="fw-bold">{{ __('portal.projects_client.show.subject') }} *</label>
+                        <input type="text" name="subject" class="form-control" required placeholder="{{ __('portal.projects_client.show.subject_placeholder') }}">
                     </div>
                     <div class="form-group">
-                        <label class="fw-bold">Request Details *</label>
-                        <textarea name="request" class="form-control" rows="4" required placeholder="Describe your request in detail..."></textarea>
+                        <label class="fw-bold">{{ __('portal.projects_client.show.request_details') }} *</label>
+                        <textarea name="request" class="form-control" rows="4" required placeholder="{{ __('portal.projects_client.show.request_details_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-info">
-                        <i class="fas fa-paper-plane"></i> Submit Request
+                        <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.submit_request') }}
                     </button>
                 </div>
             </form>
@@ -708,24 +708,24 @@ function approveMilestone(milestoneId, action) {
     
     if (action === 'approve') {
         header.className = 'modal-header bg-success text-white';
-        title.innerHTML = '<i class="fas fa-thumbs-up"></i> Approve Milestone';
+        title.innerHTML = '<i class="fas fa-thumbs-up"></i> ' + @js(__('portal.projects_client.show.approve_milestone'));
         alert.className = 'alert alert-success';
-        alertText.textContent = 'Confirm that deliverables meet your expectations.';
-        noteLabel.textContent = 'Note (Optional)';
-        noteField.placeholder = 'Any positive feedback...';
+        alertText.textContent = @js(__('portal.projects_client.show.confirm_deliverables_expectations'));
+        noteLabel.textContent = @js(__('portal.projects_client.show.note_optional'));
+        noteField.placeholder = @js(__('portal.projects_client.show.any_positive_feedback'));
         noteField.required = false;
         submitBtn.className = 'btn btn-success';
-        submitText.textContent = 'Approve';
+        submitText.textContent = @js(__('portal.projects_client.show.approve'));
     } else {
         header.className = 'modal-header bg-danger text-white';
-        title.innerHTML = '<i class="fas fa-thumbs-down"></i> Reject Milestone';
+        title.innerHTML = '<i class="fas fa-thumbs-down"></i> ' + @js(__('portal.projects_client.show.reject_milestone'));
         alert.className = 'alert alert-danger';
-        alertText.textContent = 'Please explain why you are rejecting this milestone.';
-        noteLabel.innerHTML = 'Rejection Reason <span class="text-danger">*</span>';
-        noteField.placeholder = 'Explain what needs to be fixed or changed...';
+        alertText.textContent = @js(__('portal.projects_client.show.explain_rejection'));
+        noteLabel.innerHTML = @js(__('portal.projects_client.show.rejection_reason')) + ' <span class="text-danger">*</span>';
+        noteField.placeholder = @js(__('portal.projects_client.show.explain_what_to_fix'));
         noteField.required = true;
         submitBtn.className = 'btn btn-danger';
-        submitText.textContent = 'Reject';
+        submitText.textContent = @js(__('portal.projects_client.show.reject'));
     }
     
     noteField.value = '';

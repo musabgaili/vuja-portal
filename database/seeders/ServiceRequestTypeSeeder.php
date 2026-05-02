@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\ServiceRequestType;
 use App\Models\ServiceRequestStep;
+use App\Models\ServiceRequestType;
 use App\Models\StepFormField;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class ServiceRequestTypeSeeder extends Seeder
 {
@@ -16,9 +16,10 @@ class ServiceRequestTypeSeeder extends Seeder
     public function run(): void
     {
         $manager = User::where('role', 'manager')->first();
-        
-        if (!$manager) {
+
+        if (! $manager) {
             $this->command->error('No manager user found. Please run UserSeeder first.');
+
             return;
         }
 
@@ -140,7 +141,7 @@ class ServiceRequestTypeSeeder extends Seeder
                 'Marketing & Branding',
                 'Legal Advice',
                 'Financial Planning',
-                'Other'
+                'Other',
             ],
             'is_required' => true,
             'field_order' => 1,

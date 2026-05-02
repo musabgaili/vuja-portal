@@ -1,8 +1,8 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Copyright Registrations')
+@section('title', __('portal.copyright.manager.index.title'))
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('copyright.manager.index') }}">Copyright</a></li>
-<li class="breadcrumb-item active">All Requests</li>
+<li class="breadcrumb-item"><a href="{{ route('copyright.manager.index') }}">{{ __('portal.copyright.manager.index.breadcrumb') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.copyright.manager.index.all_requests') }}</li>
 @endsection
 
 @section('content')
@@ -19,15 +19,15 @@
 
 <div class="copy-header">
     <div class="d-flex justify-content-between align-items-center">
-        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-copyright"></i> Copyright Registrations</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">Manage copyright registration requests</p></div>
-        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $copyrights->total() }}</h2><small style="opacity:0.9;">Total</small></div>
+        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-copyright"></i> {{ __('portal.copyright.manager.index.heading') }}</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">{{ __('portal.copyright.manager.index.subtitle') }}</p></div>
+        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $copyrights->total() }}</h2><small style="opacity:0.9;">{{ __('portal.copyright.manager.index.total') }}</small></div>
     </div>
 </div>
 
 @if($copyrights->count() > 0)
 <div class="table-modern">
     <table class="table mb-0">
-        <thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Client</th><th>Status</th><th>Copyright#</th><th>Actions</th></tr></thead>
+        <thead><tr><th>{{ __('portal.copyright.manager.index.col_id') }}</th><th>{{ __('portal.copyright.manager.index.col_title') }}</th><th>{{ __('portal.copyright.manager.index.col_type') }}</th><th>{{ __('portal.copyright.manager.index.col_client') }}</th><th>{{ __('portal.copyright.manager.index.col_status') }}</th><th>{{ __('portal.copyright.manager.index.col_copyright_number') }}</th><th>{{ __('portal.copyright.manager.index.col_actions') }}</th></tr></thead>
         <tbody>
             @foreach($copyrights as $c)
             <tr>
@@ -36,7 +36,7 @@
                 <td><span class="badge bg-danger">{{ $c->work_type }}</span></td>
                 <td><strong>{{ $c->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $c->user->email }}</small></td>
                 <td><span class="status-badge {{ $c->getStatusBadgeColor() }}">{{ $c->getStatusLabel() }}</span></td>
-                <td>{{ $c->copyright_number??'—' }}</td>
+                <td>{{ $c->copyright_number ?? __('portal.copyright.manager.index.none_dash') }}</td>
                 <td><div class="d-flex gap-2"><a href="{{ route('copyright.manager.show',$c) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($c->isMeetingBooked()&&!$c->meeting_confirmed_at)<button class="btn btn-sm btn-success" onclick="confirmMeeting({{ $c->id }})"><i class="fas fa-check"></i></button>@endif @if($c->isMeetingConfirmed())<button class="btn btn-sm btn-primary" onclick="updateStatus({{ $c->id }})"><i class="fas fa-edit"></i></button>@endif</div></td>
             </tr>
             @endforeach
@@ -45,13 +45,13 @@
 </div>
 <div class="d-flex justify-content-center mt-4">{{ $copyrights->links('pagination::bootstrap-5') }}</div>
 @else
-<div class="empty-state"><i class="fas fa-copyright"></i><h4 style="color:#1e293b;font-weight:600;">No Copyright Registrations</h4><p class="text-muted">No copyright registration requests yet.</p></div>
+<div class="empty-state"><i class="fas fa-copyright"></i><h4 style="color:#1e293b;font-weight:600;">{{ __('portal.copyright.manager.index.empty_title') }}</h4><p class="text-muted">{{ __('portal.copyright.manager.index.empty_body') }}</p></div>
 @endif
 @endsection
 
 @push('scripts')
 <script>
-function confirmMeeting(id){if(confirm('Confirm?'))fetch(`/internal/copyright/${id}/confirm-meeting`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+function confirmMeeting(id){if(confirm(@js(__('portal.ip.confirm_meeting_question'))))fetch(`/internal/copyright/${id}/confirm-meeting`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
 function updateStatus(id){window.location.href=`/internal/copyright/${id}`;}
 </script>
 @endpush

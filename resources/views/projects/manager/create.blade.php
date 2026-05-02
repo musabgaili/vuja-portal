@@ -1,9 +1,9 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Create New Project')
+@section('title', __('portal.projects_manager.create.title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('projects.manager.index') }}">Projects</a></li>
-<li class="breadcrumb-item active">Create</li>
+<li class="breadcrumb-item"><a href="{{ route('projects.manager.index') }}">{{ __('portal.projects_manager.projects') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.projects_manager.create.breadcrumb') }}</li>
 @endsection
 
 @section('content')
@@ -11,16 +11,16 @@
     <div class="col-lg-10 mx-auto">
         <div class="card">
             <div class="card-header">
-                <h3>Create New Project</h3>
+                <h3>{{ __('portal.projects_manager.create.heading') }}</h3>
             </div>
             <div class="card-content">
                 <form method="POST" action="{{ route('projects.store') }}">
                     @csrf
                     
                     <div class="form-group">
-                        <label>Client *</label>
+                        <label>{{ __('portal.projects_manager.create.client') }} *</label>
                         <select name="client_id" class="form-control" required>
-                            <option value="">Select Client...</option>
+                            <option value="">{{ __('portal.projects_manager.create.select_client') }}</option>
                             @foreach($clients as $client)
                             <option value="{{ $client->id }}">{{ $client->name }} ({{ $client->email }})</option>
                             @endforeach
@@ -29,40 +29,40 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Project Title *</label>
-                        <input type="text" name="title" class="form-control" required placeholder="e.g., Mobile App Development">
+                        <label>{{ __('portal.projects_manager.create.project_title') }} *</label>
+                        <input type="text" name="title" class="form-control" required placeholder="{{ __('portal.projects_manager.create.project_title_placeholder') }}">
                         @error('title')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="form-group">
-                        <label>Description *</label>
-                        <textarea name="description" rows="4" class="form-control" required placeholder="Brief project overview..."></textarea>
+                        <label>{{ __('portal.projects_manager.create.description') }} *</label>
+                        <textarea name="description" rows="4" class="form-control" required placeholder="{{ __('portal.projects_manager.create.description_placeholder') }}"></textarea>
                         @error('description')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="form-group">
-                        <label>Scope</label>
-                        <textarea name="scope" rows="4" class="form-control" placeholder="Detailed project scope and deliverables..."></textarea>
+                        <label>{{ __('portal.projects_manager.create.scope') }}</label>
+                        <textarea name="scope" rows="4" class="form-control" placeholder="{{ __('portal.projects_manager.create.scope_placeholder') }}"></textarea>
                         @error('scope')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Budget ($)</label>
+                                <label>{{ __('portal.projects_manager.create.budget') }}</label>
                                 <input type="number" name="budget" class="form-control" step="0.01" placeholder="0.00">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Project Manager</label>
+                                <label>{{ __('portal.projects_manager.create.project_manager') }}</label>
                                 <select name="project_manager_id" class="form-control">
-                                    <option value="">Select PM...</option>
+                                    <option value="">{{ __('portal.projects_manager.create.select_pm') }}</option>
                                     @foreach($managers as $manager)
                                     <option value="{{ $manager->id }}">{{ $manager->name }}</option>
                                     @endforeach
                                     @foreach($employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->name }} (Employee)</option>
+                                    <option value="{{ $employee->id }}">{{ $employee->name }} ({{ __('portal.projects_manager.create.employee') }})</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -72,34 +72,34 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Start Date</label>
+                                <label>{{ __('portal.projects_manager.create.start_date') }}</label>
                                 <input type="date" name="start_date" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>End Date</label>
+                                <label>{{ __('portal.projects_manager.create.end_date') }}</label>
                                 <input type="date" name="end_date" class="form-control">
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Team Members</label>
+                        <label>{{ __('portal.projects_manager.create.team_members') }}</label>
                         <select name="team_members[]" class="form-control" multiple size="5">
                             @foreach($employees as $employee)
                             <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                             @endforeach
                         </select>
-                        <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+                        <small class="text-muted">{{ __('portal.projects_manager.create.team_members_help') }}</small>
                     </div>
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Create Project
+                            <i class="fas fa-plus"></i> {{ __('portal.projects_manager.create.create_project') }}
                         </button>
                         <a href="{{ route('projects.manager.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
+                            <i class="fas fa-times"></i> {{ __('portal.team.cancel') }}
                         </a>
                     </div>
                 </form>

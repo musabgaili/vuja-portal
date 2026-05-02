@@ -147,7 +147,7 @@ class ServiceRequest extends Model
      */
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'warning',
             'in_review' => 'info',
             'approved' => 'success',
@@ -163,7 +163,7 @@ class ServiceRequest extends Model
      */
     public function getPriorityBadgeColor(): string
     {
-        return match($this->priority) {
+        return match ($this->priority) {
             'low' => 'success',
             'medium' => 'warning',
             'high' => 'error',
@@ -177,7 +177,7 @@ class ServiceRequest extends Model
      */
     public function getTypeDisplayName(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'idea' => 'Idea Generation',
             'consultation' => 'Consultation',
             'research' => 'Research & IP',

@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\ResearchRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ResearchRequestController extends Controller
 {
     // CLIENT SIDE
-    
+
     public function create()
     {
         return view('research.create');
@@ -50,13 +48,13 @@ class ResearchRequestController extends Controller
     public function show(ResearchRequest $research)
     {
         $user = Auth::user();
-        
+
         if ($user->isClient() && $research->user_id !== $user->id) {
             abort(403);
         }
 
         $research->load(['user', 'assignedTo']);
-        
+
         return view('research.show', compact('research'));
     }
 
@@ -75,7 +73,7 @@ class ResearchRequestController extends Controller
     public function bookMeeting(Request $request, ResearchRequest $research)
     {
         // Check if consultant is assigned
-        if (!$research->assigned_to) {
+        if (! $research->assigned_to) {
             return back()->withErrors(['error' => 'You cannot book a meeting until a consultant is assigned to your research request.']);
         }
 
@@ -93,17 +91,17 @@ class ResearchRequestController extends Controller
     }
 
     // MANAGER/EMPLOYEE SIDE
-    
+
     public function managerIndex()
     {
         $user = Auth::user();
-        
-        if (!$user->isManager() && !$user->isEmployee()) {
+
+        if (! $user->isManager() && ! $user->isEmployee()) {
             abort(403);
         }
 
         $query = ResearchRequest::with(['user', 'assignedTo']);
-        
+
         if ($user->isEmployee()) {
             $query->where('assigned_to', $user->id);
         }
@@ -116,8 +114,8 @@ class ResearchRequestController extends Controller
     public function managerShow(ResearchRequest $research)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 

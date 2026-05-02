@@ -197,18 +197,18 @@
                 @else
                 <div class="project-meta-item">
                     <i class="fas fa-user"></i>
-                    <span class="text-muted">No Client</span>
+                    <span class="text-muted">{{ __('portal.projects_manager.show.no_client') }}</span>
                 </div>
                 @endif
                 @if($project->projectManager)
                 <div class="project-meta-item">
                     <i class="fas fa-user-tie"></i>
-                    <span>PM: {{ $project->projectManager->name }}</span>
+                    <span>{{ __('portal.projects_manager.show.pm') }}: {{ $project->projectManager->name }}</span>
                 </div>
                 @endif
                 <div class="project-meta-item">
                     <i class="fas fa-users"></i>
-                    <span>{{ $project->getTeamMembers()->count() }} Members</span>
+                    <span>{{ $project->getTeamMembers()->count() }} {{ __('portal.projects_manager.show.members') }}</span>
                 </div>
                 @if($project->budget)
                 <div class="project-meta-item">
@@ -228,38 +228,38 @@
     <div class="progress-bar-modern mt-3">
         <div class="progress-fill-modern" style="width:{{ $project->completion_percentage }}%;"></div>
     </div>
-    <small style="opacity: 0.8;">{{ $project->completion_percentage }}% Complete</small>
+    <small style="opacity: 0.8;">{{ $project->completion_percentage }}% {{ __('portal.projects_manager.show.complete') }}</small>
 </div>
 
 <!-- Action Buttons -->
 <div class="mb-3" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
     @if($canEdit)
     <button class="btn btn-primary" onclick="showEditModal()">
-        <i class="fas fa-edit"></i> Edit Project
+        <i class="fas fa-edit"></i> {{ __('portal.projects_manager.show.edit_project') }}
     </button>
     @endif
     
     @if($canManageMilestones)
     <button class="btn btn-success" onclick="showMilestoneModal()">
-        <i class="fas fa-flag"></i> Add Milestone
+        <i class="fas fa-flag"></i> {{ __('portal.projects_manager.show.add_milestone') }}
     </button>
     @endif
     
     @if($canManageTasks)
     <button class="btn btn-info" onclick="showTaskModal()">
-        <i class="fas fa-tasks"></i> Add Task
+        <i class="fas fa-tasks"></i> {{ __('portal.projects_manager.show.add_task') }}
     </button>
     @endif
     
     @if($canManageExpenses)
     <a href="{{ route('projects.expenses.index', $project) }}" class="btn btn-warning">
-        <i class="fas fa-receipt"></i> Expenses
+        <i class="fas fa-receipt"></i> {{ __('portal.projects_manager.show.expenses') }}
     </a>
     @endif
     
     @if($canManageTeam)
     <button class="btn btn-secondary" onclick="showAddTeamModal()">
-        <i class="fas fa-user-plus"></i> Add Member
+        <i class="fas fa-user-plus"></i> {{ __('portal.projects_manager.show.add_member') }}
     </button>
     @endif
 </div>
@@ -267,46 +267,46 @@
 <!-- Tabs -->
 <div class="project-tabs">
     <button class="project-tab active" onclick="switchTab('overview')">
-        <i class="fas fa-th-large"></i> Overview
+        <i class="fas fa-th-large"></i> {{ __('portal.projects_manager.show.overview') }}
     </button>
     <button class="project-tab" onclick="switchTab('milestones')">
-        <i class="fas fa-flag"></i> Milestones
+        <i class="fas fa-flag"></i> {{ __('portal.projects_manager.show.milestones') }}
     </button>
     <button class="project-tab" onclick="switchTab('tasks')">
-        <i class="fas fa-tasks"></i> Tasks ({{ $project->tasks->count() }})
+        <i class="fas fa-tasks"></i> {{ __('portal.projects_manager.show.tasks') }} ({{ $project->tasks->count() }})
     </button>
     <button class="project-tab" onclick="switchTab('team')">
-        <i class="fas fa-users"></i> Team
+        <i class="fas fa-users"></i> {{ __('portal.projects_manager.show.team') }}
     </button>
     <button class="project-tab" onclick="switchTab('comments')">
-        <i class="fas fa-comments"></i> Comments
+        <i class="fas fa-comments"></i> {{ __('portal.projects_manager.show.comments') }}
     </button>
     <button class="project-tab" onclick="switchTab('documents')">
-        <i class="fas fa-folder-open"></i> Documents
+        <i class="fas fa-folder-open"></i> {{ __('portal.projects_manager.show.documents') }}
     </button>
     <button class="project-tab" onclick="switchTab('deliverables')">
-        <i class="fas fa-box-open"></i> Deliverables
+        <i class="fas fa-box-open"></i> {{ __('portal.projects_manager.show.deliverables') }}
     </button>
     <button class="project-tab" onclick="switchTab('requests')">
-        <i class="fas fa-hand-paper"></i> Requests
+        <i class="fas fa-hand-paper"></i> {{ __('portal.projects_manager.show.requests') }}
         @if($project->requests->where('status', 'open')->count() > 0)
         <span class="badge bg-warning">{{ $project->requests->where('status', 'open')->count() }}</span>
         @endif
     </button>
     <button class="project-tab" onclick="switchTab('complaints')">
-        <i class="fas fa-exclamation-triangle"></i> Complaints
+        <i class="fas fa-exclamation-triangle"></i> {{ __('portal.projects_manager.show.complaints') }}
         @if($project->complaints->where('status', 'open')->count() > 0)
         <span class="badge bg-danger">{{ $project->complaints->where('status', 'open')->count() }}</span>
         @endif
     </button>
     <button class="project-tab" onclick="switchTab('feedback')">
-        <i class="fas fa-star"></i> Feedback
+        <i class="fas fa-star"></i> {{ __('portal.projects_manager.show.feedback') }}
         @if($project->feedback)
         <span class="badge bg-success ms-1">{{ $project->feedback->rating }}/5</span>
         @endif
     </button>
     <button class="project-tab" onclick="switchTab('activity')">
-        <i class="fas fa-history"></i> Activity
+        <i class="fas fa-history"></i> {{ __('portal.projects_manager.show.activity') }}
     </button>
 </div>
 
@@ -315,26 +315,26 @@
     <div class="stats-grid">
         <div class="stat-box">
             <div class="stat-value">{{ $project->milestones->count() }}</div>
-            <div class="stat-label">Milestones</div>
+            <div class="stat-label">{{ __('portal.projects_manager.show.milestones') }}</div>
         </div>
         <div class="stat-box">
             <div class="stat-value">{{ $project->tasks->count() }}</div>
-            <div class="stat-label">Total Tasks</div>
+            <div class="stat-label">{{ __('portal.projects_manager.show.total_tasks') }}</div>
         </div>
         <div class="stat-box">
             <div class="stat-value">{{ $project->tasks->where('status', 'completed')->count() }}</div>
-            <div class="stat-label">Completed</div>
+            <div class="stat-label">{{ __('portal.projects_manager.show.completed') }}</div>
         </div>
         <div class="stat-box">
             <div class="stat-value">{{ $project->completion_percentage }}%</div>
-            <div class="stat-label">Progress</div>
+            <div class="stat-label">{{ __('portal.projects_manager.show.progress') }}</div>
         </div>
     </div>
 
     @if($project->scope)
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Project Scope</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.project_scope') }}</div>
         </div>
         <p style="white-space: pre-line;">{{ $project->scope }}</p>
     </div>
@@ -344,7 +344,7 @@
         <div class="col-md-6">
             <div class="section-card">
                 <div class="section-header">
-                    <div class="section-title">Recent Tasks</div>
+                    <div class="section-title">{{ __('portal.projects_manager.show.recent_tasks') }}</div>
                 </div>
                 @forelse($project->tasks->sortByDesc('created_at')->take(5) as $task)
                 <div class="task-item">
@@ -358,14 +358,14 @@
                     </button>
                 </div>
                 @empty
-                <p class="text-muted">No tasks yet.</p>
+                <p class="text-muted">{{ __('portal.projects_manager.show.no_tasks_yet') }}</p>
                 @endforelse
             </div>
         </div>
         <div class="col-md-6">
             <div class="section-card">
                 <div class="section-header">
-                    <div class="section-title">Upcoming Milestones</div>
+                    <div class="section-title">{{ __('portal.projects_manager.show.upcoming_milestones') }}</div>
                 </div>
                 @forelse($project->milestones->where('status', '!=', 'completed')->take(3) as $milestone)
                 <div class="milestone-item">
@@ -373,11 +373,11 @@
                     <br>
                     <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
                     @if($milestone->due_date)
-                    <small class="text-muted">• Due: {{ $milestone->due_date->format('M d') }}</small>
+                    <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d') }}</small>
                     @endif
                 </div>
                 @empty
-                <p class="text-muted">No upcoming milestones.</p>
+                <p class="text-muted">{{ __('portal.projects_manager.show.no_upcoming_milestones') }}</p>
                 @endforelse
             </div>
         </div>
@@ -388,7 +388,7 @@
 <div id="milestones-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">All Milestones</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.all_milestones') }}</div>
         </div>
         @forelse($project->milestones as $milestone)
         <div class="milestone-item">
@@ -401,22 +401,22 @@
                     <div class="mb-2">
                         <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
                         @if($milestone->client_approved === true)
-                        <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Client Approved</span>
+                        <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.client_approved') }}</span>
                         @elseif($milestone->client_approved === false)
-                        <span class="badge bg-danger ms-2"><i class="fas fa-times-circle"></i> Client Rejected</span>
+                        <span class="badge bg-danger ms-2"><i class="fas fa-times-circle"></i> {{ __('portal.projects_manager.show.client_rejected') }}</span>
                         @endif
                         @if($milestone->due_date)
-                        <small class="text-muted">• Due: {{ $milestone->due_date->format('M d, Y') }}</small>
+                        <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}</small>
                         @endif
                     </div>
                     @if($milestone->client_approved === false && $milestone->approval_note)
                     <div class="alert alert-danger mt-2">
-                        <strong><i class="fas fa-exclamation-triangle"></i> Rejection Reason:</strong>
+                        <strong><i class="fas fa-exclamation-triangle"></i> {{ __('portal.projects_manager.show.rejection_reason') }}:</strong>
                         <p class="mb-0 mt-1">"{{ $milestone->approval_note }}"</p>
                     </div>
                     @elseif($milestone->client_approved === true && $milestone->approval_note)
                     <div class="alert alert-success mt-2">
-                        <strong><i class="fas fa-comment"></i> Client Note:</strong>
+                        <strong><i class="fas fa-comment"></i> {{ __('portal.projects_manager.show.client_note') }}:</strong>
                         <p class="mb-0 mt-1">"{{ $milestone->approval_note }}"</p>
                     </div>
                     @endif
@@ -433,7 +433,7 @@
                     @if($milestone->status !== 'completed' && $canManageMilestones)
                     <div class="mt-3">
                         <button class="btn btn-sm btn-success" onclick="markMilestoneCompleted({{ $milestone->id }})">
-                            <i class="fas fa-check-circle"></i> Mark as Completed
+                            <i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.mark_as_completed') }}
                         </button>
                     </div>
                     @endif
@@ -441,7 +441,7 @@
             </div>
         </div>
         @empty
-        <p class="text-muted text-center py-4">No milestones yet. <a href="#" onclick="showMilestoneModal(); return false;">Create first milestone</a></p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_milestones_yet') }} <a href="#" onclick="showMilestoneModal(); return false;">{{ __('portal.projects_manager.show.create_first_milestone') }}</a></p>
         @endforelse
     </div>
 </div>
@@ -450,7 +450,7 @@
 <div id="tasks-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">All Tasks ({{ $project->tasks->count() }})</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.all_tasks') }} ({{ $project->tasks->count() }})</div>
         </div>
         @forelse($project->tasks->sortByDesc('created_at') as $task)
         <div class="task-item">
@@ -458,20 +458,20 @@
                 <strong>{{ $task->title }}</strong>
                 <div class="mt-1">
                     <span class="status-badge {{ $task->getStatusBadgeColor() }}">{{ ucfirst($task->status) }}</span>
-                    @if($task->priority === 'urgent')<span class="badge bg-danger">URGENT</span>@endif
-                    @if($task->priority === 'high')<span class="badge bg-warning">High</span>@endif
+                    @if($task->priority === 'urgent')<span class="badge bg-danger">{{ __('portal.projects_manager.show.urgent') }}</span>@endif
+                    @if($task->priority === 'high')<span class="badge bg-warning">{{ __('portal.projects_manager.show.high') }}</span>@endif
                     @if($task->milestone)<span class="badge bg-secondary">{{ $task->milestone->title }}</span>@endif
                     @if($task->assignedTo)<span class="badge bg-info">{{ $task->assignedTo->name }}</span>@endif
                 </div>
             </div>
             @if($canManageTasks || $task->assigned_to === auth()->id())
             <button class="btn btn-sm btn-secondary" onclick="updateTaskStatus({{ $task->id }})">
-                <i class="fas fa-edit"></i> {{ $canManageTasks ? 'Edit' : 'Update Status' }}
+                <i class="fas fa-edit"></i> {{ $canManageTasks ? __('portal.projects_manager.show.edit') : __('portal.projects_manager.show.update_status') }}
             </button>
             @endif
         </div>
         @empty
-        <p class="text-muted text-center py-4">No tasks yet.</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_tasks_yet') }}</p>
         @endforelse
     </div>
 </div>
@@ -480,10 +480,10 @@
 <div id="team-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Project Team</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.project_team') }}</div>
             @if($canManageTeam)
             <button class="btn btn-sm btn-primary" onclick="showAddTeamModal()">
-                <i class="fas fa-plus"></i> Add Member
+                <i class="fas fa-plus"></i> {{ __('portal.projects_manager.show.add_member') }}
             </button>
             @endif
         </div>
@@ -498,14 +498,14 @@
                 <span class="badge bg-{{ $person->role === 'project_manager' ? 'success' : ($person->role === 'client' ? 'info' : 'secondary') }}">
                     {{ ucfirst(str_replace('_', ' ', $person->role)) }}
                 </span>
-                @if($person->can_edit)<span class="badge bg-warning">Can Edit</span>@endif
+                @if($person->can_edit)<span class="badge bg-warning">{{ __('portal.projects_manager.show.can_edit') }}</span>@endif
             </div>
             @if($canManageTeam)
             <div style="display: flex; gap: 0.5rem;">
                 <button class="btn btn-sm btn-secondary" onclick="editTeamMember({{ $person->id }}, '{{ $person->role }}', {{ $person->can_edit ? 'true' : 'false' }})">
                     <i class="fas fa-edit"></i>
                 </button>
-                <form method="POST" action="{{ route('projects.team.remove', $person) }}" style="display:inline;" onsubmit="return confirm('Remove {{ $person->user->name }}?')">
+                <form method="POST" action="{{ route('projects.team.remove', $person) }}" style="display:inline;" onsubmit="return confirm('{{ __('portal.projects_manager.show.remove_confirm') }}')">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                 </form>
@@ -520,7 +520,7 @@
 <div id="comments-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Project Comments</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.project_comments') }}</div>
         </div>
         
         <!-- Add Comment Form -->
@@ -530,15 +530,15 @@
             <input type="hidden" name="commentable_type" value="App\Models\Project">
             <input type="hidden" name="commentable_id" value="{{ $project->id }}">
             <div class="form-group">
-                <textarea name="comment" class="form-control" rows="3" placeholder="Add a comment..." required></textarea>
+                <textarea name="comment" class="form-control" rows="3" placeholder="{{ __('portal.projects_manager.show.add_comment_placeholder') }}" required></textarea>
             </div>
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane"></i> Post Comment
+                <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.post_comment') }}
             </button>
         </form>
         @else
         <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> You can only view comments. Contact your project manager to add comments.
+            <i class="fas fa-info-circle"></i> {{ __('portal.projects_manager.show.view_only_comments') }}
         </div>
         @endif
 
@@ -549,9 +549,9 @@
                 <span class="comment-author">
                     {{ $comment->user->name }}
                     @if($comment->is_internal)
-                    <span class="badge bg-warning" style="font-size: 0.7rem;">Team</span>
+                    <span class="badge bg-warning" style="font-size: 0.7rem;">{{ __('portal.projects_manager.show.team_badge') }}</span>
                     @else
-                    <span class="badge bg-info" style="font-size: 0.7rem;">Client</span>
+                    <span class="badge bg-info" style="font-size: 0.7rem;">{{ __('portal.projects_client.show.client') }}</span>
                     @endif
                 </span>
                 <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
@@ -559,7 +559,7 @@
             <p style="margin: 0;">{{ $comment->comment }}</p>
         </div>
         @empty
-        <p class="text-muted text-center py-4">No comments yet. Be the first to comment!</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_comments_be_first') }}</p>
         @endforelse
     </div>
 </div>
@@ -568,7 +568,7 @@
 <div id="documents-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Project Documents</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.project_documents') }}</div>
         </div>
         <iframe src="{{ route('projects.client.documents.index', $project) }}" style="width: 100%; height: 600px; border: none; border-radius: 8px;"></iframe>
     </div>
@@ -578,10 +578,10 @@
 <div id="deliverables-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Project Deliverables</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.project_deliverables') }}</div>
             @if($canManageTasks)
             <button class="btn btn-sm btn-success" onclick="showDeliverableModal()">
-                <i class="fas fa-upload"></i> Upload Deliverable
+                <i class="fas fa-upload"></i> {{ __('portal.projects_manager.show.upload_deliverable') }}
             </button>
             @endif
         </div>
@@ -590,13 +590,13 @@
             <div style="flex: 1;">
                 <strong>{{ $deliverable->title }}</strong>
                 @if($deliverable->client_confirmed)
-                <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Confirmed</span>
+                <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> {{ __('portal.projects_client.show.confirmed') }}</span>
                 @endif
                 <br>
                 <small class="text-muted">{{ $deliverable->description }}</small>
                 <br>
                 <small class="text-muted">
-                    Uploaded by {{ $deliverable->uploadedBy->name }} • {{ $deliverable->created_at->format('M d, Y') }}
+                    {{ __('portal.projects_client.show.uploaded_by') }} {{ $deliverable->uploadedBy->name }} • {{ $deliverable->created_at->format('M d, Y') }}
                 </small>
             </div>
             <div class="d-flex gap-2">
@@ -604,7 +604,7 @@
                     <i class="fas fa-download"></i>
                 </a>
                 @if(auth()->user()->isManager())
-                <form method="POST" action="{{ route('projects.deliverables.destroy', $deliverable) }}" style="display: inline;" onsubmit="return confirm('Delete?')">
+                <form method="POST" action="{{ route('projects.deliverables.destroy', $deliverable) }}" style="display: inline;" onsubmit="return confirm('{{ __('portal.projects_manager.show.delete_confirm') }}')">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                 </form>
@@ -612,7 +612,7 @@
             </div>
         </div>
         @empty
-        <p class="text-muted text-center py-4">No deliverables uploaded yet.</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_client.show.no_deliverables') }}</p>
         @endforelse
     </div>
 </div>
@@ -621,7 +621,7 @@
 <div id="requests-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Client Requests</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.client_requests') }}</div>
         </div>
         @forelse($project->requests->sortByDesc('created_at') as $req)
         <div class="milestone-item" style="border-left-color: {{ $req->status === 'open' ? '#f59e0b' : '#10b981' }};">
@@ -629,26 +629,26 @@
                 <div style="flex:1;">
                     <h5 style="font-weight:600;color:#1e293b;">{{ $req->subject }}</h5>
                     <p style="color:#64748b;margin:0.5rem 0;">{{ $req->request }}</p>
-                    <small class="text-muted">By {{ $req->client->name }} • {{ $req->created_at->format('M d, Y g:i A') }}</small>
+                    <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->client->name }} • {{ $req->created_at->format('M d, Y g:i A') }}</small>
                 </div>
                 <span class="status-badge {{ $req->status === 'open' ? 'warning' : 'success' }}">{{ ucfirst($req->status) }}</span>
             </div>
             @if($req->response)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
-                <strong style="color:#1C575F;">Response:</strong>
+                <strong style="color:#1C575F;">{{ __('portal.projects_manager.show.response') }}:</strong>
                 <p style="margin:0.5rem 0 0 0;color:#065f46;">{{ $req->response }}</p>
-                <small class="text-muted">By {{ $req->handledBy->name }} • {{ $req->handled_at->format('M d, Y') }}</small>
+                <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->handledBy->name }} • {{ $req->handled_at->format('M d, Y') }}</small>
             </div>
             @else
             <div class="mt-3">
                 <button class="btn btn-sm btn-primary" onclick="respondToRequest({{ $req->id }})">
-                    <i class="fas fa-reply"></i> Respond
+                    <i class="fas fa-reply"></i> {{ __('portal.projects_manager.show.respond') }}
                 </button>
             </div>
             @endif
         </div>
         @empty
-        <p class="text-muted text-center py-4">No client requests yet.</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_client_requests') }}</p>
         @endforelse
     </div>
 </div>
@@ -657,7 +657,7 @@
 <div id="complaints-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Client Complaints</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.client_complaints') }}</div>
         </div>
         @forelse($project->complaints->sortByDesc('created_at') as $complaint)
         <div class="milestone-item" style="border-left-color: {{ $complaint->status === 'open' ? '#ef4444' : '#10b981' }};">
@@ -665,26 +665,26 @@
                 <div style="flex:1;">
                     <h5 style="font-weight:600;color:#1e293b;">{{ $complaint->subject }}</h5>
                     <p style="color:#64748b;margin:0.5rem 0;">{{ $complaint->complaint }}</p>
-                    <small class="text-muted">By {{ $complaint->client->name }} • {{ $complaint->created_at->format('M d, Y g:i A') }}</small>
+                    <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->client->name }} • {{ $complaint->created_at->format('M d, Y g:i A') }}</small>
                 </div>
                 <span class="status-badge {{ $complaint->status === 'open' ? 'error' : 'success' }}">{{ ucfirst($complaint->status) }}</span>
             </div>
             @if($complaint->resolution_note)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
-                <strong style="color:#1C575F;">Resolution:</strong>
+                <strong style="color:#1C575F;">{{ __('portal.projects_manager.show.resolution') }}:</strong>
                 <p style="margin:0.5rem 0 0 0;color:#065f46;">{{ $complaint->resolution_note }}</p>
-                <small class="text-muted">By {{ $complaint->resolvedBy->name }} • {{ $complaint->resolved_at->format('M d, Y') }}</small>
+                <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->resolvedBy->name }} • {{ $complaint->resolved_at->format('M d, Y') }}</small>
             </div>
             @elseif($user->isManager())
             <div class="mt-3">
                 <button class="btn btn-sm btn-danger" onclick="resolveComplaint({{ $complaint->id }})">
-                    <i class="fas fa-check"></i> Resolve Complaint
+                    <i class="fas fa-check"></i> {{ __('portal.projects_manager.show.resolve_complaint') }}
                 </button>
             </div>
             @endif
         </div>
         @empty
-        <p class="text-muted text-center py-4">No complaints yet.</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_complaints') }}</p>
         @endforelse
     </div>
 </div>
@@ -693,13 +693,13 @@
 <div id="feedback-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Client Feedback</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.client_feedback') }}</div>
         </div>
         @if($project->feedback)
         <div class="milestone-item" style="border-left-color: #f59e0b;">
             <div class="mb-3">
                 <h5 class="mb-3">
-                    <i class="fas fa-star text-warning"></i> Overall Rating: 
+                    <i class="fas fa-star text-warning"></i> {{ __('portal.projects_manager.show.overall_rating') }}:
                     <span class="badge bg-warning" style="font-size: 1.2rem;">{{ $project->feedback->rating }}/5</span>
                 </h5>
                 <div class="mb-3">
@@ -711,7 +711,7 @@
             
             @if($project->feedback->feedback)
             <div class="alert alert-info">
-                <strong><i class="fas fa-comment"></i> Client Comment:</strong>
+                <strong><i class="fas fa-comment"></i> {{ __('portal.projects_manager.show.client_comment') }}:</strong>
                 <p class="mb-0 mt-2">{{ $project->feedback->feedback }}</p>
             </div>
             @endif
@@ -756,20 +756,20 @@
             
             @if($project->feedback->would_recommend)
             <div class="alert alert-success mt-3">
-                <i class="fas fa-check-circle"></i> Client would recommend VujaDe to others
+                <i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.would_recommend') }}
             </div>
             @endif
             
             <div class="mt-3 pt-3 border-top">
                 <small class="text-muted">
-                    <i class="fas fa-calendar"></i> Submitted: {{ $project->feedback->created_at->format('F j, Y \a\t g:i A') }}
+                    <i class="fas fa-calendar"></i> {{ __('portal.projects_client.show.submitted') }}: {{ $project->feedback->created_at->format('F j, Y \a\t g:i A') }}
                 </small>
             </div>
         </div>
         @else
         <div class="alert alert-light text-center py-4">
             <i class="fas fa-star fa-3x text-muted mb-3"></i>
-            <p class="mb-0 text-muted">No feedback submitted yet</p>
+            <p class="mb-0 text-muted">{{ __('portal.projects_manager.show.no_feedback') }}</p>
         </div>
         @endif
     </div>
@@ -779,13 +779,13 @@
 <div id="activity-tab" class="tab-content">
     <div class="section-card">
         <div class="section-header">
-            <div class="section-title">Activity Log</div>
+            <div class="section-title">{{ __('portal.projects_manager.show.activity_log') }}</div>
         </div>
         @forelse($activities as $activity)
         <div class="comment-box">
             <div class="comment-header">
                 <span class="comment-author">
-                    {{ $activity->causer ? $activity->causer->name : 'System' }}
+                    {{ $activity->causer ? $activity->causer->name : __('portal.projects_manager.show.system') }}
                 </span>
                 <span class="comment-time">{{ $activity->created_at->diffForHumans() }}</span>
             </div>
@@ -799,7 +799,7 @@
             @endif
         </div>
         @empty
-        <p class="text-muted text-center py-4">No activity yet.</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_activity') }}</p>
         @endforelse
         <div class="mt-3">{{ $activities->links('pagination::bootstrap-5') }}</div>
     </div>
@@ -826,7 +826,7 @@ function showEditModal(){new bootstrap.Modal(document.getElementById('editModal'
 function showAddTeamModal(){new bootstrap.Modal(document.getElementById('addTeamModal')).show();}
 
 function markMilestoneCompleted(milestoneId) {
-    if (!confirm('Mark this milestone as completed? This will notify the client.')) return;
+    if (!confirm(@js(__('portal.projects_manager.show.confirm_mark_milestone_completed')))) return;
     
     fetch(`/internal/projects/milestones/${milestoneId}/complete`, {
         method: 'POST',
@@ -840,12 +840,12 @@ function markMilestoneCompleted(milestoneId) {
         if (data.success) {
             location.reload();
         } else {
-            alert(data.message || 'Error marking milestone as completed');
+            alert(data.message || @js(__('portal.projects_manager.show.error_marking_milestone')));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error marking milestone as completed');
+        alert(@js(__('portal.projects_manager.show.error_marking_milestone')));
     });
 }
 

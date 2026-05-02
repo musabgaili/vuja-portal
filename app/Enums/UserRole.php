@@ -7,28 +7,31 @@ enum UserRole: string
     case CLIENT = 'client';
     case EMPLOYEE = 'employee';
     case MANAGER = 'manager';
+    case PROJECT_MANAGER = 'project_manager';
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::CLIENT => 'Client',
             self::EMPLOYEE => 'Employee',
             self::MANAGER => 'Manager',
+            self::PROJECT_MANAGER => 'Project Manager',
         };
     }
 
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::CLIENT => 'External client using the platform',
             self::EMPLOYEE => 'Internal team member',
             self::MANAGER => 'Internal manager with full oversight',
+            self::PROJECT_MANAGER => 'Internal project manager',
         };
     }
 
     public function isInternal(): bool
     {
-        return in_array($this, [self::EMPLOYEE, self::MANAGER]);
+        return in_array($this, [self::EMPLOYEE, self::MANAGER, self::PROJECT_MANAGER], true);
     }
 
     public function isClient(): bool

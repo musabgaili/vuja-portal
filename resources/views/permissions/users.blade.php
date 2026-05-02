@@ -5,11 +5,21 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <h3 class="card-title">{{ __('portal.permissions.user_role_management') }}</h3>
-        <a href="{{ route('permissions.index') }}" class="btn btn-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> {{ __('portal.permissions.back') }}
-        </a>
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <h3 class="card-title mb-0">{{ __('portal.permissions.user_role_management') }}</h3>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="btn-group" role="group">
+                <a href="{{ route('permissions.users') }}" class="btn btn-sm {{ empty($clientsOnly ?? false) ? 'btn-primary' : 'btn-outline-primary' }}">
+                    {{ __('portal.permissions.all_users_tab') }}
+                </a>
+                <a href="{{ route('permissions.users', ['filter' => 'clients']) }}" class="btn btn-sm {{ ! empty($clientsOnly ?? false) ? 'btn-primary' : 'btn-outline-primary' }}">
+                    {{ __('portal.permissions.portal_clients_tab') }}
+                </a>
+            </div>
+            <a href="{{ route('permissions.index') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> {{ __('portal.permissions.back') }}
+            </a>
+        </div>
     </div>
     <div class="card-content">
         <div class="table-responsive">
@@ -75,7 +85,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="form-label">{{ __('portal.permissions.select_new_role') }} *</label>
-                        <select name="role_name" class="form-control" id="roleSelect" required>
+                        <select name="role" class="form-control" id="roleSelect" required>
                             @foreach($roles as $role)
                             <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
                             @endforeach

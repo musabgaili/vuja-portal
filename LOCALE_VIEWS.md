@@ -3,7 +3,7 @@
 Track **en** / **ar** work for [`lang/en.json`](lang/en.json) and [`lang/ar.json`](lang/ar.json).  
 **Skipped:** `resources/views/vendor/**` (published packages). **In scope:** everything else under `resources/views/`, including **emails**.
 
-**Last batch:** Pricing — `portal.pricing.*`
+**Last batch:** Ideas (client + manager) & time slots — `portal.ideas.*`, `portal.time_slots.*`
 
 ---
 
@@ -64,28 +64,28 @@ Merge duplicate **keys** where the same phrase reused many times, rename keys co
 
 ## Consultations
 
-- [ ] `consultations/create.blade.php`
-- [ ] `consultations/show.blade.php`
-- [ ] `consultations/manager/index.blade.php`
-- [ ] `consultations/manager/show.blade.php`
+- [x] `consultations/create.blade.php`
+- [x] `consultations/show.blade.php`
+- [x] `consultations/manager/index.blade.php`
+- [x] `consultations/manager/show.blade.php`
 
 ## Copyright
 
-- [ ] `copyright/create.blade.php`
-- [ ] `copyright/show.blade.php`
-- [ ] `copyright/manager/index.blade.php`
-- [ ] `copyright/manager/show.blade.php`
+- [x] `copyright/create.blade.php`
+- [x] `copyright/show.blade.php`
+- [x] `copyright/manager/index.blade.php`
+- [x] `copyright/manager/show.blade.php`
 
 ## Emails
 
-- [ ] `emails/complaint-alert.blade.php`
-- [ ] `emails/complaint-resolved.blade.php`
-- [ ] `emails/milestone-approved.blade.php`
-- [ ] `emails/milestone-completed.blade.php`
-- [ ] `emails/project-completed.blade.php`
-- [ ] `emails/request-received.blade.php`
-- [ ] `emails/request-responded.blade.php`
-- [ ] `emails/team-invitation.blade.php`
+- [x] `emails/complaint-alert.blade.php`
+- [x] `emails/complaint-resolved.blade.php`
+- [x] `emails/milestone-approved.blade.php`
+- [x] `emails/milestone-completed.blade.php`
+- [x] `emails/project-completed.blade.php`
+- [x] `emails/request-received.blade.php`
+- [x] `emails/request-responded.blade.php`
+- [x] `emails/team-invitation.blade.php`
 
 ## Home / misc
 
@@ -94,13 +94,13 @@ Merge duplicate **keys** where the same phrase reused many times, rename keys co
 
 ## Ideas
 
-- [ ] `ideas/ai-assessment.blade.php`
-- [ ] `ideas/create.blade.php`
-- [ ] `ideas/manager/index.blade.php`
-- [ ] `ideas/manager/show.blade.php`
-- [ ] `ideas/negotiation.blade.php`
-- [ ] `ideas/payment.blade.php`
-- [ ] `ideas/show.blade.php`
+- [x] `ideas/ai-assessment.blade.php`
+- [x] `ideas/create.blade.php`
+- [x] `ideas/manager/index.blade.php`
+- [x] `ideas/manager/show.blade.php`
+- [x] `ideas/negotiation.blade.php`
+- [x] `ideas/payment.blade.php`
+- [x] `ideas/show.blade.php`
 
 ## Internal dashboards
 
@@ -140,60 +140,60 @@ Merge duplicate **keys** where the same phrase reused many times, rename keys co
 
 ## Profile
 
-- [ ] `profile/edit.blade.php`
-- [ ] `profile/security.blade.php`
-- [ ] `profile/show.blade.php`
+- [x] `profile/edit.blade.php`
+- [x] `profile/security.blade.php`
+- [x] `profile/show.blade.php`
 
 ## Projects — client
 
-- [ ] `projects/client/feedback.blade.php`
-- [ ] `projects/client/index.blade.php`
-- [ ] `projects/client/index-new.blade.php`
-- [ ] `projects/client/index-old.blade.php`
-- [ ] `projects/client/scope-change.blade.php`
-- [ ] `projects/client/show.blade.php`
-- [ ] `projects/client/show-new.blade.php`
-- [ ] `projects/client/show-old.blade.php`
+- [x] `projects/client/feedback.blade.php`
+- [x] `projects/client/index.blade.php`
+- [x] `projects/client/index-new.blade.php`
+- [x] `projects/client/index-old.blade.php`
+- [x] `projects/client/scope-change.blade.php`
+- [x] `projects/client/show.blade.php`
+- [x] `projects/client/show-new.blade.php`
+- [x] `projects/client/show-old.blade.php`
 
 ## Projects — manager
 
-- [ ] `projects/manager/create.blade.php`
-- [ ] `projects/manager/expenses.blade.php`
-- [ ] `projects/manager/index.blade.php`
-- [ ] `projects/manager/kanban.blade.php`
-- [ ] `projects/manager/scope-changes.blade.php`
-- [ ] `projects/manager/show.blade.php`
-- [ ] `projects/manager/show-modals.blade.php`
-- [ ] `projects/manager/show-new.blade.php`
-- [ ] `projects/manager/show-old.blade.php`
+- [x] `projects/manager/create.blade.php`
+- [x] `projects/manager/expenses.blade.php`
+- [x] `projects/manager/index.blade.php`
+- [x] `projects/manager/kanban.blade.php`
+- [x] `projects/manager/scope-changes.blade.php`
+- [x] `projects/manager/show.blade.php`
+- [x] `projects/manager/show-modals.blade.php`
+- [x] `projects/manager/show-new.blade.php`
+- [x] `projects/manager/show-old.blade.php`
 
 ## Projects — shared
 
-- [ ] `projects/documents/index.blade.php`
+- [x] `projects/documents/index.blade.php`
 
 ## Research
 
-- [ ] `research/create.blade.php`
-- [ ] `research/show.blade.php`
-- [ ] `research/manager/index.blade.php`
-- [ ] `research/manager/show.blade.php`
+- [x] `research/create.blade.php`
+- [x] `research/show.blade.php`
+- [x] `research/manager/index.blade.php`
+- [x] `research/manager/show.blade.php`
 
 ## Service requests
 
-- [ ] `service-requests/create.blade.php`
-- [ ] `service-requests/index.blade.php`
-- [ ] `service-requests/review-queue.blade.php`
-- [ ] `service-requests/show.blade.php`
+- [x] `service-requests/create.blade.php`
+- [x] `service-requests/index.blade.php`
+- [x] `service-requests/review-queue.blade.php`
+- [x] `service-requests/show.blade.php`
 
 ## Services
 
-- [ ] `services/index.blade.php`
+- [x] `services/index.blade.php`
 
 ## Stepper
 
-- [ ] `stepper/client/index.blade.php`
-- [ ] `stepper/service-types/create.blade.php`
-- [ ] `stepper/service-types/index.blade.php`
+- [x] `stepper/client/index.blade.php`
+- [x] `stepper/service-types/create.blade.php`
+- [x] `stepper/service-types/index.blade.php`
 
 ## Team
 
@@ -202,9 +202,9 @@ Merge duplicate **keys** where the same phrase reused many times, rename keys co
 
 ## Time slots
 
-- [ ] `time-slots/create.blade.php`
-- [ ] `time-slots/my-slots.blade.php`
-- [ ] `time-slots/team-slots.blade.php`
+- [x] `time-slots/create.blade.php`
+- [x] `time-slots/my-slots.blade.php`
+- [x] `time-slots/team-slots.blade.php`
 
 ---
 

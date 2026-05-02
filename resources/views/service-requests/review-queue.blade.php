@@ -1,14 +1,14 @@
 @extends('layouts.internal-dashboard')
 
-@section('title', 'Review Queue')
-@section('page-title', 'Service Request Review Queue')
+@section('title', __('portal.service_requests_page.review_queue.page_title'))
+@section('page-title', __('portal.service_requests_page.review_queue.page_heading'))
 
 @section('content')
 <!-- Review Queue Stats -->
 <div class="dashboard-grid mb-4">
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Pending Reviews</h3>
+            <h3 class="widget-title">{{ __('portal.service_requests_page.review_queue.pending_title') }}</h3>
             <div class="widget-icon warning">
                 <i class="fas fa-clock"></i>
             </div>
@@ -17,7 +17,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $requests->total() }}</span>
-                    <span class="stat-label">Total</span>
+                    <span class="stat-label">{{ __('portal.service_requests_page.review_queue.total') }}</span>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">This Week</h3>
+            <h3 class="widget-title">{{ __('portal.service_requests_page.review_queue.this_week') }}</h3>
             <div class="widget-icon info">
                 <i class="fas fa-calendar-week"></i>
             </div>
@@ -34,7 +34,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $requests->where('created_at', '>=', now()->startOfWeek())->count() }}</span>
-                    <span class="stat-label">New</span>
+                    <span class="stat-label">{{ __('portal.service_requests_page.review_queue.new_label') }}</span>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
 
     <div class="widget">
         <div class="widget-header">
-            <h3 class="widget-title">Urgent Priority</h3>
+            <h3 class="widget-title">{{ __('portal.service_requests_page.review_queue.urgent_priority') }}</h3>
             <div class="widget-icon error">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
@@ -51,7 +51,7 @@
             <div class="widget-stats">
                 <div class="stat-item">
                     <span class="stat-number">{{ $requests->where('priority', 'urgent')->count() }}</span>
-                    <span class="stat-label">Urgent</span>
+                    <span class="stat-label">{{ __('portal.service_requests_page.review_queue.urgent_stat') }}</span>
                 </div>
             </div>
         </div>
@@ -61,21 +61,21 @@
 <!-- Review Queue -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Service Requests Pending Review</h3>
+        <h3 class="card-title">{{ __('portal.service_requests_page.review_queue.list_title') }}</h3>
         <div class="d-flex gap-2">
             <select class="form-control" style="width: auto;" onchange="filterByPriority(this.value)">
-                <option value="">All Priorities</option>
-                <option value="urgent">Urgent</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
+                <option value="">{{ __('portal.service_requests_page.review_queue.all_priorities') }}</option>
+                <option value="urgent">{{ __('portal.service_requests_page.priority.urgent') }}</option>
+                <option value="high">{{ __('portal.service_requests_page.priority.high') }}</option>
+                <option value="medium">{{ __('portal.service_requests_page.priority.medium') }}</option>
+                <option value="low">{{ __('portal.service_requests_page.priority.low') }}</option>
             </select>
             <select class="form-control" style="width: auto;" onchange="filterByType(this.value)">
-                <option value="">All Types</option>
-                <option value="idea">Idea Generation</option>
-                <option value="consultation">Consultation</option>
-                <option value="research">Research & IP</option>
-                <option value="copyright">Copyright Services</option>
+                <option value="">{{ __('portal.service_requests_page.review_queue.all_types') }}</option>
+                <option value="idea">{{ __('portal.service_requests_page.create.type_idea') }}</option>
+                <option value="consultation">{{ __('portal.service_requests_page.create.type_consultation') }}</option>
+                <option value="research">{{ __('portal.service_requests_page.create.type_research') }}</option>
+                <option value="copyright">{{ __('portal.service_requests_page.create.type_copyright') }}</option>
             </select>
         </div>
     </div>
@@ -100,25 +100,25 @@
                         <div class="request-info">
                             <h4 class="mb-1">{{ $request->title }}</h4>
                             <p class="text-muted mb-1">
-                                <strong>Client:</strong> {{ $request->user->name }} • 
-                                <strong>Type:</strong> {{ $request->getTypeDisplayName() }} • 
-                                <strong>Submitted:</strong> {{ $request->created_at->diffForHumans() }}
+                                <strong>{{ __('portal.service_requests_page.review_queue.client_label') }}</strong> {{ $request->user->name }} • 
+                                <strong>{{ __('portal.service_requests_page.review_queue.type_label') }}</strong> {{ $request->getTypeDisplayName() }} • 
+                                <strong>{{ __('portal.service_requests_page.review_queue.submitted_label') }}</strong> {{ $request->created_at->diffForHumans() }}
                             </p>
                             <p class="request-description">{{ Str::limit($request->description, 150) }}</p>
                         </div>
                     </div>
                     <div class="request-actions d-flex align-center gap-2">
                         <span class="priority-badge {{ $request->getPriorityBadgeColor() }}">
-                            {{ ucfirst($request->priority) }}
+                            {{ __('portal.service_requests_page.priority.' . $request->priority) }}
                         </span>
                         <a href="{{ route('service-requests.show', $request) }}" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-eye"></i> Review
+                            <i class="fas fa-eye"></i> {{ __('portal.service_requests_page.review_queue.review') }}
                         </a>
                         <button class="btn btn-success btn-sm" onclick="quickApprove({{ $request->id }})">
-                            <i class="fas fa-check"></i> Approve
+                            <i class="fas fa-check"></i> {{ __('portal.service_requests_page.review_queue.approve') }}
                         </button>
                         <button class="btn btn-error btn-sm" onclick="quickReject({{ $request->id }})">
-                            <i class="fas fa-times"></i> Reject
+                            <i class="fas fa-times"></i> {{ __('portal.service_requests_page.review_queue.reject') }}
                         </button>
                     </div>
                 </div>
@@ -133,8 +133,8 @@
             <div class="text-center py-5">
                 <div class="empty-state">
                     <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                    <h4>All Caught Up!</h4>
-                    <p class="text-muted">No service requests are pending review.</p>
+                    <h4>{{ __('portal.service_requests_page.review_queue.empty_title') }}</h4>
+                    <p class="text-muted">{{ __('portal.service_requests_page.review_queue.empty_body') }}</p>
                 </div>
             </div>
         @endif
@@ -146,7 +146,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Quick Review</h5>
+                <h5 class="modal-title">{{ __('portal.service_requests_page.review_queue.modal_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="quickReviewForm">
@@ -154,14 +154,14 @@
                 <div class="modal-body">
                     <input type="hidden" name="action" id="quickAction">
                     <div class="form-group">
-                        <label class="form-label">Review Notes (Optional)</label>
+                        <label class="form-label">{{ __('portal.service_requests_page.review_queue.modal_notes_label') }}</label>
                         <textarea name="review_notes" rows="3" class="form-control" 
-                                  placeholder="Add any notes about your decision..."></textarea>
+                                  placeholder="{{ __('portal.service_requests_page.review_queue.modal_notes_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn" id="quickSubmitBtn">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.service_requests_page.cancel') }}</button>
+                    <button type="submit" class="btn" id="quickSubmitBtn">{{ __('portal.service_requests_page.review_queue.approve') }}</button>
                 </div>
             </form>
         </div>
@@ -243,10 +243,15 @@
 
 @push('scripts')
 <script>
+const reviewQueueLabels = {
+    approve: @json(__('portal.service_requests_page.review_queue.approve')),
+    reject: @json(__('portal.service_requests_page.review_queue.reject')),
+};
+
 function quickApprove(requestId) {
     document.getElementById('quickAction').value = 'approve';
     document.getElementById('quickReviewForm').action = `/service-requests/${requestId}/review`;
-    document.getElementById('quickSubmitBtn').textContent = 'Approve';
+    document.getElementById('quickSubmitBtn').textContent = reviewQueueLabels.approve;
     document.getElementById('quickSubmitBtn').className = 'btn btn-success';
     new bootstrap.Modal(document.getElementById('quickReviewModal')).show();
 }
@@ -254,7 +259,7 @@ function quickApprove(requestId) {
 function quickReject(requestId) {
     document.getElementById('quickAction').value = 'reject';
     document.getElementById('quickReviewForm').action = `/service-requests/${requestId}/review`;
-    document.getElementById('quickSubmitBtn').textContent = 'Reject';
+    document.getElementById('quickSubmitBtn').textContent = reviewQueueLabels.reject;
     document.getElementById('quickSubmitBtn').className = 'btn btn-error';
     new bootstrap.Modal(document.getElementById('quickReviewModal')).show();
 }

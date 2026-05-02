@@ -11,7 +11,7 @@ enum UserStatus: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'Pending Verification',
             self::ACTIVE => 'Active',
             self::SUSPENDED => 'Suspended',
@@ -21,7 +21,7 @@ enum UserStatus: string
 
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'warning',
             self::ACTIVE => 'success',
             self::SUSPENDED => 'danger',

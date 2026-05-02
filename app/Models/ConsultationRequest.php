@@ -47,17 +47,44 @@ class ConsultationRequest extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
-    public function isSubmitted(): bool { return $this->status === 'submitted'; }
-    public function isFiltered(): bool { return $this->status === 'filtered'; }
-    public function isAssigned(): bool { return $this->status === 'assigned'; }
-    public function isMeetingScheduled(): bool { return $this->status === 'meeting_scheduled'; }
-    public function isMeetingSent(): bool { return $this->status === 'meeting_sent'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
-    public function isCancelled(): bool { return $this->status === 'cancelled'; }
+    public function isSubmitted(): bool
+    {
+        return $this->status === 'submitted';
+    }
+
+    public function isFiltered(): bool
+    {
+        return $this->status === 'filtered';
+    }
+
+    public function isAssigned(): bool
+    {
+        return $this->status === 'assigned';
+    }
+
+    public function isMeetingScheduled(): bool
+    {
+        return $this->status === 'meeting_scheduled';
+    }
+
+    public function isMeetingSent(): bool
+    {
+        return $this->status === 'meeting_sent';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'submitted' => 'info',
             'filtered' => 'warning',
             'assigned' => 'primary',
@@ -71,7 +98,7 @@ class ConsultationRequest extends Model
 
     public function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'submitted' => 'Submitted',
             'filtered' => 'Filtered',
             'assigned' => 'Assigned',

@@ -197,7 +197,7 @@
         <div class="col-md-3 text-center">
             <div class="progress-circle mx-auto">
                 <div class="progress-number">{{ $project->completion_percentage }}%</div>
-                <small style="opacity: 0.8;">Complete</small>
+                <small style="opacity: 0.8;">{{ __('portal.projects_client.index.complete') }}</small>
             </div>
         </div>
     </div>
@@ -207,12 +207,12 @@
 <div class="mb-4" style="display: flex; gap: 1rem; flex-wrap: wrap;">
     @if($project->isActive())
     <a href="{{ route('projects.client.scope-change.create', $project) }}" class="action-btn-client">
-        <i class="fas fa-edit"></i> Request Change
+    <i class="fas fa-edit"></i> {{ __('portal.projects_client.show.request_change') }}
     </a>
     @endif
     @if($project->isCompleted() && !$project->feedback)
     <a href="{{ route('projects.client.feedback.create', $project) }}" class="action-btn-client" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);">
-        <i class="fas fa-star"></i> Rate Project
+    <i class="fas fa-star"></i> {{ __('portal.projects_client.show.rate_project') }}
     </a>
     @endif
 </div>
@@ -221,33 +221,33 @@
 <div class="stats-modern">
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->milestones->count() }}</div>
-        <div class="stat-modern-label">Milestones</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.index.milestones') }}</div>
     </div>
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->tasks->count() }}</div>
-        <div class="stat-modern-label">Total Tasks</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.show.total_tasks') }}</div>
     </div>
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->tasks->where('status', 'completed')->count() }}</div>
-        <div class="stat-modern-label">Completed</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.index.completed') }}</div>
     </div>
     <div class="stat-modern">
         <div class="stat-modern-value">{{ $project->getTeamMembers()->count() }}</div>
-        <div class="stat-modern-label">Team Members</div>
+        <div class="stat-modern-label">{{ __('portal.projects_client.index.team_members') }}</div>
     </div>
 </div>
 
 <!-- Project Scope -->
 @if($project->scope)
 <div class="section-modern">
-    <h3><i class="fas fa-bullseye"></i> Project Scope</h3>
+    <h3><i class="fas fa-bullseye"></i> {{ __('portal.projects_client.show.project_scope') }}</h3>
     <p style="white-space: pre-line; color: #4b5563; line-height: 1.8;">{{ $project->scope }}</p>
 </div>
 @endif
 
 <!-- Milestones & Timeline -->
 <div class="section-modern">
-    <h3><i class="fas fa-flag"></i> Milestones & Timeline</h3>
+    <h3><i class="fas fa-flag"></i> {{ __('portal.projects_client.show.milestones_timeline') }}</h3>
     @forelse($project->milestones as $milestone)
     <div class="milestone-card-client">
         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -271,11 +271,11 @@
         
         <div class="d-flex justify-content-between align-items-center mb-2">
             <small style="color: #64748b;">
-                <i class="fas fa-tasks"></i> {{ $completedTasks }}/{{ $totalTasks }} tasks completed
+                <i class="fas fa-tasks"></i> {{ $completedTasks }}/{{ $totalTasks }} {{ __('portal.projects_client.show.tasks_completed') }}
             </small>
             @if($milestone->due_date)
             <small style="color: #64748b;">
-                <i class="fas fa-calendar"></i> Due: {{ $milestone->due_date->format('M d, Y') }}
+                <i class="fas fa-calendar"></i> {{ __('portal.projects_client.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}
             </small>
             @endif
         </div>
@@ -283,16 +283,16 @@
         <div class="progress-modern">
             <div class="progress-modern-fill" style="width:{{ $taskProgress }}%;"></div>
         </div>
-        <small style="color: #64748b;">{{ $taskProgress }}% complete</small>
+        <small style="color: #64748b;">{{ $taskProgress }}% {{ __('portal.projects_client.index.complete') }}</small>
     </div>
     @empty
-    <p class="text-muted text-center py-4">No milestones have been set yet.</p>
+    <p class="text-muted text-center py-4">{{ __('portal.projects_client.show.no_milestones') }}</p>
     @endforelse
 </div>
 
 <!-- Project Team -->
 <div class="section-modern">
-    <h3><i class="fas fa-users"></i> Project Team</h3>
+    <h3><i class="fas fa-users"></i> {{ __('portal.projects_client.show.project_team') }}</h3>
     <div class="row">
         @foreach($project->projectPeople as $person)
         <div class="col-md-6 mb-3">
@@ -304,21 +304,21 @@
                     <div class="d-flex align-items-center gap-2">
                         <strong style="font-size: 1.1rem; color: #1e293b;">{{ $person->user->name }}</strong>
                         @if($person->user_id === auth()->id())
-                        <span class="badge bg-success">You</span>
+                        <span class="badge bg-success">{{ __('portal.projects_client.show.you') }}</span>
                         @endif
                     </div>
                     <div class="mt-1">
                         @if($person->role === 'project_manager')
                         <span class="badge bg-success" style="font-size: 0.85rem;">
-                            <i class="fas fa-star"></i> Project Manager
+                            <i class="fas fa-star"></i> {{ __('portal.projects_client.show.project_manager') }}
                         </span>
                         @elseif($person->role === 'client')
                         <span class="badge bg-info" style="font-size: 0.85rem;">
-                            <i class="fas fa-user"></i> Client
+                            <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                         </span>
                         @else
                         <span class="badge bg-secondary" style="font-size: 0.85rem;">
-                            <i class="fas fa-user-tie"></i> Team Member
+                            <i class="fas fa-user-tie"></i> {{ __('portal.projects_client.show.team_member') }}
                         </span>
                         @endif
                     </div>
@@ -334,7 +334,7 @@
 
 <!-- Comments -->
 <div class="section-modern">
-    <h3><i class="fas fa-comments"></i> Project Comments</h3>
+    <h3><i class="fas fa-comments"></i> {{ __('portal.projects_client.show.project_comments') }}</h3>
     
     <!-- Add Comment Form -->
     <div class="mb-4" style="background: #f8fafc; padding: 1.5rem; border-radius: 12px;">
@@ -343,14 +343,14 @@
             <input type="hidden" name="commentable_type" value="App\Models\Project">
             <input type="hidden" name="commentable_id" value="{{ $project->id }}">
             <div class="form-group">
-                <label style="font-weight: 600; color: #1e293b;">Add a Comment</label>
+                <label style="font-weight: 600; color: #1e293b;">{{ __('portal.projects_client.show.add_comment') }}</label>
                 <textarea name="comment" class="form-control" rows="3" 
-                    placeholder="Share updates, ask questions, or provide feedback..." 
+                    placeholder="{{ __('portal.projects_client.show.comment_placeholder') }}" 
                     required 
                     style="border-radius: 12px; border: 2px solid #e2e8f0;"></textarea>
             </div>
             <button type="submit" class="action-btn-client">
-                <i class="fas fa-paper-plane"></i> Post Comment
+                <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.post_comment') }}
             </button>
         </form>
     </div>
@@ -363,15 +363,15 @@
                 <strong style="color: #1e293b; font-size: 1.05rem;">{{ $comment->user->name }}</strong>
                 @if($comment->is_internal)
                 <span class="badge bg-warning" style="font-size: 0.75rem;">
-                    <i class="fas fa-shield-alt"></i> VujaDe Team
+                    <i class="fas fa-shield-alt"></i> {{ __('portal.projects_client.show.vujade_team') }}
                 </span>
                 @else
                 <span class="badge bg-info" style="font-size: 0.75rem;">
-                    <i class="fas fa-user"></i> Client
+                    <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                 </span>
                 @endif
                 @if($comment->user_id === auth()->id())
-                <span class="badge bg-success" style="font-size: 0.75rem;">You</span>
+                <span class="badge bg-success" style="font-size: 0.75rem;">{{ __('portal.projects_client.show.you') }}</span>
                 @endif
             </div>
             <small style="color: #94a3b8;">
@@ -383,7 +383,7 @@
     @empty
     <div class="text-center py-5" style="background: #f8fafc; border-radius: 12px;">
         <i class="fas fa-comments" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-        <p class="text-muted">No comments yet. Start the conversation!</p>
+        <p class="text-muted">{{ __('portal.projects_client.show.no_comments') }}</p>
     </div>
     @endforelse
 </div>
@@ -391,14 +391,14 @@
 <!-- Scope Change Requests (if any) -->
 @if($project->scopeChanges->where('requested_by', auth()->id())->count() > 0)
 <div class="section-modern">
-    <h3><i class="fas fa-exchange-alt"></i> My Scope Change Requests</h3>
+    <h3><i class="fas fa-exchange-alt"></i> {{ __('portal.projects_client.show.my_scope_change_requests') }}</h3>
     @foreach($project->scopeChanges->where('requested_by', auth()->id())->sortByDesc('created_at') as $change)
     <div class="milestone-card-client" style="border-left-color: {{ $change->getStatusBadgeColor() === 'success' ? '#10b981' : ($change->getStatusBadgeColor() === 'danger' ? '#ef4444' : '#f59e0b') }};">
         <div class="d-flex justify-content-between align-items-start">
             <div style="flex: 1;">
                 <h5 style="font-weight: 600; color: #1e293b;">{{ $change->title }}</h5>
                 <p style="color: #64748b; margin-bottom: 0.5rem;">{{ $change->description }}</p>
-                <small style="color: #94a3b8;">Submitted: {{ $change->created_at->format('M d, Y') }}</small>
+                <small style="color: #94a3b8;">{{ __('portal.projects_client.show.submitted') }}: {{ $change->created_at->format('M d, Y') }}</small>
             </div>
             <span class="status-badge {{ $change->getStatusBadgeColor() }}">
                 {{ ucfirst($change->status) }}
@@ -406,7 +406,7 @@
         </div>
         @if($change->review_notes)
         <div class="mt-2 p-2" style="background: rgba(0,0,0,0.05); border-radius: 8px;">
-            <small><strong>Review:</strong> {{ $change->review_notes }}</small>
+            <small><strong>{{ __('portal.projects_client.show.review') }}:</strong> {{ $change->review_notes }}</small>
         </div>
         @endif
     </div>

@@ -12,17 +12,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('requested_by')->constrained('users')->onDelete('cascade');
-            
+
             $table->string('title');
             $table->text('description');
             $table->text('justification')->nullable();
-            
+
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            
+
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('reviewed_at')->nullable();
             $table->text('review_notes')->nullable();
-            
+
             $table->timestamps();
         });
     }

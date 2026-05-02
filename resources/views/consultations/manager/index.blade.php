@@ -1,8 +1,8 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Consultations')
+@section('title', __('portal.consultations.manager.index.title'))
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('consultations.manager.index') }}">Consultations</a></li>
-<li class="breadcrumb-item active">All Requests</li>
+<li class="breadcrumb-item"><a href="{{ route('consultations.manager.index') }}">{{ __('portal.consultations.manager.index.breadcrumb') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.consultations.manager.index.all_requests') }}</li>
 @endsection
 
 @section('content')
@@ -21,21 +21,21 @@
 
 <div class="consul-header">
     <div class="d-flex justify-content-between align-items-center">
-        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-comments"></i> Consultations</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">Manage all consultation requests</p></div>
-        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $consultations->total() }}</h2><small style="opacity:0.9;">Total</small></div>
+        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-comments"></i> {{ __('portal.consultations.manager.index.heading') }}</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">{{ __('portal.consultations.manager.index.subtitle') }}</p></div>
+        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $consultations->total() }}</h2><small style="opacity:0.9;">{{ __('portal.consultations.manager.index.total') }}</small></div>
     </div>
 </div>
 
 <div class="filter-card">
     <div class="row align-items-end">
-        <div class="col-md-3"><label class="form-label fw-bold">Filter by Status</label><select class="form-control" onchange="filterByStatus(this.value)"><option value="">All</option><option value="submitted">Submitted</option><option value="assigned">Assigned</option><option value="meeting_scheduled">Meeting Scheduled</option><option value="completed">Completed</option></select></div>
+        <div class="col-md-3"><label class="form-label fw-bold">{{ __('portal.consultations.manager.index.filter_by_status') }}</label><select class="form-control" onchange="filterByStatus(this.value)"><option value="">{{ __('portal.consultations.manager.index.all') }}</option><option value="submitted">{{ __('portal.consultations.manager.status.submitted') }}</option><option value="assigned">{{ __('portal.consultations.manager.status.assigned') }}</option><option value="meeting_scheduled">{{ __('portal.consultations.manager.status.meeting_scheduled') }}</option><option value="completed">{{ __('portal.consultations.manager.status.completed') }}</option></select></div>
     </div>
 </div>
 
 @if($consultations->count() > 0)
 <div class="table-modern">
     <table class="table mb-0">
-        <thead><tr><th>ID</th><th>Title</th><th>Client</th><th>Category</th><th>Status</th><th>Assigned</th><th>Meeting</th><th>Actions</th></tr></thead>
+        <thead><tr><th>{{ __('portal.consultations.manager.index.col_id') }}</th><th>{{ __('portal.consultations.manager.index.col_title') }}</th><th>{{ __('portal.consultations.manager.index.col_client') }}</th><th>{{ __('portal.consultations.manager.index.col_category') }}</th><th>{{ __('portal.consultations.manager.index.col_status') }}</th><th>{{ __('portal.consultations.manager.index.col_assigned') }}</th><th>{{ __('portal.consultations.manager.index.col_meeting') }}</th><th>{{ __('portal.consultations.manager.index.col_actions') }}</th></tr></thead>
         <tbody>
             @foreach($consultations as $c)
             <tr>
@@ -44,8 +44,8 @@
                 <td><strong>{{ $c->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $c->user->email }}</small></td>
                 <td><span class="badge bg-info">{{ $c->category }}</span></td>
                 <td><span class="status-badge {{ $c->getStatusBadgeColor() }}">{{ $c->getStatusLabel() }}</span></td>
-                <td>@if($c->assignedTo)<span class="badge bg-success">{{ $c->assignedTo->name }}</span>@else<span class="text-muted">—</span>@endif</td>
-                <td>@if($c->meeting)<small class="text-info"><i class="fas fa-calendar"></i> {{ $c->meeting->scheduled_at->format('M d, g:i A') }}</small>@else<span class="text-muted">—</span>@endif</td>
+                <td>@if($c->assignedTo)<span class="badge bg-success">{{ $c->assignedTo->name }}</span>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
+                <td>@if($c->meeting)<small class="text-info"><i class="fas fa-calendar"></i> {{ $c->meeting->scheduled_at->format('M d, g:i A') }}</small>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
                 <td><div class="d-flex gap-2"><a href="{{ route('consultations.manager.show',$c) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($c->isSubmitted())<button class="btn btn-sm btn-primary" onclick="showAssignModal({{ $c->id }})"><i class="fas fa-user-plus"></i></button>@endif</div></td>
             </tr>
             @endforeach
@@ -54,10 +54,10 @@
 </div>
 <div class="d-flex justify-content-center mt-4">{{ $consultations->links('pagination::bootstrap-5') }}</div>
 @else
-<div class="empty-state"><i class="fas fa-comments"></i><h4 style="color:#1e293b;font-weight:600;">No Consultations</h4><p class="text-muted">No consultation requests yet.</p></div>
+<div class="empty-state"><i class="fas fa-comments"></i><h4 style="color:#1e293b;font-weight:600;">{{ __('portal.consultations.manager.index.empty_title') }}</h4><p class="text-muted">{{ __('portal.consultations.manager.index.empty_body') }}</p></div>
 @endif
 
-<div class="modal fade" id="assignModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5><i class="fas fa-user-plus"></i> Assign Employee</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><form method="POST" id="assignForm">@csrf<div class="modal-body"><div class="form-group"><label class="form-label fw-bold">Select Employee *</label><select name="assigned_to" class="form-control" required><option value="">Choose...</option>@foreach(\App\Models\User::where('type','internal')->where('status','active')->get() as $e)<option value="{{ $e->id }}">{{ $e->name }}</option>@endforeach</select></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Assign</button></div></form></div></div></div>
+<div class="modal fade" id="assignModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5><i class="fas fa-user-plus"></i> {{ __('portal.consultations.manager.index.assign_employee') }}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><form method="POST" id="assignForm">@csrf<div class="modal-body"><div class="form-group"><label class="form-label fw-bold">{{ __('portal.consultations.manager.index.select_employee') }} *</label><select name="assigned_to" class="form-control" required><option value="">{{ __('portal.consultations.manager.index.choose') }}</option>@foreach(\App\Models\User::where('type','internal')->where('status','active')->get() as $e)<option value="{{ $e->id }}">{{ $e->name }}</option>@endforeach</select></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.consultations.manager.index.cancel') }}</button><button type="submit" class="btn btn-primary">{{ __('portal.consultations.manager.index.assign') }}</button></div></form></div></div></div>
 @endsection
 
 @push('scripts')

@@ -1,8 +1,8 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Research Requests')
+@section('title', __('portal.research.manager.index.page_title'))
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('research.manager.index') }}">Research & IP</a></li>
-<li class="breadcrumb-item active">All Requests</li>
+<li class="breadcrumb-item"><a href="{{ route('research.manager.index') }}">{{ __('portal.research.manager.index.breadcrumb_parent') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.research.manager.index.all_requests_breadcrumb') }}</li>
 @endsection
 
 @section('content')
@@ -19,15 +19,15 @@
 
 <div class="research-header">
     <div class="d-flex justify-content-between align-items-center">
-        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-search"></i> Research & IP</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">Manage research requests</p></div>
-        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $researches->total() }}</h2><small style="opacity:0.9;">Total</small></div>
+        <div><h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-search"></i> {{ __('portal.research.manager.index.heading') }}</h1><p style="margin:0.5rem 0 0 0;opacity:0.95;">{{ __('portal.research.manager.index.subtitle') }}</p></div>
+        <div class="text-end"><h2 style="margin:0;font-size:2.5rem;font-weight:700;">{{ $researches->total() }}</h2><small style="opacity:0.9;">{{ __('portal.research.manager.index.total_label') }}</small></div>
     </div>
 </div>
 
 @if($researches->count() > 0)
 <div class="table-modern">
     <table class="table mb-0">
-        <thead><tr><th>ID</th><th>Title</th><th>Client</th><th>Status</th><th>Assigned</th><th>Actions</th></tr></thead>
+        <thead><tr><th>{{ __('portal.research.manager.index.col_id') }}</th><th>{{ __('portal.research.manager.index.col_title') }}</th><th>{{ __('portal.research.manager.index.col_client') }}</th><th>{{ __('portal.research.manager.index.col_status') }}</th><th>{{ __('portal.research.manager.index.col_assigned') }}</th><th>{{ __('portal.research.manager.index.col_actions') }}</th></tr></thead>
         <tbody>
             @foreach($researches as $r)
             <tr>
@@ -44,13 +44,13 @@
 </div>
 <div class="d-flex justify-content-center mt-4">{{ $researches->links('pagination::bootstrap-5') }}</div>
 @else
-<div class="empty-state"><i class="fas fa-search"></i><h4 style="color:#1e293b;font-weight:600;">No Research Requests</h4><p class="text-muted">No research requests yet.</p></div>
+<div class="empty-state"><i class="fas fa-search"></i><h4 style="color:#1e293b;font-weight:600;">{{ __('portal.research.manager.index.empty_title') }}</h4><p class="text-muted">{{ __('portal.research.manager.index.empty_body') }}</p></div>
 @endif
 @endsection
 
 @push('scripts')
 <script>
-function assign(id){if(confirm('Assign?'))fetch(`/internal/research/${id}/assign`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
-function complete(id){if(confirm('Mark complete?'))fetch(`/internal/research/${id}/complete`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+function assign(id){if(confirm(@json(__('portal.research.manager.index.assign_confirm'))))fetch(`/internal/research/${id}/assign`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+function complete(id){if(confirm(@json(__('portal.research.manager.index.complete_confirm'))))fetch(`/internal/research/${id}/complete`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
 </script>
 @endpush

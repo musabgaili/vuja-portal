@@ -140,7 +140,7 @@ class ServiceRequestStep extends Model
     public function shouldShow(array $context = []): bool
     {
         $conditions = $this->getConditions();
-        
+
         if (empty($conditions)) {
             return true;
         }
@@ -154,19 +154,29 @@ class ServiceRequestStep extends Model
 
             switch ($operator) {
                 case 'equals':
-                    if ($contextValue !== $value) return false;
+                    if ($contextValue !== $value) {
+                        return false;
+                    }
                     break;
                 case 'not_equals':
-                    if ($contextValue === $value) return false;
+                    if ($contextValue === $value) {
+                        return false;
+                    }
                     break;
                 case 'contains':
-                    if (!str_contains($contextValue, $value)) return false;
+                    if (! str_contains($contextValue, $value)) {
+                        return false;
+                    }
                     break;
                 case 'greater_than':
-                    if ($contextValue <= $value) return false;
+                    if ($contextValue <= $value) {
+                        return false;
+                    }
                     break;
                 case 'less_than':
-                    if ($contextValue >= $value) return false;
+                    if ($contextValue >= $value) {
+                        return false;
+                    }
                     break;
             }
         }

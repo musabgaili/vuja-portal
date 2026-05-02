@@ -13,8 +13,8 @@ class ExpenseController extends Controller
     public function index(Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserView($user) || !$user->isInternal()) {
+
+        if (! $project->canUserView($user) || ! $user->isInternal()) {
             abort(403);
         }
 
@@ -27,8 +27,8 @@ class ExpenseController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserManageExpenses($user)) {
+
+        if (! $project->canUserManageExpenses($user)) {
             abort(403, 'You do not have permission to manage expenses.');
         }
 
@@ -52,7 +52,7 @@ class ExpenseController extends Controller
 
         // Update project spent amount
         $project->update([
-            'spent' => $project->expenses()->sum('amount')
+            'spent' => $project->expenses()->sum('amount'),
         ]);
 
         return back()->with('success', 'Expense logged successfully!');
@@ -61,8 +61,8 @@ class ExpenseController extends Controller
     public function destroy(ProjectExpense $expense)
     {
         $user = Auth::user();
-        
-        if (!$expense->project->canUserManageExpenses($user)) {
+
+        if (! $expense->project->canUserManageExpenses($user)) {
             abort(403, 'You do not have permission to manage expenses.');
         }
 
@@ -71,7 +71,7 @@ class ExpenseController extends Controller
 
         // Update project spent amount
         $project->update([
-            'spent' => $project->expenses()->sum('amount')
+            'spent' => $project->expenses()->sum('amount'),
         ]);
 
         return back()->with('success', 'Expense deleted successfully!');

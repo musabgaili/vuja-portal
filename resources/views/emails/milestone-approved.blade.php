@@ -12,40 +12,43 @@
     <div class="container">
         @if($milestone->client_approved)
         <div style="background:linear-gradient(135deg,#10b981 0%,#1C575F 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;">✅ Milestone Approved!</h1>
+            <h1 style="margin:0;">✅ {{ __('portal.emails.milestone_approved.approved_title') }}</h1>
         </div>
         <div style="background:#f0fdf4;padding:30px;border-radius:0 0 8px 8px;">
-            <p><strong>Great news!</strong> The client has approved a milestone.</p>
+            <p><strong>{{ __('portal.emails.milestone_approved.great_news') }}</strong> {{ __('portal.emails.milestone_approved.approved_intro') }}</p>
         @else
         <div style="background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;">❌ Milestone Rejected</h1>
+            <h1 style="margin:0;">❌ {{ __('portal.emails.milestone_approved.rejected_title') }}</h1>
         </div>
         <div style="background:#fef2f2;padding:30px;border-radius:0 0 8px 8px;">
-            <p><strong>Attention:</strong> The client has rejected a milestone.</p>
+            <p><strong>{{ __('portal.emails.milestone_approved.attention') }}</strong> {{ __('portal.emails.milestone_approved.rejected_intro') }}</p>
         @endif
             
-            <h3 style="color:{{ $milestone->client_approved ? '#10b981' : '#ef4444' }};">Details:</h3>
+            <h3 style="color:{{ $milestone->client_approved ? '#10b981' : '#ef4444' }};">{{ __('portal.emails.labels.details') }}:</h3>
             <ul>
-                <li><strong>Milestone:</strong> {{ $milestone->title }}</li>
-                <li><strong>Project:</strong> {{ $milestone->project->title }}</li>
-                <li><strong>Client:</strong> {{ $approver->name }}</li>
-                <li><strong>Date:</strong> {{ $milestone->client_approved_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.labels.milestone') }}:</strong> {{ $milestone->title }}</li>
+                <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $milestone->project->title }}</li>
+                <li><strong>{{ __('portal.emails.labels.client') }}:</strong> {{ $approver->name }}</li>
+                <li><strong>{{ __('portal.emails.labels.date') }}:</strong> {{ $milestone->client_approved_at->format('F j, Y \a\t g:i A') }}</li>
             </ul>
 
             @if($milestone->approval_note)
-            <h4>Client's {{ $milestone->client_approved ? 'Feedback' : 'Rejection Reason' }}:</h4>
+            <h4>
+                {{ __('portal.emails.milestone_approved.clients') }}
+                {{ $milestone->client_approved ? __('portal.emails.milestone_approved.feedback') : __('portal.emails.milestone_approved.rejection_reason') }}:
+            </h4>
             <p style="background:white;padding:15px;border-left:4px solid {{ $milestone->client_approved ? '#10b981' : '#ef4444' }};font-style:italic;">"{{ $milestone->approval_note }}"</p>
             @endif
 
             <p style="margin-top:30px;">
                 <a href="{{ route('projects.manager.show', $milestone->project) }}" 
                    style="display:inline-block;background:{{ $milestone->client_approved ? '#10b981' : '#ef4444' }};color:white;padding:12px 30px;text-decoration:none;border-radius:6px;font-weight:bold;">
-                    View Project
+                    {{ __('portal.emails.view_project') }}
                 </a>
             </p>
         </div>
         <div class="footer">
-            <p>VujaDe Platform Notification</p>
+            <p>{{ __('portal.emails.platform_notification') }}</p>
         </div>
     </div>
 </body>

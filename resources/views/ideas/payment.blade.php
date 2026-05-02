@@ -1,30 +1,30 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Payment Upload')
-@section('page-title', 'Upload Payment Confirmation')
+@section('title', __('portal.ideas.payment.page_title'))
+@section('page-title', __('portal.ideas.payment.page_heading'))
 
 @section('content')
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">💳 Payment Confirmation - {{ $idea->title }}</h3>
+                <h3 class="card-title">💳 {{ __('portal.ideas.payment.title', ['title' => $idea->title]) }}</h3>
             </div>
             <div class="card-content">
                 <!-- Quote Summary -->
                 <div class="quote-summary mb-4">
-                    <h4>Quote Summary</h4>
+                    <h4>{{ __('portal.ideas.payment.quote_summary') }}</h4>
                     <div class="summary-item">
-                        <span>Service:</span>
+                        <span>{{ __('portal.ideas.payment.service') }}</span>
                         <strong>{{ $idea->title }}</strong>
                     </div>
                     <div class="summary-item">
-                        <span>Amount:</span>
+                        <span>{{ __('portal.ideas.payment.amount') }}</span>
                         <strong class="amount">${{ number_format($idea->final_quote, 2) }}</strong>
                     </div>
                     @if($idea->agreement_terms)
                     <div class="summary-item">
-                        <span>Terms:</span>
+                        <span>{{ __('portal.ideas.payment.terms') }}</span>
                         <p class="terms">{{ $idea->agreement_terms }}</p>
                     </div>
                     @endif
@@ -37,17 +37,17 @@
                     
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Payment Instructions:</strong>
+                        <strong>{{ __('portal.ideas.payment.instructions_title') }}</strong>
                         <ul class="mb-0 mt-2">
-                            <li>Make payment of ${{ number_format($idea->final_quote, 2) }} to our account</li>
-                            <li>Upload payment confirmation (receipt, screenshot, or bank statement)</li>
-                            <li>Accepted formats: PDF, JPG, JPEG, PNG (max 10MB)</li>
-                            <li>Our team will verify your payment within 24-48 hours</li>
+                            <li>{{ __('portal.ideas.payment.instruction_pay', ['amount' => '$'.number_format($idea->final_quote, 2)]) }}</li>
+                            <li>{{ __('portal.ideas.payment.instruction_upload') }}</li>
+                            <li>{{ __('portal.ideas.payment.instruction_formats') }}</li>
+                            <li>{{ __('portal.ideas.payment.instruction_verify') }}</li>
                         </ul>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Upload Payment Confirmation *</label>
+                        <label class="form-label">{{ __('portal.ideas.payment.upload_label') }}</label>
                         <input type="file" name="payment_file" class="form-control @error('payment_file') is-invalid @enderror" 
                                accept=".pdf,.jpg,.jpeg,.png" required>
                         @error('payment_file')
@@ -57,39 +57,39 @@
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> Upload Payment Confirmation
+                            <i class="fas fa-upload"></i> {{ __('portal.ideas.payment.upload_confirm') }}
                         </button>
                         <a href="{{ route('ideas.show', $idea) }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back
+                            <i class="fas fa-arrow-left"></i> {{ __('portal.ideas.payment.back') }}
                         </a>
                     </div>
                 </form>
                 @else
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle me-2"></i>
-                    <strong>Payment Confirmation Uploaded!</strong>
-                    <p class="mb-0 mt-2">Your payment confirmation has been uploaded and is awaiting verification from our team.</p>
+                    <strong>{{ __('portal.ideas.payment.uploaded_title') }}</strong>
+                    <p class="mb-0 mt-2">{{ __('portal.ideas.payment.uploaded_body') }}</p>
                 </div>
 
                 <div class="payment-status">
                     <div class="status-item">
                         <i class="fas fa-file-invoice"></i>
                         <div>
-                            <strong>Payment File:</strong>
-                            <span>Uploaded</span>
+                            <strong>{{ __('portal.ideas.payment.payment_file') }}</strong>
+                            <span>{{ __('portal.ideas.payment.file_uploaded') }}</span>
                         </div>
                     </div>
                     <div class="status-item">
                         <i class="fas {{ $idea->payment_verified_at ? 'fa-check-circle text-success' : 'fa-clock text-warning' }}"></i>
                         <div>
-                            <strong>Verification Status:</strong>
-                            <span>{{ $idea->payment_verified_at ? 'Verified ✓' : 'Pending Verification' }}</span>
+                            <strong>{{ __('portal.ideas.payment.verification_label') }}</strong>
+                            <span>{{ $idea->payment_verified_at ? __('portal.ideas.payment.verified') : __('portal.ideas.payment.pending_verification') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <a href="{{ route('ideas.show', $idea) }}" class="btn btn-secondary mt-4">
-                    <i class="fas fa-arrow-left"></i> Back to Request
+                    <i class="fas fa-arrow-left"></i> {{ __('portal.ideas.payment.back_request') }}
                 </a>
                 @endif
             </div>
@@ -98,36 +98,36 @@
         <!-- Payment Methods -->
         <div class="card mt-4">
             <div class="card-header">
-                <h3 class="card-title">Payment Methods</h3>
+                <h3 class="card-title">{{ __('portal.ideas.payment.methods_title') }}</h3>
             </div>
             <div class="card-content">
                 <div class="payment-methods">
                     <div class="payment-method">
                         <i class="fas fa-university"></i>
                         <div>
-                            <strong>Bank Transfer</strong>
-                            <p>Transfer directly to our bank account</p>
+                            <strong>{{ __('portal.ideas.payment.bank_title') }}</strong>
+                            <p>{{ __('portal.ideas.payment.bank_desc') }}</p>
                         </div>
                     </div>
                     <div class="payment-method">
                         <i class="fas fa-credit-card"></i>
                         <div>
-                            <strong>Credit/Debit Card</strong>
-                            <p>Pay securely online (Coming Soon)</p>
+                            <strong>{{ __('portal.ideas.payment.card_title') }}</strong>
+                            <p>{{ __('portal.ideas.payment.card_desc') }}</p>
                         </div>
                     </div>
                     <div class="payment-method">
                         <i class="fas fa-wallet"></i>
                         <div>
-                            <strong>Digital Wallet</strong>
-                            <p>PayPal, Stripe, etc. (Coming Soon)</p>
+                            <strong>{{ __('portal.ideas.payment.wallet_title') }}</strong>
+                            <p>{{ __('portal.ideas.payment.wallet_desc') }}</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="alert alert-warning mt-3">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Note:</strong> Online payment gateway integration is coming soon. Currently, please make bank transfer and upload confirmation.
+                    <strong>{{ __('portal.service_requests_page.create.integration_note_title') }}</strong> {{ __('portal.ideas.payment.gateway_note') }}
                 </div>
             </div>
         </div>
@@ -219,4 +219,3 @@
 }
 </style>
 @endpush
-

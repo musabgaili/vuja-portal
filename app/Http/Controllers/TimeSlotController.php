@@ -14,7 +14,7 @@ class TimeSlotController extends Controller
 
     public function __construct(TimeSlotService $timeSlotService)
     {
-        $this->middleware(['auth', ]);
+        $this->middleware(['auth']);
         $this->timeSlotService = $timeSlotService;
     }
 
@@ -24,8 +24,8 @@ class TimeSlotController extends Controller
     public function mySlots()
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -40,8 +40,8 @@ class TimeSlotController extends Controller
     public function teamSlots()
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403, 'You need manager role to view team slots.');
         }
 
@@ -57,8 +57,8 @@ class TimeSlotController extends Controller
     public function create()
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -71,8 +71,8 @@ class TimeSlotController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -99,15 +99,15 @@ class TimeSlotController extends Controller
     public function destroy(TimeSlot $timeSlot)
     {
         $user = Auth::user();
-        
+
         // Only slot owner or manager can delete
-        if ($timeSlot->user_id !== $user->id && !$user->isManager()) {
+        if ($timeSlot->user_id !== $user->id && ! $user->isManager()) {
             abort(403);
         }
 
         $deleted = $this->timeSlotService->deleteTimeSlot($timeSlot);
 
-        if (!$deleted) {
+        if (! $deleted) {
             return back()->withErrors(['error' => 'Cannot delete booked time slot!']);
         }
 
@@ -120,14 +120,14 @@ class TimeSlotController extends Controller
     public function toggleBlock(TimeSlot $timeSlot)
     {
         $user = Auth::user();
-        
-        if ($timeSlot->user_id !== $user->id && !$user->isManager()) {
+
+        if ($timeSlot->user_id !== $user->id && ! $user->isManager()) {
             abort(403);
         }
 
         $toggled = $this->timeSlotService->toggleBlockStatus($timeSlot);
 
-        if (!$toggled) {
+        if (! $toggled) {
             return back()->withErrors(['error' => 'Cannot block booked time slot!']);
         }
 
@@ -140,8 +140,8 @@ class TimeSlotController extends Controller
     public function getAvailableSlots($employeeId)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -150,19 +150,19 @@ class TimeSlotController extends Controller
             ->where('type', 'internal')
             ->first();
 
-        if (!$employee) {
+        if (! $employee) {
             return response()->json(['error' => 'Employee not found'], 404);
         }
 
         // Get available slots for the employee
         $slots = $this->timeSlotService->getAvailableSlotsForBooking($employeeId);
-        
+
         // Format slots for JSON response
-        $formattedSlots = $slots->map(function($slot) {
+        $formattedSlots = $slots->map(function ($slot) {
             $startTime = \Carbon\Carbon::parse($slot->start_time);
             $endTime = \Carbon\Carbon::parse($slot->end_time);
             $duration = $startTime->diffInMinutes($endTime);
-            
+
             return [
                 'id' => $slot->id,
                 'date' => $slot->date->format('Y-m-d'),
@@ -178,7 +178,7 @@ class TimeSlotController extends Controller
             'employee' => [
                 'id' => $employee->id,
                 'name' => $employee->name,
-            ]
+            ],
         ]);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Services\Projects;
 
+use App\Actions\Projects\CreateProjectAction;
 use App\Models\Project;
 use App\Models\ProjectPerson;
 use App\Models\User;
-use App\Actions\Projects\CreateProjectAction;
 
 class ProjectService
 {
@@ -59,39 +59,39 @@ class ProjectService
     public function getProjectsForUser(User $user, array $filters = [])
     {
         $query = Project::with(['client', 'projectPeople.user', 'milestones', 'tasks', 'projectManager', 'quotedBy']);
-        
+
         // If employee, show only projects they're assigned to
         if ($user->isEmployee()) {
-            $query->whereHas('projectPeople', function($q) use ($user) {
+            $query->whereHas('projectPeople', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
         // Search by name
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('client', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                  });
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('client', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
             });
         }
 
         // Filter by status
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
         // Filter by PM
-        if (!empty($filters['pm'])) {
+        if (! empty($filters['pm'])) {
             $query->where('project_manager_id', $filters['pm']);
         }
 
         // Filter by quoter
-        if (!empty($filters['quoter'])) {
+        if (! empty($filters['quoter'])) {
             $query->where('quoted_by', $filters['quoter']);
         }
 
@@ -101,10 +101,10 @@ class ProjectService
     /**
      * Calculate project statistics for a user
      */
-    public function getProjectStats(User $user = null): array
+    public function getProjectStats(?User $user = null): array
     {
         // If no user provided, get all stats (for managers)
-        if (!$user || $user->isManager()) {
+        if (! $user || $user->isManager()) {
             return [
                 'total' => Project::count(),
                 'planning' => Project::where('status', 'planning')->count(),
@@ -119,16 +119,16 @@ class ProjectService
         // For employees, only count projects they're assigned to
         if ($user->isEmployee()) {
             return [
-                'total' => Project::whereHas('projectPeople', function($q) use ($user) {
+                'total' => Project::whereHas('projectPeople', function ($q) use ($user) {
                     $q->where('user_id', $user->id);
                 })->count(),
-                'planning' => Project::whereHas('projectPeople', function($q) use ($user) {
+                'planning' => Project::whereHas('projectPeople', function ($q) use ($user) {
                     $q->where('user_id', $user->id);
                 })->where('status', 'planning')->count(),
-                'in_progress' => Project::whereHas('projectPeople', function($q) use ($user) {
+                'in_progress' => Project::whereHas('projectPeople', function ($q) use ($user) {
                     $q->where('user_id', $user->id);
                 })->where('status', 'in_progress')->count(),
-                'completed' => Project::whereHas('projectPeople', function($q) use ($user) {
+                'completed' => Project::whereHas('projectPeople', function ($q) use ($user) {
                     $q->where('user_id', $user->id);
                 })->where('status', 'completed')->count(),
             ];
@@ -143,4 +143,3 @@ class ProjectService
         ];
     }
 }
-

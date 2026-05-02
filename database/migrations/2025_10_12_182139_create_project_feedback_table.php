@@ -12,16 +12,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('client_id')->constrained('users')->onDelete('cascade');
-            
+
             $table->integer('rating')->unsigned(); // 1-5 stars
             $table->text('feedback')->nullable();
-            
+
             $table->integer('communication_rating')->unsigned()->nullable();
             $table->integer('quality_rating')->unsigned()->nullable();
             $table->integer('timeline_rating')->unsigned()->nullable();
-            
+
             $table->boolean('would_recommend')->default(false);
-            
+
             $table->timestamps();
         });
     }

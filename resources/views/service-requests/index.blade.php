@@ -1,27 +1,27 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Service Requests')
-@section('page-title', 'My Service Requests')
+@section('title', __('portal.service_requests_page.index.page_title'))
+@section('page-title', __('portal.service_requests_page.index.page_heading'))
 
 @section('content')
 <!-- Quick Actions -->
 <div class="card mb-4">
     <div class="card-header">
-        <h3 class="card-title">Quick Actions</h3>
+        <h3 class="card-title">{{ __('portal.service_requests_page.index.quick_actions') }}</h3>
     </div>
     <div class="card-content">
         <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('service-requests.create', ['type' => 'idea']) }}" class="btn btn-primary">
-                <i class="fas fa-lightbulb"></i> Idea Generation
+                <i class="fas fa-lightbulb"></i> {{ __('portal.service_requests_page.index.btn_idea') }}
             </a>
             <a href="{{ route('service-requests.create', ['type' => 'consultation']) }}" class="btn btn-success">
-                <i class="fas fa-comments"></i> Consultation
+                <i class="fas fa-comments"></i> {{ __('portal.service_requests_page.index.btn_consultation') }}
             </a>
             <a href="{{ route('service-requests.create', ['type' => 'research']) }}" class="btn btn-info">
-                <i class="fas fa-search"></i> Research & IP
+                <i class="fas fa-search"></i> {{ __('portal.service_requests_page.index.btn_research') }}
             </a>
             <a href="{{ route('service-requests.create', ['type' => 'copyright']) }}" class="btn btn-warning">
-                <i class="fas fa-copyright"></i> Copyright Services
+                <i class="fas fa-copyright"></i> {{ __('portal.service_requests_page.index.btn_copyright') }}
             </a>
         </div>
     </div>
@@ -30,16 +30,16 @@
 <!-- Service Requests List -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Service Requests</h3>
+        <h3 class="card-title">{{ __('portal.service_requests_page.index.list_title') }}</h3>
         <div class="d-flex gap-2">
             <select class="form-control" style="width: auto;" onchange="filterRequests(this.value)">
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="in_review">In Review</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
+                <option value="">{{ __('portal.service_requests_page.index.all_status') }}</option>
+                <option value="pending">{{ __('portal.service_requests_page.index.status_pending') }}</option>
+                <option value="in_review">{{ __('portal.service_requests_page.index.status_in_review') }}</option>
+                <option value="approved">{{ __('portal.service_requests_page.index.status_approved') }}</option>
+                <option value="rejected">{{ __('portal.service_requests_page.index.status_rejected') }}</option>
+                <option value="in_progress">{{ __('portal.service_requests_page.index.status_in_progress') }}</option>
+                <option value="completed">{{ __('portal.service_requests_page.index.status_completed') }}</option>
             </select>
         </div>
     </div>
@@ -64,26 +64,26 @@
                             <h4 class="mb-1">{{ $request->title }}</h4>
                             <p class="text-muted mb-0">
                                 {{ $request->getTypeDisplayName() }} • 
-                                Submitted {{ $request->created_at->diffForHumans() }}
+                                {{ __('portal.service_requests_page.index.submitted_prefix') }} {{ $request->created_at->diffForHumans() }}
                                 @if($request->assignedTo)
-                                    • Assigned to {{ $request->assignedTo->name }}
+                                    • {{ __('portal.service_requests_page.index.assigned_prefix') }} {{ $request->assignedTo->name }}
                                 @endif
                             </p>
                         </div>
                     </div>
                     <div class="request-actions d-flex align-center gap-2">
                         <span class="status-badge {{ $request->getStatusBadgeColor() }}">
-                            {{ ucfirst(str_replace('_', ' ', $request->status)) }}
+                            {{ __('portal.service_requests_page.index.status_' . $request->status) }}
                         </span>
                         <span class="priority-badge {{ $request->getPriorityBadgeColor() }}">
-                            {{ ucfirst($request->priority) }}
+                            {{ __('portal.service_requests_page.priority.' . $request->priority) }}
                         </span>
                         <a href="{{ route('service-requests.show', $request) }}" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-eye"></i> View
+                            <i class="fas fa-eye"></i> {{ __('portal.service_requests_page.index.view') }}
                         </a>
                         @if($request->isPending() && auth()->user()->isClient())
                         <a href="{{ route('service-requests.edit', $request) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i> {{ __('portal.service_requests_page.index.edit') }}
                         </a>
                         @endif
                     </div>
@@ -99,10 +99,10 @@
             <div class="text-center py-5">
                 <div class="empty-state">
                     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                    <h4>No Service Requests</h4>
-                    <p class="text-muted">You haven't submitted any service requests yet.</p>
+                    <h4>{{ __('portal.service_requests_page.index.empty_title') }}</h4>
+                    <p class="text-muted">{{ __('portal.service_requests_page.index.empty_body') }}</p>
                     <a href="{{ route('service-requests.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Create Your First Request
+                        <i class="fas fa-plus"></i> {{ __('portal.service_requests_page.index.create_first') }}
                     </a>
                 </div>
             </div>

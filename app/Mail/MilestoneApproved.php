@@ -22,6 +22,7 @@ class MilestoneApproved extends Mailable
     public function envelope(): Envelope
     {
         $action = $this->milestone->client_approved ? 'Approved' : 'Rejected';
+
         return new Envelope(
             subject: "Milestone {$action}: {$this->milestone->title}",
         );

@@ -2,14 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Container\Attributes\Auth;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -19,7 +16,7 @@ class AuthTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Seed roles and permissions
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
     }
@@ -38,7 +35,7 @@ class AuthTest extends TestCase
         $response = $this->post(route('register'), $userData);
 
         $response->assertRedirect('/email/verify');
-        
+
         $this->assertDatabaseHas('users', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
@@ -131,14 +128,13 @@ class AuthTest extends TestCase
             'email_verified_at' => null,
             'status' => UserStatus::PENDING,
         ]);
-        
 
         $this->actingAs($user);
 
         // Simulate email verification by directly updating the user
         $user->markEmailAsVerified();
         $user->update(['status' => UserStatus::ACTIVE]);
-        
+
         $this->assertNotNull($user->email_verified_at);
         $this->assertEquals(UserStatus::ACTIVE, $user->status);
     }

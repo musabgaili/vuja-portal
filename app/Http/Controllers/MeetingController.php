@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Auth;
 class MeetingController extends Controller
 {
     protected $meetingService;
+
     protected $timeSlotService;
 
     public function __construct(MeetingService $meetingService, TimeSlotService $timeSlotService)
     {
-        $this->middleware(['auth', ]);
- 
+        $this->middleware(['auth']);
+
         $this->meetingService = $meetingService;
         $this->timeSlotService = $timeSlotService;
     }
@@ -30,32 +31,32 @@ class MeetingController extends Controller
     public function availableSlots(Request $request)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient()) {
+
+        if (! $user->isClient()) {
             abort(403);
         }
 
         // Get all service requests with assigned consultants
         $assignedConsultantIds = collect();
-        
+
         // Check consultation requests
         $consultations = \App\Models\ConsultationRequest::where('user_id', $user->id)
             ->whereNotNull('assigned_to')
             ->get();
         $assignedConsultantIds = $assignedConsultantIds->merge($consultations->pluck('assigned_to'));
-        
+
         // Check research requests
         $research = \App\Models\ResearchRequest::where('user_id', $user->id)
             ->whereNotNull('assigned_to')
             ->get();
         $assignedConsultantIds = $assignedConsultantIds->merge($research->pluck('assigned_to'));
-        
+
         // Check IP registration requests
         $ipRegistrations = \App\Models\IpRegistration::where('user_id', $user->id)
             ->whereNotNull('assigned_to')
             ->get();
         $assignedConsultantIds = $assignedConsultantIds->merge($ipRegistrations->pluck('assigned_to'));
-        
+
         // Check copyright registration requests
         $copyrights = \App\Models\CopyrightRegistration::where('user_id', $user->id)
             ->whereNotNull('assigned_to')
@@ -64,7 +65,7 @@ class MeetingController extends Controller
 
         // Get unique assigned consultant IDs
         $assignedConsultantIds = $assignedConsultantIds->unique()->values();
-        
+
         // If no consultants are assigned, show message
         if ($assignedConsultantIds->isEmpty()) {
             return view('meetings.available-slots', [
@@ -76,13 +77,13 @@ class MeetingController extends Controller
 
         // Get slots only for assigned consultants
         $allSlots = $this->timeSlotService->getAvailableSlotsForBooking(null);
-        $slots = $allSlots->filter(function($slot) use ($assignedConsultantIds) {
+        $slots = $allSlots->filter(function ($slot) use ($assignedConsultantIds) {
             return $assignedConsultantIds->contains($slot->user_id);
         });
 
         // Get service requests for dropdown
         $serviceRequests = collect();
-        $consultations->each(function($c) use ($serviceRequests) {
+        $consultations->each(function ($c) use ($serviceRequests) {
             $serviceRequests->push([
                 'id' => $c->id,
                 'type' => 'consultation',
@@ -90,7 +91,7 @@ class MeetingController extends Controller
                 'assigned_to' => $c->assigned_to,
             ]);
         });
-        $research->each(function($r) use ($serviceRequests) {
+        $research->each(function ($r) use ($serviceRequests) {
             $serviceRequests->push([
                 'id' => $r->id,
                 'type' => 'research',
@@ -98,7 +99,7 @@ class MeetingController extends Controller
                 'assigned_to' => $r->assigned_to,
             ]);
         });
-        $ipRegistrations->each(function($ip) use ($serviceRequests) {
+        $ipRegistrations->each(function ($ip) use ($serviceRequests) {
             $serviceRequests->push([
                 'id' => $ip->id,
                 'type' => 'ip',
@@ -106,7 +107,7 @@ class MeetingController extends Controller
                 'assigned_to' => $ip->assigned_to,
             ]);
         });
-        $copyrights->each(function($c) use ($serviceRequests) {
+        $copyrights->each(function ($c) use ($serviceRequests) {
             $serviceRequests->push([
                 'id' => $c->id,
                 'type' => 'copyright',
@@ -120,12 +121,12 @@ class MeetingController extends Controller
 
         // Filter slots by selected service request's assigned consultant
         if ($selectedServiceRequest && $selectedType) {
-            $selectedRequest = $serviceRequests->first(function($sr) use ($selectedServiceRequest, $selectedType) {
+            $selectedRequest = $serviceRequests->first(function ($sr) use ($selectedServiceRequest, $selectedType) {
                 return $sr['id'] == $selectedServiceRequest && $sr['type'] == $selectedType;
             });
-            
+
             if ($selectedRequest) {
-                $slots = $slots->filter(function($slot) use ($selectedRequest) {
+                $slots = $slots->filter(function ($slot) use ($selectedRequest) {
                     return $slot->user_id == $selectedRequest['assigned_to'];
                 });
             }
@@ -141,16 +142,16 @@ class MeetingController extends Controller
     public function create(Request $request, TimeSlot $timeSlot)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient()) {
+
+        if (! $user->isClient()) {
             abort(403);
         }
 
         // Require service request selection
         $serviceRequestId = $request->query('service_request_id');
         $serviceType = $request->query('service_type');
-        
-        if (!$serviceRequestId || !$serviceType) {
+
+        if (! $serviceRequestId || ! $serviceType) {
             return redirect()->route('meetings.available-slots')
                 ->withErrors(['error' => 'Please select a service request to book a meeting.']);
         }
@@ -158,7 +159,7 @@ class MeetingController extends Controller
         // Verify the consultant is assigned to this service request
         $isAssigned = false;
         $assignedConsultantId = null;
-        
+
         switch ($serviceType) {
             case 'consultation':
                 $serviceRequest = \App\Models\ConsultationRequest::where('id', $serviceRequestId)
@@ -202,12 +203,12 @@ class MeetingController extends Controller
                 break;
         }
 
-        if (!$isAssigned) {
+        if (! $isAssigned) {
             return redirect()->route('meetings.available-slots')
                 ->withErrors(['error' => 'This consultant is not assigned to the selected service request.']);
         }
 
-        if (!$timeSlot->isAvailable()) {
+        if (! $timeSlot->isAvailable()) {
             return redirect()->route('meetings.available-slots')
                 ->withErrors(['error' => 'This time slot is no longer available.']);
         }
@@ -222,8 +223,8 @@ class MeetingController extends Controller
     public function store(Request $request, TimeSlot $timeSlot)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient()) {
+
+        if (! $user->isClient()) {
             abort(403);
         }
 
@@ -237,7 +238,7 @@ class MeetingController extends Controller
 
         // Verify the consultant is assigned to this service request
         $isAssigned = false;
-        
+
         switch ($validated['service_type']) {
             case 'consultation':
                 $serviceRequest = \App\Models\ConsultationRequest::where('id', $validated['service_request_id'])
@@ -277,13 +278,13 @@ class MeetingController extends Controller
                 break;
         }
 
-        if (!$isAssigned) {
+        if (! $isAssigned) {
             return back()->withErrors(['error' => 'This consultant is not assigned to the selected service request.']);
         }
 
         try {
             $meeting = $this->meetingService->bookMeeting($user, $timeSlot, $validated);
-            
+
             return redirect()->route('meetings.my-meetings')
                 ->with('success', 'Meeting booked successfully! You will receive confirmation soon.');
         } catch (\Exception $e) {
@@ -308,8 +309,8 @@ class MeetingController extends Controller
     public function confirm(Request $request, Meeting $meeting)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -328,9 +329,9 @@ class MeetingController extends Controller
     public function cancel(Meeting $meeting)
     {
         $user = Auth::user();
-        
+
         // Client can cancel their own meetings, team member can cancel assigned meetings
-        if ($meeting->client_id !== $user->id && $meeting->team_member_id !== $user->id && !$user->isManager()) {
+        if ($meeting->client_id !== $user->id && $meeting->team_member_id !== $user->id && ! $user->isManager()) {
             abort(403);
         }
 

@@ -131,6 +131,10 @@
                         <i class="fas fa-shield-alt"></i>
                         Permissions
                     </a>
+                    <a href="{{ route('permissions.portal-clients') }}" class="nav-item">
+                        <i class="fas fa-user-friends"></i>
+                        {{ __('portal.permissions.portal_clients_nav') }}
+                    </a>
                 </div>
                 @endif
 

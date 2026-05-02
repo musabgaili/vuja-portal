@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Carbon\Carbon;
 
 class TimeSlot extends Model
 {
@@ -44,14 +44,14 @@ class TimeSlot extends Model
         if ($this->status !== 'available' || $this->meeting) {
             return false;
         }
-        
+
         // Check if slot is in the past
         if ($this->isPast()) {
             return false;
         }
-        
+
         // Additional check: ensure no overlapping meetings exist
-        return !$this->hasOverlappingMeetings();
+        return ! $this->hasOverlappingMeetings();
     }
 
     /**
@@ -59,26 +59,26 @@ class TimeSlot extends Model
      */
     public function hasOverlappingMeetings(): bool
     {
-        $slotStart = Carbon::parse($this->date->format('Y-m-d') . ' ' . $this->start_time);
-        $slotEnd = Carbon::parse($this->date->format('Y-m-d') . ' ' . $this->end_time);
-        
+        $slotStart = Carbon::parse($this->date->format('Y-m-d').' '.$this->start_time);
+        $slotEnd = Carbon::parse($this->date->format('Y-m-d').' '.$this->end_time);
+
         // Get all meetings for this user on the same date
         $meetings = Meeting::where('team_member_id', $this->user_id)
             ->where('status', '!=', 'cancelled')
             ->whereDate('scheduled_at', $this->date)
             ->get();
-        
+
         // Check each meeting for overlap
         foreach ($meetings as $meeting) {
             $meetingStart = $meeting->scheduled_at;
             $meetingEnd = $meeting->scheduled_at->copy()->addMinutes($meeting->duration_minutes);
-            
+
             // Check if meetings overlap
             if ($meetingStart < $slotEnd && $meetingEnd > $slotStart) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -94,20 +94,23 @@ class TimeSlot extends Model
 
     public function isPast(): bool
     {
-        $slotDateTime = Carbon::parse($this->date->format('Y-m-d') . ' ' . $this->end_time);
+        $slotDateTime = Carbon::parse($this->date->format('Y-m-d').' '.$this->end_time);
+
         return $slotDateTime->isPast();
     }
 
     public function getFormattedTimeRange(): string
     {
-        return Carbon::parse($this->start_time)->format('g:i A') . ' - ' . Carbon::parse($this->end_time)->format('g:i A');
+        return Carbon::parse($this->start_time)->format('g:i A').' - '.Carbon::parse($this->end_time)->format('g:i A');
     }
 
     public function getStatusBadgeColor(): string
     {
-        if ($this->isPast()) return 'secondary';
-        
-        return match($this->status) {
+        if ($this->isPast()) {
+            return 'secondary';
+        }
+
+        return match ($this->status) {
             'available' => 'success',
             'booked' => 'danger',
             'blocked' => 'warning',

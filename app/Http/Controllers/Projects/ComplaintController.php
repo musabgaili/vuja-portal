@@ -15,9 +15,9 @@ class ComplaintController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         // Only client can submit complaints
-        if (!$user->isClient() || $project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -43,8 +43,8 @@ class ComplaintController extends Controller
     public function resolve(Request $request, ProjectComplaint $complaint)
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403);
         }
 
@@ -72,10 +72,10 @@ class ComplaintController extends Controller
 
         // Super Manager (all managers)
         $managers = User::where('type', 'internal')
-            ->whereHas('roles', function($q) {
+            ->whereHas('roles', function ($q) {
                 $q->where('name', 'manager');
             })->get();
-        
+
         foreach ($managers as $manager) {
             $recipients->push($manager->email);
         }
@@ -89,14 +89,14 @@ class ComplaintController extends Controller
         $accountManager = $complaint->project->projectPeople()
             ->where('role', 'account_manager')
             ->first();
-        
+
         if ($accountManager) {
             $recipients->push($accountManager->user->email);
         }
 
         // Send email to all recipients
         $uniqueRecipients = $recipients->unique();
-        
+
         foreach ($uniqueRecipients as $email) {
             Mail::to($email)->send(new \App\Mail\ComplaintAlert($complaint));
         }

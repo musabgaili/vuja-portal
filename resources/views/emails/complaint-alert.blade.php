@@ -13,31 +13,31 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0;">🚨 URGENT: Client Complaint</h1>
+            <h1 style="margin: 0;">🚨 {{ __('portal.emails.complaint_alert.subject') }}</h1>
         </div>
         <div class="content">
-            <p><strong>A client has submitted a complaint that requires immediate attention.</strong></p>
+            <p><strong>{{ __('portal.emails.complaint_alert.intro') }}</strong></p>
             
-            <h3 style="color: #dc2626;">Complaint Details:</h3>
+            <h3 style="color: #dc2626;">{{ __('portal.emails.complaint_alert.details_title') }}:</h3>
             <ul>
-                <li><strong>Project:</strong> {{ $complaint->project->title }}</li>
-                <li><strong>Client:</strong> {{ $complaint->client->name }}</li>
-                <li><strong>Subject:</strong> {{ $complaint->subject }}</li>
-                <li><strong>Submitted:</strong> {{ $complaint->created_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $complaint->project->title }}</li>
+                <li><strong>{{ __('portal.emails.labels.client') }}:</strong> {{ $complaint->client->name }}</li>
+                <li><strong>{{ __('portal.emails.labels.subject') }}:</strong> {{ $complaint->subject }}</li>
+                <li><strong>{{ __('portal.emails.labels.submitted') }}:</strong> {{ $complaint->created_at->format('F j, Y \a\t g:i A') }}</li>
             </ul>
 
-            <h4>Complaint:</h4>
+            <h4>{{ __('portal.emails.complaint_alert.complaint') }}:</h4>
             <p style="background: white; padding: 15px; border-left: 4px solid #dc2626;">{{ $complaint->complaint }}</p>
 
             <p style="margin-top: 30px;">
                 <a href="{{ route('projects.manager.show', $complaint->project) }}" 
                    style="display: inline-block; background: #dc2626; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    View Project & Respond
+                    {{ __('portal.emails.complaint_alert.cta') }}
                 </a>
             </p>
         </div>
         <div class="footer">
-            <p>⚠️ This is a high-priority notification</p>
+            <p>⚠️ {{ __('portal.emails.complaint_alert.footer') }}</p>
         </div>
     </div>
 </body>

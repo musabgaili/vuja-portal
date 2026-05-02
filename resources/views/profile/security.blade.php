@@ -1,9 +1,9 @@
 @extends('layouts.dashboard')
-@section('title', 'Security Settings')
+@section('title', __('portal.profile.security_settings_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('profile.show') }}">Profile</a></li>
-<li class="breadcrumb-item active">Security</li>
+<li class="breadcrumb-item"><a href="{{ route('profile.show') }}">{{ __('portal.profile.profile') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.profile.security') }}</li>
 @endsection
 
 @section('content')
@@ -13,7 +13,7 @@
         <div class="card mb-4">
             <div class="card-header bg-gradient-warning text-white">
                 <h3 class="mb-0">
-                    <i class="fas fa-key"></i> Change Password
+                    <i class="fas fa-key"></i> {{ __('portal.profile.change_password') }}
                 </h3>
             </div>
             <div class="card-content">
@@ -22,7 +22,7 @@
                     @method('PUT')
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Current Password *</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.current_password') }} *</label>
                         <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" required>
                         @error('current_password')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -30,23 +30,23 @@
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">New Password *</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.new_password') }} *</label>
                         <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <small class="form-text text-muted">
-                            Password must be at least 8 characters long.
+                            {{ __('portal.profile.password_min_8') }}
                         </small>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Confirm New Password *</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.confirm_new_password') }} *</label>
                         <input type="password" name="password_confirmation" class="form-control" required>
                     </div>
                     
                     <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-save"></i> Update Password
+                        <i class="fas fa-save"></i> {{ __('portal.profile.update_password') }}
                     </button>
                 </form>
             </div>
@@ -56,7 +56,7 @@
         <div class="card mb-4">
             <div class="card-header bg-gradient-info text-white">
                 <h3 class="mb-0">
-                    <i class="fas fa-envelope"></i> Change Email Address
+                    <i class="fas fa-envelope"></i> {{ __('portal.profile.change_email_address') }}
                 </h3>
             </div>
             <div class="card-content">
@@ -65,12 +65,12 @@
                     @method('PUT')
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Current Email</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.current_email') }}</label>
                         <input type="email" class="form-control" value="{{ $user->email }}" readonly>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">New Email Address *</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.new_email_address') }} *</label>
                         <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" 
                                value="{{ old('email') }}" required>
                         @error('email')
@@ -79,18 +79,18 @@
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Current Password *</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.current_password') }} *</label>
                         <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" required>
                         @error('current_password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <small class="form-text text-muted">
-                            Required to verify your identity.
+                            {{ __('portal.profile.required_to_verify_identity') }}
                         </small>
                     </div>
                     
                     <button type="submit" class="btn btn-info">
-                        <i class="fas fa-envelope"></i> Update Email
+                        <i class="fas fa-envelope"></i> {{ __('portal.profile.update_email') }}
                     </button>
                 </form>
             </div>
@@ -100,7 +100,7 @@
         <div class="card mb-4">
             <div class="card-header bg-gradient-secondary text-white">
                 <h3 class="mb-0">
-                    <i class="fas fa-phone"></i> Update Phone Number
+                    <i class="fas fa-phone"></i> {{ __('portal.profile.update_phone_number') }}
                 </h3>
             </div>
             <div class="card-content">
@@ -109,19 +109,19 @@
                     @method('PUT')
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Phone Number</label>
+                        <label class="form-label fw-bold">{{ __('portal.auth.phone_number') }}</label>
                         <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                               value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
+                               value="{{ old('phone', $user->phone) }}" placeholder="{{ __('portal.profile.phone_placeholder') }}">
                         @error('phone')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <small class="form-text text-muted">
-                            Optional. Used for urgent notifications and account recovery.
+                            {{ __('portal.profile.phone_optional_help') }}
                         </small>
                     </div>
                     
                     <button type="submit" class="btn btn-secondary">
-                        <i class="fas fa-phone"></i> Update Phone
+                        <i class="fas fa-phone"></i> {{ __('portal.profile.update_phone') }}
                     </button>
                 </form>
             </div>
@@ -131,29 +131,29 @@
     <div class="col-lg-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-shield-alt"></i> Security Tips</h5>
+                <h5><i class="fas fa-shield-alt"></i> {{ __('portal.profile.security_tips') }}</h5>
             </div>
             <div class="card-content">
                 <ul class="list-unstyled mb-0">
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Use a strong, unique password
+                        {{ __('portal.profile.tip_strong_unique_password') }}
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Don't reuse passwords from other sites
+                        {{ __('portal.profile.tip_do_not_reuse_passwords') }}
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Keep your email address up to date
+                        {{ __('portal.profile.tip_keep_email_updated') }}
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Add a phone number for recovery
+                        {{ __('portal.profile.tip_add_phone_recovery') }}
                     </li>
                     <li class="mb-0">
                         <i class="fas fa-check text-success"></i>
-                        Log out from shared computers
+                        {{ __('portal.profile.tip_logout_shared_computers') }}
                     </li>
                 </ul>
             </div>
@@ -161,27 +161,27 @@
         
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-info-circle"></i> Account Status</h5>
+                <h5><i class="fas fa-info-circle"></i> {{ __('portal.profile.account_status') }}</h5>
             </div>
             <div class="card-content">
                 <div class="mb-2">
-                    <strong>Email:</strong>
+                    <strong>{{ __('portal.profile.email') }}:</strong>
                     @if($user->email_verified_at)
-                        <span class="badge bg-success">Verified</span>
+                        <span class="badge bg-success">{{ __('portal.profile.verified') }}</span>
                     @else
-                        <span class="badge bg-warning">Unverified</span>
+                        <span class="badge bg-warning">{{ __('portal.profile.unverified') }}</span>
                     @endif
                 </div>
                 <div class="mb-2">
-                    <strong>Phone:</strong>
+                    <strong>{{ __('portal.profile.phone') }}:</strong>
                     @if($user->phone)
-                        <span class="badge bg-success">Added</span>
+                        <span class="badge bg-success">{{ __('portal.profile.added') }}</span>
                     @else
-                        <span class="badge bg-secondary">Not Added</span>
+                        <span class="badge bg-secondary">{{ __('portal.profile.not_added') }}</span>
                     @endif
                 </div>
                 <div class="mb-0">
-                    <strong>Member Since:</strong>
+                    <strong>{{ __('portal.profile.member_since') }}:</strong>
                     <br><small class="text-muted">{{ $user->created_at->format('M d, Y') }}</small>
                 </div>
             </div>

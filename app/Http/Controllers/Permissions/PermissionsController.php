@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Permissions;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Permissions\PermissionsService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionsController extends Controller
 {
@@ -37,6 +38,7 @@ class PermissionsController extends Controller
     public function roles()
     {
         $roles = Role::withCount('users', 'permissions')->get();
+
         return view('permissions.roles', compact('roles'));
     }
 
@@ -46,17 +48,28 @@ class PermissionsController extends Controller
     public function permissions()
     {
         $permissions = $this->permissionsService->getGroupedPermissions();
+
         return view('permissions.permissions', compact('permissions'));
     }
 
     /**
      * Show users management page.
      */
-    public function users()
+    public function users(Request $request)
     {
-        $users = $this->permissionsService->getUsersWithRoles();
+        $clientsOnly = $request->query('filter') === 'clients';
+        $users = $this->permissionsService->getUsersWithRoles($clientsOnly)->withQueryString();
         $roles = Role::all();
-        return view('permissions.users', compact('users', 'roles'));
+
+        return view('permissions.users', compact('users', 'roles', 'clientsOnly'));
+    }
+
+    /**
+     * Shortcut to the users list filtered to portal client accounts.
+     */
+    public function portalClients(): RedirectResponse
+    {
+        return redirect()->route('permissions.users', ['filter' => 'clients']);
     }
 
     /**
@@ -143,6 +156,7 @@ class PermissionsController extends Controller
     public function deletePermission(Permission $permission)
     {
         $this->permissionsService->deletePermission($permission);
+
         return back()->with('success', 'Permission deleted successfully!');
     }
 

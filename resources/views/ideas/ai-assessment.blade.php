@@ -1,21 +1,21 @@
 @extends('layouts.dashboard')
 
-@section('title', 'AI Assessment')
-@section('page-title', 'AI-Powered Idea Assessment')
+@section('title', __('portal.ideas.ai.page_title'))
+@section('page-title', __('portal.ideas.ai.page_heading'))
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">🤖 AI Assessment - {{ $idea->title }}</h3>
+        <h3 class="card-title">🤖 {{ __('portal.ideas.ai.card_title', ['title' => $idea->title]) }}</h3>
         <span class="token-balance">
-            <i class="fas fa-coins"></i> Tokens Used: {{ $idea->tokens_used }}
+            <i class="fas fa-coins"></i> {{ __('portal.ideas.ai.tokens_used') }} {{ $idea->tokens_used }}
         </span>
     </div>
     <div class="card-content">
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>AI Assessment Module</strong>
-            <p class="mb-0">This feature requires integration with external AI APIs for visualization and text analysis. The system is ready, but external API keys need to be configured.</p>
+            <strong>{{ __('portal.ideas.ai.alert_title') }}</strong>
+            <p class="mb-0">{{ __('portal.ideas.ai.alert_body') }}</p>
         </div>
 
         <!-- AI Options Form -->
@@ -28,12 +28,12 @@
                     <div class="option-icon" style="background: #8b5cf6;">
                         <i class="fas fa-paint-brush"></i>
                     </div>
-                    <h4>Visualization AI</h4>
-                    <p>Generate visual concepts and mockups of your idea</p>
+                    <h4>{{ __('portal.ideas.ai.vis_title') }}</h4>
+                    <p>{{ __('portal.ideas.ai.vis_body') }}</p>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="ai_options[]" value="visualization" id="vis">
                         <label class="form-check-label" for="vis">
-                            Enable Visualization (10 tokens)
+                            {{ __('portal.ideas.ai.vis_label') }}
                         </label>
                     </div>
                 </div>
@@ -43,12 +43,12 @@
                     <div class="option-icon" style="background: #ec4899;">
                         <i class="fas fa-file-alt"></i>
                     </div>
-                    <h4>Text Analysis AI</h4>
-                    <p>Deep analysis of your idea's market potential and feasibility</p>
+                    <h4>{{ __('portal.ideas.ai.text_title') }}</h4>
+                    <p>{{ __('portal.ideas.ai.text_body') }}</p>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="ai_options[]" value="text_analysis" id="text">
                         <label class="form-check-label" for="text">
-                            Enable Text Analysis (10 tokens)
+                            {{ __('portal.ideas.ai.text_label') }}
                         </label>
                     </div>
                 </div>
@@ -58,12 +58,12 @@
                     <div class="option-icon" style="background: #10b981;">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h4>Market Research AI</h4>
-                    <p>Analyze market trends and competition for your idea</p>
+                    <h4>{{ __('portal.ideas.ai.market_title') }}</h4>
+                    <p>{{ __('portal.ideas.ai.market_body') }}</p>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="ai_options[]" value="market_research" id="market">
                         <label class="form-check-label" for="market">
-                            Enable Market Research (15 tokens)
+                            {{ __('portal.ideas.ai.market_label') }}
                         </label>
                     </div>
                 </div>
@@ -73,12 +73,12 @@
                     <div class="option-icon" style="background: #f59e0b;">
                         <i class="fas fa-briefcase"></i>
                     </div>
-                    <h4>Business Model AI</h4>
-                    <p>Generate potential business models and revenue streams</p>
+                    <h4>{{ __('portal.ideas.ai.business_title') }}</h4>
+                    <p>{{ __('portal.ideas.ai.business_body') }}</p>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="ai_options[]" value="business_model" id="business">
                         <label class="form-check-label" for="business">
-                            Enable Business Model (15 tokens)
+                            {{ __('portal.ideas.ai.business_label') }}
                         </label>
                     </div>
                 </div>
@@ -86,10 +86,10 @@
 
             <!-- Token Count -->
             <div class="form-group mt-4">
-                <label class="form-label">Total Tokens to Use *</label>
+                <label class="form-label">{{ __('portal.ideas.ai.token_total_label') }}</label>
                 <input type="number" name="token_count" class="form-control @error('token_count') is-invalid @enderror" 
                        value="{{ old('token_count', 10) }}" min="1" max="100" required>
-                <small class="form-text text-muted">Each AI tool consumes tokens. Choose wisely!</small>
+                <small class="form-text text-muted">{{ __('portal.ideas.ai.token_help') }}</small>
                 @error('token_count')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -98,16 +98,16 @@
             <!-- Token Wallet Info -->
             <div class="alert alert-info">
                 <i class="fas fa-wallet me-2"></i>
-                <strong>Token Wallet System</strong>
-                <p class="mb-0 mt-2">The token wallet and recharge system requires payment gateway integration. This will be available in the next phase.</p>
+                <strong>{{ __('portal.ideas.ai.wallet_title') }}</strong>
+                <p class="mb-0 mt-2">{{ __('portal.ideas.ai.wallet_body') }}</p>
             </div>
 
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-robot"></i> Run AI Assessment
+                    <i class="fas fa-robot"></i> {{ __('portal.ideas.ai.run') }}
                 </button>
                 <a href="{{ route('ideas.show', $idea) }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <i class="fas fa-arrow-left"></i> {{ __('portal.ideas.ai.back') }}
                 </a>
             </div>
         </form>
@@ -115,7 +115,7 @@
         <!-- AI Results (if available) -->
         @if($idea->ai_assessment_data)
         <div class="ai-results mt-4">
-            <h4>AI Assessment Results</h4>
+            <h4>{{ __('portal.ideas.ai.results_title') }}</h4>
             <div class="results-grid">
                 @foreach($idea->ai_assessment_data as $key => $value)
                 <div class="result-card">
@@ -216,4 +216,3 @@
 }
 </style>
 @endpush
-

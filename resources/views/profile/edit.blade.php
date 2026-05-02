@@ -1,9 +1,9 @@
 @extends('layouts.dashboard')
-@section('title', 'Edit Profile')
+@section('title', __('portal.profile.edit_profile_title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('profile.show') }}">Profile</a></li>
-<li class="breadcrumb-item active">Edit</li>
+<li class="breadcrumb-item"><a href="{{ route('profile.show') }}">{{ __('portal.profile.profile') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.profile.edit') }}</li>
 @endsection
 
 @section('content')
@@ -12,7 +12,7 @@
         <div class="card mb-4">
             <div class="card-header bg-gradient-primary text-white">
                 <h3 class="mb-0">
-                    <i class="fas fa-user-edit"></i> Edit Profile Information
+                    <i class="fas fa-user-edit"></i> {{ __('portal.profile.edit_profile_information') }}
                 </h3>
             </div>
             <div class="card-content">
@@ -23,7 +23,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label class="form-label fw-bold">Full Name *</label>
+                                <label class="form-label fw-bold">{{ __('portal.auth.full_name') }} *</label>
                                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
                                        value="{{ old('name', $user->name) }}" required>
                                 @error('name')
@@ -33,9 +33,9 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label class="form-label fw-bold">Phone Number</label>
+                                <label class="form-label fw-bold">{{ __('portal.auth.phone_number') }}</label>
                                 <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" 
-                                       value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
+                                       value="{{ old('phone', $user->phone) }}" placeholder="{{ __('portal.profile.phone_placeholder') }}">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -44,24 +44,24 @@
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Email Address</label>
+                        <label class="form-label fw-bold">{{ __('portal.email_address') }}</label>
                         <div class="input-group">
                             <input type="email" class="form-control" value="{{ $user->email }}" readonly>
                             <a href="{{ route('profile.security') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-edit"></i> Change Email
+                                <i class="fas fa-edit"></i> {{ __('portal.profile.change_email') }}
                             </a>
                         </div>
                         <small class="form-text text-muted">
-                            Email changes require password verification and re-verification.
+                            {{ __('portal.profile.email_change_requires_verification') }}
                         </small>
                     </div>
                     
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Update Profile
+                            <i class="fas fa-save"></i> {{ __('portal.profile.update_profile') }}
                         </button>
                         <a href="{{ route('profile.show') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
+                            <i class="fas fa-times"></i> {{ __('portal.team.cancel') }}
                         </a>
                     </div>
                 </form>
@@ -72,25 +72,25 @@
     <div class="col-lg-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-info-circle"></i> Profile Tips</h5>
+                <h5><i class="fas fa-info-circle"></i> {{ __('portal.profile.profile_tips') }}</h5>
             </div>
             <div class="card-content">
                 <ul class="list-unstyled mb-0">
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Keep your name up to date for better communication
+                        {{ __('portal.profile.tip_keep_name_updated') }}
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Add a phone number for urgent notifications
+                        {{ __('portal.profile.tip_add_phone_notifications') }}
                     </li>
                     <li class="mb-2">
                         <i class="fas fa-check text-success"></i>
-                        Email changes require verification
+                        {{ __('portal.profile.tip_email_changes_require_verification') }}
                     </li>
                     <li class="mb-0">
                         <i class="fas fa-check text-success"></i>
-                        Use a strong password for security
+                        {{ __('portal.profile.tip_use_strong_password') }}
                     </li>
                 </ul>
             </div>
@@ -98,15 +98,15 @@
         
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-shield-alt"></i> Security</h5>
+                <h5><i class="fas fa-shield-alt"></i> {{ __('portal.profile.security') }}</h5>
             </div>
             <div class="card-content">
                 <div class="d-grid gap-2">
                     <a href="{{ route('profile.security') }}" class="btn btn-outline-warning">
-                        <i class="fas fa-key"></i> Change Password
+                        <i class="fas fa-key"></i> {{ __('portal.profile.change_password') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="btn btn-outline-info">
-                        <i class="fas fa-envelope"></i> Update Email
+                        <i class="fas fa-envelope"></i> {{ __('portal.profile.update_email') }}
                     </a>
                 </div>
             </div>

@@ -11,7 +11,7 @@ class CreateProjectAction
     {
         $teamMembers = $data['team_members'] ?? [];
         $projectManagerId = $data['project_manager_id'] ?? null;
-        
+
         unset($data['team_members'], $data['project_manager_id']);
 
         $project = Project::create($data);
@@ -48,4 +48,3 @@ class CreateProjectAction
         return $project->fresh(['projectPeople.user']);
     }
 }
-

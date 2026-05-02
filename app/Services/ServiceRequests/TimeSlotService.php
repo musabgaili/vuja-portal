@@ -16,7 +16,7 @@ class TimeSlotService
         $query = TimeSlot::with(['user', 'meeting.client'])
             ->where('user_id', $user->id);
 
-        if (!$includePast) {
+        if (! $includePast) {
             $query->where('date', '>=', today());
         }
 
@@ -32,7 +32,7 @@ class TimeSlotService
     {
         $query = TimeSlot::with(['user', 'meeting.client']);
 
-        if (!$includePast) {
+        if (! $includePast) {
             $query->where('date', '>=', today());
         }
 
@@ -60,7 +60,7 @@ class TimeSlotService
             ->get();
 
         // Filter out slots that have overlapping meetings
-        $availableSlots = $slots->filter(function($slot) {
+        $availableSlots = $slots->filter(function ($slot) {
             return $slot->isAvailable();
         });
 
@@ -68,9 +68,9 @@ class TimeSlotService
         $perPage = 30;
         $currentPage = request()->get('page', 1);
         $offset = ($currentPage - 1) * $perPage;
-        
+
         $paginatedSlots = $availableSlots->slice($offset, $perPage);
-        
+
         return new \Illuminate\Pagination\LengthAwarePaginator(
             $paginatedSlots,
             $availableSlots->count(),
@@ -87,8 +87,8 @@ class TimeSlotService
     {
         $slotsCreated = 0;
         $startDate = Carbon::parse($data['start_date']);
-        $endDate = $startDate->copy()->addWeeks((int)$data['weeks']);
-        
+        $endDate = $startDate->copy()->addWeeks((int) $data['weeks']);
+
         // Map day names to Carbon day numbers
         $dayMap = [
             'sunday' => 0,
@@ -101,19 +101,19 @@ class TimeSlotService
         ];
 
         // Get selected day numbers
-        $selectedDays = array_map(fn($day) => $dayMap[$day], $data['days']);
+        $selectedDays = array_map(fn ($day) => $dayMap[$day], $data['days']);
 
         // Loop through each date in the range
         for ($date = $startDate->copy(); $date->lessThan($endDate); $date->addDay()) {
             // Check if this day is selected
-            if (!in_array($date->dayOfWeek, $selectedDays)) {
+            if (! in_array($date->dayOfWeek, $selectedDays)) {
                 continue;
             }
 
             // Create a slot for each selected time on this day
             foreach ($data['time_slots'] as $startTime) {
                 $endTime = Carbon::parse($startTime)
-                    ->addMinutes((int)$data['slot_duration'])
+                    ->addMinutes((int) $data['slot_duration'])
                     ->format('H:i');
 
                 // Check if slot already exists (avoid duplicates)
@@ -122,7 +122,7 @@ class TimeSlotService
                     ->where('start_time', $startTime)
                     ->exists();
 
-                if (!$exists) {
+                if (! $exists) {
                     TimeSlot::create([
                         'user_id' => $user->id,
                         'date' => $date->format('Y-m-d'),
@@ -132,7 +132,7 @@ class TimeSlotService
                         'recurring_pattern' => 'weekly',
                         'notes' => $data['notes'] ?? null,
                     ]);
-                    
+
                     $slotsCreated++;
                 }
             }
@@ -160,12 +160,12 @@ class TimeSlotService
     {
         $startDate = today();
         $endDate = today()->addDays($days);
-        
+
         $slots = TimeSlot::where('user_id', $employee->id)
             ->whereBetween('date', [$startDate, $endDate])
             ->with(['meeting.client'])
             ->get();
-            
+
         $summary = [
             'total_slots' => $slots->count(),
             'available_slots' => $slots->where('status', 'available')->whereDoesntHave('meeting')->count(),
@@ -174,14 +174,13 @@ class TimeSlotService
             'meetings_count' => $slots->whereNotNull('meeting')->count(),
             'availability_percentage' => 0,
         ];
-        
+
         if ($summary['total_slots'] > 0) {
             $summary['availability_percentage'] = round(
                 ($summary['available_slots'] / $summary['total_slots']) * 100, 2
             );
         }
-        
+
         return $summary;
     }
 }
-

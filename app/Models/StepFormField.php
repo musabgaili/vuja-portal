@@ -65,7 +65,7 @@ class StepFormField extends Model
     public function getValidationRules(): array
     {
         $rules = $this->validation_rules ?? [];
-        
+
         if ($this->is_required) {
             $rules[] = 'required';
         }
@@ -126,7 +126,7 @@ class StepFormField extends Model
      */
     public function getHtmlInputType(): string
     {
-        return match($this->field_type) {
+        return match ($this->field_type) {
             'email' => 'email',
             'number' => 'number',
             'tel' => 'tel',

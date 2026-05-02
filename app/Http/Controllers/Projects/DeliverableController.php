@@ -14,9 +14,9 @@ class DeliverableController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         // Only PM or Manager can upload deliverables
-        if (!$project->canUserManageTasks($user)) {
+        if (! $project->canUserManageTasks($user)) {
             abort(403);
         }
 
@@ -43,8 +43,8 @@ class DeliverableController extends Controller
     public function download(ProjectDeliverable $deliverable)
     {
         $user = Auth::user();
-        
-        if (!$deliverable->project->canUserView($user)) {
+
+        if (! $deliverable->project->canUserView($user)) {
             abort(403);
         }
 
@@ -54,9 +54,9 @@ class DeliverableController extends Controller
     public function confirmReceipt(Request $request, ProjectDeliverable $deliverable)
     {
         $user = Auth::user();
-        
+
         // Only client can confirm
-        if (!$user->isClient() || $deliverable->project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $deliverable->project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -67,7 +67,7 @@ class DeliverableController extends Controller
 
         // Check if all deliverables confirmed, close project
         $allConfirmed = $deliverable->project->deliverables()->where('client_confirmed', false)->count() === 0;
-        
+
         if ($allConfirmed) {
             $deliverable->project->update([
                 'status' => 'completed',
@@ -79,14 +79,14 @@ class DeliverableController extends Controller
                 ->send(new \App\Mail\ProjectCompleted($deliverable->project, $user));
         }
 
-        return back()->with('success', 'Deliverable confirmed! ' . ($allConfirmed ? 'Project marked as completed.' : ''));
+        return back()->with('success', 'Deliverable confirmed! '.($allConfirmed ? 'Project marked as completed.' : ''));
     }
 
     public function destroy(ProjectDeliverable $deliverable)
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403);
         }
 

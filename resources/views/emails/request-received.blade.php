@@ -13,31 +13,31 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin:0;">📋 New Client Request</h1>
+            <h1 style="margin:0;">📋 {{ __('portal.emails.request_received.subject') }}</h1>
         </div>
         <div class="content">
-            <p><strong>A client has submitted a new request for your attention.</strong></p>
+            <p><strong>{{ __('portal.emails.request_received.intro') }}</strong></p>
             
-            <h3 style="color:#2563eb;">Request Details:</h3>
+            <h3 style="color:#2563eb;">{{ __('portal.emails.request_received.details_title') }}:</h3>
             <ul>
-                <li><strong>Project:</strong> {{ $projectRequest->project->title }}</li>
-                <li><strong>Client:</strong> {{ $projectRequest->client->name }}</li>
-                <li><strong>Subject:</strong> {{ $projectRequest->subject }}</li>
-                <li><strong>Submitted:</strong> {{ $projectRequest->created_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $projectRequest->project->title }}</li>
+                <li><strong>{{ __('portal.emails.labels.client') }}:</strong> {{ $projectRequest->client->name }}</li>
+                <li><strong>{{ __('portal.emails.labels.subject') }}:</strong> {{ $projectRequest->subject }}</li>
+                <li><strong>{{ __('portal.emails.labels.submitted') }}:</strong> {{ $projectRequest->created_at->format('F j, Y \a\t g:i A') }}</li>
             </ul>
 
-            <h4>Request:</h4>
+            <h4>{{ __('portal.emails.request_received.request') }}:</h4>
             <p style="background:white;padding:15px;border-left:4px solid #3b82f6;">{{ $projectRequest->request }}</p>
 
             <p style="margin-top:30px;">
                 <a href="{{ route('projects.manager.show', $projectRequest->project) }}" 
                    style="display:inline-block;background:#3b82f6;color:white;padding:12px 30px;text-decoration:none;border-radius:6px;font-weight:bold;">
-                    View Project & Respond
+                    {{ __('portal.emails.request_received.cta') }}
                 </a>
             </p>
         </div>
         <div class="footer">
-            <p>This is a client request notification</p>
+            <p>{{ __('portal.emails.request_received.footer') }}</p>
         </div>
     </div>
 </body>

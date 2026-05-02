@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Mail\TeamInvitationMail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +23,7 @@ class TeamInvitationController extends Controller
             ->with('roles')
             ->latest()
             ->paginate(15);
-            // return $teamMembers;
+        // return $teamMembers;
 
         return view('team.index', compact('teamMembers'));
     }

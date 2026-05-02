@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\IdeaRequest;
 use App\Models\IdeaRequestComment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class IdeaRequestController extends Controller
 {
     // CLIENT SIDE METHODS
-    
+
     /**
      * Show the form for creating a new idea request.
      */
@@ -54,7 +52,7 @@ class IdeaRequestController extends Controller
     public function show(IdeaRequest $idea)
     {
         $user = Auth::user();
-        
+
         // Check access
         if ($user->isClient() && $idea->user_id !== $user->id) {
             abort(403);
@@ -71,7 +69,7 @@ class IdeaRequestController extends Controller
     public function showAiAssessment(IdeaRequest $idea)
     {
         $user = Auth::user();
-        
+
         if ($user->isClient() && $idea->user_id !== $user->id) {
             abort(403);
         }
@@ -110,6 +108,7 @@ class IdeaRequestController extends Controller
     public function showNegotiation(IdeaRequest $idea)
     {
         $idea->load('comments.user');
+
         return view('ideas.negotiation', compact('idea'));
     }
 
@@ -143,7 +142,7 @@ class IdeaRequestController extends Controller
      */
     public function acceptQuote(IdeaRequest $idea)
     {
-        if (!$idea->isQuoted()) {
+        if (! $idea->isQuoted()) {
             return back()->withErrors(['error' => 'No quote available to accept.']);
         }
 
@@ -169,7 +168,7 @@ class IdeaRequestController extends Controller
         IdeaRequestComment::create([
             'idea_request_id' => $idea->id,
             'user_id' => Auth::id(),
-            'comment' => 'Quote rejected. Reason: ' . ($validated['reason'] ?? 'No reason provided'),
+            'comment' => 'Quote rejected. Reason: '.($validated['reason'] ?? 'No reason provided'),
             'is_internal' => false,
         ]);
 
@@ -185,7 +184,7 @@ class IdeaRequestController extends Controller
      */
     public function showPayment(IdeaRequest $idea)
     {
-        if (!$idea->isAccepted() && !$idea->isPaymentPending()) {
+        if (! $idea->isAccepted() && ! $idea->isPaymentPending()) {
             abort(403);
         }
 
@@ -220,8 +219,8 @@ class IdeaRequestController extends Controller
     public function managerIndex()
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -235,8 +234,8 @@ class IdeaRequestController extends Controller
     public function managerShow(IdeaRequest $idea)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -252,8 +251,8 @@ class IdeaRequestController extends Controller
     public function sendQuote(Request $request, IdeaRequest $idea)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -279,8 +278,8 @@ class IdeaRequestController extends Controller
         IdeaRequestComment::create([
             'idea_request_id' => $idea->id,
             'user_id' => $user->id,
-            'comment' => ($user->isManager() ? 'Quote sent to client' : 'Quote uploaded for manager approval') . ': $' . number_format($validated['final_quote'], 2),
-            'is_internal' => !$user->isManager(),
+            'comment' => ($user->isManager() ? 'Quote sent to client' : 'Quote uploaded for manager approval').': $'.number_format($validated['final_quote'], 2),
+            'is_internal' => ! $user->isManager(),
             'suggested_price' => $validated['final_quote'],
         ]);
 
@@ -290,8 +289,6 @@ class IdeaRequestController extends Controller
     public function approveQuote(IdeaRequest $idea)
     {
         $user = Auth::user();
-        
-         
 
         $idea->update([
             'quote_status' => 'approved',
@@ -316,8 +313,6 @@ class IdeaRequestController extends Controller
     public function verifyPayment(Request $request, IdeaRequest $idea)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'action' => 'required|in:approve,reject',
@@ -328,11 +323,11 @@ class IdeaRequestController extends Controller
                 'status' => 'approved',
                 'payment_verified_at' => now(),
             ]);
-            
+
             return back()->with('success', 'Payment verified! Idea request approved.');
         } else {
             $idea->update(['status' => 'accepted']); // Back to accepted status
-            
+
             return back()->with('error', 'Payment rejected. Client needs to re-upload.');
         }
     }
@@ -343,8 +338,6 @@ class IdeaRequestController extends Controller
     public function assign(Request $request, IdeaRequest $idea)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'assigned_to' => 'required|exists:users,id',
@@ -373,7 +366,7 @@ class IdeaRequestController extends Controller
             IdeaRequestComment::create([
                 'idea_request_id' => $idea->id,
                 'user_id' => Auth::id(),
-                'comment' => 'Closed as ' . $validated['status'] . ': ' . $validated['reason'],
+                'comment' => 'Closed as '.$validated['status'].': '.$validated['reason'],
                 'is_internal' => true,
             ]);
         }
@@ -389,12 +382,12 @@ class IdeaRequestController extends Controller
     public function convertToProject(IdeaRequest $idea)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
-        if (!$idea->isCompleted()) {
+        if (! $idea->isCompleted()) {
             return back()->withErrors(['error' => 'Only completed ideas can be converted to projects.']);
         }
 

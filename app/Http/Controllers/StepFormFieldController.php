@@ -16,8 +16,6 @@ class StepFormFieldController extends Controller
     public function create(ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-         
 
         return view('stepper.fields.create', compact('step'));
     }
@@ -28,15 +26,13 @@ class StepFormFieldController extends Controller
     public function store(Request $request, ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'field_name' => 'required|string|max:255|regex:/^[a-zA-Z_][a-zA-Z0-9_]*$/',
             'field_label' => 'required|string|max:255',
             'field_type' => ['required', Rule::in([
-                'text', 'email', 'number', 'tel', 'url', 'textarea', 
-                'select', 'radio', 'checkbox', 'file', 'date', 'datetime-local'
+                'text', 'email', 'number', 'tel', 'url', 'textarea',
+                'select', 'radio', 'checkbox', 'file', 'date', 'datetime-local',
             ])],
             'field_description' => 'nullable|string',
             'field_options' => 'nullable|array',
@@ -60,8 +56,6 @@ class StepFormFieldController extends Controller
     public function edit(StepFormField $field)
     {
         $user = Auth::user();
-        
-         
 
         $field->load('serviceRequestStep');
 
@@ -74,15 +68,13 @@ class StepFormFieldController extends Controller
     public function update(Request $request, StepFormField $field)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'field_name' => 'required|string|max:255|regex:/^[a-zA-Z_][a-zA-Z0-9_]*$/',
             'field_label' => 'required|string|max:255',
             'field_type' => ['required', Rule::in([
-                'text', 'email', 'number', 'tel', 'url', 'textarea', 
-                'select', 'radio', 'checkbox', 'file', 'date', 'datetime-local'
+                'text', 'email', 'number', 'tel', 'url', 'textarea',
+                'select', 'radio', 'checkbox', 'file', 'date', 'datetime-local',
             ])],
             'field_description' => 'nullable|string',
             'field_options' => 'nullable|array',
@@ -103,8 +95,6 @@ class StepFormFieldController extends Controller
     public function destroy(StepFormField $field)
     {
         $user = Auth::user();
-        
-         
 
         $step = $field->serviceRequestStep;
         $field->delete();
@@ -119,8 +109,6 @@ class StepFormFieldController extends Controller
     public function reorder(Request $request, ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'field_orders' => 'required|array',

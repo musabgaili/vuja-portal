@@ -3,28 +3,28 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Add Milestone</h5>
+                <h5>{{ __('portal.projects_manager.modals.add_milestone') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.milestones.store', $project) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Title *</label>
+                        <label>{{ __('portal.projects_manager.modals.title') }} *</label>
                         <input type="text" name="title" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label>{{ __('portal.projects_manager.modals.description') }}</label>
                         <textarea name="description" rows="3" class="form-control"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Due Date</label>
+                        <label>{{ __('portal.projects_manager.show.due') }}</label>
                         <input type="date" name="due_date" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Create Milestone
+                        <i class="fas fa-plus"></i> {{ __('portal.projects_manager.modals.create_milestone') }}
                     </button>
                 </div>
             </form>
@@ -37,26 +37,26 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Add Task</h5>
+                <h5>{{ __('portal.projects_manager.modals.add_task') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.tasks.store', $project) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Title *</label>
+                        <label>{{ __('portal.projects_manager.modals.title') }} *</label>
                         <input type="text" name="title" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label>{{ __('portal.projects_manager.modals.description') }}</label>
                         <textarea name="description" rows="2" class="form-control"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Milestone</label>
+                                <label>{{ __('portal.projects_manager.show.milestones') }}</label>
                                 <select name="milestone_id" class="form-control">
-                                    <option value="">None</option>
+                                    <option value="">{{ __('portal.projects_manager.modals.none') }}</option>
                                     @foreach($project->milestones as $m)
                                     <option value="{{ $m->id }}">{{ $m->title }}</option>
                                     @endforeach
@@ -65,12 +65,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Priority</label>
+                                <label>{{ __('portal.projects_manager.modals.priority') }}</label>
                                 <select name="priority" class="form-control">
-                                    <option value="low">Low</option>
-                                    <option value="medium" selected>Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
+                                    <option value="low">{{ __('portal.projects_manager.modals.priority_low') }}</option>
+                                    <option value="medium" selected>{{ __('portal.projects_manager.modals.priority_medium') }}</option>
+                                    <option value="high">{{ __('portal.projects_manager.show.high') }}</option>
+                                    <option value="urgent">{{ __('portal.projects_manager.show.urgent') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -78,9 +78,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Assign To</label>
+                                <label>{{ __('portal.projects_manager.modals.assign_to') }}</label>
                                 <select name="assigned_to" class="form-control">
-                                    <option value="">Unassigned</option>
+                                    <option value="">{{ __('portal.projects_manager.modals.unassigned') }}</option>
                                     @foreach($employees as $emp)
                                     <option value="{{ $emp->id }}">{{ $emp->name }}</option>
                                     @endforeach
@@ -89,7 +89,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Due Date</label>
+                                <label>{{ __('portal.projects_manager.show.due') }}</label>
                                 <input type="date" name="due_date" class="form-control">
                             </div>
                         </div>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Create Task
+                        <i class="fas fa-plus"></i> {{ __('portal.projects_manager.modals.create_task') }}
                     </button>
                 </div>
             </form>
@@ -110,42 +110,42 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Update Task</h5>
+                <h5>{{ __('portal.projects_manager.modals.update_task') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="taskStatusForm">
                 @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="form-group" id="task_title_field" style="display: {{ $canManageTasks ? 'block' : 'none' }};">
-                        <label>Title *</label>
+                        <label>{{ __('portal.projects_manager.modals.title') }} *</label>
                         <input type="text" name="title" id="edit_task_title" class="form-control">
                     </div>
                     <div class="form-group" id="task_description_field" style="display: {{ $canManageTasks ? 'block' : 'none' }};">
-                        <label>Description</label>
+                        <label>{{ __('portal.projects_manager.modals.description') }}</label>
                         <textarea name="description" id="edit_task_description" rows="2" class="form-control"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-{{ $canManageTasks ? '6' : '12' }}">
                             <div class="form-group">
-                                <label>Status *</label>
+                                <label>{{ __('portal.projects_manager.index.status') }} *</label>
                                 <select name="status" id="edit_task_status" class="form-control" required>
-                                    <option value="todo">To Do</option>
-                                    <option value="in_progress">In Progress</option>
-                                    <option value="review">Review</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="blocked">Blocked</option>
+                                    <option value="todo">{{ __('portal.projects_manager.modals.status_todo') }}</option>
+                                    <option value="in_progress">{{ __('portal.projects_manager.status.in_progress') }}</option>
+                                    <option value="review">{{ __('portal.projects_manager.modals.status_review') }}</option>
+                                    <option value="completed">{{ __('portal.projects_manager.status.completed') }}</option>
+                                    <option value="blocked">{{ __('portal.projects_manager.modals.status_blocked') }}</option>
                                 </select>
                             </div>
                         </div>
                         @if($canManageTasks)
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Priority</label>
+                                <label>{{ __('portal.projects_manager.modals.priority') }}</label>
                                 <select name="priority" id="edit_task_priority" class="form-control">
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
+                                    <option value="low">{{ __('portal.projects_manager.modals.priority_low') }}</option>
+                                    <option value="medium">{{ __('portal.projects_manager.modals.priority_medium') }}</option>
+                                    <option value="high">{{ __('portal.projects_manager.show.high') }}</option>
+                                    <option value="urgent">{{ __('portal.projects_manager.show.urgent') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -153,18 +153,18 @@
                     </div>
                     @if($canManageTasks)
                     <div class="form-group">
-                        <label>Milestone</label>
+                        <label>{{ __('portal.projects_manager.show.milestones') }}</label>
                         <select name="milestone_id" id="edit_task_milestone" class="form-control">
-                            <option value="">None</option>
+                            <option value="">{{ __('portal.projects_manager.modals.none') }}</option>
                             @foreach($project->milestones as $m)
                             <option value="{{ $m->id }}">{{ $m->title }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Assign To</label>
+                        <label>{{ __('portal.projects_manager.modals.assign_to') }}</label>
                         <select name="assigned_to" id="edit_task_assigned" class="form-control">
-                            <option value="">Unassigned</option>
+                            <option value="">{{ __('portal.projects_manager.modals.unassigned') }}</option>
                             @foreach($employees as $emp)
                             <option value="{{ $emp->id }}">{{ $emp->name }}</option>
                             @endforeach
@@ -173,26 +173,26 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Due Date</label>
+                                <label>{{ __('portal.projects_manager.show.due') }}</label>
                                 <input type="date" name="due_date" id="edit_task_due_date" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Actual Hours</label>
+                                <label>{{ __('portal.projects_manager.modals.actual_hours') }}</label>
                                 <input type="number" name="actual_hours" id="edit_task_hours" class="form-control">
                             </div>
                         </div>
                     </div>
                     @else
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> As a team member, you can only update the task status.
+                        <i class="fas fa-info-circle"></i> {{ __('portal.projects_manager.modals.team_member_status_only') }}
                     </div>
                     @endif
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update Task
+                        <i class="fas fa-save"></i> {{ __('portal.projects_manager.modals.update_task') }}
                     </button>
                 </div>
             </form>
@@ -205,66 +205,66 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Edit Project</h5>
+                <h5>{{ __('portal.projects_manager.show.edit_project') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.update', $project) }}">
                 @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Title *</label>
+                        <label>{{ __('portal.projects_manager.modals.title') }} *</label>
                         <input type="text" name="title" class="form-control" value="{{ $project->title }}" required>
                     </div>
                     <div class="form-group">
-                        <label>Description *</label>
+                        <label>{{ __('portal.projects_manager.create.description') }} *</label>
                         <textarea name="description" rows="3" class="form-control" required>{{ $project->description }}</textarea>
                     </div>
                     <div class="form-group">
-                        <label>Client</label>
+                        <label>{{ __('portal.projects_manager.create.client') }}</label>
                         <select name="client_id" class="form-control">
-                            <option value="">-- No Client --</option>
+                            <option value="">{{ __('portal.projects_manager.modals.no_client') }}</option>
                             @foreach(\App\Models\User::where('type', 'client')->get() as $c)
                             <option value="{{ $c->id }}" {{ $project->client_id == $c->id ? 'selected' : '' }}>
                                 {{ $c->name }} ({{ $c->email }})
                             </option>
                             @endforeach
                         </select>
-                        <small class="text-muted">You can change or remove the client</small>
+                        <small class="text-muted">{{ __('portal.projects_manager.modals.client_help') }}</small>
                     </div>
                     <div class="form-group">
-                        <label>Scope</label>
+                        <label>{{ __('portal.projects_manager.create.scope') }}</label>
                         <textarea name="scope" rows="3" class="form-control">{{ $project->scope }}</textarea>
                     </div>
                     <div class="form-group">
-                        <label>Status</label>
+                        <label>{{ __('portal.projects_manager.index.status') }}</label>
                         <select name="status" class="form-control">
-                            <option value="planning" {{ $project->status === 'planning' ? 'selected' : '' }}>Planning</option>
-                            <option value="quoted" {{ $project->status === 'quoted' ? 'selected' : '' }}>Quoted</option>
-                            <option value="awarded" {{ $project->status === 'awarded' ? 'selected' : '' }}>Awarded</option>
-                            <option value="in_progress" {{ $project->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                            <option value="paused" {{ $project->status === 'paused' ? 'selected' : '' }}>Paused</option>
-                            <option value="completed" {{ $project->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="lost" {{ $project->status === 'lost' ? 'selected' : '' }}>Lost</option>
-                            <option value="cancelled" {{ $project->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            <option value="planning" {{ $project->status === 'planning' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.planning') }}</option>
+                            <option value="quoted" {{ $project->status === 'quoted' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.quoted') }}</option>
+                            <option value="awarded" {{ $project->status === 'awarded' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.awarded') }}</option>
+                            <option value="in_progress" {{ $project->status === 'in_progress' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.in_progress') }}</option>
+                            <option value="paused" {{ $project->status === 'paused' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.paused') }}</option>
+                            <option value="completed" {{ $project->status === 'completed' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.completed') }}</option>
+                            <option value="lost" {{ $project->status === 'lost' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.lost') }}</option>
+                            <option value="cancelled" {{ $project->status === 'cancelled' ? 'selected' : '' }}>{{ __('portal.projects_manager.status.cancelled') }}</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Budget ($)</label>
+                        <label>{{ __('portal.projects_manager.create.budget') }}</label>
                         <input type="number" name="budget" class="form-control" value="{{ $project->budget }}" step="0.01">
                     </div>
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> Progress percentage is auto-calculated from milestones & tasks.
+                        <i class="fas fa-info-circle"></i> {{ __('portal.projects_manager.modals.progress_auto_calculated') }}
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Start Date</label>
+                                <label>{{ __('portal.projects_manager.create.start_date') }}</label>
                                 <input type="date" name="start_date" class="form-control" value="{{ $project->start_date?->format('Y-m-d') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>End Date</label>
+                                <label>{{ __('portal.projects_manager.create.end_date') }}</label>
                                 <input type="date" name="end_date" class="form-control" value="{{ $project->end_date?->format('Y-m-d') }}">
                             </div>
                         </div>
@@ -272,7 +272,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update Project
+                        <i class="fas fa-save"></i> {{ __('portal.projects_manager.modals.update_project') }}
                     </button>
                 </div>
             </form>
@@ -285,41 +285,41 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Add Team Member</h5>
+                <h5>{{ __('portal.projects_manager.modals.add_team_member') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.team.add', $project) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>User *</label>
+                        <label>{{ __('portal.projects_manager.modals.user') }} *</label>
                         <select name="user_id" class="form-control" required>
-                            <option value="">Select...</option>
+                            <option value="">{{ __('portal.projects_manager.modals.select') }}</option>
                             @foreach($employees as $emp)
                             <option value="{{ $emp->id }}">{{ $emp->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Role *</label>
+                        <label>{{ __('portal.team.col_role') }} *</label>
                         <select name="role" class="form-control" required>
-                            <option value="employee">Employee</option>
+                            <option value="employee">{{ __('portal.projects_manager.modals.role_employee') }}</option>
                             @if(!$project->projectPeople()->where('role', 'project_manager')->exists())
-                            <option value="project_manager">Project Manager</option>
+                            <option value="project_manager">{{ __('portal.projects_manager.modals.role_project_manager') }}</option>
                             @endif
-                            <option value="account_manager">Account Manager</option>
+                            <option value="account_manager">{{ __('portal.projects_manager.modals.role_account_manager') }}</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="can_edit_add" name="can_edit" value="1">
-                            <label class="form-check-label" for="can_edit_add">Can Edit Project</label>
+                            <label class="form-check-label" for="can_edit_add">{{ __('portal.projects_manager.show.can_edit') }}</label>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add Member
+                        <i class="fas fa-plus"></i> {{ __('portal.projects_manager.show.add_member') }}
                     </button>
                 </div>
             </form>
@@ -332,31 +332,31 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Edit Team Member</h5>
+                <h5>{{ __('portal.projects_manager.modals.edit_team_member') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="editTeamForm">
                 @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Role *</label>
+                        <label>{{ __('portal.team.col_role') }} *</label>
                         <select name="role" id="edit_member_role" class="form-control" required>
-                            <option value="employee">Employee</option>
-                            <option value="project_manager">Project Manager</option>
-                            <option value="account_manager">Account Manager</option>
-                            <option value="client">Client</option>
+                            <option value="employee">{{ __('portal.projects_manager.modals.role_employee') }}</option>
+                            <option value="project_manager">{{ __('portal.projects_manager.modals.role_project_manager') }}</option>
+                            <option value="account_manager">{{ __('portal.projects_manager.modals.role_account_manager') }}</option>
+                            <option value="client">{{ __('portal.projects_client.show.client') }}</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="edit_member_can_edit" name="can_edit" value="1">
-                            <label class="form-check-label" for="edit_member_can_edit">Can Edit Project</label>
+                            <label class="form-check-label" for="edit_member_can_edit">{{ __('portal.projects_manager.show.can_edit') }}</label>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update
+                        <i class="fas fa-save"></i> {{ __('portal.projects_manager.modals.update') }}
                     </button>
                 </div>
             </form>
@@ -369,29 +369,29 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Upload Deliverable</h5>
+                <h5>{{ __('portal.projects_manager.show.upload_deliverable') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('projects.deliverables.store', $project) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Title *</label>
+                        <label>{{ __('portal.projects_manager.modals.title') }} *</label>
                         <input type="text" name="title" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label>{{ __('portal.projects_manager.modals.description') }}</label>
                         <textarea name="description" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>File *</label>
+                        <label>{{ __('portal.projects_manager.modals.file') }} *</label>
                         <input type="file" name="file" class="form-control" required>
-                        <small class="text-muted">Max: 50MB</small>
+                        <small class="text-muted">{{ __('portal.projects_manager.modals.max_50mb') }}</small>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-upload"></i> Upload
+                        <i class="fas fa-upload"></i> {{ __('portal.projects_manager.modals.upload') }}
                     </button>
                 </div>
             </form>
@@ -405,20 +405,20 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5><i class="fas fa-reply"></i> Respond to Request</h5>
+                <h5><i class="fas fa-reply"></i> {{ __('portal.projects_manager.modals.respond_to_request') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="respondRequestForm">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="fw-bold">Your Response *</label>
-                        <textarea name="response" class="form-control" rows="4" required placeholder="Provide a detailed response..."></textarea>
+                        <label class="fw-bold">{{ __('portal.projects_manager.modals.your_response') }} *</label>
+                        <textarea name="response" class="form-control" rows="4" required placeholder="{{ __('portal.projects_manager.modals.response_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> Send Response
+                        <i class="fas fa-paper-plane"></i> {{ __('portal.projects_manager.modals.send_response') }}
                     </button>
                 </div>
             </form>
@@ -431,23 +431,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5><i class="fas fa-check-circle"></i> Resolve Complaint</h5>
+                <h5><i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.resolve_complaint') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="resolveComplaintForm">
                 @csrf
                 <div class="modal-body">
                     <div class="alert alert-warning">
-                        <i class="fas fa-info-circle"></i> Client will be notified via email
+                        <i class="fas fa-info-circle"></i> {{ __('portal.projects_manager.modals.client_notified_email') }}
                     </div>
                     <div class="form-group">
-                        <label class="fw-bold">Resolution Note *</label>
-                        <textarea name="resolution_note" class="form-control" rows="4" required placeholder="Explain how resolved..."></textarea>
+                        <label class="fw-bold">{{ __('portal.projects_manager.modals.resolution_note') }} *</label>
+                        <textarea name="resolution_note" class="form-control" rows="4" required placeholder="{{ __('portal.projects_manager.modals.resolution_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i> Mark as Resolved
+                        <i class="fas fa-check"></i> {{ __('portal.projects_manager.modals.mark_as_resolved') }}
                     </button>
                 </div>
             </form>

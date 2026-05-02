@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'My Projects')
+@section('title', __('portal.projects_client.index.title'))
 @section('content')
 
 <style>
@@ -89,8 +89,8 @@
 <!-- Hero Section -->
 <div class="projects-hero">
     <div class="text-center">
-        <h1><i class="fas fa-folder-open"></i> My Projects</h1>
-        <p style="opacity: 0.9; font-size: 1.1rem; margin: 0;">Track your projects, view progress, and collaborate with the team</p>
+        <h1><i class="fas fa-folder-open"></i> {{ __('portal.projects_client.index.my_projects') }}</h1>
+        <p style="opacity: 0.9; font-size: 1.1rem; margin: 0;">{{ __('portal.projects_client.index.hero_subtitle') }}</p>
     </div>
 </div>
 
@@ -99,7 +99,7 @@
     <div class="col-md-4">
         <div class="stat-card-modern">
             <div class="stat-card-value">{{ $stats['total'] }}</div>
-            <div class="stat-card-label">Total Projects</div>
+            <div class="stat-card-label">{{ __('portal.projects_client.index.total_projects') }}</div>
         </div>
     </div>
     <div class="col-md-4">
@@ -107,7 +107,7 @@
             <div class="stat-card-value" style="background: linear-gradient(135deg, #10b981 0%, #1C575F 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 {{ $stats['active'] }}
             </div>
-            <div class="stat-card-label">Active</div>
+            <div class="stat-card-label">{{ __('portal.projects_client.index.active') }}</div>
         </div>
     </div>
     <div class="col-md-4">
@@ -115,7 +115,7 @@
             <div class="stat-card-value" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 {{ $stats['completed'] }}
             </div>
-            <div class="stat-card-label">Completed</div>
+            <div class="stat-card-label">{{ __('portal.projects_client.index.completed') }}</div>
         </div>
     </div>
 </div>
@@ -128,7 +128,7 @@
             <div style="flex: 1;">
                 <h4 style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">{{ $project->title }}</h4>
                 <small style="color: #64748b;">
-                    <i class="fas fa-calendar"></i> Started {{ $project->created_at->format('M d, Y') }}
+                    <i class="fas fa-calendar"></i> {{ __('portal.projects_client.index.started') }} {{ $project->created_at->format('M d, Y') }}
                 </small>
             </div>
             <span class="status-badge {{ $project->getStatusBadgeColor() }}" style="font-size: 0.9rem;">
@@ -145,23 +145,23 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <div style="margin-bottom: 0.5rem;">
-                    <strong style="color: #1e293b;">Progress</strong>
+                    <strong style="color: #1e293b;">{{ __('portal.projects_client.index.progress') }}</strong>
                 </div>
                 <div class="progress-bar-client">
                     <div class="progress-bar-client-fill" style="width:{{ $project->completion_percentage }}%;"></div>
                 </div>
-                <small style="color: #64748b;">{{ $project->completion_percentage }}% Complete</small>
+                <small style="color: #64748b;">{{ $project->completion_percentage }}% {{ __('portal.projects_client.index.complete') }}</small>
             </div>
             <div class="col-md-6">
                 <div class="d-flex flex-wrap gap-2">
                     <span class="badge bg-info" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;">
-                        <i class="fas fa-flag"></i> {{ $project->milestones->count() }} Milestones
+                        <i class="fas fa-flag"></i> {{ $project->milestones->count() }} {{ __('portal.projects_client.index.milestones') }}
                     </span>
                     <span class="badge bg-secondary" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;">
-                        <i class="fas fa-tasks"></i> {{ $project->tasks->count() }} Tasks
+                        <i class="fas fa-tasks"></i> {{ $project->tasks->count() }} {{ __('portal.projects_client.index.tasks') }}
                     </span>
                     <span class="badge bg-success" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;">
-                        <i class="fas fa-check"></i> {{ $project->tasks->where('status', 'completed')->count() }} Done
+                        <i class="fas fa-check"></i> {{ $project->tasks->where('status', 'completed')->count() }} {{ __('portal.projects_client.index.done') }}
                     </span>
                 </div>
             </div>
@@ -171,19 +171,19 @@
     <div class="project-card-footer">
         <div>
             <small style="color: #64748b;">
-                <i class="fas fa-users"></i> {{ $project->getTeamMembers()->count() }} team members
+                <i class="fas fa-users"></i> {{ $project->getTeamMembers()->count() }} {{ __('portal.projects_client.index.team_members') }}
             </small>
         </div>
         <a href="{{ route('projects.client.show', $project) }}" class="btn btn-primary" style="border-radius: 10px; padding: 0.5rem 1.5rem;">
-            <i class="fas fa-arrow-right"></i> View Project
+            <i class="fas fa-arrow-right"></i> {{ __('portal.projects_client.index.view_project') }}
         </a>
     </div>
 </div>
 @empty
 <div class="text-center py-5">
     <i class="fas fa-folder-open" style="font-size: 5rem; color: #cbd5e1; margin-bottom: 1.5rem;"></i>
-    <h4 style="color: #64748b;">No Projects Yet</h4>
-    <p style="color: #94a3b8;">Your projects will appear here once they're created.</p>
+    <h4 style="color: #64748b;">{{ __('portal.projects_client.index.empty_title') }}</h4>
+    <p style="color: #94a3b8;">{{ __('portal.projects_client.index.empty_body') }}</p>
 </div>
 @endforelse
 

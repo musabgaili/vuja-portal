@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::table('service_requests', function (Blueprint $table) {
             // Add foreign key for service_request_type_id
             $table->foreign('service_request_type_id')
-                  ->references('id')
-                  ->on('service_request_types')
-                  ->onDelete('set null');
-            
+                ->references('id')
+                ->on('service_request_types')
+                ->onDelete('set null');
+
             // Add foreign key for current_step_id
             $table->foreign('current_step_id')
-                  ->references('id')
-                  ->on('service_request_steps')
-                  ->onDelete('set null');
+                ->references('id')
+                ->on('service_request_steps')
+                ->onDelete('set null');
         });
     }
 

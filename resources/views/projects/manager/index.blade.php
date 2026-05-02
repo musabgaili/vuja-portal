@@ -1,7 +1,7 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'All Projects')
+@section('title', __('portal.projects_manager.index.title'))
 @section('breadcrumbs')
-<li class="breadcrumb-item active">Projects</li>
+<li class="breadcrumb-item active">{{ __('portal.projects_manager.projects') }}</li>
 @endsection
 
 @section('content')
@@ -23,14 +23,14 @@
 <div class="projects-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap">
         <div>
-            <h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-folder-open"></i> All Projects</h1>
-            <p style="margin:0.5rem 0 0 0;opacity:0.95;">Manage and track all projects</p>
+            <h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-folder-open"></i> {{ __('portal.projects_manager.index.all_projects') }}</h1>
+            <p style="margin:0.5rem 0 0 0;opacity:0.95;">{{ __('portal.projects_manager.index.subtitle') }}</p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a href="{{ route('projects.manager.index') }}" class="btn btn-light">Table View</a>
-            <a href="{{ route('projects.kanban') }}" class="btn btn-outline-light">Kanban</a>
+            <a href="{{ route('projects.manager.index') }}" class="btn btn-light">{{ __('portal.projects_manager.index.table_view') }}</a>
+            <a href="{{ route('projects.kanban') }}" class="btn btn-outline-light">{{ __('portal.projects_manager.index.kanban') }}</a>
             @if(auth()->user()->isManager())
-            <a href="{{ route('projects.create') }}" class="btn btn-warning"><i class="fas fa-plus"></i> New</a>
+            <a href="{{ route('projects.create') }}" class="btn btn-warning"><i class="fas fa-plus"></i> {{ __('portal.projects_manager.index.new') }}</a>
             @endif
         </div>
     </div>
@@ -40,29 +40,29 @@
     <form method="GET">
         <div class="row align-items-end">
             <div class="col-md-3 mb-2 mb-md-0">
-                <label class="form-label fw-bold">Search</label>
-                <input type="text" name="search" class="form-control" placeholder="Name, client email..." value="{{ request('search') }}">
+                <label class="form-label fw-bold">{{ __('portal.projects_manager.index.search') }}</label>
+                <input type="text" name="search" class="form-control" placeholder="{{ __('portal.projects_manager.index.search_placeholder') }}" value="{{ request('search') }}">
             </div>
             <div class="col-md-2 mb-2 mb-md-0">
-                <label class="form-label fw-bold">Status</label>
+                <label class="form-label fw-bold">{{ __('portal.projects_manager.index.status') }}</label>
                 <select name="status" class="form-control">
-                    <option value="">All</option>
-                    <option value="planning" {{ request('status')=='planning'?'selected':'' }}>Planning</option>
-                    <option value="quoted" {{ request('status')=='quoted'?'selected':'' }}>Quoted</option>
-                    <option value="awarded" {{ request('status')=='awarded'?'selected':'' }}>Awarded</option>
-                    <option value="in_progress" {{ request('status')=='in_progress'?'selected':'' }}>In Progress</option>
-                    <option value="paused" {{ request('status')=='paused'?'selected':'' }}>Paused</option>
-                    <option value="completed" {{ request('status')=='completed'?'selected':'' }}>Completed</option>
-                    <option value="lost" {{ request('status')=='lost'?'selected':'' }}>Lost</option>
-                    <option value="cancelled" {{ request('status')=='cancelled'?'selected':'' }}>Cancelled</option>
+                    <option value="">{{ __('portal.projects_manager.index.all') }}</option>
+                    <option value="planning" {{ request('status')=='planning'?'selected':'' }}>{{ __('portal.projects_manager.status.planning') }}</option>
+                    <option value="quoted" {{ request('status')=='quoted'?'selected':'' }}>{{ __('portal.projects_manager.status.quoted') }}</option>
+                    <option value="awarded" {{ request('status')=='awarded'?'selected':'' }}>{{ __('portal.projects_manager.status.awarded') }}</option>
+                    <option value="in_progress" {{ request('status')=='in_progress'?'selected':'' }}>{{ __('portal.projects_manager.status.in_progress') }}</option>
+                    <option value="paused" {{ request('status')=='paused'?'selected':'' }}>{{ __('portal.projects_manager.status.paused') }}</option>
+                    <option value="completed" {{ request('status')=='completed'?'selected':'' }}>{{ __('portal.projects_manager.status.completed') }}</option>
+                    <option value="lost" {{ request('status')=='lost'?'selected':'' }}>{{ __('portal.projects_manager.status.lost') }}</option>
+                    <option value="cancelled" {{ request('status')=='cancelled'?'selected':'' }}>{{ __('portal.projects_manager.status.cancelled') }}</option>
                 </select>
             </div>
             <div class="col-md-2 mb-2 mb-md-0">
-                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> {{ __('portal.projects_manager.index.search') }}</button>
             </div>
             @if(request()->hasAny(['search','status']))
             <div class="col-md-2">
-                <a href="{{ route('projects.manager.index') }}" class="btn btn-secondary w-100"><i class="fas fa-redo"></i> Clear</a>
+                <a href="{{ route('projects.manager.index') }}" class="btn btn-secondary w-100"><i class="fas fa-redo"></i> {{ __('portal.projects_manager.index.clear') }}</a>
             </div>
             @endif
         </div>
@@ -72,19 +72,19 @@
 <div class="stat-cards-row">
     <div class="stat-card-proj" style="border-color:#3b82f6;">
         <div class="stat-number-proj" style="color:#3b82f6;">{{ $stats['total']??0 }}</div>
-        <div class="stat-label-proj">Total Projects</div>
+        <div class="stat-label-proj">{{ __('portal.projects_manager.index.total_projects') }}</div>
     </div>
     <div class="stat-card-proj" style="border-color:#10b981;">
         <div class="stat-number-proj" style="color:#10b981;">{{ $stats['in_progress']??0 }}</div>
-        <div class="stat-label-proj">In Progress</div>
+        <div class="stat-label-proj">{{ __('portal.projects_manager.status.in_progress') }}</div>
     </div>
     <div class="stat-card-proj" style="border-color:#f59e0b;">
         <div class="stat-number-proj" style="color:#f59e0b;">{{ $stats['planning']??0 }}</div>
-        <div class="stat-label-proj">Planning</div>
+        <div class="stat-label-proj">{{ __('portal.projects_manager.status.planning') }}</div>
     </div>
     <div class="stat-card-proj" style="border-color:#8b5cf6;">
         <div class="stat-number-proj" style="color:#8b5cf6;">{{ $stats['completed']??0 }}</div>
-        <div class="stat-label-proj">Completed</div>
+        <div class="stat-label-proj">{{ __('portal.projects_manager.status.completed') }}</div>
     </div>
 </div>
 
@@ -94,14 +94,14 @@
     <table class="table mb-0" style="min-width:900px;">
         <thead>
             <tr>
-                <th>Project</th>
-                <th>Client</th>
-                <th>Status</th>
-                <th>Progress</th>
-                <th>PM</th>
-                <th>Budget</th>
-                <th>Dates</th>
-                <th>Actions</th>
+                <th>{{ __('portal.projects_manager.index.col_project') }}</th>
+                <th>{{ __('portal.projects_manager.index.col_client') }}</th>
+                <th>{{ __('portal.projects_manager.index.col_status') }}</th>
+                <th>{{ __('portal.projects_manager.index.col_progress') }}</th>
+                <th>{{ __('portal.projects_manager.index.col_pm') }}</th>
+                <th>{{ __('portal.projects_manager.index.col_budget') }}</th>
+                <th>{{ __('portal.projects_manager.index.col_dates') }}</th>
+                <th>{{ __('portal.team.col_actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -116,7 +116,7 @@
                         <strong>{{ $p->client->name }}</strong>
                         <br><small class="text-muted">{{ $p->client->email }}</small>
                     @else
-                        <span class="text-muted">No client</span>
+                        <span class="text-muted">{{ __('portal.projects_manager.index.no_client') }}</span>
                     @endif
                 </td>
                 <td><span class="status-badge {{ $p->getStatusBadgeColor() }}">{{ $p->getStatusLabel() }}</span></td>
@@ -149,7 +149,7 @@
                 </td>
                 <td>
                     <a href="{{ route('projects.manager.show',$p) }}" class="btn btn-sm btn-secondary">
-                        <i class="fas fa-eye"></i> View
+                        <i class="fas fa-eye"></i> {{ __('portal.internal.view') }}
                     </a>
                 </td>
             </tr>
@@ -165,8 +165,8 @@
 @else
 <div class="text-center py-5" style="background:white;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
     <i class="fas fa-folder-open" style="font-size:4rem;color:#cbd5e1;margin-bottom:1rem;"></i>
-    <h4 style="color:#1e293b;font-weight:600;">No Projects</h4>
-    <p class="text-muted">No projects match your criteria.</p>
+    <h4 style="color:#1e293b;font-weight:600;">{{ __('portal.projects_manager.index.empty_title') }}</h4>
+    <p class="text-muted">{{ __('portal.projects_manager.index.empty_body') }}</p>
 </div>
 @endif
 @endsection

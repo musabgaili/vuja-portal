@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\CopyrightRegistration;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,6 +13,7 @@ class CopyrightRegistrationController extends Controller
     public function create()
     {
         $workTypes = ['Literary Work', 'Artistic Work', 'Musical Work', 'Software', 'Dramatic Work', 'Other'];
+
         return view('copyright.create', compact('workTypes'));
     }
 
@@ -47,20 +47,20 @@ class CopyrightRegistrationController extends Controller
     public function show(CopyrightRegistration $copyright)
     {
         $user = Auth::user();
-        
+
         if ($user->isClient() && $copyright->user_id !== $user->id) {
             abort(403);
         }
 
         $copyright->load(['user', 'assignedTo']);
-        
+
         return view('copyright.show', compact('copyright'));
     }
 
     public function bookMeeting(Request $request, CopyrightRegistration $copyright)
     {
         // Check if consultant is assigned
-        if (!$copyright->assigned_to) {
+        if (! $copyright->assigned_to) {
             return back()->withErrors(['error' => 'You cannot book a meeting until a consultant is assigned to your copyright registration request.']);
         }
 
@@ -79,13 +79,13 @@ class CopyrightRegistrationController extends Controller
     public function managerIndex()
     {
         $user = Auth::user();
-        
-        if (!$user->isManager() && !$user->isEmployee()) {
+
+        if (! $user->isManager() && ! $user->isEmployee()) {
             abort(403);
         }
 
         $query = CopyrightRegistration::with(['user', 'assignedTo']);
-        
+
         if ($user->isEmployee()) {
             $query->where('assigned_to', $user->id);
         }
@@ -98,8 +98,8 @@ class CopyrightRegistrationController extends Controller
     public function managerShow(CopyrightRegistration $copyright)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 

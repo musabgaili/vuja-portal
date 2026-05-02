@@ -1,8 +1,8 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Projects Kanban')
+@section('title', __('portal.projects_manager.kanban.title'))
 @section('breadcrumbs')
-<li class="breadcrumb-item">Projects</li>
-<li class="breadcrumb-item active">Kanban View</li>
+<li class="breadcrumb-item">{{ __('portal.projects_manager.projects') }}</li>
+<li class="breadcrumb-item active">{{ __('portal.projects_manager.kanban.breadcrumb') }}</li>
 @endsection
 
 @section('content')
@@ -126,19 +126,19 @@
 <div class="projects-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap">
         <div>
-            <h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-th"></i> Projects Kanban</h1>
-            <p style="margin:0.5rem 0 0 0;opacity:0.95;">Drag & drop cards to update project status instantly</p>
+            <h1 style="margin:0;font-size:1.75rem;font-weight:700;"><i class="fas fa-th"></i> {{ __('portal.projects_manager.kanban.heading') }}</h1>
+            <p style="margin:0.5rem 0 0 0;opacity:0.95;">{{ __('portal.projects_manager.kanban.subtitle') }}</p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
             <a href="{{ route('projects.manager.index') }}" class="btn btn-outline-light">
-                <i class="fas fa-table"></i> Table
+                <i class="fas fa-table"></i> {{ __('portal.projects_manager.kanban.table') }}
             </a>
             <a href="{{ route('projects.kanban') }}" class="btn btn-light">
-                <i class="fas fa-th"></i> Kanban
+                <i class="fas fa-th"></i> {{ __('portal.projects_manager.index.kanban') }}
             </a>
             @if(auth()->user()->isManager())
             <a href="{{ route('projects.create') }}" class="btn btn-warning">
-                <i class="fas fa-plus"></i> New Project
+                <i class="fas fa-plus"></i> {{ __('portal.projects_manager.kanban.new_project') }}
             </a>
             @endif
         </div>
@@ -150,12 +150,12 @@
         @foreach(['planning', 'quoted', 'awarded', 'in_progress', 'paused', 'completed'] as $status)
         @php
             $colors = [
-                'planning' => ['bg' => '#3b82f6', 'name' => 'Planning'],
-                'quoted' => ['bg' => '#8b5cf6', 'name' => 'Quoted'],
-                'awarded' => ['bg' => '#10b981', 'name' => 'Awarded'],
-                'in_progress' => ['bg' => '#f59e0b', 'name' => 'In Progress'],
-                'paused' => ['bg' => '#ef4444', 'name' => 'Paused'],
-                'completed' => ['bg' => '#1C575F', 'name' => 'Completed']
+                'planning' => ['bg' => '#3b82f6', 'name' => __('portal.projects_manager.status.planning')],
+                'quoted' => ['bg' => '#8b5cf6', 'name' => __('portal.projects_manager.status.quoted')],
+                'awarded' => ['bg' => '#10b981', 'name' => __('portal.projects_manager.status.awarded')],
+                'in_progress' => ['bg' => '#f59e0b', 'name' => __('portal.projects_manager.status.in_progress')],
+                'paused' => ['bg' => '#ef4444', 'name' => __('portal.projects_manager.status.paused')],
+                'completed' => ['bg' => '#1C575F', 'name' => __('portal.projects_manager.status.completed')]
             ];
             $statusProjects = $projects->where('status', $status);
         @endphp
@@ -183,7 +183,7 @@
                         </span>
                         @else
                         <span class="client-badge" style="background:#fee2e2;color:#991b1b;">
-                            <i class="fas fa-user-slash"></i> No Client
+                            <i class="fas fa-user-slash"></i> {{ __('portal.projects_manager.show.no_client') }}
                         </span>
                         @endif
                     </div>
@@ -194,7 +194,7 @@
                         $endDate = $project->end_date;
                         $daysLeft = $now->diffInDays($endDate, false);
                         $class = $daysLeft < 0 ? 'overdue' : ($daysLeft <= 3 ? 'soon' : 'safe');
-                        $daysText = $daysLeft < 0 ? abs($daysLeft).' days overdue' : $daysLeft.' days';
+                        $daysText = $daysLeft < 0 ? abs($daysLeft).' '.__('portal.projects_manager.kanban.days_overdue') : $daysLeft.' '.__('portal.projects_manager.kanban.days');
                     @endphp
                     <div class="info-row">
                         <span class="deadline-badge {{ $class }}">
@@ -208,7 +208,7 @@
                             <div class="progress-fill" style="width:{{ $project->completion_percentage }}%;"></div>
                         </div>
                         <small class="text-muted" style="font-size:0.75rem;">
-                            <i class="fas fa-tasks"></i> {{ $project->completion_percentage }}% Complete
+                            <i class="fas fa-tasks"></i> {{ $project->completion_percentage }}% {{ __('portal.projects_manager.show.complete') }}
                         </small>
                     </div>
                     
@@ -217,14 +217,14 @@
                            class="btn btn-sm btn-outline-primary w-100" 
                            onclick="event.stopPropagation();"
                            style="border-color:{{ $colors[$status]['bg'] }};color:{{ $colors[$status]['bg'] }};">
-                            <i class="fas fa-eye"></i> View Details
+                            <i class="fas fa-eye"></i> {{ __('portal.projects_client.index.view_details') }}
                         </a>
                     </div>
                 </div>
                 @empty
                 <div class="empty-column">
                     <i class="fas fa-inbox fa-2x mb-2"></i>
-                    <p>No projects in {{ $colors[$status]['name'] }}</p>
+                    <p>{{ __('portal.projects_manager.kanban.empty_column', ['status' => $colors[$status]['name']]) }}</p>
                 </div>
                 @endforelse
             </div>
@@ -318,15 +318,15 @@ function updateProjectStatus(projectId, newStatus) {
         if (data.success) {
             updateColumnCounts();
             updateEmptyStates();
-            showToast('✓ Project status updated successfully!');
+            showToast(@js(__('portal.projects_manager.kanban.toast_updated')), 'success');
         } else {
-            showToast('✗ Error updating project status. Reloading.', 'error');
+            showToast(@js(__('portal.projects_manager.kanban.toast_error_reloading')), 'error');
             location.reload();
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('✗ Network error occurred. Reloading.', 'error');
+        showToast(@js(__('portal.projects_manager.kanban.toast_network_reloading')), 'error');
         location.reload();
     });
 }
@@ -354,7 +354,7 @@ function updateEmptyStates() {
                 cardsArea.innerHTML = `
                     <div class="empty-column">
                         <i class="fas fa-inbox fa-2x mb-2"></i>
-                        <p>No projects in ${statusNameDisplay}</p>
+                        <p>${@js(__('portal.projects_manager.kanban.no_projects_in'))} ${statusNameDisplay}</p>
                     </div>
                 `;
             }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to VujaDe Platform</title>
+    <title>{{ __('portal.emails.team_invitation.title') }}</title>
     <style>
         body{font-family:Arial,sans-serif;line-height:1.6;color:#333;background:#f4f4f4;margin:0;padding:20px;}
         .container{max-width:600px;margin:0 auto;background:#fff;padding:30px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);}
@@ -19,31 +19,31 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 Welcome to VujaDe Platform!</h1>
+            <h1>🎉 {{ __('portal.emails.team_invitation.heading') }}</h1>
         </div>
         
         <div class="content">
-            <p>Hi <strong>{{ $user->name }}</strong>,</p>
+            <p>{!! __('portal.emails.team_invitation.hi', ['name' => e($user->name)]) !!}</p>
             
-            <p>You've been invited to join the VujaDe Platform as a <strong>{{ ucfirst($user->role->value) }}</strong>.</p>
+            <p>{!! __('portal.emails.team_invitation.invited_as', ['role' => e(ucfirst($user->role->value))]) !!}</p>
             
-            <p>Your account has been created with the following credentials:</p>
+            <p>{{ __('portal.emails.team_invitation.credentials_intro') }}</p>
             
             <div class="credentials">
-                <p><strong>Email:</strong> {{ $user->email }}</p>
-                <p><strong>Temporary Password:</strong> <code style="background:#fff;padding:5px 10px;border-radius:3px;font-size:14px;">{{ $password }}</code></p>
+                <p><strong>{{ __('portal.emails.labels.email') }}:</strong> {{ $user->email }}</p>
+                <p><strong>{{ __('portal.emails.team_invitation.temporary_password') }}:</strong> <code style="background:#fff;padding:5px 10px;border-radius:3px;font-size:14px;">{{ $password }}</code></p>
             </div>
             
-            <p><strong>⚠️ Important:</strong> Please change your password after your first login for security purposes.</p>
+            <p><strong>⚠️ {{ __('portal.emails.team_invitation.important') }}:</strong> {{ __('portal.emails.team_invitation.change_password_note') }}</p>
             
-            <a href="{{ url('/login') }}" class="btn">Login to Your Account</a>
+            <a href="{{ url('/login') }}" class="btn">{{ __('portal.emails.team_invitation.login_cta') }}</a>
             
-            <p>If you have any questions, please contact your administrator.</p>
+            <p>{{ __('portal.emails.team_invitation.questions') }}</p>
         </div>
         
         <div class="footer">
-            <p>© {{ date('Y') }} VujaDe Platform. All rights reserved.</p>
-            <p>This is an automated email. Please do not reply.</p>
+            <p>© {{ date('Y') }} {{ __('portal.emails.team_invitation.footer_rights') }}</p>
+            <p>{{ __('portal.emails.team_invitation.footer_no_reply') }}</p>
         </div>
     </div>
 </body>

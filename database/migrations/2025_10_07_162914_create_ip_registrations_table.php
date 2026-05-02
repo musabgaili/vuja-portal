@@ -15,26 +15,26 @@ return new class extends Migration
             $table->text('ip_description');
             $table->string('ip_type'); // Patent, Trademark, etc.
             $table->json('supporting_documents')->nullable();
-            
+
             // Status: submitted -> meeting_booked -> meeting_confirmed -> documentation -> filing -> registered -> completed
             $table->enum('status', [
-                'submitted', 'meeting_booked', 'meeting_confirmed', 
-                'documentation', 'filing', 'registered', 'completed', 'cancelled'
+                'submitted', 'meeting_booked', 'meeting_confirmed',
+                'documentation', 'filing', 'registered', 'completed', 'cancelled',
             ])->default('submitted');
-            
+
             // Meeting
             $table->timestamp('meeting_requested_at')->nullable();
             $table->timestamp('meeting_confirmed_at')->nullable();
             $table->string('meeting_link')->nullable();
-            
+
             // Registration
             $table->string('registration_number')->nullable();
             $table->timestamp('filed_at')->nullable();
             $table->timestamp('registered_at')->nullable();
-            
+
             // Assignment
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
-            
+
             $table->timestamps();
         });
     }

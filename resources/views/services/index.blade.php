@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Services')
-@section('page-title', 'Request Our Services')
+@section('title', __('portal.services.index.page_title'))
+@section('page-title', __('portal.services.index.page_heading'))
 
 @section('content')
 <div class="services-grid">
@@ -11,15 +11,15 @@
             <i class="fas fa-lightbulb"></i>
         </div>
         <div class="service-content">
-            <h3>Idea Generation</h3>
-            <p>Transform your innovative ideas into actionable business concepts with our AI-powered ideation tools.</p>
+            <h3>{{ __('portal.services.index.idea_title') }}</h3>
+            <p>{{ __('portal.services.index.idea_body') }}</p>
             <ul class="service-features">
-                <li><i class="fas fa-check"></i> AI-Enhanced Ideation</li>
-                <li><i class="fas fa-check"></i> Price Negotiation</li>
-                <li><i class="fas fa-check"></i> Agreement & Payment</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.idea_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.idea_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.idea_f3') }}</li>
             </ul>
             <a href="{{ route('ideas.create') }}" class="btn btn-primary btn-block">
-                <i class="fas fa-arrow-right"></i> Start Idea Request
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.idea_cta') }}
             </a>
         </div>
     </div>
@@ -30,15 +30,15 @@
             <i class="fas fa-comments"></i>
         </div>
         <div class="service-content">
-            <h3>Expert Consultation</h3>
-            <p>Get expert advice and guidance from our experienced professionals across various domains.</p>
+            <h3>{{ __('portal.services.index.consultation_title') }}</h3>
+            <p>{{ __('portal.services.index.consultation_body') }}</p>
             <ul class="service-features">
-                <li><i class="fas fa-check"></i> Category-Based Matching</li>
-                <li><i class="fas fa-check"></i> Direct Meeting Scheduling</li>
-                <li><i class="fas fa-check"></i> Expert Recommendations</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.consultation_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.consultation_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.consultation_f3') }}</li>
             </ul>
             <a href="{{ route('consultations.create') }}" class="btn btn-primary btn-block">
-                <i class="fas fa-arrow-right"></i> Request Consultation
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.consultation_cta') }}
             </a>
         </div>
     </div>
@@ -49,15 +49,15 @@
             <i class="fas fa-search"></i>
         </div>
         <div class="service-content">
-            <h3>Research & IP</h3>
-            <p>Comprehensive research and intellectual property services with NDA protection.</p>
+            <h3>{{ __('portal.services.index.research_title') }}</h3>
+            <p>{{ __('portal.services.index.research_body') }}</p>
             <ul class="service-features">
-                <li><i class="fas fa-check"></i> NDA & SLA Signing</li>
-                <li><i class="fas fa-check"></i> In-Depth Research</li>
-                <li><i class="fas fa-check"></i> Meeting Coordination</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.research_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.research_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.research_f3') }}</li>
             </ul>
             <a href="{{ route('research.create') }}" class="btn btn-primary btn-block">
-                <i class="fas fa-arrow-right"></i> Request Research
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.research_cta') }}
             </a>
         </div>
     </div>
@@ -68,15 +68,15 @@
             <i class="fas fa-file-contract"></i>
         </div>
         <div class="service-content">
-            <h3>IP Registration</h3>
-            <p>Register your intellectual property including patents, trademarks, and designs.</p>
+            <h3>{{ __('portal.services.index.ip_title') }}</h3>
+            <p>{{ __('portal.services.index.ip_body') }}</p>
             <ul class="service-features">
-                <li><i class="fas fa-check"></i> Direct Meeting Booking</li>
-                <li><i class="fas fa-check"></i> Filing Assistance</li>
-                <li><i class="fas fa-check"></i> Registration Tracking</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.ip_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.ip_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.ip_f3') }}</li>
             </ul>
             <a href="{{ route('ip.create') }}" class="btn btn-primary btn-block">
-                <i class="fas fa-arrow-right"></i> Register IP
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.ip_cta') }}
             </a>
         </div>
     </div>
@@ -87,15 +87,15 @@
             <i class="fas fa-copyright"></i>
         </div>
         <div class="service-content">
-            <h3>Copyright Registration</h3>
-            <p>Protect your creative works with our copyright registration services.</p>
+            <h3>{{ __('portal.services.index.copyright_title') }}</h3>
+            <p>{{ __('portal.services.index.copyright_body') }}</p>
             <ul class="service-features">
-                <li><i class="fas fa-check"></i> Direct Meeting Booking</li>
-                <li><i class="fas fa-check"></i> Copyright Filing</li>
-                <li><i class="fas fa-check"></i> Work Protection</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.copyright_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.copyright_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.copyright_f3') }}</li>
             </ul>
             <a href="{{ route('copyright.create') }}" class="btn btn-primary btn-block">
-                <i class="fas fa-arrow-right"></i> Register Copyright
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.copyright_cta') }}
             </a>
         </div>
     </div>
@@ -104,29 +104,29 @@
 <!-- How It Works -->
 <div class="card mt-4">
     <div class="card-header">
-        <h3 class="card-title">How Our Services Work</h3>
+        <h3 class="card-title">{{ __('portal.services.index.how_title') }}</h3>
     </div>
     <div class="card-content">
         <div class="row">
             <div class="col-md-4">
                 <div class="step-box">
                     <div class="step-number">1</div>
-                    <h4>Choose Service</h4>
-                    <p>Select the service that best fits your needs from our comprehensive offerings.</p>
+                    <h4>{{ __('portal.services.index.step1_title') }}</h4>
+                    <p>{{ __('portal.services.index.step1_body') }}</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="step-box">
                     <div class="step-number">2</div>
-                    <h4>Submit Request</h4>
-                    <p>Fill out the service-specific form with your requirements and details.</p>
+                    <h4>{{ __('portal.services.index.step2_title') }}</h4>
+                    <p>{{ __('portal.services.index.step2_body') }}</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="step-box">
                     <div class="step-number">3</div>
-                    <h4>Get Results</h4>
-                    <p>Our team processes your request and delivers quality results.</p>
+                    <h4>{{ __('portal.services.index.step3_title') }}</h4>
+                    <p>{{ __('portal.services.index.step3_body') }}</p>
                 </div>
             </div>
         </div>

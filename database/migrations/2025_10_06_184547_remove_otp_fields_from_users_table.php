@@ -15,7 +15,7 @@ return new class extends Migration
             $table->dropColumn([
                 'otp_verified_at',
                 'otp_code',
-                'otp_expires_at'
+                'otp_expires_at',
             ]);
         });
     }

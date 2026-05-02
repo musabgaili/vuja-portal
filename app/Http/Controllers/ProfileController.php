@@ -6,14 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', ]);
+        $this->middleware(['auth']);
     }
 
     /**
@@ -22,6 +21,7 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
+
         return view('profile.show', compact('user'));
     }
 
@@ -31,6 +31,7 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
+
         return view('profile.edit', compact('user'));
     }
 
@@ -61,12 +62,12 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'current_password' => 'required|string',
         ]);
 
         // Verify current password
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
 
@@ -95,7 +96,7 @@ class ProfileController extends Controller
         ]);
 
         // Verify current password
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
 
@@ -131,6 +132,7 @@ class ProfileController extends Controller
     public function security()
     {
         $user = Auth::user();
+
         return view('profile.security', compact('user'));
     }
 
@@ -147,7 +149,7 @@ class ProfileController extends Controller
         ]);
 
         // Verify password
-        if (!Hash::check($validated['password'], $user->password)) {
+        if (! Hash::check($validated['password'], $user->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
 

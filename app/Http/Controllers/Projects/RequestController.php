@@ -14,8 +14,8 @@ class RequestController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient() || $project->client_id !== $user->id) {
+
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -41,8 +41,8 @@ class RequestController extends Controller
     public function respond(Request $request, ProjectRequest $projectRequest)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -79,7 +79,7 @@ class RequestController extends Controller
         }
 
         $uniqueRecipients = $recipients->unique();
-        
+
         foreach ($uniqueRecipients as $email) {
             Mail::to($email)->send(new \App\Mail\RequestReceived($projectRequest));
         }

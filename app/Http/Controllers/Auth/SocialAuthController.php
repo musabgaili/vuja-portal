@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\SocialAuthService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SocialAuthController extends Controller
@@ -21,7 +20,7 @@ class SocialAuthController extends Controller
      */
     public function redirect(string $provider)
     {
-        if (!in_array($provider, $this->socialAuthService->getSupportedProviders())) {
+        if (! in_array($provider, $this->socialAuthService->getSupportedProviders())) {
             abort(404);
         }
 
@@ -33,13 +32,13 @@ class SocialAuthController extends Controller
      */
     public function callback(string $provider)
     {
-        if (!in_array($provider, $this->socialAuthService->getSupportedProviders())) {
+        if (! in_array($provider, $this->socialAuthService->getSupportedProviders())) {
             abort(404);
         }
 
         try {
             $user = $this->socialAuthService->handleCallback($provider);
-            
+
             Auth::login($user);
 
             return redirect()->route('dashboard')->with('success', 'Welcome to VujaDe Platform!');

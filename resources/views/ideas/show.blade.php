@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Idea Request Details')
+@section('title', __('portal.ideas.show.page_title'))
 @section('page-title', $idea->title)
 
 @section('content')
@@ -19,63 +19,57 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="idea-section">
-                            <h5><i class="fas fa-{{ $idea->client_type === 'company' ? 'building' : 'user' }}"></i> Client Type</h5>
+                            <h5><i class="fas fa-{{ $idea->client_type === 'company' ? 'building' : 'user' }}"></i> {{ __('portal.ideas.show.client_type') }}</h5>
                             <span class="badge {{ $idea->client_type === 'company' ? 'bg-primary' : 'bg-secondary' }}">
-                                {{ ucfirst($idea->client_type) }}
+                                {{ __('portal.ideas.client_type.'.$idea->client_type) }}
                             </span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="idea-section">
-                            <h5><i class="fas fa-info-circle"></i> Idea Status</h5>
+                            <h5><i class="fas fa-info-circle"></i> {{ __('portal.ideas.show.idea_status') }}</h5>
                             <span class="badge bg-info">
-                                {{ match($idea->idea_status) {
-                                    'seeking_around' => 'Seeking Around',
-                                    'ready' => 'Ready',
-                                    'running_project' => 'Running Project',
-                                    'concept_only' => 'Concept Only',
-                                    default => ucfirst($idea->idea_status)
-                                } }}
+                                {{ __('portal.ideas.idea_status.'.$idea->idea_status) }}
                             </span>
                         </div>
                     </div>
                 </div>
 
                 <div class="idea-section">
-                    <h5><i class="fas fa-align-left"></i> Description</h5>
+                    <h5><i class="fas fa-align-left"></i> {{ __('portal.ideas.show.description') }}</h5>
                     <p>{{ $idea->description }}</p>
                 </div>
 
                 @if($idea->target_market)
                 <div class="idea-section">
-                    <h5><i class="fas fa-users"></i> Target Market</h5>
+                    <h5><i class="fas fa-users"></i> {{ __('portal.ideas.show.target_market') }}</h5>
                     <p>{{ $idea->target_market }}</p>
                 </div>
                 @endif
 
                 @if($idea->problem_solving)
                 <div class="idea-section">
-                    <h5><i class="fas fa-question-circle"></i> Problem It Solves</h5>
+                    <h5><i class="fas fa-question-circle"></i> {{ __('portal.ideas.show.problem_solves') }}</h5>
                     <p>{{ $idea->problem_solving }}</p>
                 </div>
                 @endif
 
                 @if($idea->unique_value)
                 <div class="idea-section">
-                    <h5><i class="fas fa-star"></i> Unique Value</h5>
+                    <h5><i class="fas fa-star"></i> {{ __('portal.ideas.show.unique_value') }}</h5>
                     <p>{{ $idea->unique_value }}</p>
                 </div>
                 @endif
 
                 @if($idea->final_quote && $idea->quote_status === 'approved')
                 <div class="idea-section">
-                    <h5><i class="fas fa-dollar-sign"></i> Quote</h5>
+                    <h5><i class="fas fa-dollar-sign"></i> {{ __('portal.ideas.show.quote') }}</h5>
                     <div class="quote-box">
                         <div class="quote-amount">${{ number_format($idea->final_quote, 2) }}</div>
                         @if($idea->quote_file_path)
                         <div class="mt-3">
                             <a href="{{ asset('storage/' . $idea->quote_file_path) }}" target="_blank" class="btn btn-primary">
-                                <i class="fas fa-file-pdf"></i> Download Quote Document
+                                <i class="fas fa-file-pdf"></i> {{ __('portal.ideas.show.download_quote') }}
                             </a>
                         </div>
                         @endif
@@ -85,7 +79,7 @@
 
                 @if($idea->negotiation_notes)
                 <div class="idea-section">
-                    <h5><i class="fas fa-comments"></i> Negotiation Notes</h5>
+                    <h5><i class="fas fa-comments"></i> {{ __('portal.ideas.show.negotiation_notes') }}</h5>
                     <p>{{ $idea->negotiation_notes }}</p>
                 </div>
                 @endif
@@ -95,17 +89,13 @@
         <!-- Actions -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Available Actions</h3>
+                <h3 class="card-title">{{ __('portal.ideas.show.actions') }}</h3>
             </div>
             <div class="card-content">
                 <div class="d-flex gap-2 flex-wrap">
                     @if($idea->isSubmitted() || $idea->isInNegotiation())
-                    {{-- AI Assessment button hidden per requirements --}}
-                    {{-- <a href="{{ route('ideas.ai-assessment', $idea) }}" class="btn btn-primary">
-                        <i class="fas fa-robot"></i> AI Assessment
-                    </a> --}}
                     <a href="{{ route('ideas.negotiation', $idea) }}" class="btn btn-secondary">
-                        <i class="fas fa-comments"></i> Negotiation
+                        <i class="fas fa-comments"></i> {{ __('portal.ideas.show.negotiation') }}
                     </a>
                     @endif
 
@@ -113,22 +103,22 @@
                     <form method="POST" action="{{ route('ideas.accept-quote', $idea) }}" class="d-inline">
                         @csrf
                         <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check"></i> Accept Quote
+                            <i class="fas fa-check"></i> {{ __('portal.ideas.show.accept_quote') }}
                         </button>
                     </form>
                     <button type="button" class="btn btn-error" onclick="showRejectModal()">
-                        <i class="fas fa-times"></i> Reject Quote
+                        <i class="fas fa-times"></i> {{ __('portal.ideas.show.reject_quote') }}
                     </button>
                     @endif
 
                     @if($idea->isAccepted() || $idea->isPaymentPending())
                     <a href="{{ route('ideas.payment', $idea) }}" class="btn btn-warning">
-                        <i class="fas fa-upload"></i> Upload Payment
+                        <i class="fas fa-upload"></i> {{ __('portal.ideas.show.upload_payment') }}
                     </a>
                     @endif
 
                     <a href="{{ route('services.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Services
+                        <i class="fas fa-arrow-left"></i> {{ __('portal.ideas.show.back_services') }}
                     </a>
                 </div>
             </div>
@@ -138,7 +128,7 @@
         @if($idea->comments->count() > 0)
         <div class="card mt-4">
             <div class="card-header">
-                <h3 class="card-title">Negotiation History</h3>
+                <h3 class="card-title">{{ __('portal.ideas.show.history') }}</h3>
             </div>
             <div class="card-content">
                 @foreach($idea->comments as $comment)
@@ -151,7 +141,7 @@
                         {{ $comment->comment }}
                         @if($comment->suggested_price)
                         <div class="suggested-price">
-                            <i class="fas fa-tag"></i> Suggested Price: ${{ number_format($comment->suggested_price, 2) }}
+                            <i class="fas fa-tag"></i> {{ __('portal.ideas.show.suggested_price') }} ${{ number_format($comment->suggested_price, 2) }}
                         </div>
                         @endif
                     </div>
@@ -167,14 +157,14 @@
         <!-- Status Timeline -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="card-title">Progress</h3>
+                <h3 class="card-title">{{ __('portal.ideas.show.progress') }}</h3>
             </div>
             <div class="card-content">
                 <div class="timeline">
                     <div class="timeline-item active">
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
-                            <h6>Submitted</h6>
+                            <h6>{{ __('portal.ideas.show.timeline_submitted') }}</h6>
                             <small>{{ $idea->created_at->format('M d, Y') }}</small>
                         </div>
                     </div>
@@ -183,8 +173,8 @@
                     <div class="timeline-item active">
                         <div class="timeline-marker warning"></div>
                         <div class="timeline-content">
-                            <h6>In Negotiation</h6>
-                            <small>Discussing terms</small>
+                            <h6>{{ __('portal.ideas.show.timeline_in_negotiation') }}</h6>
+                            <small>{{ __('portal.ideas.show.timeline_in_negotiation_sub') }}</small>
                         </div>
                     </div>
                     @endif
@@ -193,7 +183,7 @@
                     <div class="timeline-item active">
                         <div class="timeline-marker info"></div>
                         <div class="timeline-content">
-                            <h6>Quote Sent</h6>
+                            <h6>{{ __('portal.ideas.show.timeline_quote_sent') }}</h6>
                             <small>${{ number_format($idea->final_quote, 2) }}</small>
                         </div>
                     </div>
@@ -203,7 +193,7 @@
                     <div class="timeline-item active">
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
-                            <h6>Quote Accepted</h6>
+                            <h6>{{ __('portal.ideas.show.timeline_quote_accepted') }}</h6>
                             <small>{{ $idea->agreement_accepted_at?->format('M d, Y') }}</small>
                         </div>
                     </div>
@@ -213,8 +203,8 @@
                     <div class="timeline-item {{ $idea->isPaymentPending() ? 'active' : '' }}">
                         <div class="timeline-marker warning"></div>
                         <div class="timeline-content">
-                            <h6>Payment Pending</h6>
-                            <small>Waiting verification</small>
+                            <h6>{{ __('portal.ideas.show.payment_pending') }}</h6>
+                            <small>{{ __('portal.ideas.show.payment_pending_sub') }}</small>
                         </div>
                     </div>
                     @endif
@@ -223,7 +213,7 @@
                     <div class="timeline-item active">
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
-                            <h6>Approved</h6>
+                            <h6>{{ __('portal.ideas.show.timeline_approved') }}</h6>
                             <small>{{ $idea->payment_verified_at?->format('M d, Y') }}</small>
                         </div>
                     </div>
@@ -235,28 +225,28 @@
         <!-- Info Box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Information</h3>
+                <h3 class="card-title">{{ __('portal.ideas.show.information') }}</h3>
             </div>
             <div class="card-content">
                 <div class="info-item">
-                    <strong>Status:</strong>
+                    <strong>{{ __('portal.ideas.show.status') }}</strong>
                     <span class="status-badge {{ $idea->getStatusBadgeColor() }}">
                         {{ $idea->getStatusLabel() }}
                     </span>
                 </div>
                 <div class="info-item">
-                    <strong>Submitted:</strong>
+                    <strong>{{ __('portal.ideas.show.submitted') }}</strong>
                     <span>{{ $idea->created_at->format('M d, Y g:i A') }}</span>
                 </div>
                 @if($idea->assignedTo)
                 <div class="info-item">
-                    <strong>Assigned To:</strong>
+                    <strong>{{ __('portal.ideas.show.assigned_to') }}</strong>
                     <span>{{ $idea->assignedTo->name }}</span>
                 </div>
                 @endif
                 @if($idea->tokens_used > 0)
                 <div class="info-item">
-                    <strong>AI Tokens Used:</strong>
+                    <strong>{{ __('portal.ideas.show.ai_tokens_used') }}</strong>
                     <span>{{ $idea->tokens_used }}</span>
                 </div>
                 @endif
@@ -394,22 +384,22 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Reject Quote</h5>
+                <h5>{{ __('portal.ideas.show.reject_modal_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('ideas.reject-quote', $idea) }}">
                 @csrf
                 <div class="modal-body">
-                    <p>Please provide a reason for rejecting this quote. This will help us send you a better offer.</p>
+                    <p>{{ __('portal.ideas.show.reject_modal_body') }}</p>
                     <div class="form-group">
-                        <label>Reason for Rejection *</label>
-                        <textarea name="reason" class="form-control" rows="4" required placeholder="e.g., Price is too high, timeline doesn't work, need different approach..."></textarea>
+                        <label>{{ __('portal.ideas.show.reject_reason_label') }}</label>
+                        <textarea name="reason" class="form-control" rows="4" required placeholder="{{ __('portal.ideas.show.reject_reason_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.ideas.show.cancel') }}</button>
                     <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-times"></i> Reject & Continue Negotiation
+                        <i class="fas fa-times"></i> {{ __('portal.ideas.show.reject_submit') }}
                     </button>
                 </div>
             </form>
@@ -424,4 +414,3 @@ function showRejectModal() {
 }
 </script>
 @endpush
-

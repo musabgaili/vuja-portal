@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'My Profile')
+@section('title', __('portal.profile.my_profile_title'))
 
 @section('content')
 <div class="row">
@@ -7,29 +7,29 @@
         <div class="card mb-4">
             <div class="card-header bg-gradient-primary text-white">
                 <h3 class="mb-0">
-                    <i class="fas fa-user"></i> Profile Information
+                    <i class="fas fa-user"></i> {{ __('portal.profile.profile_information') }}
                 </h3>
             </div>
             <div class="card-content">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="form-label fw-bold text-muted">Full Name</label>
+                            <label class="form-label fw-bold text-muted">{{ __('portal.auth.full_name') }}</label>
                             <p class="mb-0">{{ $user->name }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="form-label fw-bold text-muted">Email Address</label>
+                            <label class="form-label fw-bold text-muted">{{ __('portal.email_address') }}</label>
                             <p class="mb-0">
                                 {{ $user->email }}
                                 @if($user->email_verified_at)
                                     <span class="badge bg-success ms-2">
-                                        <i class="fas fa-check"></i> Verified
+                                        <i class="fas fa-check"></i> {{ __('portal.profile.verified') }}
                                     </span>
                                 @else
                                     <span class="badge bg-warning ms-2">
-                                        <i class="fas fa-exclamation-triangle"></i> Unverified
+                                        <i class="fas fa-exclamation-triangle"></i> {{ __('portal.profile.unverified') }}
                                     </span>
                                 @endif
                             </p>
@@ -37,13 +37,13 @@
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="form-label fw-bold text-muted">Phone Number</label>
-                            <p class="mb-0">{{ $user->phone ?: 'Not provided' }}</p>
+                            <label class="form-label fw-bold text-muted">{{ __('portal.auth.phone_number') }}</label>
+                            <p class="mb-0">{{ $user->phone ?: __('portal.profile.not_provided') }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="form-label fw-bold text-muted">Account Type</label>
+                            <label class="form-label fw-bold text-muted">{{ __('portal.profile.account_type') }}</label>
                             <p class="mb-0">
                                 <span class="badge bg-info">{{ ucfirst($user->type) }}</span>
                                 @if($user->role)
@@ -54,13 +54,13 @@
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="form-label fw-bold text-muted">Member Since</label>
+                            <label class="form-label fw-bold text-muted">{{ __('portal.profile.member_since') }}</label>
                             <p class="mb-0">{{ $user->created_at->format('M d, Y') }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="form-label fw-bold text-muted">Last Updated</label>
+                            <label class="form-label fw-bold text-muted">{{ __('portal.profile.last_updated') }}</label>
                             <p class="mb-0">{{ $user->updated_at->format('M d, Y H:i') }}</p>
                         </div>
                     </div>
@@ -68,10 +68,10 @@
                 
                 <div class="mt-4">
                     <a href="{{ route('profile.edit') }}" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Edit Profile
+                        <i class="fas fa-edit"></i> {{ __('portal.profile.edit_profile') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-shield-alt"></i> Security Settings
+                        <i class="fas fa-shield-alt"></i> {{ __('portal.profile.security_settings') }}
                     </a>
                 </div>
             </div>
@@ -81,21 +81,21 @@
     <div class="col-lg-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-cog"></i> Quick Actions</h5>
+                <h5><i class="fas fa-cog"></i> {{ __('portal.internal.quick_actions') }}</h5>
             </div>
             <div class="card-content">
                 <div class="d-grid gap-2">
                     <a href="{{ route('profile.edit') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-user-edit"></i> Update Profile
+                        <i class="fas fa-user-edit"></i> {{ __('portal.profile.update_profile') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="btn btn-outline-warning">
-                        <i class="fas fa-key"></i> Change Password
+                        <i class="fas fa-key"></i> {{ __('portal.profile.change_password') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="btn btn-outline-info">
-                        <i class="fas fa-envelope"></i> Update Email
+                        <i class="fas fa-envelope"></i> {{ __('portal.profile.update_email') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-phone"></i> Update Phone
+                        <i class="fas fa-phone"></i> {{ __('portal.profile.update_phone') }}
                     </a>
                 </div>
             </div>
@@ -103,14 +103,14 @@
         
         <div class="card">
             <div class="card-header bg-danger text-white">
-                <h5><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+                <h5><i class="fas fa-exclamation-triangle"></i> {{ __('portal.profile.danger_zone') }}</h5>
             </div>
             <div class="card-content">
                 <p class="text-muted small mb-3">
-                    Once you delete your account, there is no going back. Please be certain.
+                    {{ __('portal.profile.delete_account_warning_body') }}
                 </p>
                 <button class="btn btn-danger btn-sm" onclick="showDeleteModal()">
-                    <i class="fas fa-trash"></i> Delete Account
+                    <i class="fas fa-trash"></i> {{ __('portal.profile.delete_account') }}
                 </button>
             </div>
         </div>
@@ -123,7 +123,7 @@
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle"></i> Delete Account
+                    <i class="fas fa-exclamation-triangle"></i> {{ __('portal.profile.delete_account') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -132,23 +132,23 @@
                 @method('DELETE')
                 <div class="modal-body">
                     <div class="alert alert-danger">
-                        <strong>Warning!</strong> This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+                        <strong>{{ __('portal.profile.warning') }}</strong> {{ __('portal.profile.delete_account_modal_body') }}
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Current Password</label>
+                        <label class="form-label fw-bold">{{ __('portal.profile.current_password') }}</label>
                         <input type="password" name="password" class="form-control" required>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Type "DELETE" to confirm</label>
-                        <input type="text" name="confirmation" class="form-control" placeholder="DELETE" required>
+                        <label class="form-label fw-bold">{{ __('portal.profile.type_delete_to_confirm') }}</label>
+                        <input type="text" name="confirmation" class="form-control" placeholder="{{ __('portal.profile.delete_word') }}" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
                     <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash"></i> Delete Account
+                        <i class="fas fa-trash"></i> {{ __('portal.profile.delete_account') }}
                     </button>
                 </div>
             </form>

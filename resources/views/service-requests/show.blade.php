@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Service Request Details')
-@section('page-title', 'Service Request Details')
+@section('title', __('portal.service_requests_page.show.page_title'))
+@section('page-title', __('portal.service_requests_page.show.page_heading'))
 
 @section('content')
 <div class="row">
@@ -13,10 +13,10 @@
                 <h3 class="card-title">{{ $serviceRequest->title }}</h3>
                 <div class="d-flex gap-2">
                     <span class="status-badge {{ $serviceRequest->getStatusBadgeColor() }}">
-                        {{ ucfirst(str_replace('_', ' ', $serviceRequest->status)) }}
+                        {{ __('portal.service_requests_page.index.status_' . $serviceRequest->status) }}
                     </span>
                     <span class="priority-badge {{ $serviceRequest->getPriorityBadgeColor() }}">
-                        {{ ucfirst($serviceRequest->priority) }}
+                        {{ __('portal.service_requests_page.priority.' . $serviceRequest->priority) }}
                     </span>
                 </div>
             </div>
@@ -24,60 +24,60 @@
                 <div class="request-meta mb-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <strong>Service Type:</strong> {{ $serviceRequest->getTypeDisplayName() }}
+                            <strong>{{ __('portal.service_requests_page.show.service_type') }}</strong> {{ $serviceRequest->getTypeDisplayName() }}
                         </div>
                         <div class="col-md-6">
-                            <strong>Submitted:</strong> {{ $serviceRequest->created_at->format('M d, Y \a\t g:i A') }}
+                            <strong>{{ __('portal.service_requests_page.show.submitted') }}</strong> {{ $serviceRequest->created_at->format('M d, Y \a\t g:i A') }}
                         </div>
                         @if($serviceRequest->assignedTo)
                         <div class="col-md-6">
-                            <strong>Assigned To:</strong> {{ $serviceRequest->assignedTo->name }}
+                            <strong>{{ __('portal.service_requests_page.show.assigned_to') }}</strong> {{ $serviceRequest->assignedTo->name }}
                         </div>
                         @endif
                         @if($serviceRequest->reviewedBy)
                         <div class="col-md-6">
-                            <strong>Reviewed By:</strong> {{ $serviceRequest->reviewedBy->name }}
+                            <strong>{{ __('portal.service_requests_page.show.reviewed_by') }}</strong> {{ $serviceRequest->reviewedBy->name }}
                         </div>
                         @endif
                     </div>
                 </div>
 
                 <div class="request-description">
-                    <h5>Description</h5>
+                    <h5>{{ __('portal.service_requests_page.show.description') }}</h5>
                     <p>{{ $serviceRequest->description }}</p>
                 </div>
 
                 @if($serviceRequest->requirements)
                 <div class="request-requirements">
-                    <h5>Requirements</h5>
+                    <h5>{{ __('portal.service_requests_page.show.requirements') }}</h5>
                     <p>{{ $serviceRequest->requirements }}</p>
                 </div>
                 @endif
 
                 @if($serviceRequest->budget_range)
                 <div class="request-budget">
-                    <h5>Budget Range</h5>
+                    <h5>{{ __('portal.service_requests_page.show.budget_range') }}</h5>
                     <p>{{ $serviceRequest->budget_range }}</p>
                 </div>
                 @endif
 
                 @if($serviceRequest->timeline)
                 <div class="request-timeline">
-                    <h5>Timeline</h5>
+                    <h5>{{ __('portal.service_requests_page.show.timeline') }}</h5>
                     <p>{{ $serviceRequest->timeline }}</p>
                 </div>
                 @endif
 
                 @if($serviceRequest->additional_info)
                 <div class="request-additional">
-                    <h5>Additional Information</h5>
+                    <h5>{{ __('portal.service_requests_page.show.additional_information') }}</h5>
                     <p>{{ $serviceRequest->additional_info }}</p>
                 </div>
                 @endif
 
                 @if($serviceRequest->review_notes)
                 <div class="request-review-notes">
-                    <h5>Review Notes</h5>
+                    <h5>{{ __('portal.service_requests_page.show.review_notes') }}</h5>
                     <div class="alert alert-info">
                         {{ $serviceRequest->review_notes }}
                     </div>
@@ -89,41 +89,41 @@
         <!-- Actions -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Actions</h3>
+                <h3 class="card-title">{{ __('portal.service_requests_page.show.actions') }}</h3>
             </div>
             <div class="card-content">
                 <div class="d-flex gap-2 flex-wrap">
                     @if($serviceRequest->isPending() && auth()->user()->isClient())
                     <a href="{{ route('service-requests.edit', $serviceRequest) }}" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Edit Request
+                        <i class="fas fa-edit"></i> {{ __('portal.service_requests_page.show.edit_request') }}
                     </a>
                     <form method="POST" action="{{ route('service-requests.destroy', $serviceRequest) }}" 
-                          onsubmit="return confirm('Are you sure you want to delete this request?')" class="d-inline">
+                          onsubmit="return confirm(@json(__('portal.service_requests_page.delete_confirm')))" class="d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-error">
-                            <i class="fas fa-trash"></i> Delete Request
+                            <i class="fas fa-trash"></i> {{ __('portal.service_requests_page.show.delete_request') }}
                         </button>
                     </form>
                     @endif
 
                     @if(auth()->user()->isManager() && $serviceRequest->isPending())
                     <button class="btn btn-success" onclick="showReviewModal('approve')">
-                        <i class="fas fa-check"></i> Approve
+                        <i class="fas fa-check"></i> {{ __('portal.service_requests_page.show.approve') }}
                     </button>
                     <button class="btn btn-error" onclick="showReviewModal('reject')">
-                        <i class="fas fa-times"></i> Reject
+                        <i class="fas fa-times"></i> {{ __('portal.service_requests_page.show.reject') }}
                     </button>
                     @endif
 
                     @if(auth()->user()->isManager() && $serviceRequest->isApproved() && !$serviceRequest->assignedTo)
                     <button class="btn btn-primary" onclick="showAssignModal()">
-                        <i class="fas fa-user-plus"></i> Assign to Employee
+                        <i class="fas fa-user-plus"></i> {{ __('portal.service_requests_page.show.assign_employee') }}
                     </button>
                     @endif
 
                     <a href="{{ route('service-requests.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Requests
+                        <i class="fas fa-arrow-left"></i> {{ __('portal.service_requests_page.show.back_requests') }}
                     </a>
                 </div>
             </div>
@@ -135,14 +135,14 @@
         <!-- Status Timeline -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="card-title">Status Timeline</h3>
+                <h3 class="card-title">{{ __('portal.service_requests_page.show.status_timeline') }}</h3>
             </div>
             <div class="card-content">
                 <div class="timeline">
                     <div class="timeline-item {{ $serviceRequest->created_at ? 'active' : '' }}">
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
-                            <h6>Request Submitted</h6>
+                            <h6>{{ __('portal.service_requests_page.show.timeline_submitted') }}</h6>
                             <small class="text-muted">{{ $serviceRequest->created_at->format('M d, Y g:i A') }}</small>
                         </div>
                     </div>
@@ -151,7 +151,7 @@
                     <div class="timeline-item {{ $serviceRequest->isApproved() || $serviceRequest->isRejected() ? 'active' : '' }}">
                         <div class="timeline-marker {{ $serviceRequest->isApproved() ? 'success' : 'error' }}"></div>
                         <div class="timeline-content">
-                            <h6>{{ $serviceRequest->isApproved() ? 'Request Approved' : 'Request Rejected' }}</h6>
+                            <h6>{{ $serviceRequest->isApproved() ? __('portal.service_requests_page.show.timeline_approved') : __('portal.service_requests_page.show.timeline_rejected') }}</h6>
                             <small class="text-muted">{{ $serviceRequest->reviewed_at->format('M d, Y g:i A') }}</small>
                         </div>
                     </div>
@@ -161,7 +161,7 @@
                     <div class="timeline-item {{ $serviceRequest->isInProgress() ? 'active' : '' }}">
                         <div class="timeline-marker primary"></div>
                         <div class="timeline-content">
-                            <h6>Work Started</h6>
+                            <h6>{{ __('portal.service_requests_page.show.timeline_started') }}</h6>
                             <small class="text-muted">{{ $serviceRequest->started_at->format('M d, Y g:i A') }}</small>
                         </div>
                     </div>
@@ -171,7 +171,7 @@
                     <div class="timeline-item active">
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
-                            <h6>Request Completed</h6>
+                            <h6>{{ __('portal.service_requests_page.show.timeline_completed') }}</h6>
                             <small class="text-muted">{{ $serviceRequest->completed_at->format('M d, Y g:i A') }}</small>
                         </div>
                     </div>
@@ -183,33 +183,33 @@
         <!-- External API Alerts -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Available Features</h3>
+                <h3 class="card-title">{{ __('portal.service_requests_page.available_features') }}</h3>
             </div>
             <div class="card-content">
                 <div class="feature-list">
                     <div class="feature-item">
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>Service Request Submission</span>
+                        <span>{{ __('portal.service_requests_page.feature_submission') }}</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>Request Review & Approval</span>
+                        <span>{{ __('portal.service_requests_page.feature_review') }}</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>Task Assignment</span>
+                        <span>{{ __('portal.service_requests_page.feature_tasks') }}</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-clock text-warning"></i>
-                        <span>Digital Signatures (External API)</span>
+                        <span>{{ __('portal.service_requests_page.feature_signatures') }}</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-clock text-warning"></i>
-                        <span>Calendar Integration (External API)</span>
+                        <span>{{ __('portal.service_requests_page.feature_calendar') }}</span>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-clock text-warning"></i>
-                        <span>AI Assessment Tools (External API)</span>
+                        <span>{{ __('portal.service_requests_page.feature_ai') }}</span>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Review Service Request</h5>
+                <h5 class="modal-title">{{ __('portal.service_requests_page.show.review_modal_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('service-requests.review', $serviceRequest) }}">
@@ -231,14 +231,14 @@
                 <div class="modal-body">
                     <input type="hidden" name="action" id="reviewAction">
                     <div class="form-group">
-                        <label class="form-label">Review Notes</label>
+                        <label class="form-label">{{ __('portal.service_requests_page.show.review_notes_label') }}</label>
                         <textarea name="review_notes" rows="4" class="form-control" 
-                                  placeholder="Add any notes about your decision..."></textarea>
+                                  placeholder="{{ __('portal.service_requests_page.show.review_notes_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn" id="reviewSubmitBtn">Submit Review</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.service_requests_page.cancel') }}</button>
+                    <button type="submit" class="btn" id="reviewSubmitBtn">{{ __('portal.service_requests_page.show.review_submit') }}</button>
                 </div>
             </form>
         </div>
@@ -252,16 +252,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Assign to Employee</h5>
+                <h5 class="modal-title">{{ __('portal.service_requests_page.assign_modal_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('service-requests.assign', $serviceRequest) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Select Employee</label>
+                        <label class="form-label">{{ __('portal.service_requests_page.assign_select_employee') }}</label>
                         <select name="assigned_to" class="form-control" required>
-                            <option value="">Choose an employee...</option>
+                            <option value="">{{ __('portal.service_requests_page.assign_choose_employee') }}</option>
                             @foreach(\App\Models\User::where('role', 'employee')->get() as $employee)
                             <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                             @endforeach
@@ -269,8 +269,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Assign</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.service_requests_page.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('portal.service_requests_page.assign_submit') }}</button>
                 </div>
             </form>
         </div>
@@ -389,15 +389,20 @@
 
 @push('scripts')
 <script>
+const serviceRequestShowLabels = {
+    approveRequest: @json(__('portal.service_requests_page.show.approve_request')),
+    rejectRequest: @json(__('portal.service_requests_page.show.reject_request')),
+};
+
 function showReviewModal(action) {
     document.getElementById('reviewAction').value = action;
     const submitBtn = document.getElementById('reviewSubmitBtn');
     
     if (action === 'approve') {
-        submitBtn.textContent = 'Approve Request';
+        submitBtn.textContent = serviceRequestShowLabels.approveRequest;
         submitBtn.className = 'btn btn-success';
     } else {
-        submitBtn.textContent = 'Reject Request';
+        submitBtn.textContent = serviceRequestShowLabels.rejectRequest;
         submitBtn.className = 'btn btn-error';
     }
     

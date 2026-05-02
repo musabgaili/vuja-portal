@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\UserRole;
-use App\Models\IdeaRequest;
 use App\Models\ConsultationRequest;
-use App\Models\ResearchRequest;
-use App\Models\IpRegistration;
 use App\Models\CopyrightRegistration;
-use App\Models\Project;
+use App\Models\IdeaRequest;
+use App\Models\IpRegistration;
 use App\Models\Meeting;
+use App\Models\Project;
+use App\Models\ResearchRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -22,12 +20,12 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         // Redirect based on user type
         if ($user->type === 'internal') {
             return redirect()->route('internal.dashboard');
         }
-        
+
         return redirect()->route('client.dashboard');
     }
 
@@ -37,93 +35,93 @@ class DashboardController extends Controller
     public function clientDashboard()
     {
         $user = Auth::user();
-        
+
         // Calculate statistics using queries (not collections)
         $stats = [
             // Projects stats
             'active_projects' => IdeaRequest::where('user_id', $user->id)
-                                           ->whereIn('status', ['approved', 'in_progress'])
-                                           ->count() +
+                ->whereIn('status', ['approved', 'in_progress'])
+                ->count() +
                                 ResearchRequest::where('user_id', $user->id)
-                                              ->where('status', 'in_progress')
-                                              ->count(),
-                                              
+                                    ->where('status', 'in_progress')
+                                    ->count(),
+
             'pending_projects' => IdeaRequest::where('user_id', $user->id)
-                                            ->whereIn('status', ['submitted', 'negotiation', 'quoted'])
-                                            ->count() +
+                ->whereIn('status', ['submitted', 'negotiation', 'quoted'])
+                ->count() +
                                  ConsultationRequest::where('user_id', $user->id)
-                                                   ->whereIn('status', ['submitted', 'filtered'])
-                                                   ->count() +
+                                     ->whereIn('status', ['submitted', 'filtered'])
+                                     ->count() +
                                  ResearchRequest::where('user_id', $user->id)
-                                               ->whereIn('status', ['submitted', 'nda_pending'])
-                                               ->count(),
-                                               
+                                     ->whereIn('status', ['submitted', 'nda_pending'])
+                                     ->count(),
+
             'completed_projects' => IdeaRequest::where('user_id', $user->id)->where('status', 'completed')->count() +
                                    ConsultationRequest::where('user_id', $user->id)->where('status', 'completed')->count() +
                                    ResearchRequest::where('user_id', $user->id)->where('status', 'completed')->count() +
                                    IpRegistration::where('user_id', $user->id)->where('status', 'completed')->count() +
                                    CopyrightRegistration::where('user_id', $user->id)->where('status', 'completed')->count(),
-            
+
             // Service requests stats
             'requests_in_review' => IdeaRequest::where('user_id', $user->id)
-                                              ->whereIn('status', ['submitted', 'negotiation'])
-                                              ->count() +
+                ->whereIn('status', ['submitted', 'negotiation'])
+                ->count() +
                                    ConsultationRequest::where('user_id', $user->id)
-                                                     ->whereIn('status', ['submitted', 'filtered', 'assigned'])
-                                                     ->count() +
+                                       ->whereIn('status', ['submitted', 'filtered', 'assigned'])
+                                       ->count() +
                                    ResearchRequest::where('user_id', $user->id)
-                                                 ->whereIn('status', ['submitted', 'nda_pending', 'nda_signed'])
-                                                 ->count(),
-                                                 
+                                       ->whereIn('status', ['submitted', 'nda_pending', 'nda_signed'])
+                                       ->count(),
+
             'requests_approved' => IdeaRequest::where('user_id', $user->id)
-                                             ->whereIn('status', ['approved', 'in_progress'])
-                                             ->count() +
+                ->whereIn('status', ['approved', 'in_progress'])
+                ->count() +
                                   ConsultationRequest::where('user_id', $user->id)
-                                                    ->where('status', 'meeting_sent')
-                                                    ->count() +
+                                      ->where('status', 'meeting_sent')
+                                      ->count() +
                                   ResearchRequest::where('user_id', $user->id)
-                                                ->where('status', 'in_progress')
-                                                ->count(),
-            
+                                      ->where('status', 'in_progress')
+                                      ->count(),
+
             // Meetings stats (using whereDate properly on queries)
             'meetings_this_week' => ConsultationRequest::where('user_id', $user->id)
-                                                      ->whereBetween('meeting_scheduled_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                                      ->count() +
+                ->whereBetween('meeting_scheduled_at', [now()->startOfWeek(), now()->endOfWeek()])
+                ->count() +
                                    ResearchRequest::where('user_id', $user->id)
-                                                 ->whereBetween('meeting_scheduled_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                                 ->count() +
+                                       ->whereBetween('meeting_scheduled_at', [now()->startOfWeek(), now()->endOfWeek()])
+                                       ->count() +
                                    IpRegistration::where('user_id', $user->id)
-                                                ->whereBetween('meeting_requested_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                                ->count() +
+                                       ->whereBetween('meeting_requested_at', [now()->startOfWeek(), now()->endOfWeek()])
+                                       ->count() +
                                    CopyrightRegistration::where('user_id', $user->id)
-                                                       ->whereBetween('meeting_requested_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                                       ->count(),
-                                                       
+                                       ->whereBetween('meeting_requested_at', [now()->startOfWeek(), now()->endOfWeek()])
+                                       ->count(),
+
             'meetings_today' => ConsultationRequest::where('user_id', $user->id)
-                                                  ->whereDate('meeting_scheduled_at', today())
-                                                  ->count() +
+                ->whereDate('meeting_scheduled_at', today())
+                ->count() +
                                ResearchRequest::where('user_id', $user->id)
-                                             ->whereDate('meeting_scheduled_at', today())
-                                             ->count() +
+                                   ->whereDate('meeting_scheduled_at', today())
+                                   ->count() +
                                IpRegistration::where('user_id', $user->id)
-                                            ->whereDate('meeting_requested_at', today())
-                                            ->count() +
+                                   ->whereDate('meeting_requested_at', today())
+                                   ->count() +
                                CopyrightRegistration::where('user_id', $user->id)
-                                                   ->whereDate('meeting_requested_at', today())
-                                                   ->count(),
-            
+                                   ->whereDate('meeting_requested_at', today())
+                                   ->count(),
+
             // AI tokens
             'total_tokens' => IdeaRequest::where('user_id', $user->id)->sum('tokens_used'),
             'ai_assessments' => IdeaRequest::where('user_id', $user->id)->whereNotNull('ai_assessment_data')->count(),
         ];
-        
+
         // Get recent activities - now using queries
         $recentActivities = collect();
-        
+
         $recentIdeas = IdeaRequest::where('user_id', $user->id)
-                                  ->latest('updated_at')
-                                  ->take(3)
-                                  ->get();
+            ->latest('updated_at')
+            ->take(3)
+            ->get();
         foreach ($recentIdeas as $idea) {
             $recentActivities->push([
                 'type' => 'idea',
@@ -134,11 +132,11 @@ class DashboardController extends Controller
                 'time' => $idea->updated_at,
             ]);
         }
-        
+
         $recentConsultations = ConsultationRequest::where('user_id', $user->id)
-                                                  ->latest('updated_at')
-                                                  ->take(3)
-                                                  ->get();
+            ->latest('updated_at')
+            ->take(3)
+            ->get();
         foreach ($recentConsultations as $consultation) {
             $recentActivities->push([
                 'type' => 'consultation',
@@ -149,11 +147,11 @@ class DashboardController extends Controller
                 'time' => $consultation->updated_at,
             ]);
         }
-        
+
         $recentResearch = ResearchRequest::where('user_id', $user->id)
-                                        ->latest('updated_at')
-                                        ->take(2)
-                                        ->get();
+            ->latest('updated_at')
+            ->take(2)
+            ->get();
         foreach ($recentResearch as $r) {
             $recentActivities->push([
                 'type' => 'research',
@@ -164,16 +162,16 @@ class DashboardController extends Controller
                 'time' => $r->updated_at,
             ]);
         }
-        
+
         $recentActivities = $recentActivities->sortByDesc('time')->take(10);
-        
+
         // Get active projects
         $activeProjects = collect();
-        
+
         $activeIdeas = IdeaRequest::where('user_id', $user->id)
-                                  ->whereIn('status', ['approved', 'in_progress'])
-                                  ->take(5)
-                                  ->get();
+            ->whereIn('status', ['approved', 'in_progress'])
+            ->take(5)
+            ->get();
         foreach ($activeIdeas as $idea) {
             $activeProjects->push([
                 'title' => $idea->title,
@@ -182,17 +180,17 @@ class DashboardController extends Controller
                 'progress' => $this->calculateProgress($idea->status, [
                     'approved' => 60,
                     'in_progress' => 85,
-                    'completed' => 100
+                    'completed' => 100,
                 ]),
                 'icon' => 'lightbulb',
                 'color' => 'primary',
             ]);
         }
-        
+
         $activeResearch = ResearchRequest::where('user_id', $user->id)
-                                        ->where('status', 'in_progress')
-                                        ->take(3)
-                                        ->get();
+            ->where('status', 'in_progress')
+            ->take(3)
+            ->get();
         foreach ($activeResearch as $r) {
             $activeProjects->push([
                 'title' => $r->title,
@@ -203,7 +201,7 @@ class DashboardController extends Controller
                 'color' => 'success',
             ]);
         }
-        
+
         return view('client.dashboard', compact('stats', 'recentActivities', 'activeProjects'));
     }
 
@@ -213,11 +211,11 @@ class DashboardController extends Controller
     public function internalDashboard()
     {
         $user = Auth::user();
-        
+
         if ($user->isManager()) {
             return $this->managerDashboard();
         }
-        
+
         return $this->employeeDashboard();
     }
 
@@ -227,12 +225,12 @@ class DashboardController extends Controller
     protected function employeeDashboard()
     {
         $user = Auth::user();
-        
+
         // Count only projects employee is assigned to
-        $assignedProjectsCount = Project::whereHas('projectPeople', function($q) use ($user) {
+        $assignedProjectsCount = Project::whereHas('projectPeople', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->count();
-        
+
         $stats = [
             'total_assigned' => IdeaRequest::where('assigned_to', $user->id)->count() +
                                ConsultationRequest::where('assigned_to', $user->id)->count() +
@@ -240,19 +238,19 @@ class DashboardController extends Controller
             'in_progress' => IdeaRequest::where('assigned_to', $user->id)->where('status', 'in_progress')->count() +
                             ResearchRequest::where('assigned_to', $user->id)->where('status', 'in_progress')->count(),
             'meetings_today' => Meeting::where('team_member_id', $user->id)
-                              ->whereDate('scheduled_at', today())->count(),
+                ->whereDate('scheduled_at', today())->count(),
             'assigned_projects' => $assignedProjectsCount,
         ];
 
         $assignedIdeas = IdeaRequest::where('assigned_to', $user->id)
             ->with('user')->latest()->take(5)->get();
-        
+
         $assignedConsultations = ConsultationRequest::where('assigned_to', $user->id)
             ->with('user')->latest()->take(5)->get();
-        
+
         $assignedResearch = ResearchRequest::where('assigned_to', $user->id)
             ->with('user')->latest()->take(5)->get();
-        
+
         $upcomingMeetings = Meeting::where('team_member_id', $user->id)
             ->with('client')
             ->where('scheduled_at', '>=', now())
@@ -282,28 +280,28 @@ class DashboardController extends Controller
             'meetings_today' => Meeting::whereDate('scheduled_at', today())->count(),
             'total_clients' => User::where('type', 'client')->count(),
             'completed_month' => IdeaRequest::where('status', 'completed')
-                                ->whereMonth('updated_at', now()->month)->count() +
+                ->whereMonth('updated_at', now()->month)->count() +
                                 ConsultationRequest::where('status', 'completed')
-                                ->whereMonth('updated_at', now()->month)->count(),
+                                    ->whereMonth('updated_at', now()->month)->count(),
         ];
 
         // Get latest 5 from each service
         $newIdeas = IdeaRequest::with('user')
             ->whereIn('status', ['submitted', 'ai_assessment', 'negotiation'])
             ->latest()->take(5)->get();
-        
+
         $newConsultations = ConsultationRequest::with('user')
             ->whereIn('status', ['submitted', 'filtered'])
             ->latest()->take(5)->get();
-        
+
         $newResearch = ResearchRequest::with('user')
             ->whereIn('status', ['submitted', 'nda_pending'])
             ->latest()->take(5)->get();
-        
+
         $newIpRegistrations = IpRegistration::with('user')
             ->whereIn('status', ['submitted', 'meeting_booked'])
             ->latest()->take(5)->get();
-        
+
         $newCopyrights = CopyrightRegistration::with('user')
             ->whereIn('status', ['submitted', 'meeting_booked'])
             ->latest()->take(5)->get();
@@ -312,7 +310,7 @@ class DashboardController extends Controller
             'stats', 'newIdeas', 'newConsultations', 'newResearch', 'newIpRegistrations', 'newCopyrights'
         ));
     }
-    
+
     /**
      * Calculate progress percentage based on status.
      */

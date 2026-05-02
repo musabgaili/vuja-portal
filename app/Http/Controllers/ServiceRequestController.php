@@ -16,7 +16,7 @@ class ServiceRequestController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         if ($user->isClient()) {
             $requests = ServiceRequest::where('user_id', $user->id)
                 ->orderBy('created_at', 'desc')
@@ -37,7 +37,7 @@ class ServiceRequestController extends Controller
     public function create(Request $request)
     {
         $type = $request->get('type', 'idea');
-        
+
         return view('service-requests.create', compact('type'));
     }
 
@@ -72,7 +72,7 @@ class ServiceRequestController extends Controller
     public function show(ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
+
         // Check if user can view this request
         if ($user->isClient() && $serviceRequest->user_id !== $user->id) {
             abort(403);
@@ -89,9 +89,9 @@ class ServiceRequestController extends Controller
     public function edit(ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
+
         // Only clients can edit their own pending requests
-        if (!$user->isClient() || $serviceRequest->user_id !== $user->id || !$serviceRequest->isPending()) {
+        if (! $user->isClient() || $serviceRequest->user_id !== $user->id || ! $serviceRequest->isPending()) {
             abort(403);
         }
 
@@ -104,9 +104,9 @@ class ServiceRequestController extends Controller
     public function update(Request $request, ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
+
         // Only clients can edit their own pending requests
-        if (!$user->isClient() || $serviceRequest->user_id !== $user->id || !$serviceRequest->isPending()) {
+        if (! $user->isClient() || $serviceRequest->user_id !== $user->id || ! $serviceRequest->isPending()) {
             abort(403);
         }
 
@@ -132,9 +132,9 @@ class ServiceRequestController extends Controller
     public function destroy(ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
+
         // Only clients can delete their own pending requests
-        if (!$user->isClient() || $serviceRequest->user_id !== $user->id || !$serviceRequest->isPending()) {
+        if (! $user->isClient() || $serviceRequest->user_id !== $user->id || ! $serviceRequest->isPending()) {
             abort(403);
         }
 
@@ -150,8 +150,6 @@ class ServiceRequestController extends Controller
     public function reviewQueue()
     {
         $user = Auth::user();
-        
-         
 
         $requests = ServiceRequest::with(['user'])
             ->where('status', 'pending')
@@ -167,8 +165,6 @@ class ServiceRequestController extends Controller
     public function review(Request $request, ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'action' => ['required', Rule::in(['approve', 'reject'])],
@@ -184,7 +180,7 @@ class ServiceRequestController extends Controller
         ]);
 
         $action = $validated['action'] === 'approve' ? 'approved' : 'rejected';
-        
+
         return redirect()->route('service-requests.review-queue')
             ->with('success', "Service request {$action} successfully!");
     }
@@ -195,8 +191,8 @@ class ServiceRequestController extends Controller
     public function assign(Request $request, ServiceRequest $serviceRequest)
     {
         $user = Auth::user();
-        
-        if (!$user->isManager() && !$user->isProjectManager()) {
+
+        if (! $user->isManager() && ! $user->isProjectManager()) {
             abort(403);
         }
 
@@ -205,9 +201,9 @@ class ServiceRequestController extends Controller
         ]);
 
         $assignedUser = User::findOrFail($validated['assigned_to']);
-        
+
         // Check if the assigned user is an employee
-        if (!$assignedUser->isEmployee()) {
+        if (! $assignedUser->isEmployee()) {
             return back()->withErrors(['assigned_to' => 'Can only assign to employees.']);
         }
 

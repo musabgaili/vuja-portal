@@ -1,15 +1,15 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Scope Change Requests')
+@section('title', __('portal.projects_manager.scope_changes.title'))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{{ route('projects.manager.index') }}">Projects</a></li>
-<li class="breadcrumb-item active">Scope Changes</li>
+<li class="breadcrumb-item"><a href="{{ route('projects.manager.index') }}">{{ __('portal.projects_manager.projects') }}</a></li>
+<li class="breadcrumb-item active">{{ __('portal.projects_manager.scope_changes.breadcrumb') }}</li>
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3>Pending Scope Change Requests</h3>
+        <h3>{{ __('portal.projects_manager.scope_changes.heading') }}</h3>
     </div>
     <div class="card-content">
         @forelse($scopeChanges as $change)
@@ -19,34 +19,34 @@
                     <div>
                         <h5>{{ $change->title }}</h5>
                         <small class="text-muted">
-                            Project: <a href="{{ route('projects.manager.show', $change->project) }}">{{ $change->project->title }}</a>
+                            {{ __('portal.projects_manager.scope_changes.project') }}: <a href="{{ route('projects.manager.show', $change->project) }}">{{ $change->project->title }}</a>
                         </small>
                     </div>
                     <span class="status-badge {{ $change->getStatusBadgeColor() }}">{{ ucfirst($change->status) }}</span>
                 </div>
             </div>
             <div class="card-content">
-                <p><strong>Description:</strong></p>
+                <p><strong>{{ __('portal.projects_manager.scope_changes.description') }}:</strong></p>
                 <p>{{ $change->description }}</p>
                 
                 @if($change->justification)
-                <p><strong>Justification:</strong></p>
+                <p><strong>{{ __('portal.projects_manager.scope_changes.justification') }}:</strong></p>
                 <p class="text-muted">{{ $change->justification }}</p>
                 @endif
                 
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <small>
-                        Requested by: <strong>{{ $change->requestedBy->name }}</strong> 
-                        on {{ $change->created_at->format('M d, Y') }}
+                        {{ __('portal.projects_manager.scope_changes.requested_by') }}: <strong>{{ $change->requestedBy->name }}</strong> 
+                        {{ __('portal.projects_manager.scope_changes.on') }} {{ $change->created_at->format('M d, Y') }}
                     </small>
                     
                     @if($change->isPending())
                     <div class="d-flex gap-2">
                         <button class="btn btn-success btn-sm" onclick="showApproveModal({{ $change->id }})">
-                            <i class="fas fa-check"></i> Approve
+                            <i class="fas fa-check"></i> {{ __('portal.projects_client.show.approve') }}
                         </button>
                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $change->id }})">
-                            <i class="fas fa-times"></i> Reject
+                            <i class="fas fa-times"></i> {{ __('portal.projects_client.show.reject') }}
                         </button>
                     </div>
                     @endif
@@ -59,20 +59,20 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5>Approve Scope Change</h5>
+                        <h5>{{ __('portal.projects_manager.scope_changes.approve_title') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form method="POST" action="{{ route('projects.scope-changes.approve', $change) }}">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Review Notes (Optional)</label>
-                                <textarea name="review_notes" rows="3" class="form-control" placeholder="Add any notes about this approval..."></textarea>
+                                <label>{{ __('portal.projects_manager.scope_changes.review_notes_optional') }}</label>
+                                <textarea name="review_notes" rows="3" class="form-control" placeholder="{{ __('portal.projects_manager.scope_changes.review_notes_placeholder') }}"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">
-                                <i class="fas fa-check"></i> Approve
+                                <i class="fas fa-check"></i> {{ __('portal.projects_client.show.approve') }}
                             </button>
                         </div>
                     </form>
@@ -85,20 +85,20 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5>Reject Scope Change</h5>
+                        <h5>{{ __('portal.projects_manager.scope_changes.reject_title') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form method="POST" action="{{ route('projects.scope-changes.reject', $change) }}">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Reason for Rejection *</label>
-                                <textarea name="review_notes" rows="4" class="form-control" required placeholder="Explain why this change cannot be approved..."></textarea>
+                                <label>{{ __('portal.projects_manager.scope_changes.reason_for_rejection') }} *</label>
+                                <textarea name="review_notes" rows="4" class="form-control" required placeholder="{{ __('portal.projects_manager.scope_changes.reject_placeholder') }}"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-times"></i> Reject
+                                <i class="fas fa-times"></i> {{ __('portal.projects_client.show.reject') }}
                             </button>
                         </div>
                     </form>
@@ -106,7 +106,7 @@
             </div>
         </div>
         @empty
-        <p class="text-muted text-center py-4">No pending scope change requests.</p>
+        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.scope_changes.empty') }}</p>
         @endforelse
         
         {{ $scopeChanges->links('pagination::bootstrap-5') }}

@@ -4,11 +4,10 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Auth\Events\Verified;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -18,7 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements HasMedia, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, LogsActivity, InteractsWithMedia;
+    use HasFactory, HasRoles, InteractsWithMedia, LogsActivity, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -73,7 +72,6 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             ->dontSubmitEmptyLogs();
     }
 
-
     /**
      * Check if user is active.
      */
@@ -107,13 +105,29 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * Check if user has the global project manager role.
+     */
+    public function isProjectManager(): bool
+    {
+        return $this->role === UserRole::PROJECT_MANAGER;
+    }
+
+    /**
+     * Whether this user may use client-facing project routes (aligned with non-internal dashboard users).
+     */
+    public function canUseClientProjectPortal(): bool
+    {
+        return ! $this->isInternal();
+    }
+
+    /**
      * Check if user is internal staff.
      */
     public function isInternal(): bool
     {
         return $this->type === 'internal';
     }
-    
+
     /**
      * Check if user is a project manager for a specific project.
      */
@@ -121,7 +135,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         return $project->project_manager_id === $this->id;
     }
-    
+
     /**
      * Check if user is part of a project team.
      */

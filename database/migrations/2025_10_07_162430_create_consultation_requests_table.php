@@ -15,21 +15,21 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->text('specific_questions')->nullable();
-            
+
             // Status: submitted -> filtered -> assigned -> meeting_scheduled -> meeting_sent -> completed
             $table->enum('status', [
-                'submitted', 'filtered', 'assigned', 'meeting_scheduled', 
-                'meeting_sent', 'completed', 'cancelled'
+                'submitted', 'filtered', 'assigned', 'meeting_scheduled',
+                'meeting_sent', 'completed', 'cancelled',
             ])->default('submitted');
-            
+
             // Employee assignment (auto-filtered)
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
-            
+
             // Meeting details
             $table->timestamp('meeting_scheduled_at')->nullable();
             $table->string('meeting_link')->nullable();
             $table->text('meeting_notes')->nullable();
-            
+
             $table->timestamps();
         });
     }

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Create test users with different roles
-        
+
         // Client User
         $client = User::create([
             'name' => 'John Client',
@@ -61,11 +61,11 @@ class UserSeeder extends Seeder
             'email' => 'pm@vujade.com',
             'phone' => '+1234567893',
             'password' => '12345678',
-            'role' => UserRole::MANAGER,
+            'role' => UserRole::PROJECT_MANAGER,
             'status' => UserStatus::ACTIVE,
             'type' => 'internal',
             'email_verified_at' => now(),
         ]);
-        // $projectManager->assignRole('project_manager');
+        $projectManager->assignRole('project_manager');
     }
 }

@@ -13,30 +13,30 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin:0;">✅ Request Resolved</h1>
+            <h1 style="margin:0;">✅ {{ __('portal.emails.request_responded.subject') }}</h1>
         </div>
         <div class="content">
-            <p>Dear {{ $projectRequest->client->name }},</p>
+            <p>{{ __('portal.emails.greeting', ['name' => $projectRequest->client->name]) }},</p>
             
-            <p>Your request regarding <strong>{{ $projectRequest->project->title }}</strong> has been addressed.</p>
+            <p>{!! __('portal.emails.request_responded.intro', ['project' => e($projectRequest->project->title)]) !!}</p>
 
-            <h4>Your Request:</h4>
+            <h4>{{ __('portal.emails.request_responded.your_request') }}:</h4>
             <p style="background:white;padding:15px;border-left:4px solid #94a3b8;">"{{ $projectRequest->request }}"</p>
 
-            <h4>Response:</h4>
+            <h4>{{ __('portal.emails.request_responded.response') }}:</h4>
             <p style="background:white;padding:15px;border-left:4px solid #10b981;">{{ $projectRequest->response }}</p>
 
-            <p>Handled by {{ $projectRequest->handledBy->name }} on {{ $projectRequest->handled_at->format('F j, Y') }}</p>
+            <p>{{ __('portal.emails.request_responded.handled_by', ['name' => $projectRequest->handledBy->name, 'date' => $projectRequest->handled_at->format('F j, Y')]) }}</p>
 
             <p style="margin-top:30px;">
                 <a href="{{ route('projects.client.show', $projectRequest->project) }}" 
                    style="display:inline-block;background:#10b981;color:white;padding:12px 30px;text-decoration:none;border-radius:6px;font-weight:bold;">
-                    View Project
+                    {{ __('portal.emails.view_project') }}
                 </a>
             </p>
         </div>
         <div class="footer">
-            <p>Thank you for working with us</p>
+            <p>{{ __('portal.emails.request_responded.footer') }}</p>
         </div>
     </div>
 </body>

@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -21,38 +20,38 @@ class RolePermissionSeeder extends Seeder
             'create users',
             'edit users',
             'delete users',
-            
+
             // Project management
             'view projects',
             'create projects',
             'edit projects',
             'delete projects',
             'assign projects',
-            
+
             // Task management
             'view tasks',
             'create tasks',
             'edit tasks',
             'delete tasks',
             'assign tasks',
-            
+
             // Client management
             'view clients',
             'create clients',
             'edit clients',
             'delete clients',
-            
+
             // Manager permissions
             'view all projects',
             'view all tasks',
             'approve projects',
             'manage team',
-            
+
             // Employee permissions
             'view assigned projects',
             'view assigned tasks',
             'update task status',
-            
+
             // Client permissions
             'view own projects',
             'view own tasks',

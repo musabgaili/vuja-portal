@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ProjectExpense extends Model
 {
@@ -38,14 +38,14 @@ class ProjectExpense extends Model
             ->logOnly(['title', 'amount', 'category', 'expense_date'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
                 'created' => 'Expense logged',
                 'updated' => 'Expense updated',
                 'deleted' => 'Expense deleted',
                 default => $eventName
             });
     }
-    
+
     public function tapActivity($activity, string $eventName)
     {
         $activity->subject_id = $this->project_id;

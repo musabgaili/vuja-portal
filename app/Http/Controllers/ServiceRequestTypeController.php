@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ServiceRequestType;
 use App\Models\ServiceRequestStep;
-use App\Models\StepFormField;
+use App\Models\ServiceRequestType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -18,8 +17,6 @@ class ServiceRequestTypeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-         
 
         $serviceTypes = ServiceRequestType::with(['createdBy', 'steps'])
             ->orderBy('sort_order')
@@ -35,8 +32,6 @@ class ServiceRequestTypeController extends Controller
     public function create()
     {
         $user = Auth::user();
-        
-         
 
         return view('stepper.service-types.create');
     }
@@ -47,8 +42,6 @@ class ServiceRequestTypeController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -74,8 +67,6 @@ class ServiceRequestTypeController extends Controller
     public function show(ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         $serviceType->load(['steps.formFields', 'createdBy']);
 
@@ -88,8 +79,6 @@ class ServiceRequestTypeController extends Controller
     public function edit(ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         return view('stepper.service-types.edit', compact('serviceType'));
     }
@@ -100,8 +89,6 @@ class ServiceRequestTypeController extends Controller
     public function update(Request $request, ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -125,8 +112,6 @@ class ServiceRequestTypeController extends Controller
     public function destroy(ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         $serviceType->delete();
 
@@ -140,8 +125,6 @@ class ServiceRequestTypeController extends Controller
     public function createStep(ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         return view('stepper.steps.create', compact('serviceType'));
     }
@@ -152,8 +135,6 @@ class ServiceRequestTypeController extends Controller
     public function storeStep(Request $request, ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -181,8 +162,6 @@ class ServiceRequestTypeController extends Controller
     public function editStep(ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-         
 
         $step->load('serviceRequestType');
 
@@ -195,8 +174,6 @@ class ServiceRequestTypeController extends Controller
     public function updateStep(Request $request, ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -221,8 +198,6 @@ class ServiceRequestTypeController extends Controller
     public function destroyStep(ServiceRequestStep $step)
     {
         $user = Auth::user();
-        
-         
 
         $serviceType = $step->serviceRequestType;
         $step->delete();
@@ -237,8 +212,6 @@ class ServiceRequestTypeController extends Controller
     public function reorderSteps(Request $request, ServiceRequestType $serviceType)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'step_orders' => 'required|array',

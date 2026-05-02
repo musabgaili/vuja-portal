@@ -1,21 +1,21 @@
 @extends('layouts.internal-dashboard')
 
-@section('title', 'Service Request Types')
-@section('page-title', 'Service Request Types Management')
+@section('title', __('portal.stepper.service_types.index.page_title'))
+@section('page-title', __('portal.stepper.service_types.index.page_heading'))
 
 @section('content')
 <!-- Quick Actions -->
 <div class="card mb-4">
     <div class="card-header">
-        <h3 class="card-title">Quick Actions</h3>
+        <h3 class="card-title">{{ __('portal.stepper.service_types.index.quick_actions') }}</h3>
     </div>
     <div class="card-content">
         <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('stepper.service-types.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Create New Service Type
+                <i class="fas fa-plus"></i> {{ __('portal.stepper.service_types.index.create_new') }}
             </a>
             <a href="{{ route('stepper.client.index') }}" class="btn btn-secondary" target="_blank">
-                <i class="fas fa-eye"></i> Preview Client View
+                <i class="fas fa-eye"></i> {{ __('portal.stepper.service_types.index.preview_client') }}
             </a>
         </div>
     </div>
@@ -24,12 +24,12 @@
 <!-- Service Types List -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Service Request Types</h3>
+        <h3 class="card-title">{{ __('portal.stepper.service_types.index.list_title') }}</h3>
         <div class="d-flex gap-2">
             <select class="form-control" style="width: auto;" onchange="filterByStatus(this.value)">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="">{{ __('portal.stepper.service_types.index.all_status') }}</option>
+                <option value="active">{{ __('portal.stepper.service_types.index.status_active') }}</option>
+                <option value="inactive">{{ __('portal.stepper.service_types.index.status_inactive') }}</option>
             </select>
         </div>
     </div>
@@ -46,9 +46,9 @@
                         <div class="service-type-info">
                             <h4 class="mb-1">{{ $serviceType->name }}</h4>
                             <p class="text-muted mb-1">
-                                <strong>Slug:</strong> {{ $serviceType->slug }} • 
-                                <strong>Steps:</strong> {{ $serviceType->steps->count() }} • 
-                                <strong>Created:</strong> {{ $serviceType->created_at->diffForHumans() }}
+                                <strong>{{ __('portal.stepper.service_types.index.slug_label') }}</strong> {{ $serviceType->slug }} • 
+                                <strong>{{ __('portal.stepper.service_types.index.steps_label') }}</strong> {{ $serviceType->steps->count() }} • 
+                                <strong>{{ __('portal.stepper.service_types.index.created_label') }}</strong> {{ $serviceType->created_at->diffForHumans() }}
                             </p>
                             @if($serviceType->description)
                             <p class="service-type-description">{{ Str::limit($serviceType->description, 150) }}</p>
@@ -57,20 +57,20 @@
                     </div>
                     <div class="service-type-actions d-flex align-center gap-2">
                         <span class="status-badge {{ $serviceType->is_active ? 'success' : 'secondary' }}">
-                            {{ $serviceType->is_active ? 'Active' : 'Inactive' }}
+                            {{ $serviceType->is_active ? __('portal.stepper.service_types.index.badge_active') : __('portal.stepper.service_types.index.badge_inactive') }}
                         </span>
                         <a href="{{ route('stepper.service-types.show', $serviceType) }}" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-eye"></i> View
+                            <i class="fas fa-eye"></i> {{ __('portal.stepper.service_types.index.view') }}
                         </a>
                         <a href="{{ route('stepper.service-types.edit', $serviceType) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i> {{ __('portal.stepper.service_types.index.edit') }}
                         </a>
                         <form method="POST" action="{{ route('stepper.service-types.destroy', $serviceType) }}" 
-                              onsubmit="return confirm('Are you sure you want to delete this service type?')" class="d-inline">
+                              onsubmit="return confirm(@json(__('portal.stepper.service_types.index.delete_confirm')))" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-error btn-sm">
-                                <i class="fas fa-trash"></i> Delete
+                                <i class="fas fa-trash"></i> {{ __('portal.stepper.service_types.index.delete') }}
                             </button>
                         </form>
                     </div>
@@ -86,10 +86,10 @@
             <div class="text-center py-5">
                 <div class="empty-state">
                     <i class="fas fa-cogs fa-3x text-muted mb-3"></i>
-                    <h4>No Service Types</h4>
-                    <p class="text-muted">You haven't created any service request types yet.</p>
+                    <h4>{{ __('portal.stepper.service_types.index.empty_title') }}</h4>
+                    <p class="text-muted">{{ __('portal.stepper.service_types.index.empty_body') }}</p>
                     <a href="{{ route('stepper.service-types.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Create Your First Service Type
+                        <i class="fas fa-plus"></i> {{ __('portal.stepper.service_types.index.create_first') }}
                     </a>
                 </div>
             </div>
@@ -172,4 +172,3 @@ function filterByStatus(status) {
 }
 </script>
 @endpush
-

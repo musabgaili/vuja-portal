@@ -16,8 +16,8 @@ class PricingToolController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -32,7 +32,7 @@ class PricingToolController extends Controller
     public function admin()
     {
         $user = Auth::user();
-        
+
         // if (!$user->isManager()) {
         //     abort(403);
         // }
@@ -48,8 +48,8 @@ class PricingToolController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403);
         }
 
@@ -72,8 +72,8 @@ class PricingToolController extends Controller
     public function update(Request $request, PricingRule $rule)
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403);
         }
 
@@ -97,8 +97,8 @@ class PricingToolController extends Controller
     public function destroy(PricingRule $rule)
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403);
         }
 
@@ -113,8 +113,8 @@ class PricingToolController extends Controller
     public function getRules()
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -127,14 +127,14 @@ class PricingToolController extends Controller
     public function quotingTasks()
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
         // Get planning projects assigned to this user
         $projects = Project::where('status', 'planning')
-            ->whereHas('projectPeople', function($q) use ($user) {
+            ->whereHas('projectPeople', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
             ->with(['client', 'quotedBy', 'projectPeople.user'])
@@ -150,9 +150,9 @@ class PricingToolController extends Controller
     public function uploadQuote(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         // Check if user is assigned to this project
-        if (!$project->projectPeople()->where('user_id', $user->id)->exists() && !$user->isManager()) {
+        if (! $project->projectPeople()->where('user_id', $user->id)->exists() && ! $user->isManager()) {
             abort(403, 'You are not assigned to this project.');
         }
 
@@ -185,13 +185,13 @@ class PricingToolController extends Controller
     public function downloadQuote(Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->quote_file) {
+
+        if (! $project->quote_file) {
             abort(404, 'No quote file found.');
         }
 
         // Check permission
-        if (!$project->projectPeople()->where('user_id', $user->id)->exists() && !$user->isManager()) {
+        if (! $project->projectPeople()->where('user_id', $user->id)->exists() && ! $user->isManager()) {
             abort(403);
         }
 

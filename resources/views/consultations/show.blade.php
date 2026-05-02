@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Consultation Details')
+@section('title', __('portal.consultations.show.title'))
 @section('page-title', $consultation->title)
 
 @section('content')
@@ -15,25 +15,25 @@
             </div>
             <div class="card-content">
                 <div class="info-section">
-                    <h5><i class="fas fa-tag"></i> Category</h5>
+                    <h5><i class="fas fa-tag"></i> {{ __('portal.consultations.show.category') }}</h5>
                     <p class="category-badge">{{ $consultation->category }}</p>
                 </div>
 
                 <div class="info-section">
-                    <h5><i class="fas fa-align-left"></i> Description</h5>
+                    <h5><i class="fas fa-align-left"></i> {{ __('portal.consultations.show.description') }}</h5>
                     <p>{{ $consultation->description }}</p>
                 </div>
 
                 @if($consultation->specific_questions)
                 <div class="info-section">
-                    <h5><i class="fas fa-question-circle"></i> Specific Questions</h5>
+                    <h5><i class="fas fa-question-circle"></i> {{ __('portal.consultations.show.specific_questions') }}</h5>
                     <p>{{ $consultation->specific_questions }}</p>
                 </div>
                 @endif
 
                 @if($consultation->meeting_scheduled_at)
                 <div class="info-section">
-                    <h5><i class="fas fa-calendar"></i> Meeting Details</h5>
+                    <h5><i class="fas fa-calendar"></i> {{ __('portal.consultations.show.meeting_details') }}</h5>
                     <div class="meeting-box">
                         <div class="meeting-time">
                             <i class="fas fa-clock"></i>
@@ -42,7 +42,7 @@
                         @if($consultation->meeting_link)
                         <div class="meeting-link">
                             <a href="{{ $consultation->meeting_link }}" target="_blank" class="btn btn-primary">
-                                <i class="fas fa-video"></i> Join Meeting
+                                <i class="fas fa-video"></i> {{ __('portal.consultations.show.join_meeting') }}
                             </a>
                         </div>
                         @endif
@@ -52,7 +52,7 @@
 
                 @if($consultation->meeting_notes)
                 <div class="info-section">
-                    <h5><i class="fas fa-sticky-note"></i> Meeting Notes</h5>
+                    <h5><i class="fas fa-sticky-note"></i> {{ __('portal.consultations.show.meeting_notes') }}</h5>
                     <div class="notes-box">
                         {{ $consultation->meeting_notes }}
                     </div>
@@ -65,26 +65,26 @@
     <div class="col-lg-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="card-title">Details</h3>
+                <h3 class="card-title">{{ __('portal.consultations.show.details') }}</h3>
             </div>
             <div class="card-content">
                 <div class="detail-item">
-                    <strong>Status:</strong>
+                    <strong>{{ __('portal.consultations.show.status') }}:</strong>
                     <span class="status-badge {{ $consultation->getStatusBadgeColor() }}">
                         {{ $consultation->getStatusLabel() }}
                     </span>
                 </div>
                 <div class="detail-item">
-                    <strong>Category:</strong>
+                    <strong>{{ __('portal.consultations.show.category') }}:</strong>
                     <span>{{ $consultation->category }}</span>
                 </div>
                 <div class="detail-item">
-                    <strong>Submitted:</strong>
+                    <strong>{{ __('portal.consultations.show.submitted') }}:</strong>
                     <span>{{ $consultation->created_at->format('M d, Y') }}</span>
                 </div>
                 @if($consultation->assignedTo)
                 <div class="detail-item">
-                    <strong>Consultant:</strong>
+                    <strong>{{ __('portal.consultations.show.consultant') }}:</strong>
                     <span>{{ $consultation->assignedTo->name }}</span>
                 </div>
                 @endif
@@ -93,16 +93,16 @@
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Next Steps</h3>
+                <h3 class="card-title">{{ __('portal.consultations.show.next_steps') }}</h3>
             </div>
             <div class="card-content">
                 @if($consultation->isMeetingSent() || $consultation->isMeetingScheduled())
-                    <p><i class="fas fa-check text-success"></i> Meeting invitation sent</p>
-                    <p><i class="fas fa-calendar text-info"></i> Check meeting details above</p>
+                    <p><i class="fas fa-check text-success"></i> {{ __('portal.consultations.show.meeting_invite_sent') }}</p>
+                    <p><i class="fas fa-calendar text-info"></i> {{ __('portal.consultations.show.check_meeting_details_above') }}</p>
                 @elseif($consultation->isAssigned())
-                    <p><i class="fas fa-clock text-warning"></i> Consultant will send meeting invite soon</p>
+                    <p><i class="fas fa-clock text-warning"></i> {{ __('portal.consultations.show.consultant_invite_soon') }}</p>
                 @else
-                    <p><i class="fas fa-filter text-info"></i> Finding the right consultant for you</p>
+                    <p><i class="fas fa-filter text-info"></i> {{ __('portal.consultations.show.finding_consultant') }}</p>
                 @endif
             </div>
         </div>

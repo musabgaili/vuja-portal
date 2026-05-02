@@ -14,6 +14,7 @@ class TeamInvitationMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     public $password;
 
     /**

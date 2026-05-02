@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ProjectMilestone extends Model
 {
@@ -42,14 +42,29 @@ class ProjectMilestone extends Model
         return $this->morphMany(ProjectComment::class, 'commentable');
     }
 
-    public function isPending(): bool { return $this->status === 'pending'; }
-    public function isInProgress(): bool { return $this->status === 'in_progress'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
-    public function isCancelled(): bool { return $this->status === 'cancelled'; }
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isInProgress(): bool
+    {
+        return $this->status === 'in_progress';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'secondary',
             'in_progress' => 'primary',
             'completed' => 'success',
@@ -64,14 +79,14 @@ class ProjectMilestone extends Model
             ->logOnly(['title', 'status', 'completion_percentage', 'due_date'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
                 'created' => 'Milestone created',
                 'updated' => 'Milestone updated',
                 'deleted' => 'Milestone deleted',
                 default => $eventName
             });
     }
-    
+
     public function tapActivity($activity, string $eventName)
     {
         $activity->subject_id = $this->project_id;

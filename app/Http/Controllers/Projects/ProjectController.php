@@ -22,12 +22,12 @@ class ProjectController extends Controller
     // ============================================
     // CLIENT SIDE
     // ============================================
-    
+
     public function clientIndex()
     {
         $user = Auth::user();
-        
-        if (!$user->isClient()) {
+
+        if (! $user->canUseClientProjectPortal()) {
             abort(403);
         }
 
@@ -48,8 +48,8 @@ class ProjectController extends Controller
     public function clientShow(Project $project)
     {
         $user = Auth::user();
-        
-        if (!$user->isClient() || $project->client_id !== $user->id) {
+
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -59,7 +59,7 @@ class ProjectController extends Controller
             'tasks.assignedTo', 'tasks.comments.user',
             'comments.user', 'scopeChanges.reviewedBy', 'feedback',
             'deliverables.uploadedBy', 'requests.handledBy', 'complaints.resolvedBy',
-            'documents.uploadedBy'
+            'documents.uploadedBy',
         ]);
 
         return view('projects.client.show', compact('project'));
@@ -68,9 +68,9 @@ class ProjectController extends Controller
     public function addComment(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         // Check if user can add comments
-        if (!$project->canUserAddComments($user)) {
+        if (! $project->canUserAddComments($user)) {
             abort(403, 'You do not have permission to add comments to this project.');
         }
 
@@ -94,12 +94,12 @@ class ProjectController extends Controller
     // ============================================
     // MANAGER/INTERNAL SIDE
     // ============================================
-    
+
     public function managerIndex(Request $request)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
@@ -112,15 +112,15 @@ class ProjectController extends Controller
     public function kanban(Request $request)
     {
         $user = Auth::user();
-        
-        if (!$user->isInternal()) {
+
+        if (! $user->isInternal()) {
             abort(403);
         }
 
         $query = Project::with(['client', 'projectPeople.user']);
-        
+
         if ($user->isEmployee()) {
-            $query->whereHas('projectPeople', function($q) use ($user) {
+            $query->whereHas('projectPeople', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
@@ -133,14 +133,14 @@ class ProjectController extends Controller
     public function updateStatus(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         // Check permissions
-        if (!$project->canUserEdit($user)) {
+        if (! $project->canUserEdit($user)) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:planning,quoted,awarded,in_progress,paused,completed,lost,cancelled'
+            'status' => 'required|in:planning,quoted,awarded,in_progress,paused,completed,lost,cancelled',
         ]);
 
         $project->update(['status' => $validated['status']]);
@@ -148,15 +148,15 @@ class ProjectController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Project status updated successfully',
-            'project' => $project
+            'project' => $project,
         ]);
     }
 
     public function create()
     {
         $user = Auth::user();
-        
-        if (!$user->isManager()) {
+
+        if (! $user->isManager()) {
             abort(403, 'Only managers can create projects.');
         }
 
@@ -164,13 +164,13 @@ class ProjectController extends Controller
             ->where('status', 'active')
             ->orderBy('name')
             ->get();
-            
+
         // Get all internal users (employees, managers, etc.)
         $employees = User::where('type', 'internal')
             ->where('status', 'active')
             ->orderBy('name')
             ->get();
-            
+
         $managers = User::where('type', 'internal')
             ->where('status', 'active')
             ->orderBy('name')
@@ -182,8 +182,6 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        
-         
 
         $validated = $request->validate([
             'client_id' => 'required|exists:users,id',
@@ -207,8 +205,8 @@ class ProjectController extends Controller
     public function managerShow(Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserView($user)) {
+
+        if (! $project->canUserView($user)) {
             abort(403);
         }
 
@@ -218,7 +216,7 @@ class ProjectController extends Controller
             'tasks.assignedTo', 'tasks.comments.user',
             'comments.user', 'scopeChanges', 'expenses.loggedBy',
             'deliverables.uploadedBy', 'requests.handledBy', 'complaints.resolvedBy',
-            'feedback.client'
+            'feedback.client',
         ]);
 
         // Get all internal users for team management (not just employees)
@@ -226,7 +224,7 @@ class ProjectController extends Controller
             ->where('status', 'active')
             ->orderBy('name')
             ->get();
-        
+
         // Granular permissions
         $canEdit = $project->canUserEdit($user);
         $canManageTeam = $project->canUserManageTeam($user);
@@ -244,7 +242,7 @@ class ProjectController extends Controller
             ->paginate(10);
 
         return view('projects.manager.show', compact(
-            'project', 'employees', 'canEdit', 'canManageTeam', 'canManageMilestones', 
+            'project', 'employees', 'canEdit', 'canManageTeam', 'canManageMilestones',
             'canManageTasks', 'canManageExpenses', 'canAddComments', 'isProjectManager', 'activities'
         ));
     }
@@ -252,8 +250,8 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserEdit($user)) {
+
+        if (! $project->canUserEdit($user)) {
             abort(403);
         }
 
@@ -277,7 +275,7 @@ class ProjectController extends Controller
             if ($oldClientId) {
                 $project->projectPeople()->where('user_id', $oldClientId)->where('role', 'client')->delete();
             }
-            
+
             // Add new client to project_people if provided
             if ($newClientId) {
                 \App\Models\ProjectPerson::firstOrCreate(
@@ -301,8 +299,6 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $user = Auth::user();
-        
-          
 
         $project->delete();
 
@@ -313,8 +309,8 @@ class ProjectController extends Controller
     public function addTeamMember(Request $request, Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserManageTeam($user)) {
+
+        if (! $project->canUserManageTeam($user)) {
             abort(403, 'You do not have permission to manage team members.');
         }
 
@@ -358,8 +354,8 @@ class ProjectController extends Controller
     public function updateTeamMember(Request $request, \App\Models\ProjectPerson $projectPerson)
     {
         $user = Auth::user();
-        
-        if (!$projectPerson->project->canUserManageTeam($user)) {
+
+        if (! $projectPerson->project->canUserManageTeam($user)) {
             abort(403, 'You do not have permission to manage team members.');
         }
 
@@ -369,8 +365,8 @@ class ProjectController extends Controller
         ]);
 
         // Check if trying to change to project manager when one already exists (and it's not the same person)
-        if ($validated['role'] === 'project_manager' && 
-            $projectPerson->role !== 'project_manager' && 
+        if ($validated['role'] === 'project_manager' &&
+            $projectPerson->role !== 'project_manager' &&
             $projectPerson->project->projectPeople()->where('role', 'project_manager')->exists()) {
             return back()->withErrors(['error' => 'Project already has a project manager. Only one project manager is allowed per project.']);
         }
@@ -388,7 +384,7 @@ class ProjectController extends Controller
                 ->where('role', 'project_manager')
                 ->where('id', '!=', $projectPerson->id)
                 ->update(['role' => 'employee']);
-            
+
             $projectPerson->project->update(['project_manager_id' => $projectPerson->user_id]);
         }
         if ($validated['role'] === 'account_manager') {
@@ -409,8 +405,8 @@ class ProjectController extends Controller
     public function removeTeamMember(\App\Models\ProjectPerson $projectPerson)
     {
         $user = Auth::user();
-        
-        if (!$projectPerson->project->canUserManageTeam($user)) {
+
+        if (! $projectPerson->project->canUserManageTeam($user)) {
             abort(403, 'You do not have permission to manage team members.');
         }
 

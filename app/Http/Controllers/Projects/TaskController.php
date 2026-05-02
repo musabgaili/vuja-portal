@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Projects;
 
+use App\Actions\Projects\UpdateProjectProgressAction;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectTask;
-use App\Actions\Projects\UpdateProjectProgressAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,8 +14,8 @@ class TaskController extends Controller
     public function getData(ProjectTask $task)
     {
         $user = Auth::user();
-        
-        if (!$task->project->canUserView($user)) {
+
+        if (! $task->project->canUserView($user)) {
             abort(403);
         }
 
@@ -35,8 +35,8 @@ class TaskController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        
-        if (!$project->canUserManageTasks($user)) {
+
+        if (! $project->canUserManageTasks($user)) {
             abort(403, 'You do not have permission to create tasks.');
         }
 
@@ -72,14 +72,14 @@ class TaskController extends Controller
     public function update(Request $request, ProjectTask $task)
     {
         $user = Auth::user();
-        
+
         // Check if user can update this task
-        if (!$task->project->canUserUpdateTask($user, $task)) {
+        if (! $task->project->canUserUpdateTask($user, $task)) {
             abort(403, 'You do not have permission to update this task.');
         }
 
         // Regular employees can ONLY update status to completed
-        $isEmployee = !$task->project->canUserManageTasks($user) && $task->assigned_to === $user->id;
+        $isEmployee = ! $task->project->canUserManageTasks($user) && $task->assigned_to === $user->id;
 
         if ($isEmployee) {
             // Employee can only update status
@@ -111,11 +111,11 @@ class TaskController extends Controller
             $milestone = $task->milestone;
             $milestoneTasksCount = $milestone->tasks()->count();
             $completedTasksCount = $milestone->tasks()->where('status', 'completed')->count();
-            
+
             if ($milestoneTasksCount > 0) {
                 $progress = round(($completedTasksCount / $milestoneTasksCount) * 100);
                 $milestone->update(['completion_percentage' => $progress]);
-                
+
                 // Update project progress
                 app(UpdateProjectProgressAction::class)->execute($task->project);
             }
@@ -127,14 +127,14 @@ class TaskController extends Controller
     public function destroy(ProjectTask $task)
     {
         $user = Auth::user();
-        
-        if (!$task->project->canUserManageTasks($user)) {
+
+        if (! $task->project->canUserManageTasks($user)) {
             abort(403, 'You do not have permission to delete tasks.');
         }
 
         $project = $task->project;
         $milestoneId = $task->milestone_id;
-        
+
         $task->delete();
 
         // Update milestone progress if task was linked

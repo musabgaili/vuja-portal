@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ProjectTask extends Model
 {
@@ -49,15 +49,34 @@ class ProjectTask extends Model
         return $this->morphMany(ProjectComment::class, 'commentable');
     }
 
-    public function isTodo(): bool { return $this->status === 'todo'; }
-    public function isInProgress(): bool { return $this->status === 'in_progress'; }
-    public function isInReview(): bool { return $this->status === 'review'; }
-    public function isCompleted(): bool { return $this->status === 'completed'; }
-    public function isBlocked(): bool { return $this->status === 'blocked'; }
+    public function isTodo(): bool
+    {
+        return $this->status === 'todo';
+    }
+
+    public function isInProgress(): bool
+    {
+        return $this->status === 'in_progress';
+    }
+
+    public function isInReview(): bool
+    {
+        return $this->status === 'review';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->status === 'blocked';
+    }
 
     public function getStatusBadgeColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'todo' => 'secondary',
             'in_progress' => 'primary',
             'review' => 'warning',
@@ -69,7 +88,7 @@ class ProjectTask extends Model
 
     public function getPriorityBadgeColor(): string
     {
-        return match($this->priority) {
+        return match ($this->priority) {
             'low' => 'success',
             'medium' => 'info',
             'high' => 'warning',
@@ -80,7 +99,7 @@ class ProjectTask extends Model
 
     public function isOverdue(): bool
     {
-        return $this->due_date && now()->greaterThan($this->due_date) && !$this->isCompleted();
+        return $this->due_date && now()->greaterThan($this->due_date) && ! $this->isCompleted();
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -89,14 +108,14 @@ class ProjectTask extends Model
             ->logOnly(['title', 'status', 'priority', 'assigned_to', 'milestone_id'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
                 'created' => 'Task created',
                 'updated' => 'Task updated',
                 'deleted' => 'Task deleted',
                 default => $eventName
             });
     }
-    
+
     public function tapActivity($activity, string $eventName)
     {
         $activity->subject_id = $this->project_id;
