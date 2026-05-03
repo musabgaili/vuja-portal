@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('title', __('portal.client_dashboard'))
-@section('page-title', __('portal.dashboard'))
+@section('page-title', __('portal.client_dashboard'))
 
 @section('content')
 <!-- Dashboard Grid -->
@@ -106,8 +106,8 @@
 <!-- Recent Activity Card -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Recent Activity</h3>
-        <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">View All Services</a>
+        <h3 class="card-title">{{ __('portal.client.dashboard.recent_activity') }}</h3>
+        <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">{{ __('portal.client.dashboard.view_all_services') }}</a>
     </div>
     <div class="card-content">
         <div class="activity-list">
@@ -124,9 +124,9 @@
             @empty
             <div class="text-center py-4">
                 <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
-                <p class="text-muted">No recent activity. Start by requesting a service!</p>
+                <p class="text-muted">{{ __('portal.client.dashboard.activity_empty_body') }}</p>
                 <a href="{{ route('services.index') }}" class="btn btn-primary btn-sm mt-2">
-                    <i class="fas fa-plus"></i> Request Service
+                    <i class="fas fa-plus"></i> {{ __('portal.client.dashboard.request_service') }}
                 </a>
             </div>
             @endforelse
@@ -137,25 +137,25 @@
 <!-- Quick Actions Card -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Quick Actions</h3>
+        <h3 class="card-title">{{ __('portal.service_requests_page.index.quick_actions') }}</h3>
     </div>
     <div class="card-content">
         <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('services.index') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
-                Request Service
+                {{ __('portal.client.dashboard.request_service') }}
             </a>
             <a href="{{ route('client.requests') }}" class="btn btn-secondary">
                 <i class="fas fa-list"></i>
-                My Requests
+                {{ __('portal.layout_client.nav_my_requests') }}
             </a>
             <a href="{{ route('ideas.create') }}" class="btn btn-secondary">
                 <i class="fas fa-lightbulb"></i>
-                Idea Generation
+                {{ __('portal.client.dashboard.idea_generation') }}
             </a>
             <a href="{{ route('consultations.create') }}" class="btn btn-secondary">
                 <i class="fas fa-comments"></i>
-                Consultation
+                {{ __('portal.client.dashboard.consultation') }}
             </a>
         </div>
     </div>
@@ -164,8 +164,8 @@
 <!-- Project Status Overview -->
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Active Projects Overview</h3>
-        <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">View All</a>
+        <h3 class="card-title">{{ __('portal.client.dashboard.active_projects_overview') }}</h3>
+        <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">{{ __('portal.client.dashboard.view_all') }}</a>
     </div>
     <div class="card-content">
         <div class="project-list">
@@ -192,9 +192,9 @@
             @empty
             <div class="text-center py-4">
                 <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
-                <p class="text-muted">No active projects yet. Submit a service request to get started!</p>
+                <p class="text-muted">{{ __('portal.client.dashboard.projects_empty_body') }}</p>
                 <a href="{{ route('services.index') }}" class="btn btn-primary btn-sm mt-2">
-                    <i class="fas fa-plus"></i> Request Service
+                    <i class="fas fa-plus"></i> {{ __('portal.client.dashboard.request_service') }}
                 </a>
             </div>
             @endforelse

@@ -35,13 +35,14 @@
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" >
                         <div class="info-item mb-3">
                             <label class="form-label fw-bold text-muted">{{ __('portal.auth.phone_number') }}</label>
                             <p class="mb-0">{{ $user->phone ?: __('portal.profile.not_provided') }}</p>
                         </div>
                     </div>
-                    <div class="col-md-6">
+               
+                    {{-- <div class="col-md-6">
                         <div class="info-item mb-3">
                             <label class="form-label fw-bold text-muted">{{ __('portal.profile.account_type') }}</label>
                             <p class="mb-0">
@@ -51,7 +52,7 @@
                                 @endif
                             </p>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-md-6">
                         <div class="info-item mb-3">
                             <label class="form-label fw-bold text-muted">{{ __('portal.profile.member_since') }}</label>

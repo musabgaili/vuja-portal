@@ -351,7 +351,7 @@
                     <div>
                         <strong>{{ $task->title }}</strong>
                         <br>
-                        <span class="status-badge {{ $task->getStatusBadgeColor() }}">{{ ucfirst($task->status) }}</span>
+                        <span class="status-badge {{ $task->getStatusBadgeColor() }}">{{ __('portal.projects_manager.show.task_status.'.$task->status) }}</span>
                     </div>
                     <button class="btn btn-sm btn-secondary" onclick="updateTaskStatus({{ $task->id }})">
                         <i class="fas fa-edit"></i>
@@ -371,7 +371,7 @@
                 <div class="milestone-item">
                     <strong>{{ $milestone->title }}</strong>
                     <br>
-                    <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
+                    <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ __('portal.projects_manager.show.milestone_status.'.$milestone->status) }}</span>
                     @if($milestone->due_date)
                     <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d') }}</small>
                     @endif
@@ -399,7 +399,7 @@
                     <p class="text-muted mb-2">{{ $milestone->description }}</p>
                     @endif
                     <div class="mb-2">
-                        <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
+                        <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ __('portal.projects_manager.show.milestone_status.'.$milestone->status) }}</span>
                         @if($milestone->client_approved === true)
                         <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.client_approved') }}</span>
                         @elseif($milestone->client_approved === false)
@@ -426,7 +426,7 @@
                         $completedTasks = $milestoneTasks->where('status', 'completed')->count();
                         $taskProgress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
                     @endphp
-                    <small class="text-muted">Tasks: {{ $completedTasks }}/{{ $totalTasks }} ({{ $taskProgress }}%)</small>
+                    <small class="text-muted">{{ __('portal.projects_manager.show.milestone_task_progress', ['done' => $completedTasks, 'total' => $totalTasks, 'pct' => $taskProgress]) }}</small>
                     <div class="progress-bar-modern">
                         <div class="progress-fill-modern" style="width:{{ $taskProgress }}%;"></div>
                     </div>
@@ -457,7 +457,7 @@
             <div style="flex: 1;">
                 <strong>{{ $task->title }}</strong>
                 <div class="mt-1">
-                    <span class="status-badge {{ $task->getStatusBadgeColor() }}">{{ ucfirst($task->status) }}</span>
+                    <span class="status-badge {{ $task->getStatusBadgeColor() }}">{{ __('portal.projects_manager.show.task_status.'.$task->status) }}</span>
                     @if($task->priority === 'urgent')<span class="badge bg-danger">{{ __('portal.projects_manager.show.urgent') }}</span>@endif
                     @if($task->priority === 'high')<span class="badge bg-warning">{{ __('portal.projects_manager.show.high') }}</span>@endif
                     @if($task->milestone)<span class="badge bg-secondary">{{ $task->milestone->title }}</span>@endif
@@ -496,7 +496,11 @@
                 <strong>{{ $person->user->name }}</strong>
                 <br>
                 <span class="badge bg-{{ $person->role === 'project_manager' ? 'success' : ($person->role === 'client' ? 'info' : 'secondary') }}">
-                    {{ ucfirst(str_replace('_', ' ', $person->role)) }}
+                    @if($person->role === 'client')
+                        {{ __('portal.projects_client.show.client') }}
+                    @else
+                        {{ __('portal.projects_manager.modals.role_'.$person->role) }}
+                    @endif
                 </span>
                 @if($person->can_edit)<span class="badge bg-warning">{{ __('portal.projects_manager.show.can_edit') }}</span>@endif
             </div>
@@ -631,7 +635,7 @@
                     <p style="color:#64748b;margin:0.5rem 0;">{{ $req->request }}</p>
                     <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->client->name }} • {{ $req->created_at->format('M d, Y g:i A') }}</small>
                 </div>
-                <span class="status-badge {{ $req->status === 'open' ? 'warning' : 'success' }}">{{ ucfirst($req->status) }}</span>
+                <span class="status-badge {{ $req->status === 'open' ? 'warning' : 'success' }}">{{ __('portal.projects_manager.show.request_status.'.$req->status) }}</span>
             </div>
             @if($req->response)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
@@ -667,7 +671,7 @@
                     <p style="color:#64748b;margin:0.5rem 0;">{{ $complaint->complaint }}</p>
                     <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->client->name }} • {{ $complaint->created_at->format('M d, Y g:i A') }}</small>
                 </div>
-                <span class="status-badge {{ $complaint->status === 'open' ? 'error' : 'success' }}">{{ ucfirst($complaint->status) }}</span>
+                <span class="status-badge {{ $complaint->status === 'open' ? 'error' : 'success' }}">{{ __('portal.projects_manager.show.complaint_status.'.$complaint->status) }}</span>
             </div>
             @if($complaint->resolution_note)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
@@ -719,7 +723,7 @@
             <div class="row mt-3">
                 @if($project->feedback->communication_rating)
                 <div class="col-md-4 mb-3">
-                    <strong><i class="fas fa-comments"></i> Communication:</strong>
+                    <strong><i class="fas fa-comments"></i> {{ __('portal.projects_manager.show.feedback_rating_communication') }}:</strong>
                     <div>
                         @for($i = 1; $i <= 5; $i++)
                         <i class="fas fa-star {{ $i <= $project->feedback->communication_rating ? 'text-primary' : 'text-muted' }}"></i>
@@ -731,7 +735,7 @@
                 
                 @if($project->feedback->quality_rating)
                 <div class="col-md-4 mb-3">
-                    <strong><i class="fas fa-gem"></i> Quality:</strong>
+                    <strong><i class="fas fa-gem"></i> {{ __('portal.projects_manager.show.feedback_rating_quality') }}:</strong>
                     <div>
                         @for($i = 1; $i <= 5; $i++)
                         <i class="fas fa-star {{ $i <= $project->feedback->quality_rating ? 'text-success' : 'text-muted' }}"></i>
@@ -743,7 +747,7 @@
                 
                 @if($project->feedback->timeline_rating)
                 <div class="col-md-4 mb-3">
-                    <strong><i class="fas fa-clock"></i> Timeline:</strong>
+                    <strong><i class="fas fa-clock"></i> {{ __('portal.projects_manager.show.feedback_rating_timeline') }}:</strong>
                     <div>
                         @for($i = 1; $i <= 5; $i++)
                         <i class="fas fa-star {{ $i <= $project->feedback->timeline_rating ? 'text-info' : 'text-muted' }}"></i>

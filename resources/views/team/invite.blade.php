@@ -43,6 +43,7 @@
                             <option value="">{{ __('portal.team.select_role') }}</option>
                             <option value="employee" {{ old('role') === 'employee' ? 'selected' : '' }}>{{ __('portal.team.role_employee') }}</option>
                             <option value="manager" {{ old('role') === 'manager' ? 'selected' : '' }}>{{ __('portal.team.role_manager') }}</option>
+                            <option value="project_manager" {{ old('role') === 'project_manager' ? 'selected' : '' }}>{{ __('portal.team.role_project_manager') }}</option>
                         </select>
                         @error('role')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Mail\TeamInvitationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -39,11 +41,13 @@ class TeamInvitationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string',
-            'role' => 'required|in:employee,manager',
+            'role' => 'required|in:employee,manager,project_manager',
         ]);
 
         // Generate random password
         $password = Str::random(12);
+
+        $role = UserRole::from($validated['role']);
 
         // Create user
         $user = User::create([
@@ -51,9 +55,9 @@ class TeamInvitationController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($password),
-            'role' => $validated['role'],
+            'role' => $role,
             'type' => 'internal',
-            'status' => 'active',
+            'status' => UserStatus::ACTIVE,
             'email_verified_at' => now(), // Auto-verify internal users
         ]);
 

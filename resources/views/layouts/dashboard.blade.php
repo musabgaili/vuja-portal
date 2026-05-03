@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') - VujaDe Platform</title>
+    <title>@yield('title', __('portal.dashboard')) - {{ __('portal.platform_name') }}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -12,13 +12,13 @@
 </head>
 <body class="client-dashboard">
     <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+    <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="{{ __('portal.app.toggle_nav') }}">
         <i class="fas fa-bars"></i>
     </button>
-    
+
     <!-- Sidebar Overlay for Mobile -->
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
-    
+
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -28,7 +28,7 @@
                     <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
                     <div class="user-details">
                         <h3>{{ auth()->user()->name }}</h3>
-                        <p>Client</p>
+                        <p>{{ __('portal.layout_client.role_badge') }}</p>
                     </div>
                 </div>
             </div>
@@ -39,37 +39,37 @@
                 <div class="nav-section">
                     <a href="{{ route('dashboard') }}" class="nav-item">
                         <i class="fas fa-home"></i>
-                        Dashboard
+                        {{ __('portal.layout_client.nav_dashboard') }}
                     </a>
                 </div>
 
                 <!-- Projects & Requests -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Work</div>
+                    <div class="nav-section-title">{{ __('portal.layout_client.section_work') }}</div>
                     <a href="{{ route('projects.client.index') }}" class="nav-item">
                         <i class="fas fa-folder"></i>
-                        My Projects
+                        {{ __('portal.layout_client.nav_my_projects') }}
                     </a>
                     <a href="{{ route('client.requests') }}" class="nav-item">
                         <i class="fas fa-list"></i>
-                        My Requests
+                        {{ __('portal.layout_client.nav_my_requests') }}
                     </a>
                     <a href="{{ route('services.index') }}" class="nav-item">
                         <i class="fas fa-plus"></i>
-                        New Request
+                        {{ __('portal.layout_client.nav_new_request') }}
                     </a>
                 </div>
 
                 <!-- Meetings -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Meetings</div>
+                    <div class="nav-section-title">{{ __('portal.layout_client.section_meetings') }}</div>
                     <a href="{{ route('meetings.available-slots') }}" class="nav-item">
                         <i class="fas fa-calendar-plus"></i>
-                        Book Meeting
+                        {{ __('portal.layout_client.nav_book_meeting') }}
                     </a>
                     <a href="{{ route('meetings.my-meetings') }}" class="nav-item">
                         <i class="fas fa-video"></i>
-                        My Meetings
+                        {{ __('portal.layout_client.nav_my_meetings') }}
                     </a>
                 </div>
 
@@ -77,15 +77,15 @@
                 <div class="nav-section mt-auto">
                     <a href="{{ route('profile.show') }}" class="nav-item">
                         <i class="fas fa-user"></i>
-                        My Profile
+                        {{ __('portal.layout_client.nav_my_profile') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="nav-item">
                         <i class="fas fa-shield-alt"></i>
-                        Security
+                        {{ __('portal.layout_client.nav_security') }}
                     </a>
                     <a href="{{ route('logout') }}" class="nav-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fas fa-sign-out-alt"></i>
-                        Logout
+                        {{ __('portal.layout_client.nav_logout') }}
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
                 </div>
@@ -97,7 +97,7 @@
             <!-- Top Header -->
             <header class="content-header">
                 <div class="header-left">
-                    <h1>@yield('title', 'Dashboard')</h1>
+                    <h1>@yield('title', __('portal.dashboard'))</h1>
                 </div>
                 <div class="header-right d-flex align-items-center gap-2">
                     @include('partials.locale-switcher')
@@ -116,7 +116,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @endif
-                
+
                 @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show">
                     @foreach($errors->all() as $error)
@@ -125,7 +125,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @endif
-                
+
                 @yield('content')
             </div>
         </main>

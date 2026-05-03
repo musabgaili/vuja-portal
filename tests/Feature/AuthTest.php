@@ -34,7 +34,7 @@ class AuthTest extends TestCase
 
         $response = $this->post(route('register'), $userData);
 
-        $response->assertRedirect('/email/verify');
+        $response->assertRedirect(route('dashboard'));
 
         $this->assertDatabaseHas('users', [
             'name' => 'John Doe',

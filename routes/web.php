@@ -24,6 +24,10 @@ use Spatie\Permission\Models\Role;
 // PUBLIC ROUTES
 // ============================================
 
+Route::get('/test', function () {
+    return Auth::user()->role->value;
+})->name('test');
+
 Route::get('language/{locale}', function (string $locale) {
     if (! in_array($locale, config('app.supported_locales', ['en', 'ar']), true)) {
         return redirect()->back();

@@ -95,8 +95,29 @@
             margin-bottom: 30px;
             line-height: 1.6;
         }
-        .auth-card .locale-switcher .btn {
-            min-width: 2.5rem;
+        .auth-card .locale-switcher .dropdown-toggle {
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            padding: 0.45rem 0.85rem;
+            font-weight: 500;
+            color: #374151;
+            background: #fff;
+        }
+        .auth-card .locale-switcher .dropdown-toggle:hover,
+        .auth-card .locale-switcher .dropdown-toggle:focus,
+        .auth-card .locale-switcher .dropdown-toggle.show {
+            border-color: #1C575F;
+            color: #1C575F;
+            background: #f8fafc;
+        }
+        .auth-card .locale-switcher .dropdown-menu {
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            margin-top: 0.35rem;
+        }
+        .auth-card .locale-switcher .dropdown-item.active {
+            background: rgba(28, 87, 95, 0.08);
+            color: #1C575F;
         }
     </style>
 </head>

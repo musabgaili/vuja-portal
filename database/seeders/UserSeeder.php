@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
             'type' => 'client',
             'email_verified_at' => now(),
         ]);
-        // $client->assignRole('client');
+        $client->assignRole('client');
 
         // Employee User
         $employee = User::create([
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
             'type' => 'internal',
             'email_verified_at' => now(),
         ]);
-        // $employee->assignRole('employee');
+        $employee->assignRole('employee');
 
         // Manager User
         $manager = User::create([
@@ -53,7 +53,7 @@ class UserSeeder extends Seeder
             'type' => 'internal',
             'email_verified_at' => now(),
         ]);
-        // $manager->assignRole('manager');
+        $manager->assignRole('manager');
 
         // Project Manager User
         $projectManager = User::create([

@@ -17,15 +17,12 @@ class PermissionsService
     {
         DB::transaction(function () use ($user, $roleName) {
             $user->syncRoles([$roleName]);
-            $profile = $this->mapSpatieRoleToUserProfile($roleName);
-            if ($profile !== null) {
-                $user->forceFill($profile)->save();
-            }
+            $this->applySpatieMappedProfileToUser($user, $this->mapSpatieRoleToUserProfile($roleName));
         });
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>|null role and type keys, or null if unmapped Spatie role name
      */
     private function mapSpatieRoleToUserProfile(string $roleName): ?array
     {
@@ -39,11 +36,59 @@ class PermissionsService
     }
 
     /**
+     * Apply mapped profile to users.role / users.type when the Spatie role is known (no-op if unmapped).
+     */
+    private function applySpatieMappedProfileToUser(User $user, ?array $profile): void
+    {
+        if ($profile === null) {
+            return;
+        }
+
+        $user->forceFill($profile)->save();
+    }
+
+    /**
+     * When no Spatie role maps to our enum, fall back to portal client (safe default after role removal).
+     */
+    private function setUserToDefaultClient(User $user): void
+    {
+        $user->forceFill([
+            'role' => UserRole::CLIENT,
+            'type' => 'client',
+        ])->save();
+    }
+
+    /**
+     * After removing a Spatie role, align users.role / type with remaining roles or default to client.
+     */
+    private function syncUserProfileFromRemainingSpatieRoles(User $user): void
+    {
+        $user->load('roles');
+        $remaining = $user->roles->first();
+
+        if ($remaining === null) {
+            $this->setUserToDefaultClient($user);
+
+            return;
+        }
+
+        $profile = $this->mapSpatieRoleToUserProfile($remaining->name);
+        if ($profile !== null) {
+            $user->forceFill($profile)->save();
+        } else {
+            $this->setUserToDefaultClient($user);
+        }
+    }
+
+    /**
      * Remove a role from a user
      */
     public function removeRoleFromUser(User $user, string $roleName): void
     {
-        $user->removeRole($roleName);
+        DB::transaction(function () use ($user, $roleName) {
+            $user->removeRole($roleName);
+            $this->syncUserProfileFromRemainingSpatieRoles($user);
+        });
     }
 
     /**

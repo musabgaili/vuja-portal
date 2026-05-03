@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Permissions;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Permissions\PermissionsService;
+use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -16,7 +17,13 @@ class PermissionsController extends Controller
 
     public function __construct(PermissionsService $permissionsService)
     {
-        $this->middleware(['role:manager']);
+        $this->middleware(function (Request $request, Closure $next) {
+            if (! $request->user()?->isManager()) {
+                abort(403);
+            }
+
+            return $next($request);
+        });
         $this->permissionsService = $permissionsService;
     }
 

@@ -826,3 +826,29 @@ body {
         display: block;
     }
 }
+
+/* Locale switcher (dropdown + flag emoji) */
+.locale-switcher__toggle {
+    border-radius: var(--radius-md, 10px);
+    font-weight: 500;
+}
+
+.locale-switcher__emoji {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+.locale-switcher__menu {
+    min-width: 10rem;
+}
+
+.locale-switcher .dropdown-item.active,
+.locale-switcher .dropdown-item:active {
+    background-color: rgba(28, 87, 95, 0.08);
+    color: var(--primary-color, #1c575f);
+}
+
+.content-header .locale-switcher .dropdown-toggle,
+.internal-dashboard .content-header .locale-switcher .dropdown-toggle {
+    border-color: var(--gray-300, #cbd5e1);
+}

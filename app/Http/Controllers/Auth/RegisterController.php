@@ -74,8 +74,7 @@ class RegisterController extends Controller
             'status' => UserStatus::PENDING,
         ]);
 
-        // Assign client role
-        // $user->assignRole('client');
+        $user->assignRole('client');
 
         // Send email verification
         event(new Registered($user));

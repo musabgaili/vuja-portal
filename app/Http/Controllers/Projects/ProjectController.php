@@ -242,7 +242,7 @@ class ProjectController extends Controller
             ->paginate(10);
 
         return view('projects.manager.show', compact(
-            'project', 'employees', 'canEdit', 'canManageTeam', 'canManageMilestones',
+            'project', 'user', 'employees', 'canEdit', 'canManageTeam', 'canManageMilestones',
             'canManageTasks', 'canManageExpenses', 'canAddComments', 'isProjectManager', 'activities'
         ));
     }
