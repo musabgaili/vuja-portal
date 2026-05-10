@@ -27,67 +27,66 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
 
     // ============================================
     // MANAGER & EMPLOYEE ROUTES (Internal Staff Only)
+    // The outer group already enforces auth + is_internal.
     // ============================================
-    Route::group(function () {
 
-        // TIME SLOTS - My Availability (All internal users)
-        Route::get('/my-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'mySlots'])->name('time-slots.my-slots');
-        Route::get('/time-slots/create', [\App\Http\Controllers\TimeSlotController::class, 'create'])->name('time-slots.create');
-        Route::post('/time-slots', [\App\Http\Controllers\TimeSlotController::class, 'store'])->name('time-slots.store');
-        Route::delete('/time-slots/{timeSlot}', [\App\Http\Controllers\TimeSlotController::class, 'destroy'])->name('time-slots.destroy');
-        Route::post('/time-slots/{timeSlot}/toggle-block', [\App\Http\Controllers\TimeSlotController::class, 'toggleBlock'])->name('time-slots.toggle-block');
-        Route::get('/time-slots/available/{employeeId}', [\App\Http\Controllers\TimeSlotController::class, 'getAvailableSlots'])->name('time-slots.available');
+    // TIME SLOTS - My Availability (All internal users)
+    Route::get('/my-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'mySlots'])->name('time-slots.my-slots');
+    Route::get('/time-slots/create', [\App\Http\Controllers\TimeSlotController::class, 'create'])->name('time-slots.create');
+    Route::post('/time-slots', [\App\Http\Controllers\TimeSlotController::class, 'store'])->name('time-slots.store');
+    Route::delete('/time-slots/{timeSlot}', [\App\Http\Controllers\TimeSlotController::class, 'destroy'])->name('time-slots.destroy');
+    Route::post('/time-slots/{timeSlot}/toggle-block', [\App\Http\Controllers\TimeSlotController::class, 'toggleBlock'])->name('time-slots.toggle-block');
+    Route::get('/time-slots/available/{employeeId}', [\App\Http\Controllers\TimeSlotController::class, 'getAvailableSlots'])->name('time-slots.available');
 
-        // MEETINGS
-        Route::get('/my-meetings', [\App\Http\Controllers\MeetingController::class, 'myMeetings'])->name('meetings.internal.my-meetings');
-        Route::post('/meetings/{meeting}/confirm', [\App\Http\Controllers\MeetingController::class, 'confirm'])->name('meetings.confirm');
+    // MEETINGS
+    Route::get('/my-meetings', [\App\Http\Controllers\MeetingController::class, 'myMeetings'])->name('meetings.internal.my-meetings');
+    Route::post('/meetings/{meeting}/confirm', [\App\Http\Controllers\MeetingController::class, 'confirm'])->name('meetings.confirm');
 
-        // Projects moved to routes/projects.php
+    // Projects moved to routes/projects.php
 
-        // IDEAS - Manager/Employee Routes
-        Route::get('/ideas/manager', [IdeaRequestController::class, 'managerIndex'])->name('ideas.manager.index');
-        Route::get('/ideas/manager/{idea}', [IdeaRequestController::class, 'managerShow'])->name('ideas.manager.show');
-        Route::post('/ideas/{idea}/send-quote', [IdeaRequestController::class, 'sendQuote'])->name('ideas.send-quote');
-        Route::post('/ideas/{idea}/approve-quote', [IdeaRequestController::class, 'approveQuote'])->name('ideas.approve-quote');
-        Route::post('/ideas/{idea}/verify-payment', [IdeaRequestController::class, 'verifyPayment'])->name('ideas.verify-payment');
-        Route::post('/ideas/{idea}/assign', [IdeaRequestController::class, 'assign'])->name('ideas.assign');
-        Route::post('/ideas/{idea}/close', [IdeaRequestController::class, 'close'])->name('ideas.close');
-        Route::post('/ideas/{idea}/convert-to-project', [IdeaRequestController::class, 'convertToProject'])->name('ideas.convert-to-project');
+    // IDEAS - Manager/Employee Routes
+    Route::get('/ideas/manager', [IdeaRequestController::class, 'managerIndex'])->name('ideas.manager.index');
+    Route::get('/ideas/manager/{idea}', [IdeaRequestController::class, 'managerShow'])->name('ideas.manager.show');
+    Route::post('/ideas/{idea}/send-quote', [IdeaRequestController::class, 'sendQuote'])->name('ideas.send-quote');
+    Route::post('/ideas/{idea}/approve-quote', [IdeaRequestController::class, 'approveQuote'])->name('ideas.approve-quote');
+    Route::post('/ideas/{idea}/verify-payment', [IdeaRequestController::class, 'verifyPayment'])->name('ideas.verify-payment');
+    Route::post('/ideas/{idea}/assign', [IdeaRequestController::class, 'assign'])->name('ideas.assign');
+    Route::post('/ideas/{idea}/close', [IdeaRequestController::class, 'close'])->name('ideas.close');
+    Route::post('/ideas/{idea}/convert-to-project', [IdeaRequestController::class, 'convertToProject'])->name('ideas.convert-to-project');
 
-        // CONSULTATIONS - Manager/Employee Routes
-        Route::get('/consultations/manager', [ConsultationRequestController::class, 'managerIndex'])->name('consultations.manager.index');
-        Route::get('/consultations/manager/{consultation}', [ConsultationRequestController::class, 'managerShow'])->name('consultations.manager.show');
-        Route::post('/consultations/{consultation}/assign', [ConsultationRequestController::class, 'assign'])->name('consultations.assign');
-        Route::post('/consultations/{consultation}/send-invite', [ConsultationRequestController::class, 'sendMeetingInvite'])->name('consultations.send-invite');
-        Route::post('/consultations/{consultation}/complete', [ConsultationRequestController::class, 'complete'])->name('consultations.complete');
+    // CONSULTATIONS - Manager/Employee Routes
+    Route::get('/consultations/manager', [ConsultationRequestController::class, 'managerIndex'])->name('consultations.manager.index');
+    Route::get('/consultations/manager/{consultation}', [ConsultationRequestController::class, 'managerShow'])->name('consultations.manager.show');
+    Route::post('/consultations/{consultation}/assign', [ConsultationRequestController::class, 'assign'])->name('consultations.assign');
+    Route::post('/consultations/{consultation}/send-invite', [ConsultationRequestController::class, 'sendMeetingInvite'])->name('consultations.send-invite');
+    Route::post('/consultations/{consultation}/complete', [ConsultationRequestController::class, 'complete'])->name('consultations.complete');
 
-        // RESEARCH - Manager/Employee Routes
-        Route::get('/research/manager', [ResearchRequestController::class, 'managerIndex'])->name('research.manager.index');
-        Route::get('/research/manager/{research}', [ResearchRequestController::class, 'managerShow'])->name('research.manager.show');
-        Route::post('/research/{research}/assign', [ResearchRequestController::class, 'assign'])->name('research.assign');
-        Route::post('/research/{research}/complete', [ResearchRequestController::class, 'complete'])->name('research.complete');
+    // RESEARCH - Manager/Employee Routes
+    Route::get('/research/manager', [ResearchRequestController::class, 'managerIndex'])->name('research.manager.index');
+    Route::get('/research/manager/{research}', [ResearchRequestController::class, 'managerShow'])->name('research.manager.show');
+    Route::post('/research/{research}/assign', [ResearchRequestController::class, 'assign'])->name('research.assign');
+    Route::post('/research/{research}/complete', [ResearchRequestController::class, 'complete'])->name('research.complete');
 
-        // IP REGISTRATION - Manager/Employee Routes
-        Route::get('/ip/manager', [IpRegistrationController::class, 'managerIndex'])->name('ip.manager.index');
-        Route::get('/ip/manager/{ip}', [IpRegistrationController::class, 'managerShow'])->name('ip.manager.show');
-        Route::post('/ip/{ip}/assign', [IpRegistrationController::class, 'assign'])->name('ip.assign');
-        Route::post('/ip/{ip}/confirm-meeting', [IpRegistrationController::class, 'confirmMeeting'])->name('ip.confirm-meeting');
-        Route::post('/ip/{ip}/update-status', [IpRegistrationController::class, 'updateStatus'])->name('ip.update-status');
+    // IP REGISTRATION - Manager/Employee Routes
+    Route::get('/ip/manager', [IpRegistrationController::class, 'managerIndex'])->name('ip.manager.index');
+    Route::get('/ip/manager/{ip}', [IpRegistrationController::class, 'managerShow'])->name('ip.manager.show');
+    Route::post('/ip/{ip}/assign', [IpRegistrationController::class, 'assign'])->name('ip.assign');
+    Route::post('/ip/{ip}/confirm-meeting', [IpRegistrationController::class, 'confirmMeeting'])->name('ip.confirm-meeting');
+    Route::post('/ip/{ip}/update-status', [IpRegistrationController::class, 'updateStatus'])->name('ip.update-status');
 
-        // COPYRIGHT - Manager/Employee Routes
-        Route::get('/copyright/manager', [CopyrightRegistrationController::class, 'managerIndex'])->name('copyright.manager.index');
-        Route::get('/copyright/manager/{copyright}', [CopyrightRegistrationController::class, 'managerShow'])->name('copyright.manager.show');
-        Route::post('/copyright/{copyright}/assign', [CopyrightRegistrationController::class, 'assign'])->name('copyright.assign');
-        Route::post('/copyright/{copyright}/confirm-meeting', [CopyrightRegistrationController::class, 'confirmMeeting'])->name('copyright.confirm-meeting');
+    // COPYRIGHT - Manager/Employee Routes
+    Route::get('/copyright/manager', [CopyrightRegistrationController::class, 'managerIndex'])->name('copyright.manager.index');
+    Route::get('/copyright/manager/{copyright}', [CopyrightRegistrationController::class, 'managerShow'])->name('copyright.manager.show');
+    Route::post('/copyright/{copyright}/assign', [CopyrightRegistrationController::class, 'assign'])->name('copyright.assign');
+    Route::post('/copyright/{copyright}/confirm-meeting', [CopyrightRegistrationController::class, 'confirmMeeting'])->name('copyright.confirm-meeting');
 
-        // PRICING TOOL
-        Route::get('/pricing-tool', [\App\Http\Controllers\PricingToolController::class, 'index'])->name('pricing.tool');
-        Route::get('/pricing/rules', [\App\Http\Controllers\PricingToolController::class, 'getRules'])->name('pricing.rules');
-        Route::get('/quoting-tasks', [\App\Http\Controllers\PricingToolController::class, 'quotingTasks'])->name('pricing.quoting-tasks');
-        Route::post('/projects/{project}/upload-quote', [\App\Http\Controllers\PricingToolController::class, 'uploadQuote'])->name('projects.quote.upload');
-        Route::get('/projects/{project}/download-quote', [\App\Http\Controllers\PricingToolController::class, 'downloadQuote'])->name('projects.quote.download');
-        Route::post('/copyright/{copyright}/update-status', [CopyrightRegistrationController::class, 'updateStatus'])->name('copyright.update-status');
-    });
+    // PRICING TOOL
+    Route::get('/pricing-tool', [\App\Http\Controllers\PricingToolController::class, 'index'])->name('pricing.tool');
+    Route::get('/pricing/rules', [\App\Http\Controllers\PricingToolController::class, 'getRules'])->name('pricing.rules');
+    Route::get('/quoting-tasks', [\App\Http\Controllers\PricingToolController::class, 'quotingTasks'])->name('pricing.quoting-tasks');
+    Route::post('/projects/{project}/upload-quote', [\App\Http\Controllers\PricingToolController::class, 'uploadQuote'])->name('projects.quote.upload');
+    Route::get('/projects/{project}/download-quote', [\App\Http\Controllers\PricingToolController::class, 'downloadQuote'])->name('projects.quote.download');
+    Route::post('/copyright/{copyright}/update-status', [CopyrightRegistrationController::class, 'updateStatus'])->name('copyright.update-status');
 
     // ============================================
     // MANAGER-ONLY ROUTES
