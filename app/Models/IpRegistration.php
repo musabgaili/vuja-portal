@@ -10,7 +10,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class IpRegistration extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'user_id',

@@ -287,10 +287,10 @@
                     <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ __('portal.projects_client.show.rejected') }}</span>
                 @elseif($canReview)
                     <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-success" onclick="approveMilestone({{ $milestone->id }}, 'approve')">
+                        <button class="btn btn-sm btn-success" onclick="approveMilestone(@js($milestone->getRouteKey()), 'approve')">
                             <i class="fas fa-thumbs-up"></i> {{ __('portal.projects_client.show.approve') }}
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="approveMilestone({{ $milestone->id }}, 'reject')">
+                        <button class="btn btn-sm btn-danger" onclick="approveMilestone(@js($milestone->getRouteKey()), 'reject')">
                             <i class="fas fa-thumbs-down"></i> {{ __('portal.projects_client.show.reject') }}
                         </button>
                     </div>

@@ -20,11 +20,7 @@ use Illuminate\Support\Facades\Route;
 | All routes accessible by internal staff (managers, employees, PMs)
 |
 */
-Route::get('/test12345678', function () {
-    return 'test12345678';
-});
-
-Route::prefix('internal')->middleware(['auth'])->group(function () {
+Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function () {
 
     // Internal Dashboard
     Route::get('/', [DashboardController::class, 'internalDashboard'])->name('internal.dashboard');
@@ -32,7 +28,7 @@ Route::prefix('internal')->middleware(['auth'])->group(function () {
     // ============================================
     // MANAGER & EMPLOYEE ROUTES (Internal Staff Only)
     // ============================================
-    Route::middleware(['is_internal'])->group(function () {
+    Route::group(function () {
 
         // TIME SLOTS - My Availability (All internal users)
         Route::get('/my-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'mySlots'])->name('time-slots.my-slots');
@@ -96,7 +92,7 @@ Route::prefix('internal')->middleware(['auth'])->group(function () {
     // ============================================
     // MANAGER-ONLY ROUTES
     // ============================================
-    Route::middleware(['is_internal'])->group(function () {
+    Route::middleware(['is_manager'])->group(function () {
 
         // Team Time Slots Overview (Manager Only)
         Route::get('/team-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'teamSlots'])->name('time-slots.team-slots');
@@ -161,19 +157,6 @@ Route::prefix('internal')->middleware(['auth'])->group(function () {
             Route::delete('fields/{field}', [StepFormFieldController::class, 'destroy'])->name('fields.destroy');
             Route::put('steps/{step}/fields/reorder', [StepFormFieldController::class, 'reorder'])->name('fields.reorder');
         });
-    });
-
-    // ============================================
-    // TEAM "EMPLOYEES" ROUTES (INVITE DISABLE EMPLOYEES Feature)
-    // ============================================
-
-    Route::prefix('employees')->name('employees.')->group(function () {
-        //     Route::get('/', [EmployeeController::class, 'index'])->name('index');
-        //     Route::get('/create', [EmployeeController::class, 'create'])->name('create');
-        //     Route::post('/', [EmployeeController::class, 'store'])->name('store');
-        //     Route::get('/{employee}', [EmployeeController::class, 'show'])->name('show');
-        //     Route::put('/{employee}', [EmployeeController::class, 'update'])->name('update');
-        //     Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
     });
 
     // ============================================

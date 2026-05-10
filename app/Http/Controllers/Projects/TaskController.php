@@ -15,9 +15,7 @@ class TaskController extends Controller
     {
         $user = Auth::user();
 
-        if (! $task->project->canUserView($user)) {
-            abort(403);
-        }
+        $this->authorize('view', $task->project);
 
         return response()->json([
             'id' => $task->id,
@@ -36,9 +34,7 @@ class TaskController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserManageTasks($user)) {
-            abort(403, 'You do not have permission to create tasks.');
-        }
+        $this->authorize('manageTasks', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -128,9 +124,7 @@ class TaskController extends Controller
     {
         $user = Auth::user();
 
-        if (! $task->project->canUserManageTasks($user)) {
-            abort(403, 'You do not have permission to delete tasks.');
-        }
+        $this->authorize('manageTasks', $task->project);
 
         $project = $task->project;
         $milestoneId = $task->milestone_id;

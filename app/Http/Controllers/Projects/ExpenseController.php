@@ -14,9 +14,10 @@ class ExpenseController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserView($user) || ! $user->isInternal()) {
+        if (! $user->isInternal()) {
             abort(403);
         }
+        $this->authorize('view', $project);
 
         $expenses = $project->expenses()->with('loggedBy')->latest()->paginate(15);
         $totalExpenses = $project->expenses()->sum('amount');
@@ -28,9 +29,7 @@ class ExpenseController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserManageExpenses($user)) {
-            abort(403, 'You do not have permission to manage expenses.');
-        }
+        $this->authorize('manageExpenses', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -62,9 +61,7 @@ class ExpenseController extends Controller
     {
         $user = Auth::user();
 
-        if (! $expense->project->canUserManageExpenses($user)) {
-            abort(403, 'You do not have permission to manage expenses.');
-        }
+        $this->authorize('manageExpenses', $expense->project);
 
         $project = $expense->project;
         $expense->delete();

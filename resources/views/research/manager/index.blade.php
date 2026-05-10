@@ -36,7 +36,7 @@
                 <td><strong>{{ $r->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $r->user->email }}</small></td>
                 <td><span class="status-badge {{ $r->getStatusBadgeColor() }}">{{ $r->getStatusLabel() }}</span></td>
                 <td>@if($r->assignedTo)<span class="badge bg-success">{{ $r->assignedTo->name }}</span>@else<span class="text-muted">—</span>@endif</td>
-                <td><div class="d-flex gap-2"><a href="{{ route('research.manager.show',$r) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($r->isNdaSigned()&&!$r->assignedTo)<button class="btn btn-sm btn-primary" onclick="assign({{ $r->id }})"><i class="fas fa-user-plus"></i></button>@endif @if($r->isInProgress())<button class="btn btn-sm btn-success" onclick="complete({{ $r->id }})"><i class="fas fa-check"></i></button>@endif</div></td>
+                <td><div class="d-flex gap-2"><a href="{{ route('research.manager.show',$r) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($r->isNdaSigned()&&!$r->assignedTo)<button class="btn btn-sm btn-primary" onclick="assign(@js($r->getRouteKey()))"><i class="fas fa-user-plus"></i></button>@endif @if($r->isInProgress())<button class="btn btn-sm btn-success" onclick="complete(@js($r->getRouteKey()))"><i class="fas fa-check"></i></button>@endif</div></td>
             </tr>
             @endforeach
         </tbody>

@@ -16,9 +16,7 @@ class DeliverableController extends Controller
         $user = Auth::user();
 
         // Only PM or Manager can upload deliverables
-        if (! $project->canUserManageTasks($user)) {
-            abort(403);
-        }
+        $this->authorize('manageTasks', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -44,9 +42,7 @@ class DeliverableController extends Controller
     {
         $user = Auth::user();
 
-        if (! $deliverable->project->canUserView($user)) {
-            abort(403);
-        }
+        $this->authorize('view', $deliverable);
 
         return Storage::disk('private')->download($deliverable->file_path, $deliverable->title);
     }
@@ -55,10 +51,7 @@ class DeliverableController extends Controller
     {
         $user = Auth::user();
 
-        // Only client can confirm
-        if (! $user->canUseClientProjectPortal() || $deliverable->project->client_id !== $user->id) {
-            abort(403);
-        }
+        $this->authorize('confirm', $deliverable);
 
         $deliverable->update([
             'client_confirmed' => true,
@@ -86,9 +79,7 @@ class DeliverableController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isManager()) {
-            abort(403);
-        }
+        $this->authorize('delete', $deliverable);
 
         Storage::disk('private')->delete($deliverable->file_path);
         $deliverable->delete();

@@ -47,6 +47,7 @@ class ComplaintController extends Controller
         if (! $user->isManager()) {
             abort(403);
         }
+        $this->authorize('view', $complaint->project);
 
         $validated = $request->validate([
             'resolution_note' => 'required|string',

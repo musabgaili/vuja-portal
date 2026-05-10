@@ -42,9 +42,7 @@ class RequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('view', $projectRequest->project);
 
         $validated = $request->validate([
             'response' => 'required|string',

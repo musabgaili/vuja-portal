@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\MeetingBooked;
+use App\Mail\MeetingConfirmed;
 use App\Models\Meeting;
 use App\Models\TimeSlot;
 use App\Models\User;
@@ -9,6 +11,7 @@ use App\Services\ServiceRequests\MeetingService;
 use App\Services\ServiceRequests\TimeSlotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class MeetingController extends Controller
 {
@@ -285,6 +288,15 @@ class MeetingController extends Controller
         try {
             $meeting = $this->meetingService->bookMeeting($user, $timeSlot, $validated);
 
+            $meeting->load(['client', 'teamMember']);
+
+            if ($meeting->teamMember?->email) {
+                Mail::to($meeting->teamMember->email)->send(new MeetingBooked($meeting));
+            }
+            if ($meeting->client?->email) {
+                Mail::to($meeting->client->email)->send(new MeetingBooked($meeting));
+            }
+
             return redirect()->route('meetings.my-meetings')
                 ->with('success', 'Meeting booked successfully! You will receive confirmation soon.');
         } catch (\Exception $e) {
@@ -313,12 +325,18 @@ class MeetingController extends Controller
         if (! $user->isInternal()) {
             abort(403);
         }
+        $this->authorize('update', $meeting);
 
         $validated = $request->validate([
             'meeting_link' => 'nullable|url',
         ]);
 
         $this->meetingService->confirmMeeting($meeting, $validated['meeting_link'] ?? null);
+
+        $meeting->refresh()->loadMissing('client');
+        if ($meeting->client?->email) {
+            Mail::to($meeting->client->email)->send(new MeetingConfirmed($meeting));
+        }
 
         return back()->with('success', 'Meeting confirmed!');
     }
@@ -330,10 +348,7 @@ class MeetingController extends Controller
     {
         $user = Auth::user();
 
-        // Client can cancel their own meetings, team member can cancel assigned meetings
-        if ($meeting->client_id !== $user->id && $meeting->team_member_id !== $user->id && ! $user->isManager()) {
-            abort(403);
-        }
+        $this->authorize('update', $meeting);
 
         $this->meetingService->cancelMeeting($meeting);
 

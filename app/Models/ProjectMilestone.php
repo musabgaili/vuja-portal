@@ -12,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class ProjectMilestone extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'project_id', 'title', 'description', 'milestone_order',

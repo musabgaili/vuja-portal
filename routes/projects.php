@@ -59,10 +59,6 @@ Route::middleware(['auth'])->group(function () {
     // ============================================
     Route::prefix('internal/projects')->middleware(['is_internal'])->name('projects.')->group(function () {
 
-        Route::get('/xx', function () {
-            return 'test';
-        });
-
         // Project Management
         Route::get('/', [ProjectController::class, 'managerIndex'])->name('manager.index');
         Route::get('/kanban', [ProjectController::class, 'kanban'])->name('kanban');
@@ -110,12 +106,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/complaints/{complaint}/resolve', [\App\Http\Controllers\Projects\ComplaintController::class, 'resolve'])->name('complaints.resolve');
 
         // Requests
-        Route::post('/requests/{request}/respond', [\App\Http\Controllers\Projects\RequestController::class, 'respond'])->name('requests.respond');
+        Route::post('/requests/{projectRequest}/respond', [\App\Http\Controllers\Projects\RequestController::class, 'respond'])->name('requests.respond');
 
         // ============================================
         // MANAGER-ONLY PROJECT ROUTES
         // ============================================
-        Route::middleware(['is_internal'])->group(function () {
+        Route::middleware(['is_manager'])->group(function () {
             Route::get('/create', [ProjectController::class, 'create'])->name('create');
             Route::post('/', [ProjectController::class, 'store'])->name('store');
             Route::delete('/destroy/{project}', [ProjectController::class, 'destroy'])->name('destroy');

@@ -176,17 +176,17 @@
                             <i class="fas fa-eye"></i>
                         </a>
                         @if($idea->isInNegotiation() || $idea->isSubmitted())
-                        <button class="btn btn-sm btn-primary" onclick="showQuoteModal({{ $idea->id }})" title="{{ __('portal.ideas.manager.index.title_send_quote') }}">
+                        <button class="btn btn-sm btn-primary" onclick="showQuoteModal(@js($idea->getRouteKey()))" title="{{ __('portal.ideas.manager.index.title_send_quote') }}">
                             <i class="fas fa-dollar-sign"></i>
                         </button>
                         @endif
                         @if($idea->isPaymentPending())
-                        <button class="btn btn-sm btn-success" onclick="verifyPayment({{ $idea->id }}, 'approve')" title="{{ __('portal.ideas.manager.index.title_verify_payment') }}">
+                        <button class="btn btn-sm btn-success" onclick="verifyPayment(@js($idea->getRouteKey()), 'approve')" title="{{ __('portal.ideas.manager.index.title_verify_payment') }}">
                             <i class="fas fa-check"></i>
                         </button>
                         @endif
                         @if($idea->isApproved() && !$idea->assignedTo)
-                        <button class="btn btn-sm btn-info" onclick="showAssignModal({{ $idea->id }})" title="{{ __('portal.ideas.manager.index.title_assign') }}">
+                        <button class="btn btn-sm btn-info" onclick="showAssignModal(@js($idea->getRouteKey()))" title="{{ __('portal.ideas.manager.index.title_assign') }}">
                             <i class="fas fa-user-plus"></i>
                         </button>
                         @endif

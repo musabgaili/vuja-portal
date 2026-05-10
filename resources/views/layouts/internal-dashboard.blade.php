@@ -213,6 +213,7 @@
         document.querySelector('.sidebar-overlay').classList.toggle('active');
     }
     </script>
+    <x-toast />
     @stack('scripts')
 </body>
 </html>

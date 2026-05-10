@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Meeting extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuidRouteKey;
 
     protected $fillable = [
         'time_slot_id',

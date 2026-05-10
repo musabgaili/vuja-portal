@@ -14,7 +14,7 @@ class FeedbackController extends Controller
     {
         $user = Auth::user();
 
-        if ($project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -36,7 +36,7 @@ class FeedbackController extends Controller
     {
         $user = Auth::user();
 
-        if ($project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 

@@ -8,6 +8,7 @@ use App\Models\IdeaRequestComment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class IdeaRequestController extends Controller
 {
@@ -51,12 +52,7 @@ class IdeaRequestController extends Controller
      */
     public function show(IdeaRequest $idea)
     {
-        $user = Auth::user();
-
-        // Check access
-        if ($user->isClient() && $idea->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->authorize('view', $idea);
 
         $idea->load(['user', 'assignedTo', 'manager', 'comments.user']);
 
@@ -68,11 +64,7 @@ class IdeaRequestController extends Controller
      */
     public function showAiAssessment(IdeaRequest $idea)
     {
-        $user = Auth::user();
-
-        if ($user->isClient() && $idea->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->authorize('view', $idea);
 
         return view('ideas.ai-assessment', compact('idea'));
     }
@@ -82,6 +74,8 @@ class IdeaRequestController extends Controller
      */
     public function processAiAssessment(Request $request, IdeaRequest $idea)
     {
+        $this->authorize('update', $idea);
+
         $validated = $request->validate([
             'ai_options' => 'required|array',
             'token_count' => 'required|integer|min:1|max:100',
@@ -107,6 +101,8 @@ class IdeaRequestController extends Controller
      */
     public function showNegotiation(IdeaRequest $idea)
     {
+        $this->authorize('view', $idea);
+
         $idea->load('comments.user');
 
         return view('ideas.negotiation', compact('idea'));
@@ -117,6 +113,8 @@ class IdeaRequestController extends Controller
      */
     public function addComment(Request $request, IdeaRequest $idea)
     {
+        $this->authorize('update', $idea);
+
         $validated = $request->validate([
             'comment' => 'required|string',
             'suggested_price' => 'nullable|numeric|min:0',
@@ -142,6 +140,8 @@ class IdeaRequestController extends Controller
      */
     public function acceptQuote(IdeaRequest $idea)
     {
+        $this->authorize('update', $idea);
+
         if (! $idea->isQuoted()) {
             return back()->withErrors(['error' => 'No quote available to accept.']);
         }
@@ -150,6 +150,8 @@ class IdeaRequestController extends Controller
             'status' => 'accepted',
             'agreement_accepted_at' => now(),
         ]);
+
+        $this->notifyInternalsOfQuoteDecision($idea, new \App\Mail\QuoteApproved($idea));
 
         return redirect()->route('ideas.payment', $idea)
             ->with('success', 'Quote accepted! Please upload payment confirmation.');
@@ -160,6 +162,8 @@ class IdeaRequestController extends Controller
      */
     public function rejectQuote(Request $request, IdeaRequest $idea)
     {
+        $this->authorize('update', $idea);
+
         $validated = $request->validate([
             'reason' => 'nullable|string|max:500',
         ]);
@@ -175,6 +179,8 @@ class IdeaRequestController extends Controller
         // Return to negotiation status, NOT rejected
         $idea->update(['status' => 'negotiation']);
 
+        $this->notifyInternalsOfQuoteDecision($idea, new \App\Mail\QuoteRejected($idea, $validated['reason'] ?? null));
+
         return redirect()->route('ideas.negotiation', $idea)
             ->with('info', 'Quote rejected. Negotiation continues - please discuss with manager.');
     }
@@ -184,6 +190,8 @@ class IdeaRequestController extends Controller
      */
     public function showPayment(IdeaRequest $idea)
     {
+        $this->authorize('view', $idea);
+
         if (! $idea->isAccepted() && ! $idea->isPaymentPending()) {
             abort(403);
         }
@@ -196,6 +204,8 @@ class IdeaRequestController extends Controller
      */
     public function uploadPayment(Request $request, IdeaRequest $idea)
     {
+        $this->authorize('update', $idea);
+
         $validated = $request->validate([
             'payment_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
@@ -235,9 +245,7 @@ class IdeaRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('manage', $idea);
 
         $idea->load(['user', 'assignedTo', 'comments.user']);
         $employees = User::where('role', 'employee')->get();
@@ -252,9 +260,7 @@ class IdeaRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('manage', $idea);
 
         $validated = $request->validate([
             'final_quote' => 'required|numeric|min:0',
@@ -290,6 +296,8 @@ class IdeaRequestController extends Controller
     {
         $user = Auth::user();
 
+        $this->authorize('manage', $idea);
+
         $idea->update([
             'quote_status' => 'approved',
             'quote_approved_by' => $user->id,
@@ -313,6 +321,8 @@ class IdeaRequestController extends Controller
     public function verifyPayment(Request $request, IdeaRequest $idea)
     {
         $user = Auth::user();
+
+        $this->authorize('manage', $idea);
 
         $validated = $request->validate([
             'action' => 'required|in:approve,reject',
@@ -339,6 +349,8 @@ class IdeaRequestController extends Controller
     {
         $user = Auth::user();
 
+        $this->authorize('manage', $idea);
+
         $validated = $request->validate([
             'assigned_to' => 'required|exists:users,id',
         ]);
@@ -356,6 +368,8 @@ class IdeaRequestController extends Controller
      */
     public function close(Request $request, IdeaRequest $idea)
     {
+        $this->authorize('manage', $idea);
+
         $validated = $request->validate([
             'status' => 'required|in:rejected,cancelled',
             'reason' => 'nullable|string',
@@ -383,9 +397,7 @@ class IdeaRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('manage', $idea);
 
         if (! $idea->isCompleted()) {
             return back()->withErrors(['error' => 'Only completed ideas can be converted to projects.']);
@@ -434,5 +446,35 @@ class IdeaRequestController extends Controller
 
         return redirect()->route('projects.manager.show', $project)
             ->with('success', 'Project created from idea!');
+    }
+
+    /**
+     * Send a quote-decision email to the assigned employee, the quote-approving manager,
+     * and any user with the manager role so leadership stays in the loop.
+     */
+    protected function notifyInternalsOfQuoteDecision(IdeaRequest $idea, $mailable): void
+    {
+        $recipients = collect();
+
+        if ($idea->assignedTo) {
+            $recipients->push($idea->assignedTo->email);
+        }
+
+        if ($idea->manager_id) {
+            $manager = User::find($idea->manager_id);
+            if ($manager) {
+                $recipients->push($manager->email);
+            }
+        }
+
+        $managers = User::where('type', 'internal')
+            ->whereHas('roles', fn ($q) => $q->where('name', 'manager'))
+            ->pluck('email');
+
+        $recipients = $recipients->merge($managers)->filter()->unique()->values();
+
+        foreach ($recipients as $email) {
+            Mail::to($email)->send($mailable);
+        }
     }
 }

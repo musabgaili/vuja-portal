@@ -12,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'client_id', 'title', 'description', 'scope', 'source_type', 'source_id',

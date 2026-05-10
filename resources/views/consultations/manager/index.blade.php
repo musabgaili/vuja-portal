@@ -46,7 +46,7 @@
                 <td><span class="status-badge {{ $c->getStatusBadgeColor() }}">{{ $c->getStatusLabel() }}</span></td>
                 <td>@if($c->assignedTo)<span class="badge bg-success">{{ $c->assignedTo->name }}</span>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
                 <td>@if($c->meeting)<small class="text-info"><i class="fas fa-calendar"></i> {{ $c->meeting->scheduled_at->format('M d, g:i A') }}</small>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
-                <td><div class="d-flex gap-2"><a href="{{ route('consultations.manager.show',$c) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($c->isSubmitted())<button class="btn btn-sm btn-primary" onclick="showAssignModal({{ $c->id }})"><i class="fas fa-user-plus"></i></button>@endif</div></td>
+                <td><div class="d-flex gap-2"><a href="{{ route('consultations.manager.show',$c) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($c->isSubmitted())<button class="btn btn-sm btn-primary" onclick="showAssignModal(@js($c->getRouteKey()))"><i class="fas fa-user-plus"></i></button>@endif</div></td>
             </tr>
             @endforeach
         </tbody>

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ScopeChangeDecision;
+use App\Mail\ScopeChangeRequested;
 use App\Models\Project;
 use App\Models\ProjectScopeChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ScopeChangeController extends Controller
 {
@@ -17,7 +20,7 @@ class ScopeChangeController extends Controller
     {
         $user = Auth::user();
 
-        if ($project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -31,7 +34,7 @@ class ScopeChangeController extends Controller
     {
         $user = Auth::user();
 
-        if ($project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
             abort(403);
         }
 
@@ -41,12 +44,17 @@ class ScopeChangeController extends Controller
             'justification' => 'nullable|string',
         ]);
 
-        ProjectScopeChange::create([
+        $scopeChange = ProjectScopeChange::create([
             ...$validated,
             'project_id' => $project->id,
             'requested_by' => $user->id,
             'status' => 'pending',
         ]);
+
+        $managerEmail = $project->projectManager?->email;
+        if ($managerEmail) {
+            Mail::to($managerEmail)->send(new ScopeChangeRequested($scopeChange));
+        }
 
         return redirect()->route('projects.client.show', $project)
             ->with('success', 'Scope change request submitted! Waiting for manager review.');
@@ -58,6 +66,10 @@ class ScopeChangeController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        if (! $user->isManager()) {
+            abort(403);
+        }
 
         $scopeChanges = ProjectScopeChange::with(['project', 'requestedBy'])
             ->where('status', 'pending')
@@ -74,6 +86,8 @@ class ScopeChangeController extends Controller
     {
         $user = Auth::user();
 
+        $this->authorize('update', $scopeChange);
+
         $validated = $request->validate([
             'review_notes' => 'nullable|string',
         ]);
@@ -85,6 +99,11 @@ class ScopeChangeController extends Controller
             'review_notes' => $validated['review_notes'] ?? null,
         ]);
 
+        $clientEmail = $scopeChange->project->client?->email;
+        if ($clientEmail) {
+            Mail::to($clientEmail)->send(new ScopeChangeDecision($scopeChange->fresh()));
+        }
+
         return back()->with('success', 'Scope change approved!');
     }
 
@@ -94,6 +113,8 @@ class ScopeChangeController extends Controller
     public function reject(Request $request, ProjectScopeChange $scopeChange)
     {
         $user = Auth::user();
+
+        $this->authorize('update', $scopeChange);
 
         $validated = $request->validate([
             'review_notes' => 'required|string',
@@ -105,6 +126,11 @@ class ScopeChangeController extends Controller
             'reviewed_at' => now(),
             'review_notes' => $validated['review_notes'],
         ]);
+
+        $clientEmail = $scopeChange->project->client?->email;
+        if ($clientEmail) {
+            Mail::to($clientEmail)->send(new ScopeChangeDecision($scopeChange->fresh()));
+        }
 
         return back()->with('success', 'Scope change rejected.');
     }

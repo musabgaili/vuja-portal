@@ -51,11 +51,7 @@ class ConsultationRequestController extends Controller
 
     public function show(ConsultationRequest $consultation)
     {
-        $user = Auth::user();
-
-        if ($user->isClient() && $consultation->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->authorize('view', $consultation);
 
         $consultation->load(['user', 'assignedTo']);
 
@@ -87,9 +83,7 @@ class ConsultationRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('manage', $consultation);
 
         $consultation->load(['user', 'assignedTo']);
         $employees = User::where('role', 'employee')->get();
@@ -99,6 +93,8 @@ class ConsultationRequestController extends Controller
 
     public function assign(Request $request, ConsultationRequest $consultation)
     {
+        $this->authorize('manage', $consultation);
+
         $validated = $request->validate([
             'assigned_to' => 'required|exists:users,id',
         ]);
@@ -118,6 +114,7 @@ class ConsultationRequestController extends Controller
         if (! $user->isEmployee() && ! $user->isManager()) {
             abort(403);
         }
+        $this->authorize('manage', $consultation);
 
         $validated = $request->validate([
             'time_slot_id' => 'required|exists:time_slots,id',
@@ -163,6 +160,8 @@ class ConsultationRequestController extends Controller
 
     public function complete(Request $request, ConsultationRequest $consultation)
     {
+        $this->authorize('manage', $consultation);
+
         $validated = $request->validate([
             'meeting_notes' => 'nullable|string',
         ]);

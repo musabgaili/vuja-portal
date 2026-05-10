@@ -11,7 +11,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class IdeaRequest extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'user_id',

@@ -60,6 +60,41 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 # vuja-portal
-# vuja-portal
-# vuja-portal
-# vuja-portal
+
+## VujaDe Portal Operations
+
+### Mail (Resend)
+
+The portal sends mail through Resend in development and production. Set the following in your `.env`:
+
+```
+MAIL_MAILER=resend
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
+MAIL_FROM_ADDRESS="no-reply@vujadesa.com"
+MAIL_FROM_NAME="VujaDe Platform"
+QUEUE_CONNECTION=database
+```
+
+All `app/Mail/*` mailables implement `ShouldQueue`, so the queue worker must be running for emails to actually be delivered. In production, run the worker under a process supervisor (Supervisor, systemd, or similar):
+
+```
+php artisan queue:work --tries=3 --backoff=30
+```
+
+The local `composer dev` script already starts `php artisan queue:listen --tries=1` alongside `serve` and Vite.
+
+Verify the `vujadesa.com` domain in the Resend dashboard and add the SPF, DKIM, and DMARC records to the registrar before going live; without DKIM, Gmail and similar providers will junk transactional mail.
+
+### Role / route access matrix
+
+| Resource                                 | Client | Employee | Project Manager | Manager | Account Manager |
+| ---------------------------------------- | :----: | :------: | :-------------: | :-----: | :-------------: |
+| `/client/*`, own service requests, projects |  view/edit  |    no     |        no       |   no    |        no        |
+| `/internal` dashboard                    |   no   |   yes    |       yes       |   yes   |       yes        |
+| `/internal/projects/*` (read, update)    |   no   |   yes    |       yes       |   yes   |       yes        |
+| `/internal/projects/{create,store,destroy}` |   no   |    no    |        no       |   yes   |        no        |
+| `/internal/pricing-admin`, team mgmt, permissions, stepper, queue review |   no   |    no    |        no       |   yes   |        no        |
+| Service request manager screens (ideas, consultations, research, IP, copyright) |   no   |   yes (assigned)   |       yes (assigned)       |   yes   |       yes        |
+| Logout (`POST /logout` or fallback `GET /logout`) |  yes   |   yes    |       yes       |   yes   |       yes        |
+
+Authorization is enforced at three layers: route middleware (`auth`, `is_internal`, `is_manager`), Laravel Policies in `app/Policies/*`, and existing `canUser*` helpers on the `Project` model.

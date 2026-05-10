@@ -46,11 +46,7 @@ class IpRegistrationController extends Controller
 
     public function show(IpRegistration $ip)
     {
-        $user = Auth::user();
-
-        if ($user->isClient() && $ip->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->authorize('view', $ip);
 
         $ip->load(['user', 'assignedTo']);
 
@@ -59,6 +55,8 @@ class IpRegistrationController extends Controller
 
     public function bookMeeting(Request $request, IpRegistration $ip)
     {
+        $this->authorize('update', $ip);
+
         // Check if consultant is assigned
         if (! $ip->assigned_to) {
             return back()->withErrors(['error' => 'You cannot book a meeting until a consultant is assigned to your IP registration request.']);
@@ -99,9 +97,7 @@ class IpRegistrationController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('manage', $ip);
 
         $ip->load(['user', 'assignedTo']);
         $employees = User::where('role', 'employee')->get();
@@ -111,6 +107,8 @@ class IpRegistrationController extends Controller
 
     public function assign(Request $request, IpRegistration $ip)
     {
+        $this->authorize('manage', $ip);
+
         $validated = $request->validate([
             'assigned_to' => 'required|exists:users,id',
         ]);
@@ -122,6 +120,8 @@ class IpRegistrationController extends Controller
 
     public function confirmMeeting(Request $request, IpRegistration $ip)
     {
+        $this->authorize('manage', $ip);
+
         $validated = $request->validate([
             'meeting_link' => 'nullable|url',
         ]);
@@ -137,6 +137,8 @@ class IpRegistrationController extends Controller
 
     public function updateStatus(Request $request, IpRegistration $ip)
     {
+        $this->authorize('manage', $ip);
+
         $validated = $request->validate([
             'status' => 'required|in:documentation,filing,registered,completed',
             'registration_number' => 'nullable|string',

@@ -432,7 +432,7 @@
                     </div>
                     @if($milestone->status !== 'completed' && $canManageMilestones)
                     <div class="mt-3">
-                        <button class="btn btn-sm btn-success" onclick="markMilestoneCompleted({{ $milestone->id }})">
+                        <button class="btn btn-sm btn-success" onclick="markMilestoneCompleted(@js($milestone->getRouteKey()))">
                             <i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.mark_as_completed') }}
                         </button>
                     </div>

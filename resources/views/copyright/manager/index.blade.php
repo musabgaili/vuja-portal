@@ -37,7 +37,7 @@
                 <td><strong>{{ $c->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $c->user->email }}</small></td>
                 <td><span class="status-badge {{ $c->getStatusBadgeColor() }}">{{ $c->getStatusLabel() }}</span></td>
                 <td>{{ $c->copyright_number ?? __('portal.copyright.manager.index.none_dash') }}</td>
-                <td><div class="d-flex gap-2"><a href="{{ route('copyright.manager.show',$c) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($c->isMeetingBooked()&&!$c->meeting_confirmed_at)<button class="btn btn-sm btn-success" onclick="confirmMeeting({{ $c->id }})"><i class="fas fa-check"></i></button>@endif @if($c->isMeetingConfirmed())<button class="btn btn-sm btn-primary" onclick="updateStatus({{ $c->id }})"><i class="fas fa-edit"></i></button>@endif</div></td>
+                <td><div class="d-flex gap-2"><a href="{{ route('copyright.manager.show',$c) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($c->isMeetingBooked()&&!$c->meeting_confirmed_at)<button class="btn btn-sm btn-success" onclick="confirmMeeting(@js($c->getRouteKey()))"><i class="fas fa-check"></i></button>@endif @if($c->isMeetingConfirmed())<button class="btn btn-sm btn-primary" onclick="updateStatus(@js($c->getRouteKey()))"><i class="fas fa-edit"></i></button>@endif</div></td>
             </tr>
             @endforeach
         </tbody>

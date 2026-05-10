@@ -228,7 +228,7 @@
                         <i class="fas fa-download"></i>
                     </a>
                     @if($doc->uploaded_by === auth()->id() || auth()->user()->isManager())
-                    <button class="btn btn-outline-warning btn-icon" onclick="editDocument({{ $doc->id }}, '{{ $doc->title }}', '{{ $doc->tag }}', '{{ addslashes($doc->comment) }}')" title="{{ __('portal.projects_documents.edit_title') }}">
+                    <button class="btn btn-outline-warning btn-icon" onclick="editDocument(@js($doc->getRouteKey()), @js($doc->title), @js($doc->tag), @js($doc->comment))" title="{{ __('portal.projects_documents.edit_title') }}">
                         <i class="fas fa-edit"></i>
                     </button>
                     <form method="POST" action="{{ route('projects.documents.destroy', $doc) }}" style="display: inline;" onsubmit="return confirm(@json(__('portal.projects_documents.delete_confirm')))">

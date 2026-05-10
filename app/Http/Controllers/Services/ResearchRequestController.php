@@ -47,11 +47,7 @@ class ResearchRequestController extends Controller
 
     public function show(ResearchRequest $research)
     {
-        $user = Auth::user();
-
-        if ($user->isClient() && $research->user_id !== $user->id) {
-            abort(403);
-        }
+        $this->authorize('view', $research);
 
         $research->load(['user', 'assignedTo']);
 
@@ -60,6 +56,8 @@ class ResearchRequestController extends Controller
 
     public function signDocuments(Request $request, ResearchRequest $research)
     {
+        $this->authorize('update', $research);
+
         // Placeholder for digital signature integration
         $research->update([
             'nda_signed_at' => now(),
@@ -72,6 +70,8 @@ class ResearchRequestController extends Controller
 
     public function bookMeeting(Request $request, ResearchRequest $research)
     {
+        $this->authorize('update', $research);
+
         // Check if consultant is assigned
         if (! $research->assigned_to) {
             return back()->withErrors(['error' => 'You cannot book a meeting until a consultant is assigned to your research request.']);
@@ -115,9 +115,7 @@ class ResearchRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isInternal()) {
-            abort(403);
-        }
+        $this->authorize('manage', $research);
 
         $research->load(['user', 'assignedTo']);
         $employees = User::where('role', 'employee')->get();
@@ -127,6 +125,8 @@ class ResearchRequestController extends Controller
 
     public function assign(Request $request, ResearchRequest $research)
     {
+        $this->authorize('manage', $research);
+
         $validated = $request->validate([
             'assigned_to' => 'required|exists:users,id',
         ]);
@@ -141,6 +141,8 @@ class ResearchRequestController extends Controller
 
     public function complete(Request $request, ResearchRequest $research)
     {
+        $this->authorize('manage', $research);
+
         $validated = $request->validate([
             'research_findings' => 'required|string',
         ]);

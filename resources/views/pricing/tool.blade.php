@@ -118,6 +118,10 @@ body { font-family: 'Inter', sans-serif; }
             <div id="cartContainer" class="mb-3" style="max-height: 400px; overflow-y: auto;">
                 <!-- Items will be rendered here -->
             </div>
+            <div id="cartLoading" class="text-center text-muted small d-none mb-3">
+                <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                Calculating...
+            </div>
 
             <div class="grand-total text-center">
                 <p class="mb-0 opacity-90">{{ __('portal.pricing.total') }}</p>
@@ -158,10 +162,14 @@ function removeFromCart(index) {
 function updateCart() {
     const container = document.getElementById('cartContainer');
     const totalEl = document.getElementById('grandTotal');
+    const loadingEl = document.getElementById('cartLoading');
+
+    loadingEl.classList.remove('d-none');
     
     if (cart.length === 0) {
         container.innerHTML = @js('<p class="text-muted text-center py-3"><i class="fas fa-inbox"></i><br><small>' . __('portal.pricing.empty_cart') . '</small></p>');
         totalEl.textContent = '$0.00';
+        loadingEl.classList.add('d-none');
         return;
     }
     
@@ -200,8 +208,11 @@ function updateCart() {
         `;
     });
     
-    container.innerHTML = html;
-    totalEl.textContent = '$' + total.toFixed(2);
+    requestAnimationFrame(() => {
+        container.innerHTML = html;
+        totalEl.textContent = '$' + total.toFixed(2);
+        loadingEl.classList.add('d-none');
+    });
 }
 
 // Initialize empty cart

@@ -3,11 +3,8 @@
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceRequestController;
-use App\Models\Project;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,10 +20,6 @@ use Spatie\Permission\Models\Role;
 // ============================================
 // PUBLIC ROUTES
 // ============================================
-
-Route::get('/test', function () {
-    return Auth::user()->role->value;
-})->name('test');
 
 Route::get('language/{locale}', function (string $locale) {
     if (! in_array($locale, config('app.supported_locales', ['en', 'ar']), true)) {
@@ -55,6 +48,14 @@ Route::get('/', function () {
 // ============================================
 
 Auth::routes(['verify' => true]);
+
+Route::get('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+
+    return redirect()->route('login');
+});
 
 // Social Authentication Routes
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');

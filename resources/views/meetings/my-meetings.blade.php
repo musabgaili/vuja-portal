@@ -73,7 +73,7 @@
                     </td>
                     <td>
                         @if(auth()->user()->isInternal() && $meeting->isScheduled())
-                        <button class="btn btn-sm btn-success" onclick="confirmMeeting({{ $meeting->id }})">
+                        <button class="btn btn-sm btn-success" onclick="confirmMeeting(@js($meeting->getRouteKey()))">
                             <i class="fas fa-check"></i> {{ __('portal.meetings.confirm') }}
                         </button>
                         @endif

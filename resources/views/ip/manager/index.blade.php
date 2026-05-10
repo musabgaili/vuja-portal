@@ -37,7 +37,7 @@
                 <td><strong>{{ $ip->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $ip->user->email }}</small></td>
                 <td><span class="status-badge {{ $ip->getStatusBadgeColor() }}">{{ $ip->getStatusLabel() }}</span></td>
                 <td>{{ $ip->registration_number??'—' }}</td>
-                <td><div class="d-flex gap-2"><a href="{{ route('ip.manager.show',$ip) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($ip->isMeetingBooked()&&!$ip->meeting_confirmed_at)<button class="btn btn-sm btn-success" onclick="confirmMeeting({{ $ip->id }})"><i class="fas fa-check"></i></button>@endif @if($ip->isMeetingConfirmed())<button class="btn btn-sm btn-primary" onclick="updateStatus({{ $ip->id }})"><i class="fas fa-edit"></i></button>@endif</div></td>
+                <td><div class="d-flex gap-2"><a href="{{ route('ip.manager.show',$ip) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($ip->isMeetingBooked()&&!$ip->meeting_confirmed_at)<button class="btn btn-sm btn-success" onclick="confirmMeeting(@js($ip->getRouteKey()))"><i class="fas fa-check"></i></button>@endif @if($ip->isMeetingConfirmed())<button class="btn btn-sm btn-primary" onclick="updateStatus(@js($ip->getRouteKey()))"><i class="fas fa-edit"></i></button>@endif</div></td>
             </tr>
             @endforeach
         </tbody>

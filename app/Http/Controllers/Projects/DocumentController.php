@@ -15,9 +15,7 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserView($user)) {
-            abort(403);
-        }
+        $this->authorize('view', $project);
 
         $documents = $project->documents()->with('uploadedBy')->latest()->get();
 
@@ -29,9 +27,7 @@ class DocumentController extends Controller
         $user = Auth::user();
 
         // Client or PM can upload
-        if (! $project->canUserView($user)) {
-            abort(403);
-        }
+        $this->authorize('view', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -62,10 +58,7 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
 
-        // Only uploader or manager can update
-        if ($document->uploaded_by !== $user->id && ! $user->isManager()) {
-            abort(403);
-        }
+        $this->authorize('update', $document);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -92,9 +85,7 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
 
-        if (! $document->project->canUserView($user)) {
-            abort(403);
-        }
+        $this->authorize('view', $document);
 
         return Storage::disk('private')->download($document->file_path, $document->title.'.'.$document->file_type);
     }
@@ -103,10 +94,7 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
 
-        // Only uploader or manager can delete
-        if ($document->uploaded_by !== $user->id && ! $user->isManager()) {
-            abort(403);
-        }
+        $this->authorize('delete', $document);
 
         Storage::disk('private')->delete($document->file_path);
         $document->delete();

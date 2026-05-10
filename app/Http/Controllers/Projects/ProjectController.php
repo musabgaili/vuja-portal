@@ -49,9 +49,10 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
+        if (! $user->canUseClientProjectPortal()) {
             abort(403);
         }
+        $this->authorize('view', $project);
 
         $project->load([
             'client', 'projectPeople.user',
@@ -206,9 +207,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserView($user)) {
-            abort(403);
-        }
+        $this->authorize('view', $project);
 
         $project->load([
             'client', 'projectPeople.user',
@@ -251,9 +250,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserEdit($user)) {
-            abort(403);
-        }
+        $this->authorize('update', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -300,6 +297,8 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
+        $this->authorize('delete', $project);
+
         $project->delete();
 
         return redirect()->route('projects.manager.index')
@@ -310,9 +309,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserManageTeam($user)) {
-            abort(403, 'You do not have permission to manage team members.');
-        }
+        $this->authorize('manageTeam', $project);
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -355,9 +352,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $projectPerson->project->canUserManageTeam($user)) {
-            abort(403, 'You do not have permission to manage team members.');
-        }
+        $this->authorize('manageTeam', $projectPerson->project);
 
         $validated = $request->validate([
             'role' => 'required|in:employee,project_manager,account_manager,client',
@@ -406,9 +401,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $projectPerson->project->canUserManageTeam($user)) {
-            abort(403, 'You do not have permission to manage team members.');
-        }
+        $this->authorize('manageTeam', $projectPerson->project);
 
         $project = $projectPerson->project;
         $removedRole = $projectPerson->role;

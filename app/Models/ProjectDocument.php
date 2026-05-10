@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProjectDocument extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuidRouteKey;
 
     protected $fillable = [
         'project_id',

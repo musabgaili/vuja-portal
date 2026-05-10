@@ -15,9 +15,7 @@ class MilestoneController extends Controller
     {
         $user = Auth::user();
 
-        if (! $project->canUserManageMilestones($user)) {
-            abort(403, 'You do not have permission to create milestones.');
-        }
+        $this->authorize('manageMilestones', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -40,9 +38,7 @@ class MilestoneController extends Controller
     {
         $user = Auth::user();
 
-        if (! $milestone->project->canUserManageMilestones($user)) {
-            abort(403, 'You do not have permission to edit milestones.');
-        }
+        $this->authorize('update', $milestone);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -82,9 +78,7 @@ class MilestoneController extends Controller
     {
         $user = Auth::user();
 
-        if (! $milestone->project->canUserManageMilestones($user)) {
-            abort(403, 'You do not have permission to delete milestones.');
-        }
+        $this->authorize('delete', $milestone);
 
         $project = $milestone->project;
         $milestone->delete();
@@ -102,10 +96,7 @@ class MilestoneController extends Controller
     {
         $user = Auth::user();
 
-        // Only client can approve their own project milestones
-        if (! $user->canUseClientProjectPortal() || $milestone->project->client_id !== $user->id) {
-            abort(403, 'You do not have permission to approve this milestone.');
-        }
+        $this->authorize('approve', $milestone);
 
         // All milestone tasks must be completed or in review
         $incompleteTasks = $milestone->tasks()->whereNotIn('status', ['completed', 'review'])->count();
@@ -137,9 +128,7 @@ class MilestoneController extends Controller
     {
         $user = Auth::user();
 
-        if (! $milestone->project->canUserManageMilestones($user)) {
-            return response()->json(['success' => false, 'message' => 'Permission denied'], 403);
-        }
+        $this->authorize('update', $milestone);
 
         $milestone->update([
             'status' => 'completed',
