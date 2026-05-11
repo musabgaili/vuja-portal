@@ -49,31 +49,46 @@ body { font-family: 'Inter', sans-serif; }
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{{ __('portal.pricing.item') }} *</label>
-                    <input type="text" name="item" class="form-control" placeholder="{{ __('portal.pricing.item_placeholder') }}" required>
+                    <input type="text" name="item" class="form-control @error('item') is-invalid @enderror" value="{{ old('item') }}" placeholder="{{ __('portal.pricing.item_placeholder') }}" required>
+                    @error('item')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label>{{ __('portal.pricing.rate') }} *</label>
-                    <input type="number" name="rate" class="form-control" step="0.01" min="0" placeholder="100.00" required>
+                    <input type="number" name="rate" class="form-control @error('rate') is-invalid @enderror" value="{{ old('rate') }}" step="0.01" min="0" placeholder="100.00" required>
+                    @error('rate')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label>{{ __('portal.pricing.unit') }} *</label>
-                    <input type="text" name="unit" class="form-control" placeholder="{{ __('portal.pricing.unit_placeholder') }}" required>
+                    <input type="text" name="unit" class="form-control @error('unit') is-invalid @enderror" value="{{ old('unit') }}" placeholder="{{ __('portal.pricing.unit_placeholder') }}" required>
+                    @error('unit')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label>{{ __('portal.pricing.level') }} *</label>
-                    <input type="text" name="level" class="form-control" placeholder="{{ __('portal.pricing.level_placeholder') }}" required>
+                    <input type="text" name="level" class="form-control @error('level') is-invalid @enderror" value="{{ old('level') }}" placeholder="{{ __('portal.pricing.level_placeholder') }}" required>
+                    @error('level')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{{ __('portal.pricing.note') }} *</label>
-                    <input type="text" name="note" class="form-control" placeholder="{{ __('portal.pricing.note_placeholder') }}" required>
+                    <input type="text" name="note" class="form-control @error('note') is-invalid @enderror" value="{{ old('note') }}" placeholder="{{ __('portal.pricing.note_placeholder') }}" required>
+                    @error('note')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -121,7 +136,7 @@ body { font-family: 'Inter', sans-serif; }
                         <button class="btn btn-sm btn-warning" onclick="editRule({{ $rule->id }}, '{{ $rule->item }}', {{ $rule->rate }}, '{{ $rule->unit }}', '{{ $rule->level }}', '{{ addslashes($rule->note) }}', {{ $rule->is_active ? 'true' : 'false' }})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <form method="POST" action="{{ route('pricing.destroy', $rule) }}" style="display: inline;" onsubmit="return confirm('{{ __('portal.pricing.delete_rule_confirm') }}')">
+                        <form method="POST" action="{{ route('pricing.destroy', $rule) }}" class="js-delete-rule" style="display: inline;" data-rule-item="{{ $rule->item }}">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">
                                 <i class="fas fa-trash"></i>
@@ -200,10 +215,31 @@ body { font-family: 'Inter', sans-serif; }
         </div>
     </div>
 </div>
+
+<!-- Delete Rule Modal -->
+<div class="modal fade" id="deleteRuleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>{{ __('portal.pricing.delete_rule_title') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteRuleMessage" class="mb-0">{{ __('portal.pricing.delete_rule_confirm') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteRuleButton">{{ __('portal.pricing.delete_rule_submit') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
+let pendingDeleteRuleForm = null;
+
 function editRule(id, item, rate, unit, level, note, isActive) {
     document.getElementById('edit_item').value = item;
     document.getElementById('edit_rate').value = rate;
@@ -214,6 +250,21 @@ function editRule(id, item, rate, unit, level, note, isActive) {
     document.getElementById('editRuleForm').action = `/internal/pricing-rules/${id}`;
     new bootstrap.Modal(document.getElementById('editRuleModal')).show();
 }
+
+document.querySelectorAll('.js-delete-rule').forEach((form) => {
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        pendingDeleteRuleForm = form;
+        document.getElementById('deleteRuleMessage').textContent = @json(__('portal.pricing.delete_rule_confirm')) + ' (' + form.dataset.ruleItem + ')';
+        new bootstrap.Modal(document.getElementById('deleteRuleModal')).show();
+    });
+});
+
+document.getElementById('confirmDeleteRuleButton').addEventListener('click', function () {
+    if (pendingDeleteRuleForm) {
+        pendingDeleteRuleForm.submit();
+    }
+});
 </script>
 @endpush
 

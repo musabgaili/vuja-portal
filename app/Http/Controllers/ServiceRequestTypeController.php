@@ -44,11 +44,13 @@ class ServiceRequestTypeController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('service_request_types', 'name')],
             'description' => 'nullable|string',
             'icon' => 'required|string',
             'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'is_active' => 'boolean',
+        ], [
+            'name.unique' => 'A service type with this name already exists.',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -91,11 +93,13 @@ class ServiceRequestTypeController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('service_request_types', 'name')->ignore($serviceType->id)],
             'description' => 'nullable|string',
             'icon' => 'required|string',
             'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'is_active' => 'boolean',
+        ], [
+            'name.unique' => 'A service type with this name already exists.',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);

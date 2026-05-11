@@ -7,6 +7,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class PricingToolController extends Controller
 {
@@ -54,11 +55,20 @@ class PricingToolController extends Controller
         }
 
         $validated = $request->validate([
-            'item' => 'required|string|max:255',
+            'item' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('pricing_rules', 'item')->where(fn ($query) => $query
+                    ->where('level', $request->input('level'))
+                    ->where('unit', $request->input('unit'))),
+            ],
             'rate' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
             'level' => 'required|string|max:100',
             'note' => 'required|string',
+        ], [
+            'item.unique' => 'A pricing rule with this item, level, and unit already exists.',
         ]);
 
         PricingRule::create($validated);
@@ -78,12 +88,21 @@ class PricingToolController extends Controller
         }
 
         $validated = $request->validate([
-            'item' => 'required|string|max:255',
+            'item' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('pricing_rules', 'item')->ignore($rule->id)->where(fn ($query) => $query
+                    ->where('level', $request->input('level'))
+                    ->where('unit', $request->input('unit'))),
+            ],
             'rate' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
             'level' => 'required|string|max:100',
             'note' => 'required|string',
             'is_active' => 'boolean',
+        ], [
+            'item.unique' => 'A pricing rule with this item, level, and unit already exists.',
         ]);
 
         $rule->update($validated);

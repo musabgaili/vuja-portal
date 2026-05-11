@@ -60,8 +60,8 @@ class ProjectService
     {
         $query = Project::with(['client', 'projectPeople.user', 'milestones', 'tasks', 'projectManager', 'quotedBy']);
 
-        // If employee, show only projects they're assigned to
-        if ($user->isEmployee()) {
+        // Employees and global project managers should only see projects they are assigned to.
+        if ($user->isEmployee() || $user->isProjectManager()) {
             $query->whereHas('projectPeople', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
@@ -116,8 +116,8 @@ class ProjectService
             ];
         }
 
-        // For employees, only count projects they're assigned to
-        if ($user->isEmployee()) {
+        // Employees and global project managers only count projects they're assigned to.
+        if ($user->isEmployee() || $user->isProjectManager()) {
             return [
                 'total' => Project::whereHas('projectPeople', function ($q) use ($user) {
                     $q->where('user_id', $user->id);

@@ -238,8 +238,14 @@
         <i class="fas fa-edit"></i> {{ __('portal.projects_manager.show.edit_project') }}
     </button>
     @endif
+
+    @if($canEdit && !$project->isTerminal())
+    <button class="btn btn-outline-danger" onclick="showCloseProjectModal()">
+        <i class="fas fa-box-archive"></i> {{ __('portal.projects_manager.show.close_project') }}
+    </button>
+    @endif
     
-    @if($canManageMilestones)
+    @if($canManageMilestones && !$project->isCompleted())
     <button class="btn btn-success" onclick="showMilestoneModal()">
         <i class="fas fa-flag"></i> {{ __('portal.projects_manager.show.add_milestone') }}
     </button>
@@ -441,7 +447,12 @@
             </div>
         </div>
         @empty
-        <p class="text-muted text-center py-4">{{ __('portal.projects_manager.show.no_milestones_yet') }} <a href="#" onclick="showMilestoneModal(); return false;">{{ __('portal.projects_manager.show.create_first_milestone') }}</a></p>
+        <p class="text-muted text-center py-4">
+            {{ __('portal.projects_manager.show.no_milestones_yet') }}
+            @if($canManageMilestones && !$project->isCompleted())
+            <a href="#" onclick="showMilestoneModal(); return false;">{{ __('portal.projects_manager.show.create_first_milestone') }}</a>
+            @endif
+        </p>
         @endforelse
     </div>
 </div>
@@ -827,6 +838,7 @@ function switchTab(tab) {
 function showMilestoneModal(){new bootstrap.Modal(document.getElementById('milestoneModal')).show();}
 function showTaskModal(){new bootstrap.Modal(document.getElementById('taskModal')).show();}
 function showEditModal(){new bootstrap.Modal(document.getElementById('editModal')).show();}
+function showCloseProjectModal(){new bootstrap.Modal(document.getElementById('closeProjectModal')).show();}
 function showAddTeamModal(){new bootstrap.Modal(document.getElementById('addTeamModal')).show();}
 
 function markMilestoneCompleted(milestoneId) {

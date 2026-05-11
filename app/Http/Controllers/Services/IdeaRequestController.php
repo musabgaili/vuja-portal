@@ -292,7 +292,7 @@ class IdeaRequestController extends Controller
         return back()->with('success', $user->isManager() ? 'Quote sent to client!' : 'Quote uploaded! Waiting for manager approval.');
     }
 
-    public function approveQuote(IdeaRequest $idea)
+    public function approveQuote(Request $request, IdeaRequest $idea)
     {
         $user = Auth::user();
 
@@ -312,7 +312,7 @@ class IdeaRequestController extends Controller
             'is_internal' => true,
         ]);
 
-        return back()->with('success', 'Quote approved and sent to client!');
+        return $this->respondToManagerAction($request, 'Quote approved and sent to client!');
     }
 
     /**
@@ -334,11 +334,11 @@ class IdeaRequestController extends Controller
                 'payment_verified_at' => now(),
             ]);
 
-            return back()->with('success', 'Payment verified! Idea request approved.');
+            return $this->respondToManagerAction($request, 'Payment verified! Idea request approved.');
         } else {
             $idea->update(['status' => 'accepted']); // Back to accepted status
 
-            return back()->with('error', 'Payment rejected. Client needs to re-upload.');
+            return $this->respondToManagerAction($request, 'Payment rejected. Client needs to re-upload.', false, 422);
         }
     }
 
@@ -476,5 +476,17 @@ class IdeaRequestController extends Controller
         foreach ($recipients as $email) {
             Mail::to($email)->send($mailable);
         }
+    }
+
+    protected function respondToManagerAction(Request $request, string $message, bool $success = true, int $status = 200)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => $success,
+                'message' => $message,
+            ], $status);
+        }
+
+        return back()->with($success ? 'success' : 'error', $message);
     }
 }

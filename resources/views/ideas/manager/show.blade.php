@@ -104,7 +104,7 @@
                 </div>
                 <div class="card-content">
                     @if($idea->quote_status === 'pending_approval' && auth()->user()->isManager())
-                        <button class="btn btn-warning btn-block mb-2" onclick="approveQuote()"><i class="fas fa-check-circle"></i> {{ __('portal.ideas.manager.show.approve_quote') }}</button>
+                        <button id="approveQuoteButton" class="btn btn-warning btn-block mb-2" onclick="approveQuote()"><i class="fas fa-check-circle"></i> {{ __('portal.ideas.manager.show.approve_quote') }}</button>
                         <a href="{{ asset('storage/' . $idea->quote_file_path) }}" target="_blank" class="btn btn-secondary btn-block mb-2">
                             <i class="fas fa-file-pdf"></i> {{ __('portal.ideas.manager.show.view_quote_file') }}
                         </a>
@@ -115,7 +115,7 @@
                     @endif
                     
                     @if ($idea->isPaymentPending() && $idea->payment_file_path)
-                        <button class="btn btn-success btn-block mb-2" onclick="verifyPayment()"><i class="fas fa-check"></i> {{ __('portal.ideas.manager.show.verify_payment') }}</button>
+                        <button id="verifyPaymentButton" class="btn btn-success btn-block mb-2" onclick="verifyPayment()"><i class="fas fa-check"></i> {{ __('portal.ideas.manager.show.verify_payment') }}</button>
                     @endif
                     
                     @if (!$idea->assigned_to)
@@ -228,6 +228,7 @@
     <script>
         const approveQuoteConfirm = @json(__('portal.ideas.manager.show.approve_quote_confirm'));
         const verifyPaymentConfirm = @json(__('portal.ideas.manager.show.verify_payment_confirm'));
+        const managerActionError = @json(__('portal.projects_manager.show.error_marking_milestone'));
 
         function showQuoteModal() {
             new bootstrap.Modal(document.getElementById('quoteModal')).show();
@@ -241,26 +242,62 @@
             new bootstrap.Modal(document.getElementById('closeModal')).show();
         }
 
-        function approveQuote() {
-            if (confirm(approveQuoteConfirm)) {
-                fetch('{{ route('ideas.approve-quote', $idea) }}', {
+        async function submitManagerAction(url, confirmMessage, buttonId, payload = {}) {
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            const button = document.getElementById(buttonId);
+            const originalHtml = button ? button.innerHTML : '';
+
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>' + originalHtml;
+            }
+
+            try {
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                }).then(() => location.reload());
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || managerActionError);
+                }
+
+                if (buttonId === 'approveQuoteButton' && button) {
+                    button.classList.remove('btn-warning');
+                    button.classList.add('btn-success');
+                }
+
+                window.showAppToast(data.message, 'success');
+                window.setTimeout(() => location.reload(), 600);
+            } catch (error) {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                }
+
+                window.showAppToast(error.message || managerActionError, 'error');
             }
         }
 
+        function approveQuote() {
+            submitManagerAction('{{ route('ideas.approve-quote', $idea) }}', approveQuoteConfirm, 'approveQuoteButton');
+        }
+
         function verifyPayment() {
-            if (confirm(verifyPaymentConfirm)) {
-                fetch('{{ route('ideas.verify-payment', $idea) }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                }).then(() => location.reload());
-            }
+            submitManagerAction('{{ route('ideas.verify-payment', $idea) }}', verifyPaymentConfirm, 'verifyPaymentButton', {
+                action: 'approve'
+            });
         }
     </script>
 @endpush

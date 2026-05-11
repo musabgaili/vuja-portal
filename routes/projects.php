@@ -64,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kanban', [ProjectController::class, 'kanban'])->name('kanban');
         Route::get('/show/{project}', [ProjectController::class, 'managerShow'])->name('manager.show');
         Route::put('/update/{project}', [ProjectController::class, 'update'])->name('update');
+        Route::post('/{project}/close', [ProjectController::class, 'close'])->name('close');
         Route::post('/{project}/update-status', [ProjectController::class, 'updateStatus'])->name('update-status');
         Route::post('/{project}/comments', [ProjectController::class, 'addComment'])->name('add-comment');
 

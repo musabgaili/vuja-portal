@@ -321,10 +321,11 @@
 @push('scripts')
 <script>
 const rolesData = @json($roles);
+const updatePermissionsRouteTemplate = @json(url('/internal/permissions/roles/__ROLE__/update-permissions'));
 
 function editRolePermissions(roleId, roleName) {
     document.getElementById('roleName').textContent = roleName;
-    document.getElementById('editPermissionsForm').action = `/permissions/roles/${roleId}/update-permissions`;
+    document.getElementById('editPermissionsForm').action = updatePermissionsRouteTemplate.replace('__ROLE__', roleId);
     
     // Find role data
     const role = rolesData.find(r => r.id === roleId);

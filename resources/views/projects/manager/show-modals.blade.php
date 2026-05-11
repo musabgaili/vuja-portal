@@ -6,6 +6,16 @@
                 <h5>{{ __('portal.projects_manager.modals.add_milestone') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            @if($project->isCompleted())
+            <div class="modal-body">
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-lock me-1"></i> {{ __('portal.projects_manager.modals.milestones_locked_completed') }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
+            </div>
+            @else
             <form method="POST" action="{{ route('projects.milestones.store', $project) }}">
                 @csrf
                 <div class="modal-body">
@@ -28,6 +38,7 @@
                     </button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
 </div>
@@ -211,6 +222,11 @@
             <form method="POST" action="{{ route('projects.update', $project) }}">
                 @csrf @method('PUT')
                 <div class="modal-body">
+                    @if($project->isBudgetLocked())
+                    <div class="alert alert-warning">
+                        <i class="fas fa-lock me-1"></i> {{ __('portal.projects_manager.modals.budget_locked_notice') }}
+                    </div>
+                    @endif
                     <div class="form-group">
                         <label>{{ __('portal.projects_manager.modals.title') }} *</label>
                         <input type="text" name="title" class="form-control" value="{{ $project->title }}" required>
@@ -250,7 +266,10 @@
                     </div>
                     <div class="form-group">
                         <label>{{ __('portal.projects_manager.create.budget') }}</label>
-                        <input type="number" name="budget" class="form-control" value="{{ $project->budget }}" step="0.01">
+                        <input type="number" name="budget" class="form-control" value="{{ $project->budget }}" step="0.01" {{ $project->isBudgetLocked() ? 'disabled' : '' }}>
+                        @if($project->isBudgetLocked())
+                        <small class="text-muted">{{ __('portal.projects_manager.modals.budget_scope_change_hint') }}</small>
+                        @endif
                     </div>
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i> {{ __('portal.projects_manager.modals.progress_auto_calculated') }}
@@ -274,6 +293,47 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> {{ __('portal.projects_manager.modals.update_project') }}
                     </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Close Project Modal -->
+<div class="modal fade" id="closeProjectModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>{{ __('portal.projects_manager.show.close_project') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ route('projects.close', $project) }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-circle-info me-1"></i> {{ __('portal.projects_manager.show.close_project_help') }}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ __('portal.projects_manager.show.close_project_status') }}</label>
+                        <select name="status" class="form-control" required>
+                            <option value="completed">{{ __('portal.projects_manager.status.completed') }}</option>
+                            <option value="cancelled">{{ __('portal.projects_manager.status.cancelled') }}</option>
+                            <option value="lost">{{ __('portal.projects_manager.status.lost') }}</option>
+                        </select>
+                    </div>
+                    @if($project->hasPendingScopeChanges())
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-triangle-exclamation me-1"></i> {{ __('portal.projects_manager.show.close_project_blocked_scope_changes') }}
+                    </div>
+                    @elseif($project->hasIncompleteMilestones() || $project->hasOpenTasks())
+                    <div class="alert alert-secondary mb-0">
+                        <i class="fas fa-list-check me-1"></i> {{ __('portal.projects_manager.show.close_project_completed_requires_work') }}
+                    </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ __('portal.projects_manager.show.close_project_submit') }}</button>
                 </div>
             </form>
         </div>

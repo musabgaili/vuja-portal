@@ -135,6 +135,10 @@
                         <i class="fas fa-user-friends"></i>
                         {{ __('portal.permissions.portal_clients_nav') }}
                     </a>
+                    <a href="{{ route('reports.financial') }}" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        {{ __('portal.internal.financial_reports') }}
+                    </a>
                 </div>
                 @endif
 

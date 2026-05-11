@@ -156,21 +156,28 @@ class Project extends Model
     /**
      * Check if user can fully edit the project (PM or Manager or user with can_edit=true)
      */
+    public function hasAssignedManagementAccess(User $user): bool
+    {
+        if (! $user->isInternal()) {
+            return false;
+        }
+
+        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
+
+        if ($projectPerson?->can_edit) {
+            return true;
+        }
+
+        if ($projectPerson && in_array($projectPerson->role, ['project_manager', 'account_manager'], true)) {
+            return true;
+        }
+
+        return $this->project_manager_id === $user->id || $this->account_manager_id === $user->id;
+    }
+
     public function canUserEdit(User $user): bool
     {
-        // Super Admin / Manager can edit any project
-        if ($user->isManager()) {
-            return true;
-        }
-
-        // Check if user has can_edit permission in this project
-        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
-        if ($projectPerson && $projectPerson->can_edit) {
-            return true;
-        }
-
-        // Project Manager can edit (legacy check)
-        return $this->isUserProjectManager($user);
+        return $this->hasAssignedManagementAccess($user);
     }
 
     /**
@@ -186,24 +193,7 @@ class Project extends Model
      */
     public function canUserManageTeam(User $user): bool
     {
-        // Super Admin / Manager can manage team
-        if ($user->isManager()) {
-            return true;
-        }
-
-        // Check if user has can_edit permission in this project
-        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
-        if ($projectPerson && $projectPerson->can_edit) {
-            return true;
-        }
-
-        // Project Manager can manage team
-        if ($this->isUserProjectManager($user)) {
-            return true;
-        }
-
-        // Account Manager can manage team
-        return $this->isUserAccountManager($user);
+        return $this->hasAssignedManagementAccess($user);
     }
 
     /**
@@ -211,19 +201,7 @@ class Project extends Model
      */
     public function canUserManageMilestones(User $user): bool
     {
-        // Super Admin / Manager can manage milestones
-        if ($user->isManager()) {
-            return true;
-        }
-
-        // Check if user has can_edit permission in this project
-        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
-        if ($projectPerson && $projectPerson->can_edit) {
-            return true;
-        }
-
-        // Project Manager can manage milestones
-        return $this->isUserProjectManager($user);
+        return $this->hasAssignedManagementAccess($user);
     }
 
     /**
@@ -231,19 +209,7 @@ class Project extends Model
      */
     public function canUserManageTasks(User $user): bool
     {
-        // Super Admin / Manager can manage tasks
-        if ($user->isManager()) {
-            return true;
-        }
-
-        // Check if user has can_edit permission in this project
-        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
-        if ($projectPerson && $projectPerson->can_edit) {
-            return true;
-        }
-
-        // Project Manager can manage tasks
-        return $this->isUserProjectManager($user);
+        return $this->hasAssignedManagementAccess($user);
     }
 
     /**
@@ -286,19 +252,7 @@ class Project extends Model
      */
     public function canUserUpdateTask(User $user, ProjectTask $task): bool
     {
-        // Super Admin / Manager can update any task
-        if ($user->isManager()) {
-            return true;
-        }
-
-        // Check if user has can_edit permission in this project
-        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
-        if ($projectPerson && $projectPerson->can_edit) {
-            return true;
-        }
-
-        // Project Manager can update any task
-        if ($this->isUserProjectManager($user)) {
+        if ($this->hasAssignedManagementAccess($user)) {
             return true;
         }
 
@@ -311,19 +265,32 @@ class Project extends Model
      */
     public function canUserManageExpenses(User $user): bool
     {
-        // Super Admin / Manager can manage expenses
-        if ($user->isManager()) {
-            return true;
-        }
+        return $this->hasAssignedManagementAccess($user);
+    }
 
-        // Check if user has can_edit permission in this project
-        $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
-        if ($projectPerson && $projectPerson->can_edit) {
-            return true;
-        }
+    public function isBudgetLocked(): bool
+    {
+        return in_array($this->status, ['awarded', 'in_progress', 'paused', 'completed', 'lost', 'cancelled'], true);
+    }
 
-        // Project Manager can manage expenses
-        return $this->isUserProjectManager($user);
+    public function isTerminal(): bool
+    {
+        return in_array($this->status, ['completed', 'lost', 'cancelled'], true);
+    }
+
+    public function hasPendingScopeChanges(): bool
+    {
+        return $this->scopeChanges()->where('status', 'pending')->exists();
+    }
+
+    public function hasIncompleteMilestones(): bool
+    {
+        return $this->milestones()->where('status', '!=', 'completed')->exists();
+    }
+
+    public function hasOpenTasks(): bool
+    {
+        return $this->tasks()->where('status', '!=', 'completed')->exists();
     }
 
     /**

@@ -263,6 +263,12 @@ class ProjectController extends Controller
             'end_date' => 'nullable|date',
         ]);
 
+        if ($project->isBudgetLocked() && array_key_exists('budget', $validated) && (float) ($validated['budget'] ?? 0) !== (float) ($project->budget ?? 0)) {
+            return back()->withErrors([
+                'error' => 'Budget is locked after approval. Use a scope change request to adjust the commercial terms.',
+            ]);
+        }
+
         // Handle client change in project_people table
         $oldClientId = $project->client_id;
         $newClientId = $validated['client_id'] ?? null;
@@ -291,6 +297,37 @@ class ProjectController extends Controller
         $project->update($validated);
 
         return back()->with('success', 'Project updated successfully!');
+    }
+
+    public function close(Request $request, Project $project)
+    {
+        $user = Auth::user();
+
+        $this->authorize('update', $project);
+
+        $validated = $request->validate([
+            'status' => 'required|in:completed,cancelled,lost',
+        ]);
+
+        if ($project->hasPendingScopeChanges()) {
+            return back()->withErrors([
+                'error' => 'Resolve pending scope change requests before closing this project.',
+            ]);
+        }
+
+        if ($validated['status'] === 'completed' && ($project->hasIncompleteMilestones() || $project->hasOpenTasks())) {
+            return back()->withErrors([
+                'error' => 'Complete all milestones and tasks before marking this project as completed.',
+            ]);
+        }
+
+        $project->update([
+            'status' => $validated['status'],
+            'actual_end_date' => now(),
+            'completion_percentage' => $validated['status'] === 'completed' ? 100 : $project->completion_percentage,
+        ]);
+
+        return back()->with('success', 'Project closed successfully.');
     }
 
     public function destroy(Project $project)

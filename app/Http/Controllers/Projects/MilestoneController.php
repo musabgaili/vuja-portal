@@ -17,6 +17,12 @@ class MilestoneController extends Controller
 
         $this->authorize('manageMilestones', $project);
 
+        if ($project->isCompleted()) {
+            return back()->withErrors([
+                'error' => 'Completed projects cannot receive new milestones.',
+            ]);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',

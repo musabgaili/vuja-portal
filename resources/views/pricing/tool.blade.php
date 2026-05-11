@@ -61,9 +61,11 @@ body { font-family: 'Inter', sans-serif; }
             <i class="fas fa-calculator"></i> {{ __('portal.pricing.internal_tool_heading') }}
         </h1>
         <p class="opacity-90">{{ __('portal.pricing.internal_tool_subtitle') }}</p>
+        @if(auth()->user()->isManager())
         <a href="{{ route('pricing.admin') }}" class="btn btn-light btn-sm mt-3" style="background: white; color: #1C575F; border: 1px solid #1C575F;">
             <i class="fas fa-cogs"></i> {{ __('portal.pricing.pricing_admin') }}
         </a>
+        @endif
     </div>
 </div>
 

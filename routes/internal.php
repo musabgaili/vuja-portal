@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinancialReportController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ServiceRequestTypeController;
 use App\Http\Controllers\Services\ConsultationRequestController;
@@ -101,6 +102,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::post('/pricing-rules', [\App\Http\Controllers\PricingToolController::class, 'store'])->name('pricing.store');
         Route::put('/pricing-rules/{rule}', [\App\Http\Controllers\PricingToolController::class, 'update'])->name('pricing.update');
         Route::delete('/pricing-rules/{rule}', [\App\Http\Controllers\PricingToolController::class, 'destroy'])->name('pricing.destroy');
+        Route::get('/reports/financial', [FinancialReportController::class, 'index'])->name('reports.financial');
 
         // Projects moved to routes/projects.php
 
