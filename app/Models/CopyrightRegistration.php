@@ -107,14 +107,14 @@ class CopyrightRegistration extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'submitted' => 'Submitted',
-            'meeting_booked' => 'Meeting Booked',
-            'meeting_confirmed' => 'Meeting Confirmed',
-            'filing' => 'Filing',
-            'registered' => 'Registered',
-            'completed' => 'Completed',
-            'cancelled' => 'Cancelled',
-            default => ucfirst($this->status)
+            'submitted' => __('portal.copyright.status_submitted'),
+            'meeting_booked' => __('portal.copyright.status_meeting_booked'),
+            'meeting_confirmed' => __('portal.copyright.status_meeting_confirmed'),
+            'filing' => __('portal.copyright.status_filing'),
+            'registered' => __('portal.copyright.status_registered'),
+            'completed' => __('portal.copyright.status_completed'),
+            'cancelled' => __('portal.copyright.status_cancelled'),
+            default => str_replace('_', ' ', $this->status)
         };
     }
 }

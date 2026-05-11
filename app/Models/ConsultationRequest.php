@@ -99,14 +99,14 @@ class ConsultationRequest extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'submitted' => 'Submitted',
-            'filtered' => 'Filtered',
-            'assigned' => 'Assigned',
-            'meeting_scheduled' => 'Meeting Scheduled',
-            'meeting_sent' => 'Meeting Invitation Sent',
-            'completed' => 'Completed',
-            'cancelled' => 'Cancelled',
-            default => ucfirst($this->status)
+            'submitted' => __('portal.consultations.status.submitted'),
+            'filtered' => __('portal.consultations.status.filtered'),
+            'assigned' => __('portal.consultations.status.assigned'),
+            'meeting_scheduled' => __('portal.consultations.status.meeting_scheduled'),
+            'meeting_sent' => __('portal.consultations.status.meeting_sent'),
+            'completed' => __('portal.consultations.status.completed'),
+            'cancelled' => __('portal.consultations.status.cancelled'),
+            default => str_replace('_', ' ', $this->status)
         };
     }
 }

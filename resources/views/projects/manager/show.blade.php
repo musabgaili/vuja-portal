@@ -842,14 +842,15 @@ function markMilestoneCompleted(milestoneId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            window.showAppToast(data.message, 'success');
+            window.setTimeout(() => location.reload(), 500);
         } else {
-            alert(data.message || @js(__('portal.projects_manager.show.error_marking_milestone')));
+            window.showAppToast(data.message || @js(__('portal.projects_manager.show.error_marking_milestone')), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert(@js(__('portal.projects_manager.show.error_marking_milestone')));
+        window.showAppToast(@js(__('portal.projects_manager.show.error_marking_milestone')), 'error');
     });
 }
 

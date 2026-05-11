@@ -7,6 +7,7 @@ use App\Models\ConsultationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ConsultationRequestController extends Controller
 {
@@ -154,7 +155,16 @@ class ConsultationRequestController extends Controller
             return back()->with('success', 'Meeting scheduled and invitation sent to client!');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            Log::error('Consultation meeting invitation failed.', [
+                'consultation_id' => $consultation->id,
+                'time_slot_id' => $timeSlot->id,
+                'assigned_to' => $consultation->assigned_to,
+                'exception' => $e,
+            ]);
+
+            return back()->withErrors([
+                'error' => 'We could not schedule the consultation meeting right now. Please try again.',
+            ]);
         }
     }
 

@@ -108,15 +108,15 @@ class ResearchRequest extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'submitted' => 'Submitted',
-            'nda_pending' => 'NDA Pending',
-            'nda_signed' => 'NDA Signed',
-            'details_provided' => 'Details Provided',
-            'meeting_scheduled' => 'Meeting Scheduled',
-            'in_progress' => 'In Progress',
-            'completed' => 'Completed',
-            'cancelled' => 'Cancelled',
-            default => ucfirst($this->status)
+            'submitted' => __('portal.research.status.submitted'),
+            'nda_pending' => __('portal.research.status.nda_pending'),
+            'nda_signed' => __('portal.research.status.nda_signed'),
+            'details_provided' => __('portal.research.status.details_provided'),
+            'meeting_scheduled' => __('portal.research.status.meeting_scheduled'),
+            'in_progress' => __('portal.research.status.in_progress'),
+            'completed' => __('portal.research.status.completed'),
+            'cancelled' => __('portal.research.status.cancelled'),
+            default => str_replace('_', ' ', $this->status)
         };
     }
 }

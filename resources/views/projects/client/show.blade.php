@@ -5,12 +5,12 @@
 <style>
 /* Modern Client Project View */
 .client-project-header {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     color: white;
     padding: 2.5rem;
     border-radius: 16px;
     margin-bottom: 2rem;
-    box-shadow: 0 20px 60px rgba(79, 172, 254, 0.3);
+    box-shadow: 0 20px 60px rgba(28, 87, 95, 0.25);
 }
 .client-project-header h1 {
     font-size: 2.5rem;
@@ -50,18 +50,18 @@
     color: #2d3748;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 3px solid #4facfe;
+    border-bottom: 3px solid #10b981;
 }
 .milestone-card-client {
     background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-    border-left: 5px solid #4facfe;
+    border-left: 5px solid #10b981;
     padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
     transition: all 0.3s;
 }
 .milestone-card-client:hover {
-    box-shadow: 0 4px 16px rgba(79, 172, 254, 0.2);
+    box-shadow: 0 4px 16px rgba(28, 87, 95, 0.12);
     transform: translateX(5px);
 }
 .team-member-card {
@@ -76,25 +76,25 @@
     transition: all 0.3s;
 }
 .team-member-card:hover {
-    border-color: #4facfe;
-    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);
+    border-color: #10b981;
+    box-shadow: 0 4px 12px rgba(28, 87, 95, 0.12);
 }
 .team-avatar-large {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 700;
     font-size: 1.5rem;
-    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    box-shadow: 0 4px 12px rgba(28, 87, 95, 0.25);
 }
 .comment-modern {
     background: #f8fafc;
-    border-left: 4px solid #4facfe;
+    border-left: 4px solid #10b981;
     padding: 1.25rem;
     border-radius: 12px;
     margin-bottom: 1rem;
@@ -109,7 +109,7 @@
     background: #fffbeb;
 }
 .action-btn-client {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -119,11 +119,11 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    box-shadow: 0 4px 12px rgba(28, 87, 95, 0.22);
 }
 .action-btn-client:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+    box-shadow: 0 8px 20px rgba(28, 87, 95, 0.3);
 }
 .stats-modern {
     display: grid;
@@ -146,7 +146,7 @@
 .stat-modern-value {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -165,9 +165,9 @@
 }
 .progress-modern-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(90deg, #10b981 0%, #1C575F 100%);
     transition: width 0.5s ease;
-    box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+    box-shadow: 0 0 10px rgba(28, 87, 95, 0.28);
 }
 </style>
 
@@ -272,7 +272,7 @@
             </div>
             <div class="d-flex gap-2 align-items-start flex-wrap">
                 <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">
-                    {{ ucfirst($milestone->status) }}
+                    {{ $milestone->getStatusLabel() }}
                 </span>
                 
                 @php
@@ -410,15 +410,15 @@
                             <strong style="color: #1e293b; font-size: 1.05rem;">{{ $comment->user->name }}</strong>
                             @if($comment->is_internal)
                             <span class="badge bg-warning" style="font-size: 0.75rem;">
-                                <i class="fas fa-shield-alt"></i> VujaDe Team
+                                <i class="fas fa-shield-alt"></i> {{ __('portal.projects_client.show.vujade_team') }}
                             </span>
                             @else
-                            <span class="badge bg-info" style="font-size: 0.75rem;">
-                                <i class="fas fa-user"></i> Client
+                            <span class="badge" style="font-size: 0.75rem; background: #1C575F;">
+                                <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                             </span>
                             @endif
                             @if($comment->user_id === auth()->id())
-                            <span class="badge bg-success" style="font-size: 0.75rem;">You</span>
+                            <span class="badge bg-success" style="font-size: 0.75rem;">{{ __('portal.projects_client.show.you') }}</span>
                             @endif
                         </div>
                         <small style="color: #94a3b8;">
@@ -468,7 +468,7 @@
             </div>
             <div class="ms-3">
                 <a href="{{ route('projects.client.documents.download', $doc) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-download"></i> Download
+                    <i class="fas fa-download"></i> {{ __('portal.projects_client.show.download') }}
                 </a>
             </div>
         </div>
@@ -501,7 +501,7 @@
                             <i class="fas fa-star"></i> {{ __('portal.projects_client.show.project_manager') }}
                         </span>
                         @elseif($person->role === 'client')
-                        <span class="badge bg-info" style="font-size: 0.85rem;">
+                        <span class="badge" style="font-size: 0.85rem; background: #1C575F;">
                             <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                         </span>
                         @else
@@ -534,7 +534,7 @@
                 <small style="color: #94a3b8;">{{ __('portal.projects_client.show.submitted') }}: {{ $change->created_at->format('M d, Y') }}</small>
             </div>
             <span class="status-badge {{ $change->getStatusBadgeColor() }}">
-                {{ ucfirst($change->status) }}
+                {{ $change->getStatusLabel() }}
             </span>
         </div>
         @if($change->review_notes)
@@ -552,7 +552,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" id="approveModalHeader">
-                <h5 id="approveModalTitle"><i class="fas fa-check-circle"></i> Review Milestone</h5>
+                <h5 id="approveModalTitle"><i class="fas fa-check-circle"></i> {{ __('portal.projects_client.show.review_milestone') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="approveMilestoneForm">
@@ -660,7 +660,7 @@
 <div class="modal fade" id="requestModal">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
+            <div class="modal-header text-white" style="background: #1C575F;">
     <h5><i class="fas fa-hand-paper"></i> {{ __('portal.projects_client.show.submit_request') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -680,7 +680,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-info">
+                    <button type="submit" class="btn text-white" style="background: #1C575F; border-color: #1C575F;">
                         <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.submit_request') }}
                     </button>
                 </div>

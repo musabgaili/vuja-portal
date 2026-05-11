@@ -73,6 +73,17 @@ class ProjectMilestone extends Model
         };
     }
 
+    public function getStatusLabel(): string
+    {
+        return match ($this->status) {
+            'pending' => __('portal.projects.milestone_status.pending'),
+            'in_progress' => __('portal.projects.milestone_status.in_progress'),
+            'completed' => __('portal.projects.milestone_status.completed'),
+            'cancelled' => __('portal.projects.milestone_status.cancelled'),
+            default => str_replace('_', ' ', $this->status)
+        };
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

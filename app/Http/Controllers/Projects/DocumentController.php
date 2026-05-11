@@ -51,7 +51,7 @@ class DocumentController extends Controller
             'file_size' => $file->getSize(),
         ]);
 
-        return back()->with('success', 'Document uploaded successfully!');
+        return $this->respond($request, 'Document uploaded successfully!');
     }
 
     public function update(Request $request, ProjectDocument $document)
@@ -78,7 +78,7 @@ class DocumentController extends Controller
 
         $document->update($validated);
 
-        return back()->with('success', 'Document updated successfully!');
+        return $this->respond($request, 'Document updated successfully!');
     }
 
     public function download(ProjectDocument $document)
@@ -90,7 +90,7 @@ class DocumentController extends Controller
         return Storage::disk('private')->download($document->file_path, $document->title.'.'.$document->file_type);
     }
 
-    public function destroy(ProjectDocument $document)
+    public function destroy(Request $request, ProjectDocument $document)
     {
         $user = Auth::user();
 
@@ -99,6 +99,18 @@ class DocumentController extends Controller
         Storage::disk('private')->delete($document->file_path);
         $document->delete();
 
-        return back()->with('success', 'Document deleted successfully!');
+        return $this->respond($request, 'Document deleted successfully!');
+    }
+
+    protected function respond(Request $request, string $message)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 }

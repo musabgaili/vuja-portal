@@ -61,6 +61,16 @@ class ProjectScopeChange extends Model
         };
     }
 
+    public function getStatusLabel(): string
+    {
+        return match ($this->status) {
+            'pending' => __('portal.projects.scope_change_status.pending'),
+            'approved' => __('portal.projects.scope_change_status.approved'),
+            'rejected' => __('portal.projects.scope_change_status.rejected'),
+            default => str_replace('_', ' ', $this->status)
+        };
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

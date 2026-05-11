@@ -366,6 +366,11 @@ function updateEmptyStates() {
 }
 
 function showToast(message, type = 'success') {
+    if (typeof window.showAppToast === 'function') {
+        window.showAppToast(message, type);
+        return;
+    }
+
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed;

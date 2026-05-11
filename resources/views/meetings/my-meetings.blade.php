@@ -63,7 +63,7 @@
                     <td>{{ $meeting->duration_minutes }} {{ __('portal.meetings.min') }}</td>
                     <td>
                         <span class="status-badge {{ $meeting->getStatusBadgeColor() }}">
-                            {{ ucfirst($meeting->status) }}
+                            {{ $meeting->getStatusLabel() }}
                         </span>
                         @if($meeting->meeting_link)
                         <br><a href="{{ $meeting->meeting_link }}" target="_blank" class="btn btn-sm btn-primary mt-1">

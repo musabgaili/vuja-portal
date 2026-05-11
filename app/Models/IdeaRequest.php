@@ -149,18 +149,18 @@ class IdeaRequest extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'draft' => 'Draft',
-            'submitted' => 'Submitted',
-            'ai_assessment' => 'AI Assessment',
-            'negotiation' => 'In Negotiation',
-            'quoted' => 'Quoted',
-            'accepted' => 'Accepted',
-            'rejected' => 'Rejected',
-            'payment_pending' => 'Payment Pending',
-            'approved' => 'Approved',
-            'in_progress' => 'In Progress',
-            'completed' => 'Completed',
-            default => ucfirst($this->status)
+            'draft' => __('portal.ideas.status.draft'),
+            'submitted' => __('portal.ideas.status.submitted'),
+            'ai_assessment' => __('portal.ideas.status.ai_assessment'),
+            'negotiation' => __('portal.ideas.status.negotiation'),
+            'quoted' => __('portal.ideas.status.quoted'),
+            'accepted' => __('portal.ideas.status.accepted'),
+            'rejected' => __('portal.ideas.status.rejected'),
+            'payment_pending' => __('portal.ideas.status.payment_pending'),
+            'approved' => __('portal.ideas.status.approved'),
+            'in_progress' => __('portal.ideas.status.in_progress'),
+            'completed' => __('portal.ideas.status.completed'),
+            default => str_replace('_', ' ', $this->status)
         };
     }
 }

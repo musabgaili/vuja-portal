@@ -407,7 +407,17 @@ class Project extends Model
 
     public function getStatusLabel(): string
     {
-        return ucfirst(str_replace('_', ' ', $this->status));
+        return match ($this->status) {
+            'planning' => __('portal.projects.status.planning'),
+            'quoted' => __('portal.projects.status.quoted'),
+            'awarded' => __('portal.projects.status.awarded'),
+            'in_progress' => __('portal.projects.status.in_progress'),
+            'paused' => __('portal.projects.status.paused'),
+            'completed' => __('portal.projects.status.completed'),
+            'lost' => __('portal.projects.status.lost'),
+            'cancelled' => __('portal.projects.status.cancelled'),
+            default => str_replace('_', ' ', $this->status)
+        };
     }
 
     public function getBudgetRemaining()

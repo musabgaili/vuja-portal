@@ -87,6 +87,17 @@ class Meeting extends Model
         };
     }
 
+    public function getStatusLabel(): string
+    {
+        return match ($this->status) {
+            'scheduled' => __('portal.meetings.status.scheduled'),
+            'confirmed' => __('portal.meetings.status.confirmed'),
+            'completed' => __('portal.meetings.status.completed'),
+            'cancelled' => __('portal.meetings.status.cancelled'),
+            default => str_replace('_', ' ', $this->status)
+        };
+    }
+
     public function getEndTime()
     {
         return $this->scheduled_at->addMinutes($this->duration_minutes);

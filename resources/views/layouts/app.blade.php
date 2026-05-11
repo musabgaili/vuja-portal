@@ -79,6 +79,51 @@
             @yield('content')
         </main>
     </div>
+    <script>
+    window.showAppToast = function(message, type = 'info') {
+        if (!message) {
+            return;
+        }
+
+        let container = document.querySelector('.app-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container position-fixed top-0 end-0 p-3 app-toast-container';
+            container.style.zIndex = '1080';
+            document.body.appendChild(container);
+        }
+
+        const classMap = {
+            success: 'text-bg-success',
+            error: 'text-bg-danger',
+            warning: 'text-bg-warning',
+            info: 'text-bg-info',
+        };
+
+        const toastEl = document.createElement('div');
+        toastEl.className = `toast align-items-center border-0 mb-2 ${classMap[type] || classMap.info}`;
+        toastEl.setAttribute('role', 'alert');
+        toastEl.setAttribute('aria-live', 'assertive');
+        toastEl.setAttribute('aria-atomic', 'true');
+        toastEl.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close ${type === 'warning' ? '' : 'btn-close-white'} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        container.appendChild(toastEl);
+
+        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+            toast.show();
+            return;
+        }
+
+        window.setTimeout(() => toastEl.remove(), 4000);
+    };
+    </script>
     <x-toast />
 </body>
 </html>

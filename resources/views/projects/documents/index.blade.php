@@ -201,6 +201,24 @@
             </div>
         </div>
 
+        <div id="pageFeedback" class="mb-3">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
+                </div>
+            @endif
+
+            @if(session('error') || $errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') ?? $errors->first() }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
+                </div>
+            @endif
+        </div>
+
+        <div id="embeddedToastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;"></div>
+
         @forelse($documents as $doc)
         <div class="doc-card">
             <div class="d-flex justify-content-between align-items-start">
@@ -231,7 +249,7 @@
                     <button class="btn btn-outline-warning btn-icon" onclick="editDocument(@js($doc->getRouteKey()), @js($doc->title), @js($doc->tag), @js($doc->comment))" title="{{ __('portal.projects_documents.edit_title') }}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('projects.documents.destroy', $doc) }}" style="display: inline;" onsubmit="return confirm(@json(__('portal.projects_documents.delete_confirm')))">
+                    <form method="POST" action="{{ route('projects.documents.destroy', $doc) }}" class="js-document-delete" style="display: inline;" data-confirm="{{ __('portal.projects_documents.delete_confirm') }}">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-outline-danger btn-icon" title="{{ __('portal.projects_documents.delete_title') }}">
                             <i class="fas fa-trash"></i>
@@ -261,9 +279,10 @@
                     <h5><i class="fas fa-upload"></i> {{ __('portal.projects_documents.upload_modal_title') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="{{ route('projects.client.documents.store', $project) }}" enctype="multipart/form-data">
+                <form method="POST" id="uploadForm" action="{{ route('projects.client.documents.store', $project) }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
+                        <div id="uploadFormErrors" class="alert alert-danger d-none" role="alert"></div>
                         <div class="mb-3">
                             <label class="form-label">{{ __('portal.projects_documents.label_title') }} *</label>
                             <input type="text" name="title" class="form-control" required>
@@ -309,6 +328,7 @@
                 <form method="POST" id="editForm" enctype="multipart/form-data">
                     @csrf @method('PUT')
                     <div class="modal-body">
+                        <div id="editFormErrors" class="alert alert-danger d-none" role="alert"></div>
                         <div class="mb-3">
                             <label class="form-label">{{ __('portal.projects_documents.label_title') }} *</label>
                             <input type="text" name="title" id="edit_title" class="form-control" required>
@@ -343,8 +363,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const uploadModalEl = document.getElementById('uploadModal');
+        const editModalEl = document.getElementById('editModal');
+        const pageFeedbackEl = document.getElementById('pageFeedback');
+        const embeddedToastContainer = document.getElementById('embeddedToastContainer');
+
         function showUploadModal() {
-            new bootstrap.Modal(document.getElementById('uploadModal')).show();
+            bootstrap.Modal.getOrCreateInstance(uploadModalEl).show();
         }
 
         function editDocument(id, title, tag, comment) {
@@ -352,8 +377,197 @@
             document.getElementById('edit_tag').value = tag;
             document.getElementById('edit_comment').value = comment || '';
             document.getElementById('editForm').action = `/internal/projects/documents/${id}`;
-            new bootstrap.Modal(document.getElementById('editModal')).show();
+            clearFormErrors(document.getElementById('editFormErrors'));
+            bootstrap.Modal.getOrCreateInstance(editModalEl).show();
         }
+
+        function clearFormErrors(container) {
+            container.classList.add('d-none');
+            container.innerHTML = '';
+        }
+
+        function renderFormErrors(container, messages) {
+            const items = messages.map((message) => `<li>${message}</li>`).join('');
+            container.innerHTML = `<ul class="mb-0 ps-3">${items}</ul>`;
+            container.classList.remove('d-none');
+        }
+
+        function showPageFeedback(message, type = 'success') {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            pageFeedbackEl.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
+                </div>
+            `;
+        }
+
+        function showEmbeddedToast(message, type = 'success') {
+            if (window.parent && window.parent !== window && typeof window.parent.showAppToast === 'function') {
+                window.parent.showAppToast(message, type);
+            }
+
+            const className = type === 'success'
+                ? 'text-bg-success'
+                : type === 'warning'
+                    ? 'text-bg-warning'
+                    : 'text-bg-danger';
+
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center ${className} border-0 mb-2`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{{ __('Close') }}"></button>
+                </div>
+            `;
+
+            embeddedToastContainer.appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+            toast.show();
+        }
+
+        async function submitDocumentForm(form, options = {}) {
+            const {
+                errorContainer,
+                modalEl,
+                resetForm = false
+            } = options;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton ? submitButton.innerHTML : null;
+
+            if (errorContainer) {
+                clearFormErrors(errorContainer);
+            }
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>${originalText}`;
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new FormData(form)
+                });
+
+                const payload = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    if (response.status === 422 && errorContainer) {
+                        const messages = Object.values(payload.errors || {}).flat();
+                        const errorMessages = messages.length ? messages : [payload.message || 'Please review the form and try again.'];
+                        renderFormErrors(errorContainer, errorMessages);
+                        showEmbeddedToast(errorMessages[0], 'error');
+                        return;
+                    }
+
+                    throw new Error(payload.message || 'Request failed.');
+                }
+
+                showPageFeedback(payload.message, 'success');
+                showEmbeddedToast(payload.message, 'success');
+
+                if (modalEl) {
+                    bootstrap.Modal.getInstance(modalEl)?.hide();
+                }
+
+                if (resetForm) {
+                    form.reset();
+                }
+
+                window.setTimeout(() => {
+                    window.location.reload();
+                }, 600);
+            } catch (error) {
+                const message = error.message || 'Request failed.';
+
+                if (errorContainer) {
+                    renderFormErrors(errorContainer, [message]);
+                } else {
+                    showPageFeedback(message, 'error');
+                }
+
+                showEmbeddedToast(message, 'error');
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            submitDocumentForm(this, {
+                errorContainer: document.getElementById('uploadFormErrors'),
+                modalEl: uploadModalEl,
+                resetForm: true
+            });
+        });
+
+        document.getElementById('editForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            submitDocumentForm(this, {
+                errorContainer: document.getElementById('editFormErrors'),
+                modalEl: editModalEl
+            });
+        });
+
+        document.querySelectorAll('.js-document-delete').forEach((form) => {
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                if (!confirm(form.dataset.confirm)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new FormData(form)
+                    });
+
+                    const payload = await response.json().catch(() => ({}));
+
+                    if (!response.ok) {
+                        throw new Error(payload.message || 'Request failed.');
+                    }
+
+                    showPageFeedback(payload.message, 'success');
+                    showEmbeddedToast(payload.message, 'success');
+
+                    window.setTimeout(() => {
+                        window.location.reload();
+                    }, 400);
+                } catch (error) {
+                    const message = error.message || 'Request failed.';
+                    showPageFeedback(message, 'error');
+                    showEmbeddedToast(message, 'error');
+                }
+            });
+        });
+
+        uploadModalEl.addEventListener('hidden.bs.modal', () => {
+            document.getElementById('uploadForm').reset();
+            clearFormErrors(document.getElementById('uploadFormErrors'));
+        });
+
+        editModalEl.addEventListener('hidden.bs.modal', () => {
+            clearFormErrors(document.getElementById('editFormErrors'));
+        });
     </script>
 </body>
 </html>

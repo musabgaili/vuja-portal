@@ -136,6 +136,11 @@ body { font-family: 'Inter', sans-serif; }
 <script>
 let cart = [];
 
+function normalizeQuantityValue(value) {
+    const parsed = Number.parseInt(String(value).trim(), 10);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+}
+
 function addToCart(id, item, rate, unit, level, note) {
     cart.push({
         id: id + '_' + Date.now(),
@@ -149,9 +154,43 @@ function addToCart(id, item, rate, unit, level, note) {
     updateCart();
 }
 
-function updateQuantity(index, value) {
-    cart[index].quantity = Math.max(1, parseInt(value) || 1);
-    updateCart();
+function refreshCartTotals() {
+    const totalEl = document.getElementById('grandTotal');
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        const lineTotal = item.rate * item.quantity;
+        total += lineTotal;
+
+        const lineTotalEl = document.querySelector(`[data-line-total="${index}"]`);
+        if (lineTotalEl) {
+            lineTotalEl.textContent = '$' + lineTotal.toFixed(2);
+        }
+    });
+
+    totalEl.textContent = '$' + total.toFixed(2);
+}
+
+function syncQuantityInput(index, input) {
+    const normalized = normalizeQuantityValue(input.value);
+    cart[index].quantity = normalized;
+    input.value = normalized;
+    refreshCartTotals();
+}
+
+function sanitizeQuantityInput(index, input) {
+    syncQuantityInput(index, input);
+}
+
+function updateQuantity(index, value, input = null) {
+    const normalized = normalizeQuantityValue(value);
+    cart[index].quantity = normalized;
+
+    if (input) {
+        input.value = normalized;
+    }
+
+    refreshCartTotals();
 }
 
 function removeFromCart(index) {
@@ -177,11 +216,12 @@ function updateCart() {
     let total = 0;
     
     cart.forEach((item, index) => {
+        item.quantity = normalizeQuantityValue(item.quantity);
         const lineTotal = item.rate * item.quantity;
         total += lineTotal;
         
         html += `
-            <div class="cart-item">
+            <div class="cart-item" data-cart-index="${index}">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <div style="flex: 1;">
                         <strong style="color: #1e293b; font-size: 0.9rem;">${item.item}</strong>
@@ -195,14 +235,18 @@ function updateCart() {
                     <input type="number" 
                         value="${item.quantity}" 
                         min="1" 
-                        onchange="updateQuantity(${index}, this.value)"
+                        step="1"
+                        inputmode="numeric"
+                        oninput="sanitizeQuantityInput(${index}, this)"
+                        onchange="updateQuantity(${index}, this.value, this)"
+                        onblur="updateQuantity(${index}, this.value, this)"
                         class="form-control form-control-sm" 
                         style="width: 60px; height: 28px; font-size: 0.8rem;">
                     <small class="text-muted" style="font-size: 0.75rem;">${item.unit} × $${item.rate.toFixed(2)}</small>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted" style="font-size: 0.7rem;">${item.note}</small>
-                    <strong class="text-success" style="font-size: 0.9rem;">$${lineTotal.toFixed(2)}</strong>
+                    <strong class="text-success" style="font-size: 0.9rem;" data-line-total="${index}">$${lineTotal.toFixed(2)}</strong>
                 </div>
             </div>
         `;

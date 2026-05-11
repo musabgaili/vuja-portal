@@ -11,6 +11,7 @@ use App\Services\ServiceRequests\MeetingService;
 use App\Services\ServiceRequests\TimeSlotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class MeetingController extends Controller
@@ -300,7 +301,17 @@ class MeetingController extends Controller
             return redirect()->route('meetings.my-meetings')
                 ->with('success', 'Meeting booked successfully! You will receive confirmation soon.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            Log::error('Meeting booking failed.', [
+                'user_id' => $user->id,
+                'time_slot_id' => $timeSlot->id,
+                'service_request_id' => $validated['service_request_id'],
+                'service_type' => $validated['service_type'],
+                'exception' => $e,
+            ]);
+
+            return back()->withErrors([
+                'error' => 'We could not book this meeting right now. Please try again or choose another available slot.',
+            ]);
         }
     }
 

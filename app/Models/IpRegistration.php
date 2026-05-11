@@ -113,15 +113,15 @@ class IpRegistration extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'submitted' => 'Submitted',
-            'meeting_booked' => 'Meeting Booked',
-            'meeting_confirmed' => 'Meeting Confirmed',
-            'documentation' => 'Documentation',
-            'filing' => 'Filing',
-            'registered' => 'Registered',
-            'completed' => 'Completed',
-            'cancelled' => 'Cancelled',
-            default => ucfirst($this->status)
+            'submitted' => __('portal.ip.status_submitted'),
+            'meeting_booked' => __('portal.ip.status_meeting_booked'),
+            'meeting_confirmed' => __('portal.ip.status_meeting_confirmed'),
+            'documentation' => __('portal.ip.status_documentation'),
+            'filing' => __('portal.ip.status_filing'),
+            'registered' => __('portal.ip.status_registered'),
+            'completed' => __('portal.ip.status_completed'),
+            'cancelled' => __('portal.ip.status_cancelled'),
+            default => str_replace('_', ' ', $this->status)
         };
     }
 }

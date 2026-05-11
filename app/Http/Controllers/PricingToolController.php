@@ -118,6 +118,8 @@ class PricingToolController extends Controller
             abort(403);
         }
 
+        // Follow-up checkpoint: if quote line items are later submitted to the backend,
+        // validate each quantity as an integer with a minimum of 1 before pricing.
         return response()->json(PricingRule::active()->orderBy('item')->orderBy('level')->get());
     }
 

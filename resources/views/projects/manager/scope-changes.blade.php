@@ -22,7 +22,7 @@
                             {{ __('portal.projects_manager.scope_changes.project') }}: <a href="{{ route('projects.manager.show', $change->project) }}">{{ $change->project->title }}</a>
                         </small>
                     </div>
-                    <span class="status-badge {{ $change->getStatusBadgeColor() }}">{{ ucfirst($change->status) }}</span>
+                    <span class="status-badge {{ $change->getStatusBadgeColor() }}">{{ $change->getStatusLabel() }}</span>
                 </div>
             </div>
             <div class="card-content">
