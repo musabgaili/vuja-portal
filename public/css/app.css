@@ -852,3 +852,78 @@ body {
 .internal-dashboard .content-header .locale-switcher .dropdown-toggle {
     border-color: var(--gray-300, #cbd5e1);
 }
+
+/* ===== RTL SUPPORT (Arabic) ===== */
+/* Sidebar moves to the right; main content gets right-side margin instead of left. */
+[dir="rtl"] .sidebar {
+    left: auto;
+    right: 0;
+    border-right: none;
+    border-left: 1px solid var(--gray-200);
+}
+
+[dir="rtl"] .main-content {
+    margin-left: 0;
+    margin-right: 280px;
+}
+
+/* Active/hover indicator on the inline-end edge for RTL */
+[dir="rtl"] .nav-item {
+    border-left: none;
+    border-right: 3px solid transparent;
+}
+
+[dir="rtl"] .nav-item:hover,
+[dir="rtl"] .nav-item.active {
+    border-left-color: transparent;
+    border-right-color: var(--primary-color);
+}
+
+[dir="rtl"] .nav-item i {
+    margin-right: 0;
+    margin-left: var(--space-md);
+}
+
+[dir="rtl"] .nav-submenu {
+    border-left: none;
+    border-right: 3px solid var(--primary-color);
+}
+
+[dir="rtl"] .nav-submenu .nav-item {
+    padding-left: var(--space-xl);
+    padding-right: calc(var(--space-xl) + var(--space-lg));
+}
+
+[dir="rtl"] .nav-toggle {
+    right: auto;
+    left: var(--space-xl);
+}
+
+/* Tablet: narrower sidebar still on the right */
+@media (min-width: 769px) and (max-width: 1024px) {
+    [dir="rtl"] .main-content {
+        margin-left: 0;
+        margin-right: 240px;
+    }
+}
+
+/* Mobile: sidebar slides in from the right, toggle button on the right */
+@media (max-width: 768px) {
+    [dir="rtl"] .sidebar {
+        transform: translateX(100%);
+    }
+
+    [dir="rtl"] .sidebar.open,
+    [dir="rtl"] .sidebar.active {
+        transform: translateX(0);
+    }
+
+    [dir="rtl"] .main-content {
+        margin-right: 0;
+    }
+
+    [dir="rtl"] .mobile-menu-toggle {
+        left: auto;
+        right: 1rem;
+    }
+}

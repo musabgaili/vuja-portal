@@ -96,7 +96,7 @@ class ResearchRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isManager() && ! $user->isEmployee()) {
+        if (! $user->isManager() && ! $user->isEmployee() && ! $user->isProjectManager()) {
             abort(403);
         }
 

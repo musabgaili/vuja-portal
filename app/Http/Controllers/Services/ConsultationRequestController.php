@@ -65,7 +65,7 @@ class ConsultationRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isManager() && ! $user->isEmployee()) {
+        if (! $user->isManager() && ! $user->isEmployee() && ! $user->isProjectManager()) {
             abort(403);
         }
 
@@ -112,7 +112,7 @@ class ConsultationRequestController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isEmployee() && ! $user->isManager()) {
+        if (! $user->isEmployee() && ! $user->isManager() && ! $user->isProjectManager()) {
             abort(403);
         }
         $this->authorize('manage', $consultation);
