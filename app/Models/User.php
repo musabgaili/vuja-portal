@@ -34,6 +34,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'status',
         'provider',
         'provider_id',
+        'impact_points',
     ];
 
     /**
@@ -58,7 +59,26 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             'password' => 'hashed',
             'role' => UserRole::class,
             'status' => UserStatus::class,
+            'impact_points' => 'integer',
         ];
+    }
+
+    /**
+     * Engagement / Impact Points helpers.
+     */
+    public function engagementLogs()
+    {
+        return $this->hasMany(EngagementLog::class);
+    }
+
+    public function engagementLevel(): array
+    {
+        return app(\App\Services\EngagementService::class)->levelFor((int) $this->impact_points);
+    }
+
+    public function engagementProgress(): int
+    {
+        return app(\App\Services\EngagementService::class)->levelProgress((int) $this->impact_points);
     }
 
     /**

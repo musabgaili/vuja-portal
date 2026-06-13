@@ -19,6 +19,7 @@
     
     <!-- Sidebar Overlay for Mobile -->
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    @include('partials.ip-toasts')
     
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -35,6 +36,10 @@
                     <a href="{{ route('internal.dashboard') }}" class="nav-item">
                         <i class="fas fa-home"></i>
                         Dashboard
+                    </a>
+                    <a href="{{ route('engagement.index') }}" class="nav-item {{ request()->routeIs('engagement.*') ? 'active' : '' }}">
+                        <i class="fas fa-bolt"></i>
+                        Engagement
                     </a>
                 </div>
 
@@ -170,6 +175,7 @@
                     <h1>@yield('title', 'Dashboard')</h1>
                 </div>
                 <div class="header-right d-flex align-items-center gap-2">
+                    @include('partials.xp-bar')
                     @include('partials.theme-toggle')
                     @include('partials.locale-switcher')
                     <div class="user-menu">

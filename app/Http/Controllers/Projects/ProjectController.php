@@ -103,6 +103,11 @@ class ProjectController extends Controller
             'is_internal' => $user->isInternal(),
         ]);
 
+        // Engagement: an internal team member leaving a comment is a "solution comment".
+        if ($user->isInternal()) {
+            app(\App\Services\EngagementService::class)->award($user, 'solution_comment', $project, null, 'Comment on '.$project->title);
+        }
+
         return back()->with('success', 'Comment added successfully!');
     }
 

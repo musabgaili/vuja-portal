@@ -55,6 +55,16 @@ class FeedbackController extends Controller
             'client_id' => $user->id,
         ]);
 
+        // Engagement: a 5-star rating rewards the people who delivered the project.
+        if ((int) $validated['rating'] === 5) {
+            $engagement = app(\App\Services\EngagementService::class);
+            foreach (array_unique(array_filter([$project->project_manager_id, $project->account_manager_id])) as $recipientId) {
+                if ($recipient = \App\Models\User::find($recipientId)) {
+                    $engagement->award($recipient, 'client_five_star', $project, null, '5-star rating on '.$project->title);
+                }
+            }
+        }
+
         return redirect()->route('projects.client.show', $project)
             ->with('success', 'Thank you for your feedback!');
     }

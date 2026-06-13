@@ -1111,3 +1111,20 @@ body {
 .nav-item.active { background: var(--primary-light); color: var(--primary-color); }
 .nav-item.active i { color: var(--primary-color); }
 [data-bs-theme="dark"] .nav-item.active { color: var(--primary-color); }
+/* ===== Engagement / Impact Points UI ===== */
+.ip-toast-wrap{ position:fixed; top:70px; inset-inline-end:20px; z-index:1080; display:flex; flex-direction:column; gap:8px; }
+.ip-toast{ display:flex; align-items:center; gap:8px; background:var(--bg-primary); border:1px solid var(--gray-200); border-inline-start:4px solid var(--primary-color); border-radius:10px; padding:10px 14px; box-shadow:var(--shadow-lg); animation:ipPop .3s ease-out; }
+.ip-toast.neg{ border-inline-start-color:var(--error-color); }
+.ip-toast i{ color:var(--primary-color); } .ip-toast.neg i{ color:var(--error-color); }
+.ip-toast span{ font-weight:700; color:var(--gray-900); } .ip-toast small{ color:var(--gray-500); text-transform:capitalize; }
+@keyframes ipPop{ from{ transform:translateY(-8px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+.xp-chip{ display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--gray-200); background:var(--bg-primary); text-decoration:none; }
+.xp-chip:hover{ border-color:var(--primary-color); }
+.xp-chip .xp-level{ font-size:12px; font-weight:700; color:var(--primary-color); white-space:nowrap; }
+.xp-chip .xp-track{ width:72px; height:6px; border-radius:999px; background:var(--bg-tertiary); overflow:hidden; }
+.xp-chip .xp-fill{ height:100%; background:var(--grad-header); border-radius:999px; }
+.xp-chip .xp-pts{ font-size:11px; font-weight:600; color:var(--gray-500); white-space:nowrap; }
+.ip-rank{ width:28px; height:28px; border-radius:999px; background:var(--primary-light); color:var(--primary-color); font-weight:700; display:inline-flex; align-items:center; justify-content:center; font-size:13px; }
+.ip-rank.top{ background:var(--grad-header); color:#fff; }
+.ip-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--primary-light); color:var(--primary-color); font-size:12px; font-weight:600; }
+.ip-level-pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; background:var(--grad-header); color:#fff; font-weight:700; font-size:13px; }

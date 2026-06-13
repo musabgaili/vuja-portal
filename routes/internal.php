@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\FinancialReportController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ServiceRequestTypeController;
@@ -30,6 +31,10 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // MANAGER & EMPLOYEE ROUTES (Internal Staff Only)
     // The outer group already enforces auth + is_internal.
     // ============================================
+
+    // ENGAGEMENT — Impact Points (all internal users; managers get the Owner view)
+    Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
+    Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
 
     // TIME SLOTS - My Availability (All internal users)
     Route::get('/my-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'mySlots'])->name('time-slots.my-slots');
