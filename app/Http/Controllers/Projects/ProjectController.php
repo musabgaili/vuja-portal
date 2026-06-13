@@ -81,6 +81,20 @@ class ProjectController extends Controller
             'commentable_id' => 'required|integer',
         ]);
 
+        // Prevent IDOR: the comment target must belong to the authorized project,
+        // otherwise a user could attach comments to projects/milestones/tasks they
+        // don't own by supplying a foreign commentable_id.
+        $belongsToProject = match ($validated['commentable_type']) {
+            \App\Models\Project::class => (int) $validated['commentable_id'] === (int) $project->id,
+            \App\Models\ProjectMilestone::class => $project->milestones()->whereKey($validated['commentable_id'])->exists(),
+            \App\Models\ProjectTask::class => $project->tasks()->whereKey($validated['commentable_id'])->exists(),
+            default => false,
+        };
+
+        if (! $belongsToProject) {
+            abort(403, 'The comment target does not belong to this project.');
+        }
+
         ProjectComment::create([
             'commentable_type' => $validated['commentable_type'],
             'commentable_id' => $validated['commentable_id'],

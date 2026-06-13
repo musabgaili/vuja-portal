@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -74,8 +75,16 @@ class RegisterController extends Controller
 
         $user->assignRole('client');
 
-        // Send email verification
-        event(new Registered($user));
+        // Send email verification. A mail-provider/transport failure must never
+        // block account creation — log it and let the user request a new link later.
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            Log::warning('Verification email could not be sent during registration.', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $user;
     }

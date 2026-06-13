@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\BudgetLockedException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,32 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Project extends Model
 {
     use HasFactory, HasUuidRouteKey, LogsActivity;
+
+    /** Statuses at/after which the budget is locked (client approval onward). */
+    public const LOCKED_BUDGET_STATUSES = ['awarded', 'in_progress', 'paused', 'completed', 'lost', 'cancelled'];
+
+    /**
+     * One-shot escape hatch allowing a budget change on a locked project. Set to
+     * true ONLY by the approved change-request application path; never persisted.
+     */
+    public bool $allowBudgetOverride = false;
+
+    protected static function booted(): void
+    {
+        // Model-level backstop for the budget lock: blocks any budget change once
+        // the project is locked, unless an approved change request set the override.
+        static::updating(function (self $project): void {
+            if ($project->isDirty('budget') && ! $project->allowBudgetOverride) {
+                // Use the status as it was BEFORE this save (status may change in the same update).
+                $originalStatus = $project->getOriginal('status');
+                if (in_array($originalStatus, self::LOCKED_BUDGET_STATUSES, true)) {
+                    throw new BudgetLockedException(
+                        'Project budget is locked after client approval. Submit an approved change request to adjust it.'
+                    );
+                }
+            }
+        });
+    }
 
     protected $fillable = [
         'client_id', 'title', 'description', 'scope', 'source_type', 'source_id',
@@ -270,7 +297,7 @@ class Project extends Model
 
     public function isBudgetLocked(): bool
     {
-        return in_array($this->status, ['awarded', 'in_progress', 'paused', 'completed', 'lost', 'cancelled'], true);
+        return in_array($this->status, self::LOCKED_BUDGET_STATUSES, true);
     }
 
     public function isTerminal(): bool
