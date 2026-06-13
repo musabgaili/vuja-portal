@@ -12,7 +12,7 @@
 <style>
 body { font-family: 'Inter', sans-serif; }
 .admin-header {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #0C7075 0%, #072E33 100%);
     color: white;
     padding: 2rem;
     border-radius: 16px;

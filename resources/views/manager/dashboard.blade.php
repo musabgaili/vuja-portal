@@ -75,7 +75,7 @@
     <div class="widget">
         <div class="widget-header">
             <h3 class="widget-title">📄 {{ __('portal.client.requests.ip_registration') }} & ©️</h3>
-            <div class="widget-icon" style="background: #8b5cf6;">
+            <div class="widget-icon" style="background: #0C7075;">
                 <i class="fas fa-certificate"></i>
             </div>
         </div>

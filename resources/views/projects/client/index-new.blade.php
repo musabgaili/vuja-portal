@@ -112,7 +112,7 @@
     </div>
     <div class="col-md-4">
         <div class="stat-card-modern">
-            <div class="stat-card-value" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <div class="stat-card-value" style="background: linear-gradient(135deg, #0C7075 0%, #072E33 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 {{ $stats['completed'] }}
             </div>
             <div class="stat-card-label">{{ __('portal.projects_client.index.completed') }}</div>

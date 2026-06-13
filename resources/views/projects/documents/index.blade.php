@@ -22,7 +22,7 @@
             margin: 0 auto;
         }
         .doc-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
             color: white;
             padding: 1.5rem 2rem;
             border-radius: 12px;
@@ -39,13 +39,13 @@
             padding: 1.5rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #0F969C;
             transition: all 0.3s ease;
         }
         .doc-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
-            border-left-color: #764ba2;
+            border-left-color: #0C7075;
         }
         .doc-title {
             font-size: 1.1rem;
@@ -115,7 +115,7 @@
             overflow: hidden;
         }
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
             color: white;
             border: none;
             padding: 1.25rem 1.5rem;
@@ -145,7 +145,7 @@
             padding: 0.6rem 0.9rem;
         }
         .form-control:focus {
-            border-color: #667eea;
+            border-color: #0F969C;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         .btn {
@@ -155,7 +155,7 @@
             transition: all 0.2s;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
             border: none;
         }
         .btn-primary:hover {
@@ -163,12 +163,12 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         .btn-outline-primary {
-            border-color: #667eea;
-            color: #667eea;
+            border-color: #0F969C;
+            color: #0F969C;
         }
         .btn-outline-primary:hover {
-            background: #667eea;
-            border-color: #667eea;
+            background: #0F969C;
+            border-color: #0F969C;
         }
         .btn-outline-warning {
             border-color: #f59e0b;

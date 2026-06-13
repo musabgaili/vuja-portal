@@ -25,7 +25,7 @@
             <div class="ai-options-grid">
                 <!-- Visualization AI -->
                 <div class="ai-option-card">
-                    <div class="option-icon" style="background: #8b5cf6;">
+                    <div class="option-icon" style="background: #0C7075;">
                         <i class="fas fa-paint-brush"></i>
                     </div>
                     <h4>{{ __('portal.ideas.ai.vis_title') }}</h4>

@@ -14,7 +14,7 @@
     <div class="card-content">
         <div class="roles-grid">
             @foreach($roles as $role)
-            <div class="role-card" style="border-left-color: {{ $role->name === 'manager' ? '#f59e0b' : ($role->name === 'employee' ? '#10b981' : ($role->name === 'client' ? '#3b82f6' : '#8b5cf6')) }};">
+            <div class="role-card" style="border-left-color: {{ $role->name === 'manager' ? '#f59e0b' : ($role->name === 'employee' ? '#10b981' : ($role->name === 'client' ? '#3b82f6' : '#0C7075')) }};">
                 <div class="role-header">
                     <h4>{{ ucfirst(str_replace('_', ' ', $role->name)) }}</h4>
                     <span class="role-badge">{{ $role->users_count }} {{ __('portal.permissions.users') }}</span>
@@ -180,7 +180,7 @@
 .role-badge-client { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
 .role-badge-employee { background: #10b981; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
 .role-badge-manager { background: #f59e0b; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
-.role-badge-project_manager { background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
+.role-badge-project_manager { background: #0C7075; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
 
 .permission-list {
     margin: 0;

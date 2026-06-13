@@ -133,7 +133,7 @@
 .role-badge-client { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 4px; }
 .role-badge-employee { background: #10b981; color: white; padding: 4px 12px; border-radius: 4px; }
 .role-badge-manager { background: #f59e0b; color: white; padding: 4px 12px; border-radius: 4px; }
-.role-badge-project_manager { background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 4px; }
+.role-badge-project_manager { background: #0C7075; color: white; padding: 4px 12px; border-radius: 4px; }
 
 .status-badge {
     padding: 4px 12px;

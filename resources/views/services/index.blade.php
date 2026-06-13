@@ -63,8 +63,8 @@
     </div>
 
     <!-- IP Registration -->
-    <div class="service-card" style="border-left: 4px solid #8b5cf6;">
-        <div class="service-icon" style="background: #8b5cf6;">
+    <div class="service-card" style="border-left: 4px solid #0C7075;">
+        <div class="service-icon" style="background: #0C7075;">
             <i class="fas fa-file-contract"></i>
         </div>
         <div class="service-content">

@@ -2,12 +2,16 @@
 
 /* ===== CSS VARIABLES ===== */
 :root {
-    /* ===== BRAND — single theme color #2C3F43 (Sahem-style) ===== */
-    --primary-color: #2C3F43;
-    --primary-dark: #1d2a2d;      /* hover / gradient end */
-    --primary-light: #e7eced;     /* tint: badges, active nav background */
-    --primary-rgb: 44, 63, 67;
-    --secondary-color: #64748b;
+    /* ===== BRAND — teal palette (#0C7075 / #0F969C / #294D61 / #6DA5C0) ===== */
+    --primary-color: #0C7075;     /* primary teal */
+    --primary-dark: #095055;      /* hover / gradient end */
+    --primary-bright: #0F969C;    /* bright accent */
+    --primary-accent: #6DA5C0;    /* light-blue accent */
+    --primary-slate: #294D61;     /* slate secondary */
+    --primary-light: #ddf0f1;     /* tint: badges, active nav background */
+    --primary-rgb: 12, 112, 117;
+    --secondary-color: #294D61;
+    --grad-header: linear-gradient(135deg, #0F969C 0%, #0C7075 55%, #294D61 100%);
 
     /* Status (functional palette, kept) */
     --success-color: #16a34a;
@@ -29,16 +33,16 @@
 
     /* Backgrounds */
     --bg-primary: #ffffff;        /* cards / sidebar / header */
-    --bg-secondary: #f5f6f7;      /* app background */
-    --bg-tertiary: #eef0f1;       /* hover / subtle fills */
-    --bg-dark: #212224;
+    --bg-secondary: #f1f6f6;      /* app background (faint teal tint) */
+    --bg-tertiary: #e7f1f1;       /* hover / subtle teal fill */
+    --bg-dark: #05161A;
     --bg-glass: rgba(255, 255, 255, 0.95);
 
     /* Shadows (soft) */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 2px 0 rgba(16, 24, 40, 0.06);
+    --shadow-md: 0 4px 16px rgba(16, 24, 40, 0.08);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --shadow-xl: 0 24px 48px rgba(16, 24, 40, 0.14);
 
     /* Border Radius */
     --radius-sm: 0.375rem;
@@ -71,74 +75,79 @@
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
 
-    /* ===== Bootstrap 5.3 variable overrides (rebrand to #2C3F43) ===== */
-    --bs-primary: #2C3F43;
-    --bs-primary-rgb: 44, 63, 67;
-    --bs-link-color: #2C3F43;
-    --bs-link-color-rgb: 44, 63, 67;
-    --bs-link-hover-color: #1d2a2d;
-    --bs-link-hover-color-rgb: 29, 42, 45;
+    /* ===== Bootstrap 5.3 variable overrides (rebrand to teal) ===== */
+    --bs-primary: #0C7075;
+    --bs-primary-rgb: 12, 112, 117;
+    --bs-link-color: #0C7075;
+    --bs-link-color-rgb: 12, 112, 117;
+    --bs-link-hover-color: #095055;
+    --bs-link-hover-color-rgb: 9, 80, 85;
 }
 
 /* Bootstrap brand buttons compile literal hex, so override their component vars. */
 .btn-primary {
-    --bs-btn-bg: #2C3F43; --bs-btn-border-color: #2C3F43;
-    --bs-btn-hover-bg: #1d2a2d; --bs-btn-hover-border-color: #1d2a2d;
-    --bs-btn-active-bg: #16242a; --bs-btn-active-border-color: #16242a;
-    --bs-btn-disabled-bg: #2C3F43; --bs-btn-disabled-border-color: #2C3F43;
-    --bs-btn-focus-shadow-rgb: 44, 63, 67;
+    --bs-btn-bg: #0C7075; --bs-btn-border-color: #0C7075;
+    --bs-btn-hover-bg: #095055; --bs-btn-hover-border-color: #095055;
+    --bs-btn-active-bg: #073f43; --bs-btn-active-border-color: #073f43;
+    --bs-btn-disabled-bg: #0C7075; --bs-btn-disabled-border-color: #0C7075;
+    --bs-btn-focus-shadow-rgb: 12, 112, 117;
 }
 .btn-outline-primary {
-    --bs-btn-color: #2C3F43; --bs-btn-border-color: #2C3F43;
-    --bs-btn-hover-bg: #2C3F43; --bs-btn-hover-border-color: #2C3F43;
-    --bs-btn-active-bg: #2C3F43; --bs-btn-active-border-color: #2C3F43;
-    --bs-btn-focus-shadow-rgb: 44, 63, 67;
+    --bs-btn-color: #0C7075; --bs-btn-border-color: #0C7075;
+    --bs-btn-hover-bg: #0C7075; --bs-btn-hover-border-color: #0C7075;
+    --bs-btn-active-bg: #0C7075; --bs-btn-active-border-color: #0C7075;
+    --bs-btn-focus-shadow-rgb: 12, 112, 117;
 }
 
 /* ===== DARK THEME (Sahem charcoal) ===== */
 [data-bs-theme="dark"] {
-    --primary-color: #6f9aa1;     /* lightened brand for legibility on charcoal */
-    --primary-dark: #587e85;
-    --primary-light: #2a3a3e;     /* dark tint for active nav background */
-    --primary-rgb: 111, 154, 161;
+    --primary-color: #2bb6bd;     /* bright teal — readable on dark (text/icons/active/links) */
+    --primary-dark: #0F969C;
+    --primary-bright: #4fc9cf;
+    --primary-accent: #6DA5C0;
+    --primary-slate: #294D61;
+    --primary-light: #0c3a40;     /* dark teal tint for active nav background */
+    --primary-rgb: 43, 182, 189;
+    --grad-header: linear-gradient(135deg, #0C7075 0%, #094f54 55%, #05161A 100%);
 
-    --gray-50: #1b1c1e;
-    --gray-100: #212224;
-    --gray-200: #313236;          /* borders */
-    --gray-300: #3c3d41;
-    --gray-400: #6b7280;
-    --gray-500: #9ca3af;
-    --gray-600: #b6bcc4;          /* secondary text */
-    --gray-700: #e5e7eb;          /* body text */
-    --gray-800: #f1f3f5;
-    --gray-900: #f9fafb;          /* headings */
+    /* gray ramp inverted + brightened for AA contrast on #05161A */
+    --gray-50: #0a2024;
+    --gray-100: #072e33;
+    --gray-200: #15454c;          /* borders — visible on dark teal */
+    --gray-300: #1f565e;
+    --gray-400: #84a6ab;          /* meta (brightened so it stays readable) */
+    --gray-500: #a1c1c5;
+    --gray-600: #c2d8db;          /* secondary text */
+    --gray-700: #e9f1f2;          /* body text */
+    --gray-800: #f3f8f8;
+    --gray-900: #fbfdfd;          /* headings */
 
-    --bg-primary: #29292d;        /* cards / sidebar / header */
-    --bg-secondary: #212224;      /* app background */
-    --bg-tertiary: #313236;       /* hover */
-    --bg-glass: rgba(41, 42, 45, 0.95);
+    --bg-primary: #072E33;        /* cards / sidebar / header */
+    --bg-secondary: #05161A;      /* app background (palette darkest) */
+    --bg-tertiary: #0b3a40;       /* hover / elevated */
+    --bg-glass: rgba(7, 46, 51, 0.95);
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.45);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.50);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.60);
+    --shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.65);
 
     /* Bootstrap dark surfaces + brand */
-    --bs-primary: #6f9aa1; --bs-primary-rgb: 111, 154, 161;
-    --bs-link-color-rgb: 111, 154, 161; --bs-link-hover-color-rgb: 140, 178, 184;
-    --bs-body-bg: #212224; --bs-body-color: #e5e7eb;
-    --bs-secondary-bg: #29292d; --bs-tertiary-bg: #313236;
-    --bs-border-color: #313236; --bs-emphasis-color: #f9fafb;
+    --bs-primary: #2bb6bd; --bs-primary-rgb: 43, 182, 189;
+    --bs-link-color-rgb: 79, 201, 207; --bs-link-hover-color-rgb: 120, 220, 225;
+    --bs-body-bg: #05161A; --bs-body-color: #e9f1f2;
+    --bs-secondary-bg: #072E33; --bs-tertiary-bg: #0b3a40;
+    --bs-border-color: #15454c; --bs-emphasis-color: #fbfdfd;
 }
 [data-bs-theme="dark"] .btn-primary {
-    --bs-btn-bg: #3e5a60; --bs-btn-border-color: #3e5a60; --bs-btn-color: #fff;
-    --bs-btn-hover-bg: #4a6b72; --bs-btn-hover-border-color: #4a6b72; --bs-btn-hover-color: #fff;
-    --bs-btn-active-bg: #4a6b72; --bs-btn-active-border-color: #4a6b72;
-    --bs-btn-disabled-bg: #3e5a60; --bs-btn-disabled-border-color: #3e5a60;
+    --bs-btn-bg: #0C7075; --bs-btn-border-color: #0C7075; --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #0F969C; --bs-btn-hover-border-color: #0F969C; --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #0F969C; --bs-btn-active-border-color: #0F969C;
+    --bs-btn-disabled-bg: #0C7075; --bs-btn-disabled-border-color: #0C7075;
 }
 [data-bs-theme="dark"] .btn-outline-primary {
-    --bs-btn-color: #8fb6bc; --bs-btn-border-color: #4a6b72;
-    --bs-btn-hover-bg: #3e5a60; --bs-btn-hover-border-color: #3e5a60; --bs-btn-hover-color: #fff;
+    --bs-btn-color: #4fc9cf; --bs-btn-border-color: #0C7075;
+    --bs-btn-hover-bg: #0C7075; --bs-btn-hover-border-color: #0C7075; --bs-btn-hover-color: #fff;
 }
 
 /* Theme toggle button */
@@ -1013,563 +1022,92 @@ body {
     }
 }
 
+/* ============================================================
+   TEAL / DONEZO POLISH LAYER  (appended — wins via cascade)
+   ============================================================ */
 
-/* ===================================================================
-   GRAPHITE REDESIGN LAYER (appended — wins via cascade order)
-   =================================================================== */
-/* ============================================================================
-   GRAPHITE â€” Linear-grade monochrome portal on #2C3F43  (VujaDe redesign)
-   Paste at the END of public/css/app.css (after Bootstrap CDN + existing rules)
-   so this layer wins. Light + Dark + RTL safe. Single brand color #2C3F43.
-   Targets the REAL class names: .sidebar/.sidebar-header(h2,small,.user-info,
-   .user-avatar), .nav-section(-title)/.nav-item, .content-header/.header-left h1
-   /.header-right/.user-menu/.user-name, .content-body, .widget/.card,
-   .stat-card-manager/.stat-card-modern/.stat-number-manager/.stat-label-manager,
-   .request-item-modern, .manager-hero + the hero family, Bootstrap .btn/.table/
-   .badge/.form-control/.form-select/.dropdown-menu.
-   ============================================================================ */
-
-/* ---------------------------------------------------------------------------
-   1) TOKENS â€” refine :root (these override the earlier :root via cascade order)
-   --------------------------------------------------------------------------- */
-:root{
-  /* brand â€” single ink accent */
-  --primary-color:#2C3F43; --primary-dark:#1d2a2d; --primary-800:#16242a;
-  --primary-light:#e7eced;            /* active-nav bg + icon-chip tint */
-  --primary-rgb:44,63,67;
-  --primary-ring:rgba(44,63,67,.15);
-
-  /* surfaces (light) â€” a hair warmer than clinical white */
-  --bg-primary:#ffffff;               /* cards / sidebar / topbar */
-  --bg-secondary:#f7f8f7;             /* app background */
-  --bg-tertiary:#f1f2f3;              /* hover / subtle fill */
-
-  /* hairline borders carry structure */
-  --gray-200:#e6e8ea;                 /* default hairline */
-  --gray-300:#d6dadd;                 /* strong border / hover-border */
-  --bd-row:#eceef0;                   /* table row separator */
-  --gray-400:#94a3b8; --gray-500:#64748b; --gray-600:#475569;
-  --gray-700:#334155; --gray-800:#1e293b; --gray-900:#0f172a;
-
-  /* whisper shadows (borders do the work) */
-  --shadow-sm:0 1px 2px rgba(16,24,40,.04);
-  --shadow-md:0 8px 24px rgba(16,24,40,.10);
-  --shadow-lg:0 16px 40px rgba(16,24,40,.16);
-  --shadow-pop:var(--shadow-md);
-
-  /* tight geometry */
-  --radius-sm:8px; --radius-md:8px; --radius-lg:10px; --radius-xl:10px;
-  --radius-2xl:10px; --radius-pill:999px;
-
-  --ease:.13s ease-out;
-
-  /* Bootstrap rebrand */
-  --bs-primary:#2C3F43; --bs-primary-rgb:44,63,67;
-  --bs-body-bg:var(--bg-secondary); --bs-body-color:var(--gray-700);
-  --bs-border-color:var(--gray-200);
-  --bs-link-color:#2C3F43; --bs-link-color-rgb:44,63,67;
-  --bs-link-hover-color:#1d2a2d; --bs-link-hover-color-rgb:29,42,45;
+/* ---- Page headers: unify every hero/header to the teal gradient ---- */
+.pricing-header, .quoting-header, .quoting-tasks-header, .manager-hero, .modern-hero,
+.employee-hero, .consul-header, .research-header, .ip-header, .copy-header, .ideas-header,
+.slots-header, .create-slots-header, .page-hero, .dashboard-hero, .projects-hero {
+    background: var(--grad-header) !important;
+    background-image: var(--grad-header) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+.pricing-header *, .quoting-header *, .quoting-tasks-header *, .manager-hero *, .modern-hero *,
+.employee-hero *, .consul-header *, .research-header *, .ip-header *, .copy-header *,
+.ideas-header *, .slots-header *, .create-slots-header *, .page-hero *, .dashboard-hero *,
+.projects-hero * {
+    color: #fff !important;
+    border-color: rgba(255,255,255,.25) !important;
 }
 
-/* DARK â€” reuse the codebase's existing charcoal tokens VERBATIM (zero drift). */
-[data-bs-theme="dark"]{
-  --primary-color:#8fb6bc;            /* brand text/icon, AA on charcoal */
-  --primary-dark:#4a6b72; --primary-800:#3e5a60;
-  --primary-light:#2a3a3e;            /* active-nav tint */
-  --primary-rgb:143,182,188;
-  --primary-ring:rgba(143,182,188,.30);
-
-  --bg-primary:#29292d; --bg-secondary:#212224; --bg-tertiary:#313236;
-  --gray-200:#313236; --gray-300:#3c3d41; --bd-row:#313236;
-  --gray-400:#6b7280; --gray-500:#9ca3af; --gray-600:#b6bcc4;
-  --gray-700:#e5e7eb; --gray-800:#f1f3f5; --gray-900:#f9fafb;
-
-  --shadow-sm:0 1px 2px rgba(0,0,0,.35);
-  --shadow-md:0 12px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.04);
-  --shadow-lg:0 20px 48px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.05);
-
-  --bs-body-bg:#212224; --bs-body-color:#e5e7eb;
-  --bs-secondary-bg:#29292d; --bs-tertiary-bg:#313236;
-  --bs-border-color:#313236; --bs-emphasis-color:#f9fafb;
-  --bs-primary:#8fb6bc; --bs-primary-rgb:143,182,188;
+/* ---- Cards: soft Donezo elevation + rounded ---- */
+.card, .widget, .section-card, .service-card-modern, .stat-card, .stat-card-modern,
+.stat-card-manager, .pricing-card, .stat-box {
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    background: var(--bg-primary);
 }
 
-/* ---------------------------------------------------------------------------
-   2) BOOTSTRAP BRAND BUTTONS (compile literal hex â†’ override --bs-btn-* vars)
-   --------------------------------------------------------------------------- */
-.btn-primary{
-  --bs-btn-bg:#2C3F43; --bs-btn-border-color:#2C3F43;
-  --bs-btn-hover-bg:#1d2a2d; --bs-btn-hover-border-color:#1d2a2d;
-  --bs-btn-active-bg:#16242a; --bs-btn-active-border-color:#16242a;
-  --bs-btn-disabled-bg:#2C3F43; --bs-btn-disabled-border-color:#2C3F43;
-  --bs-btn-focus-shadow-rgb:44,63,67;
+/* ---- De-rainbow KPI tiles: neutralize inline per-metric border/number colors ---- */
+.stat-card-manager[style*="border-color"], .stat-card-modern[style*="border-color"],
+.request-item-modern[style*="border-color"], .stat-card[style*="border-left-color"],
+.service-stat[style*="border-left-color"] { border-color: var(--gray-200) !important; border-left-color: var(--gray-200) !important; }
+.stat-number-manager[style*="color"], .stat-number[style*="color"],
+.service-stat i[style*="color"] { color: var(--gray-900) !important; }
+
+/* ---- Donezo KPI: first stat tile filled teal (featured) ---- */
+.dashboard-grid > .stat-card:first-child, .dashboard-grid > .stat-card-manager:first-child,
+.stats-grid > .stat-card-manager:first-child, .stat-card.is-featured {
+    background: var(--grad-header) !important; border: none !important; color: #fff !important;
 }
-.btn-outline-primary{
-  --bs-btn-color:#2C3F43; --bs-btn-border-color:#2C3F43;
-  --bs-btn-hover-bg:#2C3F43; --bs-btn-hover-border-color:#2C3F43;
-  --bs-btn-active-bg:#2C3F43; --bs-btn-active-border-color:#2C3F43;
-  --bs-btn-focus-shadow-rgb:44,63,67;
-}
-[data-bs-theme="dark"] .btn-primary{
-  --bs-btn-bg:#3e5a60; --bs-btn-border-color:#3e5a60; --bs-btn-color:#fff;
-  --bs-btn-hover-bg:#4a6b72; --bs-btn-hover-border-color:#4a6b72; --bs-btn-hover-color:#fff;
-  --bs-btn-active-bg:#4a6b72; --bs-btn-active-border-color:#4a6b72;
-  --bs-btn-disabled-bg:#3e5a60; --bs-btn-disabled-border-color:#3e5a60;
-  --bs-btn-focus-shadow-rgb:143,182,188;
-}
-[data-bs-theme="dark"] .btn-outline-primary{
-  --bs-btn-color:#8fb6bc; --bs-btn-border-color:#4a6b72;
-  --bs-btn-hover-bg:#3e5a60; --bs-btn-hover-border-color:#3e5a60; --bs-btn-hover-color:#fff;
-  --bs-btn-focus-shadow-rgb:143,182,188;
+.dashboard-grid > .stat-card:first-child .stat-number,
+.dashboard-grid > .stat-card:first-child .stat-label,
+.stats-grid > .stat-card-manager:first-child .stat-number-manager,
+.stats-grid > .stat-card-manager:first-child .stat-label-manager { color: #fff !important; }
+
+/* ---- Status badges: soft tinted pills (Donezo style) ---- */
+.badge.bg-success, .badge.text-bg-success { background: rgba(22,163,74,.12) !important; color: #15803d !important; }
+.badge.bg-danger,  .badge.text-bg-danger  { background: rgba(220,38,38,.12) !important; color: #b91c1c !important; }
+.badge.bg-warning, .badge.text-bg-warning { background: rgba(217,119,6,.14) !important; color: #b45309 !important; }
+.badge.bg-info,    .badge.text-bg-info    { background: rgba(8,145,178,.12) !important; color: #0e7490 !important; }
+.badge.bg-primary, .badge.text-bg-primary { background: var(--primary-light) !important; color: var(--primary-color) !important; }
+.badge.bg-secondary { background: var(--bg-tertiary) !important; color: var(--gray-600) !important; }
+[data-bs-theme="dark"] .badge.bg-success, [data-bs-theme="dark"] .badge.text-bg-success { background: rgba(74,222,128,.16) !important; color: #4ade80 !important; }
+[data-bs-theme="dark"] .badge.bg-danger,  [data-bs-theme="dark"] .badge.text-bg-danger  { background: rgba(248,113,113,.16) !important; color: #f87171 !important; }
+[data-bs-theme="dark"] .badge.bg-warning, [data-bs-theme="dark"] .badge.text-bg-warning { background: rgba(251,191,36,.16) !important; color: #fbbf24 !important; }
+[data-bs-theme="dark"] .badge.bg-info,    [data-bs-theme="dark"] .badge.text-bg-info    { background: rgba(103,201,224,.16) !important; color: #67c9e0 !important; }
+
+/* ---- DARK MODE contrast safety net (fixes invisible / washed-out text) ---- */
+[data-bs-theme="dark"] .text-dark, [data-bs-theme="dark"] .text-black,
+[data-bs-theme="dark"] .text-body, [data-bs-theme="dark"] .text-body-emphasis { color: var(--gray-800) !important; }
+[data-bs-theme="dark"] .text-muted, [data-bs-theme="dark"] .text-secondary { color: var(--gray-500) !important; }
+[data-bs-theme="dark"] .table { color: var(--gray-700); --bs-table-color: var(--gray-700); --bs-table-border-color: var(--gray-200); }
+[data-bs-theme="dark"] .table > :not(caption) > * > * { color: var(--gray-700); }
+[data-bs-theme="dark"] .table thead th { color: var(--gray-500); }
+/* scoped inline dark-text -> readable */
+[data-bs-theme="dark"] .content-body [style*="color: #1e293b"], [data-bs-theme="dark"] .content-body [style*="color:#1e293b"],
+[data-bs-theme="dark"] .content-body [style*="color: #0f172a"], [data-bs-theme="dark"] .content-body [style*="color:#0f172a"],
+[data-bs-theme="dark"] .content-body [style*="color: #334155"], [data-bs-theme="dark"] .content-body [style*="color:#334155"],
+[data-bs-theme="dark"] .content-body [style*="color: #475569"], [data-bs-theme="dark"] .content-body [style*="color:#475569"],
+[data-bs-theme="dark"] .content-body [style*="color: #1f2937"], [data-bs-theme="dark"] .content-body [style*="color:#1f2937"],
+[data-bs-theme="dark"] .content-body [style*="color: #333"],   [data-bs-theme="dark"] .content-body [style*="color:#333"] { color: var(--gray-700) !important; }
+/* scoped inline white/light backgrounds -> dark surface */
+[data-bs-theme="dark"] .content-body [style*="background: #fff"], [data-bs-theme="dark"] .content-body [style*="background:#fff"],
+[data-bs-theme="dark"] .content-body [style*="background: #ffffff"], [data-bs-theme="dark"] .content-body [style*="background:#ffffff"],
+[data-bs-theme="dark"] .content-body [style*="background: white"],
+[data-bs-theme="dark"] .content-body [style*="background-color: #fff"], [data-bs-theme="dark"] .content-body [style*="background-color:#fff"],
+[data-bs-theme="dark"] .content-body [style*="background: #f8fafc"], [data-bs-theme="dark"] .content-body [style*="background:#f8fafc"],
+[data-bs-theme="dark"] .content-body [style*="background: #f1f5f9"] {
+    background: var(--bg-primary) !important; background-image: none !important; border-color: var(--gray-200) !important;
 }
 
-/* ---------------------------------------------------------------------------
-   3) BASE
-   --------------------------------------------------------------------------- */
-body{
-  background:var(--bg-secondary); color:var(--gray-700);
-  line-height:1.5; font-feature-settings:"tnum" 1,"cnum" 1;
-}
-
-/* ---------------------------------------------------------------------------
-   4) SIDEBAR â€” flat, quiet, no gradient header, soft-tinted active pill
-   --------------------------------------------------------------------------- */
-.sidebar{
-  width:260px; background:var(--bg-primary);
-  border-right:1px solid var(--gray-200); box-shadow:none;
-}
-.main-content{ margin-left:260px; background:var(--bg-secondary); }
-
-/* kill the orange/teal gradient header â†’ flat surface, brand only on wordmark */
-.sidebar-header{
-  background:none !important; color:var(--gray-900);
-  border-bottom:1px solid var(--gray-200); padding:16px;
-}
-.sidebar-header h2,.sidebar-logo{
-  color:var(--primary-color); font-size:16px; font-weight:700; margin:0;
-}
-.sidebar-header small{ color:var(--gray-500); font-size:11px;
-  text-transform:uppercase; letter-spacing:.06em; }
-
-/* client-layout user block lives in the header â†’ neutralize its white-on-gradient */
-.sidebar-header .user-info{ display:flex; align-items:center; gap:10px; margin-top:12px; }
-.sidebar-header .user-avatar{
-  width:34px; height:34px; border-radius:999px;
-  background:var(--primary-light); color:var(--primary-color);
-  font-size:13px; font-weight:600; }
-.sidebar-header .user-details h3{ color:var(--gray-900); font-size:13px; font-weight:600; margin:0; }
-.sidebar-header .user-details p,.sidebar-header .user-info p{ color:var(--gray-500); font-size:11px; opacity:1; margin:0; }
-
-.sidebar-nav{ padding:8px; }
-.nav-section{ margin-bottom:4px; }
-.nav-section-title{
-  padding:0 10px; margin:16px 0 6px;
-  font-size:11px; font-weight:600; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--gray-400);
-}
-.nav-item{
-  display:flex; align-items:center; gap:10px;
-  margin:2px 0; padding:8px 10px; border-radius:8px;
-  border-left:0 !important; border-right:0 !important;   /* remove the 3px bar */
-  color:var(--gray-600); font-size:14px; font-weight:500;
-  text-decoration:none;
-  transition:background-color var(--ease),color var(--ease);
-}
-.nav-item i{ width:18px; font-size:18px; text-align:center; margin:0 !important; color:var(--gray-500); }
-.nav-item:hover{
-  background:var(--bg-tertiary); color:var(--gray-900);
-  border-color:transparent !important; transform:none;
-}
-.nav-item:hover i{ color:var(--gray-900); }
-.nav-item.active{
-  background:var(--primary-light); color:var(--primary-color);
-  font-weight:600; border-color:transparent !important;
-}
-.nav-item.active i{ color:var(--primary-color); }
-
-/* submenu: thin inset guide, no brand rail */
-.nav-submenu{ background:transparent; border:0 !important;
-  margin-inline-start:18px; border-inline-start:1px solid var(--gray-200) !important; }
-.nav-submenu .nav-item{ font-size:13px; padding-inline-start:14px; }
-
-/* footer settings btn â†’ quiet ghost, no lift */
-.sidebar-footer{ padding:12px; border-top:1px solid var(--gray-200); }
-.settings-btn{
-  background:var(--bg-tertiary); color:var(--gray-600);
-  border:1px solid var(--gray-200); border-radius:8px; padding:8px 12px;
-}
-.settings-btn:hover{
-  background:var(--bg-tertiary); color:var(--primary-color);
-  border-color:var(--gray-300); transform:none !important; box-shadow:none !important;
-}
-
-/* ---------------------------------------------------------------------------
-   5) TOPBAR â€” slim sticky bar, grouped equal-chrome controls, avatar chip
-   --------------------------------------------------------------------------- */
-.content-header{
-  position:sticky; top:0; z-index:100;
-  height:56px; min-height:56px; padding:0 20px;
-  background:var(--bg-primary); border-bottom:1px solid var(--gray-200);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.content-header .header-left h1,.page-title{
-  font-size:18px; font-weight:600; color:var(--gray-900); margin:0;
-}
-.content-header .header-right{ display:flex; align-items:center; gap:8px; }
-
-/* equal 36px chrome for theme toggle + locale + user */
-.theme-toggle-btn{
-  width:36px; height:36px; border-radius:8px;
-  background:var(--bg-primary); color:var(--gray-600);
-  border:1px solid var(--gray-200);
-  transition:background-color var(--ease),border-color var(--ease),color var(--ease);
-}
-.theme-toggle-btn:hover{ background:var(--bg-tertiary); color:var(--primary-color); border-color:var(--gray-300); }
-.locale-switcher .dropdown-toggle,
-.content-header .locale-switcher .dropdown-toggle,
-.internal-dashboard .content-header .locale-switcher .dropdown-toggle{
-  height:36px; border-radius:8px; border:1px solid var(--gray-200) !important;
-  background:var(--bg-primary); color:var(--gray-600); font-weight:500;
-}
-.locale-switcher .dropdown-toggle:hover{ background:var(--bg-tertiary); border-color:var(--gray-300) !important; }
-
-/* user menu â†’ real avatar chip with a grouping divider before it */
-.user-menu{
-  display:inline-flex; align-items:center; gap:8px;
-  height:36px; padding:0 10px 0 8px; border-radius:999px;
-  border:1px solid var(--gray-200); background:var(--bg-primary);
-  color:var(--gray-700); cursor:pointer; position:relative;
-  transition:background-color var(--ease),border-color var(--ease);
-}
-.user-menu::before{
-  content:""; position:absolute; inset-inline-start:-8px; top:8px;
-  width:1px; height:20px; background:var(--gray-200);
-}
-.user-menu:hover{ background:var(--bg-tertiary); border-color:var(--gray-300); }
-.user-menu .user-name{ font-size:14px; font-weight:500; color:var(--gray-700); }
-.user-menu i.fa-user,.user-menu .fa-user{
-  width:28px; height:28px; border-radius:999px;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:var(--primary-light); color:var(--primary-color); font-size:13px;
-}
-
-/* topbar dropdowns get the pop shadow + (dark) inset catch-light */
-.dropdown-menu{
-  border:1px solid var(--gray-200); border-radius:10px;
-  box-shadow:var(--shadow-md); padding:6px;
-  background:var(--bg-primary); color:var(--gray-700);
-}
-.dropdown-item{ border-radius:6px; padding:8px 10px; color:var(--gray-700); }
-.dropdown-item:hover,.dropdown-item:focus{ background:var(--bg-tertiary); color:var(--gray-900); }
-.locale-switcher .dropdown-item.active,
-.locale-switcher .dropdown-item:active{
-  background:var(--primary-light); color:var(--primary-color);
-}
-
-/* ---------------------------------------------------------------------------
-   6) CONTENT REGION â€” controlled max width on ultrawide
-   --------------------------------------------------------------------------- */
-.content-body{ padding:24px; max-width:1440px; margin-inline:auto; }
-.dashboard-grid{ gap:16px; margin-bottom:16px; }
-
-/* ---------------------------------------------------------------------------
-   7) CONTENT CARD â€” ONE recipe (.card == .widget == .service-card-modern)
-   --------------------------------------------------------------------------- */
-.card,.widget,.service-card-modern{
-  background:var(--bg-primary) !important;
-  border:1px solid var(--gray-200) !important;
-  border-radius:10px !important; padding:20px;
-  box-shadow:none !important; margin-bottom:16px;
-  transition:border-color var(--ease),box-shadow var(--ease);
-}
-.card:hover,.widget:hover,.service-card-modern:hover{
-  border-color:var(--gray-300) !important; box-shadow:var(--shadow-sm) !important;
-  transform:none !important;
-}
-.card-header,.widget-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 0 12px; margin-bottom:16px;
-  border-bottom:1px solid var(--gray-200);
-  background:none !important; background-image:none !important; border-top:0; border-radius:0;
-}
-.card-title,.widget-title{ font-size:15px; font-weight:600; color:var(--gray-900); }
-/* kill the gradient header + 2px border on .service-card-modern variants */
-.service-card-modern .card-header,
-.service-card-modern .widget-header{ border-bottom:1px solid var(--gray-200) !important; }
-/* neutral widget icon (kill role-color rotation: .success/.warning/.info) */
-.widget-icon,
-.widget-icon.primary,.widget-icon.success,.widget-icon.warning,.widget-icon.info{
-  width:36px; height:36px; border-radius:8px;
-  background:var(--primary-light) !important; color:var(--primary-color) !important;
-  font-size:16px;
-}
-
-/* ---------------------------------------------------------------------------
-   8) KPI / STAT CARDS â€” monochrome, identical for every metric, no rainbow
-   --------------------------------------------------------------------------- */
-.stat-card,.stat-card-manager,.stat-card-modern{
-  background:var(--bg-primary) !important;
-  border:1px solid var(--gray-200) !important;
-  border-left:1px solid var(--gray-200) !important;   /* kill the 4px color bar */
-  border-radius:10px !important; padding:16px 18px !important;
-  box-shadow:none !important;
-  transition:border-color var(--ease),box-shadow var(--ease);
-}
-.stat-card:hover,.stat-card-manager:hover,.stat-card-modern:hover{
-  border-color:var(--gray-300) !important; box-shadow:var(--shadow-sm) !important;
-  transform:none !important;
-}
-/* number â†’ near-black + tabular, overriding inline color:#f59e0b/#10b981/... */
-.stat-card .stat-number,.stat-number,.stat-number-manager{
-  font-size:28px !important; font-weight:700; line-height:1.1;
-  color:var(--gray-900) !important; font-feature-settings:"tnum" 1;
-}
-.stat-label,.stat-label-manager{
-  font-size:11px !important; font-weight:600; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--gray-500) !important;
-}
-/* uniform brand icon-chip (grafted from Sahem) â€” same on every tile */
-.stat-card .stat-icon,.stat-icon-manager,.stat-card-modern .stat-icon{
-  width:40px; height:40px; border-radius:8px;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:var(--primary-light) !important; color:var(--primary-color) !important;
-  font-size:18px;
-}
-
-/* request rows (manager dashboard) â€” kill inline border-color rainbow */
-.request-item-modern{
-  background:var(--bg-primary) !important;
-  border:1px solid var(--gray-200) !important;
-  border-left:1px solid var(--gray-200) !important;
-  border-radius:8px !important; transition:border-color var(--ease),background-color var(--ease);
-}
-.request-item-modern:hover{ background:var(--bg-tertiary) !important; border-color:var(--gray-300) !important; transform:none !important; }
-.request-item-modern strong{ color:var(--gray-900) !important; }
-
-/* ---------------------------------------------------------------------------
-   9) HEROES â€” neutralize every inline gradient hero â†’ flat brand-neutral panel
-   --------------------------------------------------------------------------- */
-.manager-hero,.modern-hero,.consul-header,.research-header,.ip-header,
-.copy-header,.ideas-header,.slots-header,.create-slots-header{
-  background:var(--bg-primary) !important; background-image:none !important;
-  color:var(--gray-900) !important;
-  border:1px solid var(--gray-200) !important; border-radius:10px !important;
-  box-shadow:none !important;
-}
-.manager-hero h1,.modern-hero h1,.consul-header h1,.research-header h1,.ip-header h1,
-.copy-header h1,.ideas-header h1,.slots-header h1,.create-slots-header h1,
-.manager-hero p,.modern-hero p,.consul-header p,.research-header p,.ip-header p,
-.copy-header p,.ideas-header p,.slots-header p,.create-slots-header p{
-  color:var(--gray-900) !important; opacity:1 !important;
-}
-.manager-hero p,.modern-hero p{ color:var(--gray-600) !important; }
-
-/* ---------------------------------------------------------------------------
-   10) BUTTONS â€” tight, no bounce, ghost secondary, demoted status
-   --------------------------------------------------------------------------- */
-.btn{
-  border-radius:8px; font-weight:500; font-size:14px; gap:8px;
-  transition:background-color var(--ease),border-color var(--ease),
-             color var(--ease),box-shadow var(--ease);
-}
-.btn:hover{ transform:none !important; }
-.btn-primary{ background:var(--primary-color); color:#fff; }
-.btn-primary:hover{ background:var(--primary-dark); transform:none !important; box-shadow:none !important; }
-[data-bs-theme="dark"] .btn-primary{ background:#3e5a60; }
-[data-bs-theme="dark"] .btn-primary:hover{ background:#4a6b72; }
-/* default/secondary â†’ clean ghost, NOT a gray fill */
-.btn-secondary{
-  background:var(--bg-primary) !important; color:var(--gray-700) !important;
-  border:1px solid var(--gray-300) !important;
-}
-.btn-secondary:hover{ background:var(--bg-tertiary) !important; transform:none !important; }
-/* demote saturated status buttons â†’ neutral ghost + small colored icon */
-.btn-success,.btn-warning,.btn-error{
-  background:var(--bg-primary) !important; border:1px solid var(--gray-300) !important;
-}
-.btn-success{ color:var(--success-color) !important; }
-.btn-warning{ color:var(--warning-color) !important; }
-.btn-error{ color:var(--error-color) !important; }
-.btn-success:hover,.btn-warning:hover,.btn-error:hover{ background:var(--bg-tertiary) !important; transform:none !important; }
-/* focus ring on-brand */
-.btn:focus,.btn:focus-visible{ box-shadow:0 0 0 3px var(--primary-ring) !important; }
-
-/* ---------------------------------------------------------------------------
-   11) FORMS â€” on-brand focus (kills stray blue), 40px fields, dark-safe
-   --------------------------------------------------------------------------- */
-.form-control,.form-select{
-  height:40px; border-radius:8px; padding:0 12px; font-size:14px;
-  background:var(--bg-primary); color:var(--gray-900);
-  border:1px solid var(--gray-300);
-  transition:border-color var(--ease),box-shadow var(--ease);
-}
-textarea.form-control{ height:auto; padding:10px 12px; }
-.form-control::placeholder{ color:var(--gray-400); }
-.form-control:focus,.form-select:focus{
-  outline:none; border-color:var(--primary-color);
-  box-shadow:0 0 0 3px var(--primary-ring);   /* was rgba(37,99,235,.1) blue */
-}
-.form-label{ font-size:13px; font-weight:600; color:var(--gray-700); margin-bottom:6px; }
-.form-check-input:checked{ background-color:var(--primary-color); border-color:var(--primary-color); }
-.form-check-input:focus{ border-color:var(--primary-color); box-shadow:0 0 0 3px var(--primary-ring); }
-.form-switch .form-check-input:checked{ background-color:var(--primary-color); }
-
-/* ---------------------------------------------------------------------------
-   12) TABLE â€” hairline rows, neutral hover, uppercase head, tabular nums
-   --------------------------------------------------------------------------- */
-.table{
-  --bs-table-bg:transparent;
-  --bs-table-color:var(--gray-700);
-  --bs-table-border-color:var(--bd-row);
-  --bs-table-hover-bg:var(--bg-tertiary);
-  --bs-table-hover-color:var(--gray-900);
-  --bs-table-striped-bg:transparent;
-  margin:0;
-}
-.table thead th{
-  background:none; border-bottom:1px solid var(--gray-200);
-  font-size:11px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; color:var(--gray-500);
-}
-.table td,.table th{
-  padding:12px 16px; border-left:0; border-right:0;
-  border-bottom:1px solid var(--bd-row); vertical-align:middle;
-}
-.table td.num,.table th.num{ text-align:end; font-feature-settings:"tnum" 1; }
-.table-modern,.table-responsive{ border:1px solid var(--gray-200); border-radius:10px; overflow:hidden; }
-.table-modern .table,.table-responsive .table{ margin:0; }
-
-/* ---------------------------------------------------------------------------
-   13) BADGES & STATUS â€” muted; never a saturated fill
-   --------------------------------------------------------------------------- */
-.badge{ font-weight:600; font-size:11px; padding:3px 9px; border-radius:999px; }
-.badge.bg-primary,.badge.text-bg-primary{
-  background:var(--primary-light) !important; color:var(--primary-color) !important;
-}
-/* soften Bootstrap filled status badges â†’ 1px-outline pill across all 71 views */
-.badge.bg-success,.badge.bg-danger,.badge.bg-warning,.badge.bg-info,
-.badge.text-bg-success,.badge.text-bg-danger,.badge.text-bg-warning,.badge.text-bg-info{
-  background:transparent !important; border:1px solid currentColor; border-radius:999px;
-}
-.badge.bg-success,.badge.text-bg-success{ color:var(--success-color) !important; }
-.badge.bg-danger,.badge.text-bg-danger{ color:var(--error-color) !important; }
-.badge.bg-warning,.badge.text-bg-warning{ color:var(--warning-color) !important; }
-.badge.bg-info,.badge.text-bg-info{ color:var(--info-color) !important; }
-.badge.bg-secondary,.badge.text-bg-secondary{
-  background:var(--bg-tertiary) !important; color:var(--gray-600) !important;
-}
-[data-bs-theme="dark"] .badge.bg-success{ color:#4ade80 !important; }
-[data-bs-theme="dark"] .badge.bg-danger{ color:#f87171 !important; }
-[data-bs-theme="dark"] .badge.bg-warning{ color:#fbbf24 !important; }
-[data-bs-theme="dark"] .badge.bg-info{ color:#67c9e0 !important; }
-
-/* reusable status primitive (grafted from Quartz): dot + 1px outline pill */
-.status{
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:12px; font-weight:600; padding:2px 9px; border-radius:999px;
-  border:1px solid currentColor; background:transparent;
-}
-.status::before{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor; }
-.status.is-success{ color:var(--success-color); }
-.status.is-warning{ color:var(--warning-color); }
-.status.is-danger { color:var(--error-color); }
-.status.is-info   { color:var(--info-color); }
-.status.is-muted  { color:var(--gray-500); }
-
-/* ---------------------------------------------------------------------------
-   14) ALERTS â€” quiet tinted surfaces instead of loud blocks
-   --------------------------------------------------------------------------- */
-.alert{ border-radius:8px; border:1px solid var(--gray-200); }
-.alert-success{ background:rgba(22,163,74,.07); border-color:rgba(22,163,74,.30); color:var(--success-color); }
-.alert-warning{ background:rgba(217,119,6,.07); border-color:rgba(217,119,6,.30); color:var(--warning-color); }
-.alert-error,.alert-danger{ background:rgba(220,38,38,.07); border-color:rgba(220,38,38,.30); color:var(--error-color); }
-.alert-info{ background:rgba(8,145,178,.07); border-color:rgba(8,145,178,.30); color:var(--info-color); }
-
-/* ---------------------------------------------------------------------------
-   15) BREADCRUMB / MISC chrome
-   --------------------------------------------------------------------------- */
-.breadcrumb{ background:transparent; padding:0 0 4px; margin-bottom:16px; }
-.breadcrumb-item a{ color:var(--gray-500); }
-.breadcrumb-item a:hover{ color:var(--primary-color); }
-.breadcrumb-item.active{ color:var(--gray-700); }
-.spinner{ border-color:var(--gray-300); border-top-color:var(--primary-color); }
-
-/* ---------------------------------------------------------------------------
-   16) CUSTOM SCROLLBAR â€” quiet, theme-aware
-   --------------------------------------------------------------------------- */
-*{ scrollbar-width:thin; scrollbar-color:var(--gray-300) transparent; }
-::-webkit-scrollbar{ width:10px; height:10px; }
-::-webkit-scrollbar-track{ background:transparent; }
-::-webkit-scrollbar-thumb{ background:var(--gray-300); border-radius:999px; border:2px solid var(--bg-secondary); }
-::-webkit-scrollbar-thumb:hover{ background:var(--gray-400); }
-.sidebar-nav::-webkit-scrollbar-thumb{ border-color:var(--bg-primary); }
-
-/* ---------------------------------------------------------------------------
-   17) DARK-MODE LEAK-GUARD â€” scoped: neutralize inline light styles on the
-   known inline-styled classes (62 files). Scoped to classes + a tight set of
-   inline-hex matches so we don't clobber intended whites (e.g. white text).
-   --------------------------------------------------------------------------- */
-[data-bs-theme="dark"] .manager-hero,
-[data-bs-theme="dark"] .modern-hero,
-[data-bs-theme="dark"] .consul-header,
-[data-bs-theme="dark"] .research-header,
-[data-bs-theme="dark"] .ip-header,
-[data-bs-theme="dark"] .copy-header,
-[data-bs-theme="dark"] .ideas-header,
-[data-bs-theme="dark"] .slots-header,
-[data-bs-theme="dark"] .create-slots-header,
-[data-bs-theme="dark"] .service-card-modern,
-[data-bs-theme="dark"] .stat-card-manager,
-[data-bs-theme="dark"] .stat-card-modern,
-[data-bs-theme="dark"] .request-item-modern{
-  background:var(--bg-primary) !important; background-image:none !important;
-  color:var(--gray-700) !important; border-color:var(--gray-200) !important;
-}
-/* scoped inline-bg matches (background only) within content body */
-[data-bs-theme="dark"] .content-body [style*="background: #f8fafc"],
-[data-bs-theme="dark"] .content-body [style*="background:#f8fafc"],
-[data-bs-theme="dark"] .content-body [style*="background: #ffffff"],
-[data-bs-theme="dark"] .content-body [style*="background:#ffffff"],
-[data-bs-theme="dark"] .content-body [style*="background: #fff;"],
-[data-bs-theme="dark"] .content-body [style*="background:#fff;"],
-[data-bs-theme="dark"] .content-body [style*="background: white"]{
-  background:var(--bg-primary) !important; background-image:none !important;
-  border-color:var(--gray-200) !important;
-}
-/* scoped inline dark-text matches â†’ readable on charcoal */
-[data-bs-theme="dark"] .content-body [style*="color: #1e293b"],
-[data-bs-theme="dark"] .content-body [style*="color:#1e293b"],
-[data-bs-theme="dark"] .content-body [style*="color: #0f172a"],
-[data-bs-theme="dark"] .content-body [style*="color:#0f172a"],
-[data-bs-theme="dark"] .content-body [style*="color: #64748b"],
-[data-bs-theme="dark"] .content-body [style*="color:#64748b"]{
-  color:var(--gray-700) !important;
-}
-/* dark dropdowns/menus get the inset catch-light */
-[data-bs-theme="dark"] .dropdown-menu{ box-shadow:var(--shadow-md); }
-
-/* ---------------------------------------------------------------------------
-   18) RTL â€” pills are symmetric (no edge bars to flip); fix margins only
-   --------------------------------------------------------------------------- */
-[dir="rtl"] .sidebar{ border-right:0; border-left:1px solid var(--gray-200); }
-[dir="rtl"] .main-content{ margin-left:0; margin-right:260px; }
-[dir="rtl"] .nav-item{ border-left:0 !important; border-right:0 !important; }
-[dir="rtl"] .nav-item:hover,[dir="rtl"] .nav-item.active{ border-color:transparent !important; }
-[dir="rtl"] .nav-item i{ margin:0 !important; }
-[dir="rtl"] .nav-submenu{ border-inline-start:1px solid var(--gray-200) !important; border-right:0 !important; }
-[dir="rtl"] .user-menu::before{ inset-inline-start:-8px; }
-
-/* ---------------------------------------------------------------------------
-   19) RESPONSIVE reconcile (sidebar/topbar at new 260px / 56px)
-   --------------------------------------------------------------------------- */
-@media (max-width:768px){
-  .main-content{ margin-left:0; }
-  [dir="rtl"] .main-content{ margin-right:0; }
-  .content-body{ padding:16px; }
-  .content-header{ padding:0 16px; }
-}
-@media (min-width:769px) and (max-width:1024px){
-  .sidebar{ width:240px; }
-  .main-content{ margin-left:240px; }
-  [dir="rtl"] .main-content{ margin-left:0; margin-right:240px; }
-}
+/* ---- Active nav teal ---- */
+.nav-item.active { background: var(--primary-light); color: var(--primary-color); }
+.nav-item.active i { color: var(--primary-color); }
+[data-bs-theme="dark"] .nav-item.active { color: var(--primary-color); }

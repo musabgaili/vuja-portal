@@ -5,7 +5,7 @@
 <style>
 /* Professional Project View Styles */
 .project-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
     color: white;
     padding: 2rem;
     border-radius: 12px;
@@ -138,7 +138,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -154,7 +154,7 @@
 }
 .progress-fill-modern {
     height: 100%;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #0F969C 0%, #0C7075 100%);
     transition: width 0.5s ease;
 }
 .stats-grid {

@@ -5,7 +5,7 @@
 
 <style>
 .modern-hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
     color: white;
     padding: 3rem 2rem;
     border-radius: 16px;
@@ -27,7 +27,7 @@
 .stat-number-modern {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -67,7 +67,7 @@
     background: #f8fafc;
     border-radius: 8px;
     margin-bottom: 0.75rem;
-    border-left: 3px solid #667eea;
+    border-left: 3px solid #0F969C;
     transition: all 0.2s;
 }
 .item-modern:hover {
@@ -107,7 +107,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card-modern" style="border-color: #8b5cf6;">
+        <div class="stat-card-modern" style="border-color: #0C7075;">
             <div class="stat-number-modern">{{ $stats['assigned_projects'] ?? 0 }}</div>
             <div class="stat-label-modern">{{ __('portal.active_projects') }}</div>
         </div>

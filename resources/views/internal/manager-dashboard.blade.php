@@ -77,7 +77,7 @@
     transform: translateX(4px);
 }
 .quick-stats-modern {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
     color: white;
     border-radius: 12px;
     padding: 1.5rem;
@@ -119,8 +119,8 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card-manager" style="border-color: #8b5cf6;">
-            <div class="stat-number-manager" style="color: #8b5cf6;">{{ $stats['meetings_today'] }}</div>
+        <div class="stat-card-manager" style="border-color: #0C7075;">
+            <div class="stat-number-manager" style="color: #0C7075;">{{ $stats['meetings_today'] }}</div>
             <div class="stat-label-manager">{{ __('portal.internal.stat_meetings_today') }}</div>
         </div>
     </div>
@@ -217,7 +217,7 @@
             </div>
             <div class="service-content-modern">
                 @forelse($newIpRegistrations as $ip)
-                <div class="request-item-modern" style="border-color: #8b5cf6;">
+                <div class="request-item-modern" style="border-color: #0C7075;">
                     <div class="d-flex justify-content-between align-items-start">
                         <div style="flex:1;">
                             <strong style="color: #1e293b;">{{ Str::limit($ip->title, 40) }}</strong>

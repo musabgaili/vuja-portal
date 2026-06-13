@@ -12,7 +12,7 @@
 <style>
 body { font-family: 'Inter', sans-serif; }
 .quote-header {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);
     color: white;
     padding: 2rem;
     border-radius: 16px;
@@ -25,7 +25,7 @@ body { font-family: 'Inter', sans-serif; }
     padding: 1.5rem;
     margin-bottom: 1rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    border-left: 4px solid #6366f1;
+    border-left: 4px solid #0F969C;
     transition: all 0.3s;
 }
 .project-card:hover {

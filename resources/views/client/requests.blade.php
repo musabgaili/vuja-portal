@@ -103,8 +103,8 @@
                     <span>{{ __('portal.client.requests.research') }}</span>
                 </div>
             </div>
-            <div class="service-stat" style="border-left-color: #8b5cf6;">
-                <i class="fas fa-file-contract" style="color: #8b5cf6;"></i>
+            <div class="service-stat" style="border-left-color: #0C7075;">
+                <i class="fas fa-file-contract" style="color: #0C7075;"></i>
                 <div>
                     <strong>{{ $summary['ip'] }}</strong>
                     <span>{{ __('portal.client.requests.ip_registration') }}</span>

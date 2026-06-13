@@ -449,7 +449,7 @@
                     <i class="fas fa-file-{{ $doc->file_type === 'pdf' ? 'pdf text-danger' : 'alt text-primary' }}"></i> {{ $doc->title }}
                 </h5>
                 <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-                    <span class="badge" style="background: {{ match($doc->tag) { 'initial' => '#8b5cf6', 'design' => '#3b82f6', 'development' => '#10b981', 'final' => '#f59e0b', default => '#6b7280' } }};">
+                    <span class="badge" style="background: {{ match($doc->tag) { 'initial' => '#0C7075', 'design' => '#3b82f6', 'development' => '#10b981', 'final' => '#f59e0b', default => '#6b7280' } }};">
                         {{ ucfirst($doc->tag) }}
                     </span>
                     <small class="text-muted">

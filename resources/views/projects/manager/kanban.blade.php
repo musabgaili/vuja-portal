@@ -7,7 +7,7 @@
 
 @section('content')
 <style>
-.projects-header{background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(99,102,241,0.3);}
+.projects-header{background:linear-gradient(135deg,#0F969C 0%,#4f46e5 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(99,102,241,0.3);}
 .stat-cards-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
 .stat-card-proj{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 4px 16px rgba(0,0,0,0.08);border-left:4px solid;transition:all 0.3s;}
 .stat-card-proj:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.12);}
@@ -151,7 +151,7 @@
         @php
             $colors = [
                 'planning' => ['bg' => '#3b82f6', 'name' => __('portal.projects_manager.status.planning')],
-                'quoted' => ['bg' => '#8b5cf6', 'name' => __('portal.projects_manager.status.quoted')],
+                'quoted' => ['bg' => '#0C7075', 'name' => __('portal.projects_manager.status.quoted')],
                 'awarded' => ['bg' => '#10b981', 'name' => __('portal.projects_manager.status.awarded')],
                 'in_progress' => ['bg' => '#f59e0b', 'name' => __('portal.projects_manager.status.in_progress')],
                 'paused' => ['bg' => '#ef4444', 'name' => __('portal.projects_manager.status.paused')],
@@ -285,7 +285,7 @@ function drop(event) {
         // 2. Update border and button colors
         const colors = {
             'planning': '#3b82f6',
-            'quoted': '#8b5cf6',
+            'quoted': '#0C7075',
             'awarded': '#10b981',
             'in_progress': '#f59e0b',
             'paused': '#ef4444',
