@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #1C575F 0%, #153d44 100%);
+            background: linear-gradient(135deg, #2C3F43 0%, #1d2a2d 100%);
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
@@ -34,7 +34,7 @@
             margin-bottom: 30px;
         }
         .logo h1 {
-            color: #1C575F;
+            color: #2C3F43;
             font-weight: 700;
             font-size: 32px;
             margin-bottom: 5px;
@@ -55,11 +55,11 @@
             transition: all 0.3s ease;
         }
         .form-control:focus {
-            border-color: #1C575F;
+            border-color: #2C3F43;
             box-shadow: 0 0 0 0.2rem rgba(28, 87, 95, 0.25);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #1C575F 0%, #153d44 100%);
+            background: linear-gradient(135deg, #2C3F43 0%, #1d2a2d 100%);
             border: none;
             border-radius: 12px;
             padding: 12px 24px;
@@ -72,7 +72,7 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(28, 87, 95, 0.4);
-            background: linear-gradient(135deg, #0BABB5 0%, #1C575F 100%);
+            background: linear-gradient(135deg, #0BABB5 0%, #2C3F43 100%);
         }
         .social-login {
             margin: 20px 0;
@@ -93,8 +93,8 @@
             transition: all 0.3s ease;
         }
         .social-btn:hover {
-            border-color: #1C575F;
-            color: #1C575F;
+            border-color: #2C3F43;
+            color: #2C3F43;
             transform: translateY(-1px);
         }
         .social-btn i {
@@ -126,7 +126,7 @@
             margin-top: 20px;
         }
         .auth-links a {
-            color: #1C575F;
+            color: #2C3F43;
             text-decoration: none;
             font-weight: 500;
         }
@@ -157,8 +157,8 @@
         .auth-card .locale-switcher .dropdown-toggle:hover,
         .auth-card .locale-switcher .dropdown-toggle:focus,
         .auth-card .locale-switcher .dropdown-toggle.show {
-            border-color: #1C575F;
-            color: #1C575F;
+            border-color: #2C3F43;
+            color: #2C3F43;
             background: #f8fafc;
         }
         .auth-card .locale-switcher .dropdown-menu {
@@ -168,7 +168,7 @@
         }
         .auth-card .locale-switcher .dropdown-item.active {
             background: rgba(28, 87, 95, 0.08);
-            color: #1C575F;
+            color: #2C3F43;
         }
     </style>
 </head>

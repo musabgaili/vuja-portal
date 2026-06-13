@@ -111,7 +111,7 @@
 }
 .progress-fill{
     height:100%;
-    background:linear-gradient(90deg,#10b981,#1C575F);
+    background:linear-gradient(90deg,#10b981,#2C3F43);
     border-radius:10px;
     transition:width 0.3s;
 }
@@ -155,7 +155,7 @@
                 'awarded' => ['bg' => '#10b981', 'name' => __('portal.projects_manager.status.awarded')],
                 'in_progress' => ['bg' => '#f59e0b', 'name' => __('portal.projects_manager.status.in_progress')],
                 'paused' => ['bg' => '#ef4444', 'name' => __('portal.projects_manager.status.paused')],
-                'completed' => ['bg' => '#1C575F', 'name' => __('portal.projects_manager.status.completed')]
+                'completed' => ['bg' => '#2C3F43', 'name' => __('portal.projects_manager.status.completed')]
             ];
             $statusProjects = $projects->where('status', $status);
         @endphp
@@ -198,7 +198,7 @@
                     @endphp
                     <div class="info-row">
                         <span class="deadline-badge {{ $class }}">
-                            <i class="fas fa-calendar-alt"></i> {{ $endDate->format('M d, Y') }} • {{ $daysText }}
+                            <i class="fas fa-calendar-alt"></i> {{ $endDate->format('M d, Y') }} â€¢ {{ $daysText }}
                         </span>
                     </div>
                     @endif
@@ -289,7 +289,7 @@ function drop(event) {
             'awarded': '#10b981',
             'in_progress': '#f59e0b',
             'paused': '#ef4444',
-            'completed': '#1C575F'
+            'completed': '#2C3F43'
         };
         draggedElement.style.borderColor = colors[newStatus];
         
@@ -376,7 +376,7 @@ function showToast(message, type = 'success') {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: ${type === 'success' ? 'linear-gradient(135deg,#10b981,#1C575F)' : 'linear-gradient(135deg,#ef4444,#dc2626)'};
+        background: ${type === 'success' ? 'linear-gradient(135deg,#10b981,#2C3F43)' : 'linear-gradient(135deg,#ef4444,#dc2626)'};
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 10px;

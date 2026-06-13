@@ -7,7 +7,7 @@
 
 @section('content')
 <style>
-.research-header{background:linear-gradient(135deg,#10b981 0%,#1C575F 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(16,185,129,0.3);}
+.research-header{background:linear-gradient(135deg,#10b981 0%,#2C3F43 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(16,185,129,0.3);}
 .table-modern{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
 .table-modern thead{background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);}
 .table-modern th{padding:1rem;font-weight:600;color:#1e293b;border-bottom:2px solid #e2e8f0;font-size:0.875rem;text-transform:uppercase;}
@@ -35,7 +35,7 @@
                 <td><strong style="color:#1e293b;">{{ $r->title }}</strong></td>
                 <td><strong>{{ $r->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $r->user->email }}</small></td>
                 <td><span class="status-badge {{ $r->getStatusBadgeColor() }}">{{ $r->getStatusLabel() }}</span></td>
-                <td>@if($r->assignedTo)<span class="badge bg-success">{{ $r->assignedTo->name }}</span>@else<span class="text-muted">—</span>@endif</td>
+                <td>@if($r->assignedTo)<span class="badge bg-success">{{ $r->assignedTo->name }}</span>@else<span class="text-muted">â€”</span>@endif</td>
                 <td><div class="d-flex gap-2"><a href="{{ route('research.manager.show',$r) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>@if($r->isNdaSigned()&&!$r->assignedTo)<button class="btn btn-sm btn-primary" onclick="assign(@js($r->getRouteKey()))"><i class="fas fa-user-plus"></i></button>@endif @if($r->isInProgress())<button class="btn btn-sm btn-success" onclick="complete(@js($r->getRouteKey()))"><i class="fas fa-check"></i></button>@endif</div></td>
             </tr>
             @endforeach

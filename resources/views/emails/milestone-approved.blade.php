@@ -11,14 +11,14 @@
 <body>
     <div class="container">
         @if($milestone->client_approved)
-        <div style="background:linear-gradient(135deg,#10b981 0%,#1C575F 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;">✅ {{ __('portal.emails.milestone_approved.approved_title') }}</h1>
+        <div style="background:linear-gradient(135deg,#10b981 0%,#2C3F43 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
+            <h1 style="margin:0;">âœ… {{ __('portal.emails.milestone_approved.approved_title') }}</h1>
         </div>
         <div style="background:#f0fdf4;padding:30px;border-radius:0 0 8px 8px;">
             <p><strong>{{ __('portal.emails.milestone_approved.great_news') }}</strong> {{ __('portal.emails.milestone_approved.approved_intro') }}</p>
         @else
         <div style="background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;">❌ {{ __('portal.emails.milestone_approved.rejected_title') }}</h1>
+            <h1 style="margin:0;">âŒ {{ __('portal.emails.milestone_approved.rejected_title') }}</h1>
         </div>
         <div style="background:#fef2f2;padding:30px;border-radius:0 0 8px 8px;">
             <p><strong>{{ __('portal.emails.milestone_approved.attention') }}</strong> {{ __('portal.emails.milestone_approved.rejected_intro') }}</p>

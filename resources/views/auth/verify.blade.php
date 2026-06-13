@@ -122,8 +122,8 @@
         .auth-card .locale-switcher .dropdown-toggle:hover,
         .auth-card .locale-switcher .dropdown-toggle:focus,
         .auth-card .locale-switcher .dropdown-toggle.show {
-            border-color: #1C575F;
-            color: #1C575F;
+            border-color: #2C3F43;
+            color: #2C3F43;
             background: #f8fafc;
         }
         .auth-card .locale-switcher .dropdown-menu {
@@ -133,7 +133,7 @@
         }
         .auth-card .locale-switcher .dropdown-item.active {
             background: rgba(28, 87, 95, 0.08);
-            color: #1C575F;
+            color: #2C3F43;
         }
     </style>
 </head>

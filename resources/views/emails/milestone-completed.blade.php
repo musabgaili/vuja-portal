@@ -10,8 +10,8 @@
 </head>
 <body>
     <div class="container">
-        <div style="background:linear-gradient(135deg,#10b981 0%,#1C575F 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;">✨ {{ __('portal.emails.milestone_completed.title') }}</h1>
+        <div style="background:linear-gradient(135deg,#10b981 0%,#2C3F43 100%);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0;">
+            <h1 style="margin:0;">âœ¨ {{ __('portal.emails.milestone_completed.title') }}</h1>
         </div>
         <div style="background:#f0fdf4;padding:30px;border-radius:0 0 8px 8px;">
             <p><strong>{{ __('portal.emails.milestone_approved.great_news') }}</strong> {{ __('portal.emails.milestone_completed.intro') }}</p>
@@ -30,7 +30,7 @@
             @endif
 
             <div style="background:white;padding:20px;border-radius:8px;margin:20px 0;border:2px solid #10b981;">
-                <h4 style="margin-top:0;">📋 {{ __('portal.emails.milestone_completed.ready_title') }}</h4>
+                <h4 style="margin-top:0;">ðŸ“‹ {{ __('portal.emails.milestone_completed.ready_title') }}</h4>
                 <p>{{ __('portal.emails.milestone_completed.ready_body') }}</p>
             </div>
 

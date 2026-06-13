@@ -379,7 +379,7 @@
                     <br>
                     <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ __('portal.projects_manager.show.milestone_status.'.$milestone->status) }}</span>
                     @if($milestone->due_date)
-                    <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d') }}</small>
+                    <small class="text-muted">â€¢ {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d') }}</small>
                     @endif
                 </div>
                 @empty
@@ -412,7 +412,7 @@
                         <span class="badge bg-danger ms-2"><i class="fas fa-times-circle"></i> {{ __('portal.projects_manager.show.client_rejected') }}</span>
                         @endif
                         @if($milestone->due_date)
-                        <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}</small>
+                        <small class="text-muted">â€¢ {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}</small>
                         @endif
                     </div>
                     @if($milestone->client_approved === false && $milestone->approval_note)
@@ -611,7 +611,7 @@
                 <small class="text-muted">{{ $deliverable->description }}</small>
                 <br>
                 <small class="text-muted">
-                    {{ __('portal.projects_client.show.uploaded_by') }} {{ $deliverable->uploadedBy->name }} • {{ $deliverable->created_at->format('M d, Y') }}
+                    {{ __('portal.projects_client.show.uploaded_by') }} {{ $deliverable->uploadedBy->name }} â€¢ {{ $deliverable->created_at->format('M d, Y') }}
                 </small>
             </div>
             <div class="d-flex gap-2">
@@ -644,15 +644,15 @@
                 <div style="flex:1;">
                     <h5 style="font-weight:600;color:#1e293b;">{{ $req->subject }}</h5>
                     <p style="color:#64748b;margin:0.5rem 0;">{{ $req->request }}</p>
-                    <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->client->name }} • {{ $req->created_at->format('M d, Y g:i A') }}</small>
+                    <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->client->name }} â€¢ {{ $req->created_at->format('M d, Y g:i A') }}</small>
                 </div>
                 <span class="status-badge {{ $req->status === 'open' ? 'warning' : 'success' }}">{{ __('portal.projects_manager.show.request_status.'.$req->status) }}</span>
             </div>
             @if($req->response)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
-                <strong style="color:#1C575F;">{{ __('portal.projects_manager.show.response') }}:</strong>
+                <strong style="color:#2C3F43;">{{ __('portal.projects_manager.show.response') }}:</strong>
                 <p style="margin:0.5rem 0 0 0;color:#065f46;">{{ $req->response }}</p>
-                <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->handledBy->name }} • {{ $req->handled_at->format('M d, Y') }}</small>
+                <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $req->handledBy->name }} â€¢ {{ $req->handled_at->format('M d, Y') }}</small>
             </div>
             @else
             <div class="mt-3">
@@ -680,15 +680,15 @@
                 <div style="flex:1;">
                     <h5 style="font-weight:600;color:#1e293b;">{{ $complaint->subject }}</h5>
                     <p style="color:#64748b;margin:0.5rem 0;">{{ $complaint->complaint }}</p>
-                    <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->client->name }} • {{ $complaint->created_at->format('M d, Y g:i A') }}</small>
+                    <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->client->name }} â€¢ {{ $complaint->created_at->format('M d, Y g:i A') }}</small>
                 </div>
                 <span class="status-badge {{ $complaint->status === 'open' ? 'error' : 'success' }}">{{ __('portal.projects_manager.show.complaint_status.'.$complaint->status) }}</span>
             </div>
             @if($complaint->resolution_note)
             <div class="mt-3 p-3" style="background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;">
-                <strong style="color:#1C575F;">{{ __('portal.projects_manager.show.resolution') }}:</strong>
+                <strong style="color:#2C3F43;">{{ __('portal.projects_manager.show.resolution') }}:</strong>
                 <p style="margin:0.5rem 0 0 0;color:#065f46;">{{ $complaint->resolution_note }}</p>
-                <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->resolvedBy->name }} • {{ $complaint->resolved_at->format('M d, Y') }}</small>
+                <small class="text-muted">{{ __('portal.projects_manager.show.by') }} {{ $complaint->resolvedBy->name }} â€¢ {{ $complaint->resolved_at->format('M d, Y') }}</small>
             </div>
             @elseif($user->isManager())
             <div class="mt-3">

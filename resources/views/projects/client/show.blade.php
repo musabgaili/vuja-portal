@@ -5,7 +5,7 @@
 <style>
 /* Modern Client Project View */
 .client-project-header {
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     color: white;
     padding: 2.5rem;
     border-radius: 16px;
@@ -83,7 +83,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,7 +109,7 @@
     background: #fffbeb;
 }
 .action-btn-client {
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -146,7 +146,7 @@
 .stat-modern-value {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -165,7 +165,7 @@
 }
 .progress-modern-fill {
     height: 100%;
-    background: linear-gradient(90deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(90deg, #10b981 0%, #2C3F43 100%);
     transition: width 0.5s ease;
     box-shadow: 0 0 10px rgba(28, 87, 95, 0.28);
 }
@@ -196,7 +196,7 @@
                     <i class="fas fa-calendar"></i> 
                     {{ $project->start_date->format('M d, Y') }}
                     @if($project->end_date)
-                    → {{ $project->end_date->format('M d, Y') }}
+                    â†’ {{ $project->end_date->format('M d, Y') }}
                     @endif
                 </span>
                 @endif
@@ -349,7 +349,7 @@
                         <p class="text-muted small">{{ $deliverable->description }}</p>
                         @endif
                         <small class="text-muted">
-                            {{ __('portal.projects_client.show.uploaded_by') }} {{ $deliverable->uploadedBy->name }} • {{ $deliverable->created_at->format('M d, Y') }}
+                            {{ __('portal.projects_client.show.uploaded_by') }} {{ $deliverable->uploadedBy->name }} â€¢ {{ $deliverable->created_at->format('M d, Y') }}
                         </small>
                     </div>
                     <div class="d-flex gap-2 flex-column">
@@ -413,7 +413,7 @@
                                 <i class="fas fa-shield-alt"></i> {{ __('portal.projects_client.show.vujade_team') }}
                             </span>
                             @else
-                            <span class="badge" style="font-size: 0.75rem; background: #1C575F;">
+                            <span class="badge" style="font-size: 0.75rem; background: #2C3F43;">
                                 <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                             </span>
                             @endif
@@ -501,7 +501,7 @@
                             <i class="fas fa-star"></i> {{ __('portal.projects_client.show.project_manager') }}
                         </span>
                         @elseif($person->role === 'client')
-                        <span class="badge" style="font-size: 0.85rem; background: #1C575F;">
+                        <span class="badge" style="font-size: 0.85rem; background: #2C3F43;">
                             <i class="fas fa-user"></i> {{ __('portal.projects_client.show.client') }}
                         </span>
                         @else
@@ -660,7 +660,7 @@
 <div class="modal fade" id="requestModal">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header text-white" style="background: #1C575F;">
+            <div class="modal-header text-white" style="background: #2C3F43;">
     <h5><i class="fas fa-hand-paper"></i> {{ __('portal.projects_client.show.submit_request') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -680,7 +680,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn text-white" style="background: #1C575F; border-color: #1C575F;">
+                    <button type="submit" class="btn text-white" style="background: #2C3F43; border-color: #2C3F43;">
                         <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.submit_request') }}
                     </button>
                 </div>

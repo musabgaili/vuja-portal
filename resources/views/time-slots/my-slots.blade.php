@@ -8,7 +8,7 @@
 @section('content')
 <style>
 .slots-header {
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     color: white;
     padding: 2rem;
     border-radius: 12px;
@@ -125,7 +125,7 @@
                         @endif
                         <br><small class="text-info"><i class="fas fa-comment"></i> <strong>{{ $slot->meeting->title }}</strong></small>
                     @else
-                        <span class="text-muted">—</span>
+                        <span class="text-muted">â€”</span>
                     @endif
                 </td>
                 <td>

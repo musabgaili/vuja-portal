@@ -118,11 +118,11 @@
 @push('styles')
 <style>
 .card-header.bg-gradient-primary {
-    background: linear-gradient(135deg, #1C575F 0%, #153d44 100%) !important;
+    background: linear-gradient(135deg, #2C3F43 0%, #1d2a2d 100%) !important;
 }
 
 .form-control:focus {
-    border-color: #1C575F;
+    border-color: #2C3F43;
     box-shadow: 0 0 0 0.2rem rgba(28, 87, 95, 0.25);
 }
 

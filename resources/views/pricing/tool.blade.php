@@ -12,7 +12,7 @@
 <style>
 body { font-family: 'Inter', sans-serif; }
 .pricing-header {
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     color: white;
     padding: 2rem;
     border-radius: 16px;
@@ -46,7 +46,7 @@ body { font-family: 'Inter', sans-serif; }
     box-shadow: 0 1px 4px rgba(16, 185, 129, 0.1);
 }
 .grand-total {
-    background: linear-gradient(135deg, #10b981 0%, #1C575F 100%);
+    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
     color: white;
     padding: 1.5rem;
     border-radius: 12px;
@@ -62,7 +62,7 @@ body { font-family: 'Inter', sans-serif; }
         </h1>
         <p class="opacity-90">{{ __('portal.pricing.internal_tool_subtitle') }}</p>
         @if(auth()->user()->isManager())
-        <a href="{{ route('pricing.admin') }}" class="btn btn-light btn-sm mt-3" style="background: white; color: #1C575F; border: 1px solid #1C575F;">
+        <a href="{{ route('pricing.admin') }}" class="btn btn-light btn-sm mt-3" style="background: white; color: #2C3F43; border: 1px solid #2C3F43;">
             <i class="fas fa-cogs"></i> {{ __('portal.pricing.pricing_admin') }}
         </a>
         @endif
@@ -244,7 +244,7 @@ function updateCart() {
                         onblur="updateQuantity(${index}, this.value, this)"
                         class="form-control form-control-sm" 
                         style="width: 60px; height: 28px; font-size: 0.8rem;">
-                    <small class="text-muted" style="font-size: 0.75rem;">${item.unit} × $${item.rate.toFixed(2)}</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">${item.unit} Ã— $${item.rate.toFixed(2)}</small>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted" style="font-size: 0.7rem;">${item.note}</small>
