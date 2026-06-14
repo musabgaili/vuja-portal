@@ -104,3 +104,8 @@ require __DIR__.'/internal.php';
 // INCLUDE PROJECT ROUTES (Client + Internal)
 // ============================================
 require __DIR__.'/projects.php';
+
+// ============================================
+// INCLUDE INVENTORY ROUTES (Manager)
+// ============================================
+require __DIR__.'/inventory.php';

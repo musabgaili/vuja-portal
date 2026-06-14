@@ -204,6 +204,10 @@
                         <i class="fas fa-sliders"></i>
                         {{ __('portal.nav.engagement_settings') }}
                     </a>
+                    <a href="{{ route('inventory.index') }}" class="nav-item {{ request()->routeIs('inventory.*') ? 'active' : '' }}">
+                        <i class="fas fa-boxes-stacked"></i>
+                        {{ __('portal.nav.inventory') }}
+                    </a>
                     <a href="{{ route('permissions.portal-clients') }}" class="nav-item">
                         <i class="fas fa-user-friends"></i>
                         {{ __('portal.permissions.portal_clients_nav') }}
