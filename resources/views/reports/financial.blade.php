@@ -48,8 +48,13 @@
             <h3 class="card-title mb-1">{{ __('portal.reports.financial.title') }}</h3>
             <small class="text-muted">{{ __('portal.reports.financial.subtitle') }}</small>
         </div>
-        <div class="badge {{ $totals['remaining'] < 0 ? 'bg-danger' : 'bg-success' }}">
-            {{ __('portal.reports.financial.total_remaining') }}: ${{ number_format($totals['remaining'], 2) }}
+        <div class="d-flex gap-2 align-items-center">
+            <div class="badge {{ $totals['remaining'] < 0 ? 'bg-danger' : 'bg-success' }}">
+                {{ __('portal.reports.financial.total_remaining') }}: ${{ number_format($totals['remaining'], 2) }}
+            </div>
+            <div class="badge {{ ($totals['margin_pct'] ?? 0) < 0 ? 'bg-danger' : 'bg-primary' }}">
+                {{ __('portal.reports.financial.profit_margin') }}: {{ number_format($totals['margin_pct'] ?? 0, 1) }}%
+            </div>
         </div>
     </div>
     <div class="card-content">

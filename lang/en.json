@@ -1,4 +1,5 @@
 {
+    "portal.reports.financial.profit_margin": "Profit Margin",
     "portal.nav.workload": "Workload",
     "portal.workload.title": "Employee Workload Heatmap",
     "portal.workload.subtitle": "Who is busy and who is idle, at a glance.",

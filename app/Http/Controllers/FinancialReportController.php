@@ -53,6 +53,9 @@ class FinancialReportController extends Controller
             'remaining' => $summaryProjects->sum(fn (Project $project) => (float) $project->getBudgetRemaining()),
             'over_budget' => $summaryProjects->filter(fn (Project $project) => $project->isOverBudget())->count(),
         ];
+        // Profit margin = (budget - actual cost) / budget. The owner's at-a-glance health.
+        $totals['margin'] = $totals['budget'] - $totals['spent'];
+        $totals['margin_pct'] = $totals['budget'] > 0 ? round($totals['margin'] / $totals['budget'] * 100, 1) : 0.0;
 
         $projects = $query->latest()->paginate(15)->withQueryString();
 
