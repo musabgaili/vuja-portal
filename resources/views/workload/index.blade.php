@@ -33,7 +33,9 @@
             <tbody>
                 @forelse($rows as $row)
                     <tr>
-                        <td style="text-align:start; font-weight:600;">{{ $row['user']->name }}</td>
+                        <td style="text-align:start; font-weight:600;">
+                            <a href="{{ route('workload.show', $row['user']) }}" style="color:var(--primary-color); text-decoration:none;">{{ $row['user']->name }} <i class="fas fa-up-right-from-square" style="font-size:.7rem;"></i></a>
+                        </td>
                         <td style="{{ $heat($row['projects'], $maxProjects) }} border-radius:6px;">{{ $row['projects'] }}</td>
                         <td style="{{ $heat($row['tasks'], $maxTasks) }} border-radius:6px;">{{ $row['tasks'] }}</td>
                         <td style="{{ $heat($row['requests'], $maxRequests) }} border-radius:6px;">{{ $row['requests'] }}</td>

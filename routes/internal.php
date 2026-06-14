@@ -85,6 +85,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
 
     // WORKLOAD HEATMAP — who is busy / who is idle (manager)
     Route::get('/workload', [\App\Http\Controllers\WorkloadController::class, 'index'])->name('workload.index');
+    Route::get('/workload/{user}', [\App\Http\Controllers\WorkloadController::class, 'show'])->name('workload.show');
 
     // WEEKLY STRATEGIC PLANNER (employees plan; managers review/oversee)
     Route::get('/weekly-planner', [WeeklyPlannerController::class, 'index'])->name('weekly-planner.index');
