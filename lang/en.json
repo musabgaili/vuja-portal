@@ -2327,5 +2327,10 @@
     "portal.permissions.user_delete_failed": "Could not delete — the account has linked records.",
     "portal.permissions.bulk_deleted": ":deleted account(s) deleted, :skipped skipped.",
     "portal.permissions.unverified_deleted": ":deleted unverified client(s) deleted, :skipped skipped.",
-    "portal.permissions.no_users": "No users match."
+    "portal.permissions.no_users": "No users match.",
+    "portal.projects_manager.index.delete": "Delete project",
+    "portal.projects_manager.index.delete_confirm": "Permanently delete this project and all its milestones, tasks, files and team assignments? This cannot be undone.",
+    "portal.projects_manager.index.deleted": "Project deleted.",
+    "portal.projects_manager.index.delete_failed": "Could not delete this project — it has linked records.",
+    "portal.projects_manager.show.delete_project": "Delete Project"
 }

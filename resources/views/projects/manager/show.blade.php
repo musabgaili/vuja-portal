@@ -268,6 +268,16 @@
         <i class="fas fa-user-plus"></i> {{ __('portal.projects_manager.show.add_member') }}
     </button>
     @endif
+
+    @if(auth()->user()->isManager())
+    <form method="POST" action="{{ route('projects.destroy', $project) }}" class="d-inline"
+          onsubmit="return confirm('{{ __('portal.projects_manager.show.delete_confirm') }}');">
+        @csrf @method('DELETE')
+        <button type="submit" class="btn btn-outline-danger">
+            <i class="fas fa-trash"></i> {{ __('portal.projects_manager.show.delete_project') }}
+        </button>
+    </form>
+    @endif
 </div>
 
 <!-- Tabs -->

@@ -2326,5 +2326,10 @@
     "portal.permissions.user_delete_failed": "تعذّر الحذف — الحساب مرتبط بسجلات أخرى.",
     "portal.permissions.bulk_deleted": "تم حذف :deleted حساب، وتم تخطي :skipped.",
     "portal.permissions.unverified_deleted": "تم حذف :deleted عميل غير موثّق، وتم تخطي :skipped.",
-    "portal.permissions.no_users": "لا يوجد مستخدمون مطابقون."
+    "portal.permissions.no_users": "لا يوجد مستخدمون مطابقون.",
+    "portal.projects_manager.index.delete": "حذف المشروع",
+    "portal.projects_manager.index.delete_confirm": "حذف هذا المشروع وكل مراحله ومهامه وملفاته وفريقه نهائيًا؟ لا يمكن التراجع.",
+    "portal.projects_manager.index.deleted": "تم حذف المشروع.",
+    "portal.projects_manager.index.delete_failed": "تعذّر حذف هذا المشروع — مرتبط بسجلات أخرى.",
+    "portal.projects_manager.show.delete_project": "حذف المشروع"
 }

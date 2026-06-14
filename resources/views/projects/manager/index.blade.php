@@ -148,9 +148,20 @@
                     @endif
                 </td>
                 <td>
-                    <a href="{{ route('projects.manager.show',$p) }}" class="btn btn-sm btn-secondary">
-                        <i class="fas fa-eye"></i> {{ __('portal.internal.view') }}
-                    </a>
+                    <div class="d-flex gap-1">
+                        <a href="{{ route('projects.manager.show',$p) }}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-eye"></i> {{ __('portal.internal.view') }}
+                        </a>
+                        @if(auth()->user()->isManager())
+                        <form method="POST" action="{{ route('projects.destroy', $p) }}" class="d-inline"
+                              onsubmit="return confirm('{{ __('portal.projects_manager.index.delete_confirm') }}');">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger" title="{{ __('portal.projects_manager.index.delete') }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        @endif
+                    </div>
                 </td>
             </tr>
             @endforeach

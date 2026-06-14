@@ -351,14 +351,17 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        $user = Auth::user();
-
         $this->authorize('delete', $project);
 
-        $project->delete();
+        try {
+            $project->delete();
+        } catch (\Throwable $e) {
+            // e.g. a foreign-key restriction from a linked record.
+            return back()->with('error', __('portal.projects_manager.index.delete_failed'));
+        }
 
         return redirect()->route('projects.manager.index')
-            ->with('success', 'Project deleted successfully!');
+            ->with('success', __('portal.projects_manager.index.deleted'));
     }
 
     public function addTeamMember(Request $request, Project $project)

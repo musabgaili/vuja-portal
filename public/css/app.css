@@ -1107,6 +1107,34 @@ body {
     background: var(--bg-primary) !important; background-image: none !important; border-color: var(--gray-200) !important;
 }
 
+/* ---- Dark-mode: class-based hardcoded light surfaces from per-page <style> blocks ---- */
+/* These per-view classes hardcode `background: white` in their own <style>, which
+   loads after app.css and overrides the themed .card rule. Re-assert the dark
+   surface with !important so the text (which uses the inverted gray ramp) stays readable. */
+[data-bs-theme="dark"] .section-card,
+[data-bs-theme="dark"] .stat-box,
+[data-bs-theme="dark"] .task-item,
+[data-bs-theme="dark"] .task-item:hover,
+[data-bs-theme="dark"] .milestone-item:hover,
+[data-bs-theme="dark"] .filter-card,
+[data-bs-theme="dark"] .table-modern,
+[data-bs-theme="dark"] .stat-card-proj {
+    background: var(--bg-primary) !important;
+    background-image: none !important;
+    border-color: var(--gray-200) !important;
+}
+[data-bs-theme="dark"] .table-modern thead { background: var(--bg-tertiary) !important; background-image: none !important; }
+[data-bs-theme="dark"] .table-modern th { color: var(--gray-500) !important; border-bottom-color: var(--gray-200) !important; }
+[data-bs-theme="dark"] .table-modern td { border-bottom-color: var(--gray-100) !important; }
+[data-bs-theme="dark"] .table-modern tbody tr:hover { background: var(--bg-tertiary) !important; }
+/* Inline white/light backgrounds not inside .content-body (e.g. empty-state panels) */
+[data-bs-theme="dark"] [style*="background:white"],
+[data-bs-theme="dark"] [style*="background: white"],
+[data-bs-theme="dark"] [style*="background:#fff"],
+[data-bs-theme="dark"] [style*="background: #fff"] {
+    background: var(--bg-primary) !important; background-image: none !important;
+}
+
 /* ---- Active nav teal ---- */
 .nav-item.active { background: var(--primary-light); color: var(--primary-color); }
 .nav-item.active i { color: var(--primary-color); }
