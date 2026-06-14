@@ -42,6 +42,10 @@
                         <i class="fas fa-tower-observation"></i>
                         {{ __('portal.nav.control_tower') }}
                     </a>
+                    <a href="{{ route('workload.index') }}" class="nav-item {{ request()->routeIs('workload.*') ? 'active' : '' }}">
+                        <i class="fas fa-fire"></i>
+                        {{ __('portal.nav.workload') }}
+                    </a>
                     @endif
                     <a href="{{ route('engagement.index') }}" class="nav-item {{ request()->routeIs('engagement.*') ? 'active' : '' }}">
                         <i class="fas fa-bolt"></i>

@@ -41,6 +41,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // CONTROL TOWER — owner project-health traffic light + risk alerts (manager)
     Route::get('/control-tower', [ControlTowerController::class, 'index'])->name('control-tower.index');
 
+    // WORKLOAD HEATMAP — who is busy / who is idle (manager)
+    Route::get('/workload', [\App\Http\Controllers\WorkloadController::class, 'index'])->name('workload.index');
+
     // WEEKLY STRATEGIC PLANNER (employees plan; managers review/oversee)
     Route::get('/weekly-planner', [WeeklyPlannerController::class, 'index'])->name('weekly-planner.index');
     Route::post('/weekly-planner', [WeeklyPlannerController::class, 'store'])->name('weekly-planner.store');
