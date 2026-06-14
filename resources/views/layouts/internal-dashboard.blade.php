@@ -78,6 +78,10 @@
                         <i class="fas fa-address-book"></i>
                         {{ __('portal.nav.contacts') }}
                     </a>
+                    <a href="{{ route('crm-activities.index') }}" class="nav-item {{ request()->routeIs('crm-activities.*') ? 'active' : '' }}">
+                        <i class="fas fa-list-check"></i>
+                        {{ __('portal.nav.activities') }}
+                    </a>
                 </div>
 
                 <!-- Service Requests -->

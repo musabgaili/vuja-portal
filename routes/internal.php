@@ -54,6 +54,12 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::resource('companies', \App\Http\Controllers\CompanyController::class);
     Route::resource('contacts', \App\Http\Controllers\ContactController::class)->except('show');
 
+    // CRM activities & chatter (log notes / schedule next-actions; My Activities inbox)
+    Route::get('/crm-activities', [\App\Http\Controllers\CrmActivityController::class, 'index'])->name('crm-activities.index');
+    Route::post('/crm-activities', [\App\Http\Controllers\CrmActivityController::class, 'store'])->name('crm-activities.store');
+    Route::post('/crm-activities/{activity}/complete', [\App\Http\Controllers\CrmActivityController::class, 'complete'])->name('crm-activities.complete');
+    Route::delete('/crm-activities/{activity}', [\App\Http\Controllers\CrmActivityController::class, 'destroy'])->name('crm-activities.destroy');
+
     // AI SCOPE & INVENTORY PLANNER (all internal — front-end of the Pricing Tool)
     Route::get('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'index'])->name('scope-planner.index');
     Route::post('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'plan'])->name('scope-planner.plan');

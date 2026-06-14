@@ -68,4 +68,8 @@
         </div>
     </div>
 </div>
+
+<div class="mt-3">
+    @include('partials.activity-timeline', ['subject' => $company, 'subjectKey' => 'company'])
+</div>
 @endsection

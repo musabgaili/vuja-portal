@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCrmActivities;
 use App\Models\Concerns\HasTags;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Opportunity extends Model
 {
-    use HasTags;
+    use HasCrmActivities, HasTags;
 
     protected $fillable = [
         'name', 'company_name', 'contact_name', 'email', 'phone', 'source',

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCrmActivities;
 use App\Models\Concerns\HasTags;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Contact extends Model
 {
-    use HasTags;
+    use HasCrmActivities, HasTags;
 
     protected $fillable = [
         'company_id', 'name', 'job_title', 'email', 'phone', 'is_primary', 'notes', 'owner_id', 'user_id',
