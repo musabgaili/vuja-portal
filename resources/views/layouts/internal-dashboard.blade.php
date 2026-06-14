@@ -55,6 +55,10 @@
                         <i class="fas fa-calendar-week"></i>
                         {{ __('portal.nav.weekly_planner') }}
                     </a>
+                    <a href="{{ route('staff-tasks.index') }}" class="nav-item {{ request()->routeIs('staff-tasks.*') ? 'active' : '' }}">
+                        <i class="fas fa-list-check"></i>
+                        {{ auth()->user()->isManager() ? __('portal.nav.staff_tasks') : __('portal.nav.my_tasks') }}
+                    </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('weekly-planner.review') }}" class="nav-item {{ request()->routeIs('weekly-planner.review') || request()->routeIs('weekly-planner.presence') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-check"></i>
@@ -191,6 +195,10 @@
                     <a href="{{ route('permissions.index') }}" class="nav-item">
                         <i class="fas fa-shield-alt"></i>
                         {{ __('portal.nav.permissions') }}
+                    </a>
+                    <a href="{{ route('engagement.settings.edit') }}" class="nav-item {{ request()->routeIs('engagement.settings.*') ? 'active' : '' }}">
+                        <i class="fas fa-sliders"></i>
+                        {{ __('portal.nav.engagement_settings') }}
                     </a>
                     <a href="{{ route('permissions.portal-clients') }}" class="nav-item">
                         <i class="fas fa-user-friends"></i>

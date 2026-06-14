@@ -38,6 +38,11 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
     Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
 
+    // DIRECT STAFF TASKS — assignee inbox + status updates (all internal);
+    // creation / deletion is manager-only (see the is_manager group below).
+    Route::get('/staff-tasks', [\App\Http\Controllers\StaffTaskController::class, 'index'])->name('staff-tasks.index');
+    Route::post('/staff-tasks/{staffTask}/status', [\App\Http\Controllers\StaffTaskController::class, 'updateStatus'])->name('staff-tasks.status');
+
     // CRM — sales pipeline (Leads / Opportunities), all internal staff
     Route::get('/crm', [\App\Http\Controllers\OpportunityController::class, 'index'])->name('crm.index');
     Route::get('/crm/create', [\App\Http\Controllers\OpportunityController::class, 'create'])->name('crm.create');
@@ -151,6 +156,16 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // MANAGER-ONLY ROUTES
     // ============================================
     Route::middleware(['is_manager'])->group(function () {
+
+        // ENGAGEMENT SETTINGS — manager-tunable Impact-Points rulebook
+        Route::get('/engagement/settings', [\App\Http\Controllers\EngagementSettingsController::class, 'edit'])->name('engagement.settings.edit');
+        Route::put('/engagement/settings', [\App\Http\Controllers\EngagementSettingsController::class, 'update'])->name('engagement.settings.update');
+        Route::post('/engagement/settings/reset', [\App\Http\Controllers\EngagementSettingsController::class, 'reset'])->name('engagement.settings.reset');
+
+        // DIRECT STAFF TASKS — assign / delete (manager only)
+        Route::get('/staff-tasks/create', [\App\Http\Controllers\StaffTaskController::class, 'create'])->name('staff-tasks.create');
+        Route::post('/staff-tasks', [\App\Http\Controllers\StaffTaskController::class, 'store'])->name('staff-tasks.store');
+        Route::delete('/staff-tasks/{staffTask}', [\App\Http\Controllers\StaffTaskController::class, 'destroy'])->name('staff-tasks.destroy');
 
         // Team Time Slots Overview (Manager Only)
         Route::get('/team-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'teamSlots'])->name('time-slots.team-slots');

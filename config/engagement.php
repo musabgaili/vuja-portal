@@ -6,7 +6,10 @@
  */
 return [
 
-    // Points awarded per action key.
+    // Points awarded per action key. These are DEFAULTS — a manager can override
+    // any value at runtime via the Engagement Settings editor (stored in the
+    // `settings` table, key `engagement.actions`). EngagementService merges the
+    // overrides over these defaults, so a missing/blank override falls back here.
     'actions' => [
         // Execution
         'task_completed_early'   => 50,   // before the deadline
@@ -25,6 +28,42 @@ return [
         'weekly_plan_on_time'    => 20,
         'weekly_plan_late'       => -50,
         'weekly_plan_approved'   => 30,
+        // Direct staff tasks (manager-assigned) — a higher rank than ordinary
+        // task completion to reward owning a discrete deliverable end-to-end.
+        'staff_task_project'     => 60,   // tied to a specific project
+        'staff_task_presale'    => 70,   // pre-sale / scoping work
+        'staff_task_sales'       => 80,   // sales / revenue work
+        'staff_task_management'  => 90,   // management / internal initiatives
+    ],
+
+    // Editor metadata: groups each action under a category and gives it a label
+    // for the Engagement Settings UI. Keys must match `actions` above. An action
+    // with no entry here still works — it just won't show in the grouped editor.
+    'categories' => [
+        'execution'    => 'Execution',
+        'collaboration'=> 'Collaboration',
+        'client'       => 'Client success',
+        'hygiene'      => 'Platform hygiene',
+        'gratitude'    => 'Peer gratitude',
+        'planner'      => 'Weekly planner',
+        'staff_tasks'  => 'Direct staff tasks',
+    ],
+    'action_meta' => [
+        'task_completed_early'   => ['category' => 'execution',     'label' => 'Task completed early'],
+        'task_completed_on_time' => ['category' => 'execution',     'label' => 'Task completed on time'],
+        'solution_comment'       => ['category' => 'collaboration', 'label' => 'Helpful solution comment'],
+        'peer_review'            => ['category' => 'collaboration', 'label' => 'Peer document review'],
+        'client_reply_fast'      => ['category' => 'client',        'label' => 'Fast client reply (<2h)'],
+        'client_five_star'       => ['category' => 'client',        'label' => '5-star client rating'],
+        'daily_status_update'    => ['category' => 'hygiene',       'label' => 'Daily status update'],
+        'thank_you_received'     => ['category' => 'gratitude',     'label' => 'Thank-You received'],
+        'weekly_plan_on_time'    => ['category' => 'planner',       'label' => 'Weekly plan on time'],
+        'weekly_plan_late'       => ['category' => 'planner',       'label' => 'Weekly plan late (penalty)'],
+        'weekly_plan_approved'   => ['category' => 'planner',       'label' => 'Weekly plan approved'],
+        'staff_task_project'     => ['category' => 'staff_tasks',   'label' => 'Direct task — Project'],
+        'staff_task_presale'    => ['category' => 'staff_tasks',   'label' => 'Direct task — Pre-sale'],
+        'staff_task_sales'       => ['category' => 'staff_tasks',   'label' => 'Direct task — Sales'],
+        'staff_task_management'  => ['category' => 'staff_tasks',   'label' => 'Direct task — Management'],
     ],
 
     // Levels: name, inclusive point range, unlocked perk.

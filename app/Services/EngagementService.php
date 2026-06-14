@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EngagementLog;
+use App\Models\Setting;
 use App\Models\ThankYouToken;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +23,7 @@ class EngagementService
      */
     public function award(User $user, string $action, ?Model $subject = null, ?int $overridePoints = null, ?string $description = null): ?EngagementLog
     {
-        $points = $overridePoints ?? (config("engagement.actions.$action"));
+        $points = $overridePoints ?? $this->pointsFor($action);
         if ($points === null) {
             return null; // unknown action — fail safe, never throw in a request path
         }
@@ -54,6 +55,51 @@ class EngagementService
         }
 
         return $log;
+    }
+
+    /**
+     * Effective point value for an action: a manager override (settings table)
+     * layered over the config default. Returns null for an unknown action.
+     */
+    public function pointsFor(string $action): ?int
+    {
+        $points = $this->actionPoints();
+
+        return array_key_exists($action, $points) ? (int) $points[$action] : null;
+    }
+
+    /**
+     * The full action => points map (config defaults with manager overrides
+     * merged on top). Blank/non-numeric overrides are ignored so a cleared
+     * field falls back to the default.
+     */
+    public function actionPoints(): array
+    {
+        $defaults = config('engagement.actions', []);
+        $overrides = collect(Setting::get('engagement.actions', []))
+            ->filter(fn ($v) => $v !== null && $v !== '' && is_numeric($v))
+            ->map(fn ($v) => (int) $v)
+            ->toArray();
+
+        return array_merge($defaults, $overrides);
+    }
+
+    /** A scalar engagement setting (manager override over config default). */
+    public function setting(string $key, $default = null)
+    {
+        $val = Setting::get("engagement.$key", null);
+
+        return ($val === null || $val === '') ? $default : $val;
+    }
+
+    public function thankYouQuota(): int
+    {
+        return (int) $this->setting('thank_you_monthly_quota', config('engagement.thank_you_monthly_quota', 5));
+    }
+
+    public function burnoutInactiveDays(): int
+    {
+        return (int) $this->setting('burnout_inactive_days', config('engagement.burnout_inactive_days', 7));
     }
 
     /** Resolve the level definition for a points total. */
@@ -90,7 +136,7 @@ class EngagementService
         }
         $period = now()->format('Y-m');
         $used = ThankYouToken::where('from_user_id', $from->id)->where('period', $period)->count();
-        $quota = (int) config('engagement.thank_you_monthly_quota', 5);
+        $quota = $this->thankYouQuota();
         if ($used >= $quota) {
             return ['ok' => false, 'error' => "You've used all {$quota} Thank-You tokens this month."];
         }
@@ -111,7 +157,7 @@ class EngagementService
         $period = now()->format('Y-m');
         $used = ThankYouToken::where('from_user_id', $user->id)->where('period', $period)->count();
 
-        return max(0, (int) config('engagement.thank_you_monthly_quota', 5) - $used);
+        return max(0, $this->thankYouQuota() - $used);
     }
 
     /** Leaderboard: most valuable culture-carriers (by impact points). */
@@ -134,7 +180,7 @@ class EngagementService
      */
     public function burnoutAlerts()
     {
-        $cutoff = now()->subDays((int) config('engagement.burnout_inactive_days', 7));
+        $cutoff = now()->subDays($this->burnoutInactiveDays());
         $threshold = config('engagement.levels')[2]['min'] ?? 2001; // Client Champion+
 
         return User::where('type', 'internal')
