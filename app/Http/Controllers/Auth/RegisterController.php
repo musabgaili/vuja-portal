@@ -6,10 +6,8 @@ use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -98,17 +96,10 @@ class RegisterController extends Controller
 
         $user->assignRole('client');
 
-        // Send email verification. A mail-provider/transport failure must never
-        // block account creation — log it and let the user request a new link later.
-        try {
-            event(new Registered($user));
-        } catch (\Throwable $e) {
-            Log::warning('Verification email could not be sent during registration.', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
+        // NOTE: do NOT fire Registered here — the RegistersUsers trait's register()
+        // already dispatches it. Firing it twice sent two verification emails and,
+        // worse, the trait's (unwrapped) dispatch 500'd on any mail-transport
+        // error. Mail resilience now lives in User::sendEmailVerificationNotification().
         return $user;
     }
 }

@@ -64,6 +64,21 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * Send the email-verification notification, but never let a mail-transport
+     * failure (e.g. an unverified Resend domain) bubble up — that would 500 the
+     * registration request and, with APP_DEBUG on, leak the request body. The
+     * account is still created; the user can request a fresh link later.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        try {
+            parent::sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
      * Engagement / Impact Points helpers.
      */
     public function engagementLogs()
