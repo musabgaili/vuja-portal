@@ -82,6 +82,12 @@
                         <i class="fas fa-list-check"></i>
                         {{ __('portal.nav.activities') }}
                     </a>
+                    @if(auth()->user()->isManager())
+                    <a href="{{ route('crm-reports.index') }}" class="nav-item {{ request()->routeIs('crm-reports.*') ? 'active' : '' }}">
+                        <i class="fas fa-chart-line"></i>
+                        {{ __('portal.nav.sales_reports') }}
+                    </a>
+                    @endif
                 </div>
 
                 <!-- Service Requests -->

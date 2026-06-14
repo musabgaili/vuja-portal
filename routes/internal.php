@@ -54,6 +54,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::resource('companies', \App\Http\Controllers\CompanyController::class);
     Route::resource('contacts', \App\Http\Controllers\ContactController::class)->except('show');
 
+    // CRM reporting — sales analytics (manager)
+    Route::get('/crm-reports', [\App\Http\Controllers\CrmReportController::class, 'index'])->name('crm-reports.index');
+
     // CRM activities & chatter (log notes / schedule next-actions; My Activities inbox)
     Route::get('/crm-activities', [\App\Http\Controllers\CrmActivityController::class, 'index'])->name('crm-activities.index');
     Route::post('/crm-activities', [\App\Http\Controllers\CrmActivityController::class, 'store'])->name('crm-activities.store');
