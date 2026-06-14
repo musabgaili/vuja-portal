@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTags;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Opportunity extends Model
 {
+    use HasTags;
+
     protected $fillable = [
         'name', 'company_name', 'contact_name', 'email', 'phone', 'source',
         'stage', 'expected_value', 'probability', 'expected_close_date',
-        'owner_id', 'client_id', 'description', 'lost_reason',
+        'owner_id', 'client_id', 'company_id', 'contact_id', 'description', 'lost_reason',
         'won_at', 'lost_at', 'converted_project_id',
     ];
 
@@ -30,6 +33,16 @@ class Opportunity extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function contact(): BelongsTo
+    {
+        return $this->belongsTo(Contact::class);
     }
 
     public function project(): BelongsTo

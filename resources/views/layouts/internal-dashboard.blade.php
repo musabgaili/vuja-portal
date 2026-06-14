@@ -70,6 +70,14 @@
                         <i class="fas fa-funnel-dollar"></i>
                         {{ __('portal.nav.pipeline') }}
                     </a>
+                    <a href="{{ route('companies.index') }}" class="nav-item {{ request()->routeIs('companies.*') ? 'active' : '' }}">
+                        <i class="fas fa-building"></i>
+                        {{ __('portal.nav.companies') }}
+                    </a>
+                    <a href="{{ route('contacts.index') }}" class="nav-item {{ request()->routeIs('contacts.*') ? 'active' : '' }}">
+                        <i class="fas fa-address-book"></i>
+                        {{ __('portal.nav.contacts') }}
+                    </a>
                 </div>
 
                 <!-- Service Requests -->

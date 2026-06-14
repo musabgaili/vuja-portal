@@ -50,6 +50,10 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/crm/{opportunity}/convert', [\App\Http\Controllers\OpportunityController::class, 'convert'])->name('crm.convert');
     Route::delete('/crm/{opportunity}', [\App\Http\Controllers\OpportunityController::class, 'destroy'])->name('crm.destroy');
 
+    // CRM address book — companies & contacts
+    Route::resource('companies', \App\Http\Controllers\CompanyController::class);
+    Route::resource('contacts', \App\Http\Controllers\ContactController::class)->except('show');
+
     // AI SCOPE & INVENTORY PLANNER (all internal — front-end of the Pricing Tool)
     Route::get('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'index'])->name('scope-planner.index');
     Route::post('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'plan'])->name('scope-planner.plan');

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
+use App\Models\Contact;
 use App\Models\Opportunity;
 use App\Models\Project;
 use App\Models\User;
@@ -156,6 +158,8 @@ class OpportunityController extends Controller
         return [
             'owners' => User::where('type', 'internal')->orderBy('name')->get(),
             'clients' => User::where('role', 'client')->orderBy('name')->get(),
+            'companies' => Company::orderBy('name')->get(),
+            'contacts' => Contact::orderBy('name')->get(),
             'sources' => config('crm.sources'),
             'stages' => config('crm.stages'),
         ];
@@ -176,6 +180,8 @@ class OpportunityController extends Controller
             'expected_close_date' => 'nullable|date',
             'owner_id' => 'nullable|exists:users,id',
             'client_id' => 'nullable|exists:users,id',
+            'company_id' => 'nullable|exists:companies,id',
+            'contact_id' => 'nullable|exists:contacts,id',
             'description' => 'nullable|string',
         ]);
     }

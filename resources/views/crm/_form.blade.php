@@ -67,6 +67,24 @@
             @endforeach
         </select>
     </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ __('portal.crm.company') }} <small class="text-muted">({{ __('portal.crm.from_book') }})</small></label>
+        <select name="company_id" class="form-select">
+            <option value="">—</option>
+            @foreach($companies as $co)
+                <option value="{{ $co->id }}" @selected((int) old('company_id', $opp?->company_id) === $co->id)>{{ $co->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ __('portal.crm.contact') }} <small class="text-muted">({{ __('portal.crm.from_book') }})</small></label>
+        <select name="contact_id" class="form-select">
+            <option value="">—</option>
+            @foreach($contacts as $ct)
+                <option value="{{ $ct->id }}" @selected((int) old('contact_id', $opp?->contact_id) === $ct->id)>{{ $ct->name }}{{ $ct->company ? ' — '.$ct->company->name : '' }}</option>
+            @endforeach
+        </select>
+    </div>
     <div class="col-12">
         <label class="form-label">{{ __('portal.crm.description') }}</label>
         <textarea name="description" rows="4" class="form-control">{{ old('description', $opp?->description) }}</textarea>
