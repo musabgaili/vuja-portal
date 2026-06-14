@@ -41,6 +41,16 @@
                         <i class="fas fa-bolt"></i>
                         {{ __('portal.nav.engagement') }}
                     </a>
+                    <a href="{{ route('weekly-planner.index') }}" class="nav-item {{ request()->routeIs('weekly-planner.index') ? 'active' : '' }}">
+                        <i class="fas fa-calendar-week"></i>
+                        {{ __('portal.nav.weekly_planner') }}
+                    </a>
+                    @if(auth()->user()->isManager())
+                    <a href="{{ route('weekly-planner.review') }}" class="nav-item {{ request()->routeIs('weekly-planner.review') || request()->routeIs('weekly-planner.presence') ? 'active' : '' }}">
+                        <i class="fas fa-clipboard-check"></i>
+                        {{ __('portal.nav.plans_review') }}
+                    </a>
+                    @endif
                 </div>
 
                 <!-- Service Requests -->

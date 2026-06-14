@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\FinancialReportController;
+use App\Http\Controllers\WeeklyPlannerController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ServiceRequestTypeController;
 use App\Http\Controllers\Services\ConsultationRequestController;
@@ -35,6 +36,14 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // ENGAGEMENT — Impact Points (all internal users; managers get the Owner view)
     Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
     Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
+
+    // WEEKLY STRATEGIC PLANNER (employees plan; managers review/oversee)
+    Route::get('/weekly-planner', [WeeklyPlannerController::class, 'index'])->name('weekly-planner.index');
+    Route::post('/weekly-planner', [WeeklyPlannerController::class, 'store'])->name('weekly-planner.store');
+    Route::get('/weekly-planner/review', [WeeklyPlannerController::class, 'review'])->name('weekly-planner.review');
+    Route::get('/weekly-planner/presence', [WeeklyPlannerController::class, 'presence'])->name('weekly-planner.presence');
+    Route::post('/weekly-planner/{weeklyPlan}/approve', [WeeklyPlannerController::class, 'approve'])->name('weekly-planner.approve');
+    Route::post('/weekly-planner/{weeklyPlan}/reject', [WeeklyPlannerController::class, 'reject'])->name('weekly-planner.reject');
 
     // TIME SLOTS - My Availability (All internal users)
     Route::get('/my-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'mySlots'])->name('time-slots.my-slots');
