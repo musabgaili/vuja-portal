@@ -1128,3 +1128,35 @@ body {
 .ip-rank.top{ background:var(--grad-header); color:#fff; }
 .ip-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--primary-light); color:var(--primary-color); font-size:12px; font-weight:600; }
 .ip-level-pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; background:var(--grad-header); color:#fff; font-weight:700; font-size:13px; }
+/* ===== ROUND-3 FIXES ===== */
+/* #5 uniform, compact page headers (pricing was oversized) + #3 include .projects-header */
+.pricing-header, .quoting-header, .quoting-tasks-header, .manager-hero, .modern-hero,
+.employee-hero, .consul-header, .research-header, .ip-header, .copy-header, .ideas-header,
+.slots-header, .create-slots-header, .page-hero, .dashboard-hero, .projects-header, .projects-hero {
+    background: var(--grad-header) !important; background-image: var(--grad-header) !important;
+    color: #fff !important; border: none !important;
+    border-radius: var(--radius-xl) !important; box-shadow: var(--shadow-md) !important;
+    padding: 1.5rem 1.75rem !important; margin-bottom: 1.5rem !important;
+}
+.projects-header *, .quoting-tasks-header *, .projects-hero * { color: #fff !important; }
+
+/* #4 widget/stat icons -> brand teal chip (kill green/blue/role colors) */
+.widget-icon, .widget-icon.primary, .widget-icon.success, .widget-icon.info,
+.widget-icon.warning, .widget-icon.danger, .stat-icon {
+    background: var(--primary-light) !important; color: var(--primary-color) !important;
+}
+
+/* #1 dark mode: force in-view white cards (manager dashboard etc.) onto dark surface */
+[data-bs-theme="dark"] .card, [data-bs-theme="dark"] .widget, [data-bs-theme="dark"] .section-card,
+[data-bs-theme="dark"] .service-card-modern, [data-bs-theme="dark"] .stat-card,
+[data-bs-theme="dark"] .stat-card-modern, [data-bs-theme="dark"] .stat-card-manager,
+[data-bs-theme="dark"] .stat-box, [data-bs-theme="dark"] .pricing-card, [data-bs-theme="dark"] .cart-card,
+[data-bs-theme="dark"] .role-card, [data-bs-theme="dark"] .request-item-modern, [data-bs-theme="dark"] .cart-item {
+    background: var(--bg-primary) !important; background-image: none !important;
+    border-color: var(--gray-200) !important; color: var(--gray-700) !important;
+}
+[data-bs-theme="dark"] .stat-number, [data-bs-theme="dark"] .stat-number-manager,
+[data-bs-theme="dark"] .stat-value, [data-bs-theme="dark"] .stat-card h3,
+[data-bs-theme="dark"] .card h1, [data-bs-theme="dark"] .card h2, [data-bs-theme="dark"] .card h3,
+[data-bs-theme="dark"] .widget h3, [data-bs-theme="dark"] .stat-card-manager * { color: var(--gray-900) !important; }
+[data-bs-theme="dark"] .stat-label, [data-bs-theme="dark"] .stat-label-manager { color: var(--gray-500) !important; }

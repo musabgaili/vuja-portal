@@ -68,7 +68,7 @@
             <a href="{{ route('permissions.users') }}" class="btn btn-secondary">
                 <i class="fas fa-users"></i> {{ __('portal.permissions.assign_user_roles') }}
             </a>
-            <button class="btn btn-success" onclick="showCreatePermissionModal()">
+            <button class="btn btn-primary" onclick="showCreatePermissionModal()">
                 <i class="fas fa-plus"></i> {{ __('portal.permissions.create_permission') }}
             </button>
         </div>
@@ -218,7 +218,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-plus"></i> {{ __('portal.permissions.create_permission') }}
                     </button>
                 </div>

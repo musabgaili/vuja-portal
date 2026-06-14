@@ -28,6 +28,22 @@
         document.querySelectorAll('[data-theme-icon]').forEach(function (i) {
             i.className = (dark ? 'fas fa-sun' : 'fas fa-moon');
         });
+
+        // Keep the sidebar scrolled where it was across full-page navigations.
+        var nav = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+        if (nav) {
+            try {
+                var s = sessionStorage.getItem('vuja-sidebar-scroll');
+                if (s !== null) nav.scrollTop = parseInt(s, 10) || 0;
+            } catch (e) {}
+            nav.addEventListener('scroll', function () {
+                try { sessionStorage.setItem('vuja-sidebar-scroll', nav.scrollTop); } catch (e) {}
+            }, { passive: true });
+            // Save immediately on nav click so the next page restores precisely.
+            nav.addEventListener('click', function () {
+                try { sessionStorage.setItem('vuja-sidebar-scroll', nav.scrollTop); } catch (e) {}
+            }, true);
+        }
     });
 })();
 </script>

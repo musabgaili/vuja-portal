@@ -7,7 +7,7 @@
 
 @section('content')
 <style>
-.projects-header{background:linear-gradient(135deg,#0F969C 0%,#4f46e5 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(99,102,241,0.3);}
+.projects-header{background:linear-gradient(135deg,#0F969C 0%,#294D61 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(12,112,117,0.3);}
 .stat-cards-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
 .stat-card-proj{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 4px 16px rgba(0,0,0,0.08);border-left:4px solid;transition:all 0.3s;}
 .stat-card-proj:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.12);}

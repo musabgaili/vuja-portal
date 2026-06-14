@@ -228,7 +228,7 @@
                         {{ $doc->title }}
                     </div>
                     <div class="doc-meta-row">
-                        <span class="doc-tag" style="background: {{ match($doc->tag) { 'initial' => '#a855f7', 'design' => '#3b82f6', 'development' => '#10b981', 'final' => '#f59e0b', default => '#64748b' } }};">
+                        <span class="doc-tag" style="background: {{ match($doc->tag) { 'initial' => '#0C7075', 'design' => '#3b82f6', 'development' => '#10b981', 'final' => '#f59e0b', default => '#64748b' } }};">
                             {{ __('portal.projects_documents.tag_' . $doc->tag) }}
                         </span>
                         <span><i class="fas fa-user"></i> {{ $doc->uploadedBy->name }}</span>

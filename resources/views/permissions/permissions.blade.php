@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">{{ __('portal.permissions.all_permissions') }}</h3>
-                <button class="btn btn-success btn-sm" onclick="showCreateModal()">
+                <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
                     <i class="fas fa-plus"></i> {{ __('portal.permissions.create_permission') }}
                 </button>
             </div>
@@ -144,7 +144,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.team.cancel') }}</button>
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-plus"></i> {{ __('portal.permissions.create') }}
                     </button>
                 </div>

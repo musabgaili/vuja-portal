@@ -35,92 +35,92 @@
                 <div class="nav-section">
                     <a href="{{ route('internal.dashboard') }}" class="nav-item">
                         <i class="fas fa-home"></i>
-                        Dashboard
+                        {{ __('portal.nav.dashboard') }}
                     </a>
                     <a href="{{ route('engagement.index') }}" class="nav-item {{ request()->routeIs('engagement.*') ? 'active' : '' }}">
                         <i class="fas fa-bolt"></i>
-                        Engagement
+                        {{ __('portal.nav.engagement') }}
                     </a>
                 </div>
 
                 <!-- Service Requests -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Services</div>
+                    <div class="nav-section-title">{{ __('portal.nav.services') }}</div>
                     <a href="{{ route('ideas.manager.index') }}" class="nav-item">
                         <i class="fas fa-lightbulb"></i>
-                        Ideas
+                        {{ __('portal.nav.ideas') }}
                     </a>
                     <a href="{{ route('consultations.manager.index') }}" class="nav-item">
                         <i class="fas fa-comments"></i>
-                        Consultations
+                        {{ __('portal.nav.consultations') }}
                     </a>
                     <a href="{{ route('research.manager.index') }}" class="nav-item">
                         <i class="fas fa-search"></i>
-                        Research
+                        {{ __('portal.nav.research') }}
                     </a>
                     <a href="{{ route('ip.manager.index') }}" class="nav-item">
                         <i class="fas fa-file-contract"></i>
-                        IP Reg
+                        {{ __('portal.nav.ip_reg') }}
                     </a>
                     <a href="{{ route('copyright.manager.index') }}" class="nav-item">
                         <i class="fas fa-copyright"></i>
-                        Copyright
+                        {{ __('portal.nav.copyright') }}
                     </a>
                 </div>
 
                 <!-- Projects -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Projects</div>
+                    <div class="nav-section-title">{{ __('portal.nav.projects') }}</div>
                     <a href="{{ route('projects.manager.index') }}" class="nav-item">
                         <i class="fas fa-folder"></i>
-                        All Projects
+                        {{ __('portal.nav.all_projects') }}
                     </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('projects.create') }}" class="nav-item">
                         <i class="fas fa-plus"></i>
-                        New Project
+                        {{ __('portal.nav.new_project') }}
                     </a>
                     <a href="{{ route('projects.scope-changes.index') }}" class="nav-item">
                         <i class="fas fa-edit"></i>
-                        Scope Changes
+                        {{ __('portal.nav.scope_changes') }}
                     </a>
                     @endif
                 </div>
 
                 <!-- Quote System -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Quote System</div>
+                    <div class="nav-section-title">{{ __('portal.nav.quote_system') }}</div>
                     <a href="{{ route('pricing.quoting-tasks') }}" class="nav-item">
                         <i class="fas fa-file-invoice-dollar"></i>
-                        Quoting Tasks
+                        {{ __('portal.nav.quoting_tasks') }}
                     </a>
                     <a href="{{ route('pricing.tool') }}" class="nav-item">
                         <i class="fas fa-calculator"></i>
-                        Pricing Tool
+                        {{ __('portal.nav.pricing_tool') }}
                     </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('pricing.admin') }}" class="nav-item">
                         <i class="fas fa-cogs"></i>
-                        Pricing Admin
+                        {{ __('portal.nav.pricing_admin') }}
                     </a>
                     @endif
                 </div>
 
                 <!-- Meetings -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Meetings</div>
+                    <div class="nav-section-title">{{ __('portal.nav.meetings') }}</div>
                     <a href="{{ route('time-slots.my-slots') }}" class="nav-item">
                         <i class="fas fa-calendar"></i>
-                        My Slots
+                        {{ __('portal.nav.my_slots') }}
                     </a>
                     <a href="{{ route('meetings.internal.my-meetings') }}" class="nav-item">
                         <i class="fas fa-video"></i>
-                        My Meetings
+                        {{ __('portal.nav.my_meetings') }}
                     </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('time-slots.team-slots') }}" class="nav-item">
                         <i class="fas fa-users-cog"></i>
-                        Team Slots
+                        {{ __('portal.nav.team_slots') }}
                     </a>
                     @endif
                 </div>
@@ -128,14 +128,14 @@
                 <!-- Admin (Manager Only) -->
                 @if(auth()->user()->isManager())
                 <div class="nav-section">
-                    <div class="nav-section-title">Admin</div>
+                    <div class="nav-section-title">{{ __('portal.nav.admin') }}</div>
                     <a href="{{ route('team.index') }}" class="nav-item">
                         <i class="fas fa-users"></i>
-                        Team
+                        {{ __('portal.nav.team') }}
                     </a>
                     <a href="{{ route('permissions.index') }}" class="nav-item">
                         <i class="fas fa-shield-alt"></i>
-                        Permissions
+                        {{ __('portal.nav.permissions') }}
                     </a>
                     <a href="{{ route('permissions.portal-clients') }}" class="nav-item">
                         <i class="fas fa-user-friends"></i>
@@ -152,15 +152,15 @@
                 <div class="nav-section mt-auto">
                     <a href="{{ route('profile.show') }}" class="nav-item">
                         <i class="fas fa-user"></i>
-                        My Profile
+                        {{ __('portal.nav.my_profile') }}
                     </a>
                     <a href="{{ route('profile.security') }}" class="nav-item">
                         <i class="fas fa-shield-alt"></i>
-                        Security
+                        {{ __('portal.nav.security') }}
                     </a>
                     <a href="{{ route('logout') }}" class="nav-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fas fa-sign-out-alt"></i>
-                        Logout
+                        {{ __('portal.nav.logout') }}
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
                 </div>

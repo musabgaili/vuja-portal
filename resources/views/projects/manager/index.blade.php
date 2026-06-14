@@ -6,7 +6,7 @@
 
 @section('content')
 <style>
-.projects-header{background:linear-gradient(135deg,#0F969C 0%,#4f46e5 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(99,102,241,0.3);}
+.projects-header{background:linear-gradient(135deg,#0F969C 0%,#294D61 100%);color:white;padding:2rem;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(12,112,117,0.3);}
 .filter-card{background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-bottom:1.5rem;}
 .table-modern{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
 .table-modern thead{background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);}
