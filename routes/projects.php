@@ -45,9 +45,11 @@ Route::middleware(['auth'])->group(function () {
         // Requests
         Route::post('/{project}/requests', [\App\Http\Controllers\Projects\RequestController::class, 'store'])->name('requests.store');
 
-        // Scope Change Requests
+        // Scope / Change Requests (with budget delta + client signature)
         Route::get('/{project}/scope-change', [ScopeChangeController::class, 'create'])->name('scope-change.create');
         Route::post('/{project}/scope-change', [ScopeChangeController::class, 'store'])->name('scope-change.store');
+        Route::get('/{project}/change-requests', [ScopeChangeController::class, 'clientList'])->name('change-requests.index');
+        Route::post('/change-requests/{scopeChange}/sign', [ScopeChangeController::class, 'sign'])->name('change-requests.sign');
 
         // Project Feedback
         Route::get('/{project}/feedback', [FeedbackController::class, 'create'])->name('feedback.create');

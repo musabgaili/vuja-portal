@@ -34,6 +34,12 @@
                         <textarea name="justification" rows="3" class="form-control" placeholder="{{ __('portal.projects_client.scope_change.justification_placeholder') }}"></textarea>
                         @error('justification')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
+                    <div class="form-group">
+                        <label>{{ __('portal.change_req.budget_impact') }}</label>
+                        <input type="number" step="0.01" name="budget_delta" class="form-control" placeholder="0.00">
+                        <small class="text-muted">{{ __('portal.change_req.budget_hint') }}</small>
+                        @error('budget_delta')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">

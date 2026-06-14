@@ -13,13 +13,30 @@ class ProjectScopeChange extends Model
     use HasFactory, LogsActivity;
 
     protected $fillable = [
-        'project_id', 'requested_by', 'title', 'description', 'justification',
+        'project_id', 'requested_by', 'title', 'description', 'justification', 'budget_delta',
         'status', 'reviewed_by', 'reviewed_at', 'review_notes',
+        'client_signature', 'client_signed_at', 'client_ip', 'applied_at',
     ];
 
     protected $casts = [
         'reviewed_at' => 'datetime',
+        'client_signed_at' => 'datetime',
+        'applied_at' => 'datetime',
+        'budget_delta' => 'decimal:2',
     ];
+
+    /** Approved, carries a budget change, and the client has not yet signed. */
+    public function needsClientSignature(): bool
+    {
+        return $this->status === 'approved'
+            && (float) $this->budget_delta !== 0.0
+            && $this->client_signed_at === null;
+    }
+
+    public function isApplied(): bool
+    {
+        return $this->applied_at !== null;
+    }
 
     public function project(): BelongsTo
     {

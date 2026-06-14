@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\ProjectScopeChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class ScopeChangeController extends Controller
@@ -42,10 +43,12 @@ class ScopeChangeController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'justification' => 'nullable|string',
+            'budget_delta' => 'nullable|numeric',
         ]);
 
         $scopeChange = ProjectScopeChange::create([
             ...$validated,
+            'budget_delta' => $validated['budget_delta'] ?? 0,
             'project_id' => $project->id,
             'requested_by' => $user->id,
             'status' => 'pending',
@@ -133,5 +136,57 @@ class ScopeChangeController extends Controller
         }
 
         return back()->with('success', 'Scope change rejected.');
+    }
+
+    /** Client: list this project's change requests (and sign the approved ones). */
+    public function clientList(Project $project)
+    {
+        $user = Auth::user();
+
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
+            abort(403);
+        }
+
+        $changeRequests = $project->scopeChanges()->with('requestedBy')->latest()->get();
+
+        return view('projects.client.change-requests', compact('project', 'changeRequests'));
+    }
+
+    /**
+     * Client digitally signs an approved change request. Signing is what applies
+     * the budget delta to the (otherwise locked) project budget.
+     */
+    public function sign(Request $request, ProjectScopeChange $scopeChange)
+    {
+        $user = Auth::user();
+        $project = $scopeChange->project;
+
+        if (! $user->canUseClientProjectPortal() || $project->client_id !== $user->id) {
+            abort(403);
+        }
+
+        if (! $scopeChange->needsClientSignature()) {
+            return back()->withErrors(['sign' => 'This change request is not awaiting your signature.']);
+        }
+
+        $validated = $request->validate([
+            'client_signature' => 'required|string|max:120',
+        ]);
+
+        DB::transaction(function () use ($scopeChange, $project, $validated, $request) {
+            // The signature is the formal approval that unlocks the budget change.
+            $project->allowBudgetOverride = true;
+            $project->budget = max(0, (float) $project->budget + (float) $scopeChange->budget_delta);
+            $project->save();
+
+            $scopeChange->update([
+                'client_signature' => $validated['client_signature'],
+                'client_signed_at' => now(),
+                'client_ip' => $request->ip(),
+                'applied_at' => now(),
+            ]);
+        });
+
+        return back()->with('success', 'Change request signed — the revised budget is now in effect.');
     }
 }
