@@ -6,7 +6,7 @@
         <div class="ip-toast {{ $pos ? 'pos' : 'neg' }}">
             <i class="fas {{ $pos ? 'fa-bolt' : 'fa-triangle-exclamation' }}"></i>
             <span>{{ $pos ? '+' : '' }}{{ $pts }} IP</span>
-            <small>{{ str_replace('_', ' ', $t['action'] ?? '') }}</small>
+            <small>{{ ($t['action'] ?? null) ? __('portal.engagement.action.'.$t['action']) : '' }}</small>
         </div>
     @endforeach
 </div>
