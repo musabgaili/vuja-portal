@@ -1,48 +1,46 @@
 @extends('layouts.internal-dashboard')
-@section('title', 'Weekly Plans Review')
+@section('title', __('portal.planner.review_title'))
 
 @section('content')
-@php
-    $tvTotal = max(1, $timeValue['projects'] + $timeValue['development'] + $timeValue['presale']);
-    $pPct = round($timeValue['projects'] / $tvTotal * 100);
-    $dPct = round($timeValue['development'] / $tvTotal * 100);
-    $sPct = 100 - $pPct - $dPct;
-@endphp
 <div class="page-hero">
-    <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-clipboard-check"></i> Weekly Plans — Review</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">Week of {{ $weekStart->format('D, M j, Y') }}</p>
+    <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-clipboard-check"></i> {{ __('portal.planner.review_title') }}</h1>
+    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ $weekStart->format('D, M j, Y') }}</p>
 </div>
 
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="d-flex justify-content-end mb-3">
-    <a href="{{ route('weekly-planner.presence') }}" class="btn btn-outline-primary"><i class="fas fa-map-marker-alt"></i> Team Presence</a>
+    <a href="{{ route('weekly-planner.presence') }}" class="btn btn-outline-primary"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</a>
 </div>
 
 <div class="row g-3">
     <div class="col-lg-8">
         <div class="card">
-            <div class="card-header"><span class="card-title">Pending Approvals ({{ $pending->count() }})</span></div>
+            <div class="card-header"><span class="card-title">{{ __('portal.planner.pending_approvals') }} ({{ $pending->count() }})</span></div>
             <div class="card-content p-0">
                 <table class="table mb-0">
-                    <thead><tr><th>Employee</th><th>Projects</th><th>Dev</th><th>Pre-sale</th><th>Total</th><th class="text-end">Action</th></tr></thead>
+                    <thead><tr><th>{{ __('portal.planner.employee') }}</th><th>{{ __('portal.planner.breakdown') }}</th><th>{{ __('portal.planner.total') }}</th><th class="text-end">{{ __('portal.planner.action') }}</th></tr></thead>
                     <tbody>
                     @forelse($pending as $p)
                         <tr>
                             <td>{{ $p->user->name }}</td>
-                            <td>{{ $p->hours_projects }}h</td><td>{{ $p->hours_development }}h</td><td>{{ $p->hours_presale }}h</td>
+                            <td>
+                                @foreach($p->categoryBreakdown() as $cat => $h)
+                                    <span class="badge bg-light text-dark border">{{ $cat }}: {{ $h }}h</span>
+                                @endforeach
+                            </td>
                             <td><strong>{{ $p->totalHours() }}h</strong></td>
                             <td class="text-end">
                                 <form method="POST" action="{{ route('weekly-planner.approve', $p) }}" class="d-inline">@csrf
                                     <button class="btn btn-primary btn-sm"><i class="fas fa-check"></i></button>
                                 </form>
                                 <form method="POST" action="{{ route('weekly-planner.reject', $p) }}" class="d-inline">@csrf
-                                    <button class="btn btn-outline-primary btn-sm" title="Send back"><i class="fas fa-rotate-left"></i></button>
+                                    <button class="btn btn-outline-primary btn-sm" title="{{ __('portal.planner.send_back') }}"><i class="fas fa-rotate-left"></i></button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-muted text-center py-3">No plans awaiting approval. 🎉</td></tr>
+                        <tr><td colspan="4" class="text-muted text-center py-3">{{ __('portal.planner.none_pending') }} 🎉</td></tr>
                     @endforelse
                     </tbody>
                 </table>
@@ -50,16 +48,16 @@
         </div>
 
         <div class="card mt-3">
-            <div class="card-header"><span class="card-title">All Plans This Week</span></div>
+            <div class="card-header"><span class="card-title">{{ __('portal.planner.all_plans') }}</span></div>
             <div class="card-content p-0">
                 <table class="table mb-0">
-                    <thead><tr><th>Employee</th><th>Total</th><th>Status</th></tr></thead>
+                    <thead><tr><th>{{ __('portal.planner.employee') }}</th><th>{{ __('portal.planner.total') }}</th><th>{{ __('portal.planner.field_status') }}</th></tr></thead>
                     <tbody>
                     @forelse($plans as $p)
                         <tr><td>{{ $p->user->name }}</td><td>{{ $p->totalHours() }}h</td>
-                            <td><span class="badge bg-{{ $p->statusColor() }}">{{ ucfirst($p->status) }}</span></td></tr>
+                            <td><span class="badge bg-{{ $p->statusColor() }}">{{ __('portal.planner.status.'.$p->status) }}</span></td></tr>
                     @empty
-                        <tr><td colspan="3" class="text-muted text-center py-3">No plans submitted yet.</td></tr>
+                        <tr><td colspan="3" class="text-muted text-center py-3">{{ __('portal.planner.none_submitted') }}</td></tr>
                     @endforelse
                     </tbody>
                 </table>
@@ -67,25 +65,28 @@
         </div>
     </div>
 
-    {{-- Time-Value donut --}}
+    {{-- Category breakdown across all submitted timesheets --}}
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-header"><span class="card-title">Time-Value Split</span></div>
-            <div class="card-content text-center">
-                <div style="width:170px; height:170px; border-radius:50%; margin:0 auto;
-                            background: conic-gradient(var(--primary-color) 0 {{ $pPct }}%, var(--primary-bright) {{ $pPct }}% {{ $pPct + $dPct }}%, var(--primary-accent) {{ $pPct + $dPct }}% 100%);
-                            display:flex; align-items:center; justify-content:center;">
-                    <div style="width:108px; height:108px; border-radius:50%; background:var(--bg-primary); display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                        <strong style="font-size:1.1rem;">{{ $tvTotal }}h</strong>
-                        <small class="text-muted">total</small>
+            <div class="card-header"><span class="card-title">{{ __('portal.planner.time_breakdown') }}</span></div>
+            <div class="card-content">
+                @if($breakdownTotal > 0)
+                    <div class="text-center mb-3">
+                        <strong style="font-size:1.5rem; color:var(--primary-color);">{{ $breakdownTotal }}h</strong>
+                        <div class="text-muted" style="font-size:.8rem;">{{ __('portal.planner.total_logged') }}</div>
                     </div>
-                </div>
-                <div class="mt-3 text-start" style="font-size:.85rem;">
-                    <div class="d-flex justify-content-between"><span><i class="fas fa-square" style="color:var(--primary-color)"></i> Projects</span><span>{{ $pPct }}%</span></div>
-                    <div class="d-flex justify-content-between"><span><i class="fas fa-square" style="color:var(--primary-bright)"></i> Development</span><span>{{ $dPct }}%</span></div>
-                    <div class="d-flex justify-content-between"><span><i class="fas fa-square" style="color:var(--primary-accent)"></i> Pre-sale</span><span>{{ $sPct }}%</span></div>
-                </div>
-                <p class="text-muted mt-2" style="font-size:.75rem;">Watch non-billable (Dev + Pre-sale) share.</p>
+                    @foreach($breakdown as $cat => $h)
+                        @php $pct = round($h / $breakdownTotal * 100); @endphp
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between" style="font-size:.85rem;"><span>{{ $cat }}</span><span>{{ $h }}h ({{ $pct }}%)</span></div>
+                            <div style="height:8px; background:var(--bg-tertiary); border-radius:999px; overflow:hidden;">
+                                <div style="height:100%; width:{{ $pct }}%; background:var(--grad-header); border-radius:999px;"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <p class="text-muted text-center py-3">{{ __('portal.planner.no_data') }}</p>
+                @endif
             </div>
         </div>
     </div>

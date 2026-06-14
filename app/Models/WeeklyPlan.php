@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WeeklyPlan extends Model
 {
@@ -33,9 +34,25 @@ class WeeklyPlan extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+    public function lines(): HasMany
+    {
+        return $this->hasMany(WeeklyPlanLine::class);
+    }
+
+    /** Total logged hours for the week, summed across every timesheet line. */
     public function totalHours(): int
     {
-        return (int) $this->hours_projects + (int) $this->hours_development + (int) $this->hours_presale;
+        return (int) $this->lines->sum(fn (WeeklyPlanLine $l) => $l->totalHours());
+    }
+
+    /** Hours grouped by reporting category, e.g. ['Projects & Tasks' => 24, 'Vacation' => 8]. */
+    public function categoryBreakdown(): array
+    {
+        return $this->lines
+            ->groupBy(fn (WeeklyPlanLine $l) => $l->category())
+            ->map(fn ($group) => (int) $group->sum(fn (WeeklyPlanLine $l) => $l->totalHours()))
+            ->filter(fn ($h) => $h > 0)
+            ->toArray();
     }
 
     public function isComplete(): bool

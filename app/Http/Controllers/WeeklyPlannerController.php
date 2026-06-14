@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Project;
+use App\Models\ProjectPerson;
+use App\Models\StaffTask;
 use App\Models\WeeklyPlan;
 use App\Services\EngagementService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class WeeklyPlannerController extends Controller
 {
@@ -15,13 +18,13 @@ class WeeklyPlannerController extends Controller
     {
     }
 
-    /** The Sunday that starts the upcoming planned week. */
+    /** The Sunday that starts the upcoming planned week (the default week). */
     public static function upcomingWeekStart(): Carbon
     {
         return Carbon::today()->next(Carbon::SUNDAY);
     }
 
-    /** Saturday 18:00 the day before the planned week. */
+    /** Saturday 18:00 the day before the planned week (the "Saturday protocol"). */
     public static function deadlineFor(Carbon $weekStart): Carbon
     {
         [$h, $m] = explode(':', (string) config('planner.deadline_time', '18:00'));
@@ -29,116 +32,264 @@ class WeeklyPlannerController extends Controller
         return $weekStart->copy()->subDay()->setTime((int) $h, (int) $m);
     }
 
-    /** Employee view: create / edit my plan for the upcoming week. */
-    public function index()
+    /** Resolve the week being planned from the ?week= param, snapped to its Sunday. */
+    private function resolveWeekStart(Request $request): Carbon
+    {
+        $week = $request->input('week');
+        if ($week) {
+            try {
+                $d = Carbon::parse($week)->startOfDay();
+
+                return $d->isSunday() ? $d : $d->startOfWeek(Carbon::SUNDAY);
+            } catch (\Throwable $e) {
+                // fall through to default
+            }
+        }
+
+        return self::upcomingWeekStart();
+    }
+
+    /**
+     * Find (or make) a user's plan for a week. Matches on the DATE part only —
+     * week_start may be stored with a 00:00:00 time component, so an exact string
+     * match (firstOrNew) would miss it and hit the unique constraint on insert.
+     */
+    private function planFor(int $userId, Carbon $weekStart): WeeklyPlan
+    {
+        return WeeklyPlan::with('lines')
+            ->where('user_id', $userId)
+            ->whereDate('week_start', $weekStart->toDateString())
+            ->first()
+            ?? new WeeklyPlan(['user_id' => $userId, 'week_start' => $weekStart->toDateString()]);
+    }
+
+    /** Employee timesheet: log hours per day against projects, tasks and activities. */
+    public function index(Request $request)
     {
         $user = Auth::user();
         abort_unless($user->isInternal(), 403);
 
-        $weekStart = self::upcomingWeekStart();
-        $plan = WeeklyPlan::firstOrNew(['user_id' => $user->id, 'week_start' => $weekStart->toDateString()]);
+        $weekStart = $this->resolveWeekStart($request);
+        $plan = $this->planFor($user->id, $weekStart);
+
+        // Rows the employee may log against: their assigned projects + direct tasks
+        // + the fixed activity list. Choose-from-list only (no free text).
+        $projects = Project::whereHas('projectPeople', fn ($q) => $q->where('user_id', $user->id))
+            ->orderBy('title')->get();
+        $tasks = StaffTask::where('assigned_to', $user->id)
+            ->whereIn('status', ['open', 'in_progress', 'done'])
+            ->orderByDesc('id')->get();
+
+        // Keep rows for anything already logged, even if membership/assignment changed.
+        $lineProjectIds = $plan->lines->where('kind', 'project')->pluck('project_id')->filter();
+        $missingProjects = $lineProjectIds->diff($projects->pluck('id'));
+        if ($missingProjects->isNotEmpty()) {
+            $projects = $projects->merge(Project::whereIn('id', $missingProjects)->get());
+        }
+        $lineTaskIds = $plan->lines->where('kind', 'task')->pluck('staff_task_id')->filter();
+        $missingTasks = $lineTaskIds->diff($tasks->pluck('id'));
+        if ($missingTasks->isNotEmpty()) {
+            $tasks = $tasks->merge(StaffTask::whereIn('id', $missingTasks)->get());
+        }
+
+        // cells[kind][id-or-key][day] = hours — pre-fills the grid.
+        $cells = ['project' => [], 'task' => [], 'activity' => []];
+        foreach ($plan->lines as $line) {
+            $ref = $line->kind === 'project' ? $line->project_id
+                 : ($line->kind === 'task' ? $line->staff_task_id : $line->activity);
+            if ($ref !== null) {
+                $cells[$line->kind][$ref] = $line->hours ?? [];
+            }
+        }
 
         return view('weekly-planner.index', [
             'plan' => $plan,
             'weekStart' => $weekStart,
+            'prevWeek' => $weekStart->copy()->subWeek()->toDateString(),
+            'nextWeek' => $weekStart->copy()->addWeek()->toDateString(),
             'deadline' => self::deadlineFor($weekStart),
-            'buckets' => config('planner.buckets'),
             'days' => config('planner.days'),
             'locations' => config('planner.locations'),
+            'activities' => config('planner.activities'),
+            'projects' => $projects,
+            'tasks' => $tasks,
+            'cells' => $cells,
             'requiredHours' => (int) config('planner.required_hours', 40),
-            'history' => WeeklyPlan::where('user_id', $user->id)->orderByDesc('week_start')->limit(8)->get(),
+            'maxHoursPerDay' => (int) config('planner.max_hours_per_day', 24),
+            'history' => WeeklyPlan::with('lines')->where('user_id', $user->id)
+                ->orderByDesc('week_start')->limit(8)->get(),
         ]);
     }
 
-    /** Save (draft) or submit the plan. */
+    /** Save (draft) or submit the timesheet. */
     public function store(Request $request)
     {
         $user = Auth::user();
         abort_unless($user->isInternal(), 403);
 
-        $validated = $request->validate([
-            'hours_projects' => 'required|integer|min:0|max:80',
-            'hours_development' => 'required|integer|min:0|max:80',
-            'hours_presale' => 'required|integer|min:0|max:80',
-            'locations' => 'array',
+        $request->validate([
             'action' => 'required|in:draft,submit',
+            'week' => 'nullable|date',
+            'hours' => 'array',
+            'locations' => 'array',
         ]);
 
-        $weekStart = self::upcomingWeekStart();
-        $plan = WeeklyPlan::firstOrNew(['user_id' => $user->id, 'week_start' => $weekStart->toDateString()]);
+        $weekStart = $this->resolveWeekStart($request);
+        $plan = $this->planFor($user->id, $weekStart);
 
-        // Clean locations to the configured days/options.
-        $allowedDays = config('planner.days');
+        $days = config('planner.days');
+        $maxHpd = (int) config('planner.max_hours_per_day', 24);
+
+        // Allowed rows = current membership/assignment ∪ anything already on the plan.
+        $myProjectIds = ProjectPerson::where('user_id', $user->id)
+            ->whereIn('role', ['project_manager', 'employee'])->pluck('project_id')->all();
+        $myTaskIds = StaffTask::where('assigned_to', $user->id)->pluck('id')->all();
+        $allowedProjectIds = array_unique(array_merge(
+            $myProjectIds, $plan->lines->where('kind', 'project')->pluck('project_id')->filter()->all()
+        ));
+        $allowedTaskIds = array_unique(array_merge(
+            $myTaskIds, $plan->lines->where('kind', 'task')->pluck('staff_task_id')->filter()->all()
+        ));
+        $allowedActivities = array_keys(config('planner.activities'));
+
+        $grid = $request->input('hours', []);
+        $lines = [];
+
+        foreach (($grid['project'] ?? []) as $pid => $byDay) {
+            if (! in_array((int) $pid, array_map('intval', $allowedProjectIds), true)) {
+                continue;
+            }
+            $hours = $this->cleanHours((array) $byDay, $days, $maxHpd);
+            if (array_sum($hours) <= 0) {
+                continue;
+            }
+            $lines[] = [
+                'kind' => 'project', 'project_id' => (int) $pid, 'staff_task_id' => null, 'activity' => null,
+                'label' => optional(Project::find($pid))->title ?? "Project #{$pid}", 'hours' => $hours,
+            ];
+        }
+
+        foreach (($grid['task'] ?? []) as $tid => $byDay) {
+            if (! in_array((int) $tid, array_map('intval', $allowedTaskIds), true)) {
+                continue;
+            }
+            $hours = $this->cleanHours((array) $byDay, $days, $maxHpd);
+            if (array_sum($hours) <= 0) {
+                continue;
+            }
+            $lines[] = [
+                'kind' => 'task', 'project_id' => null, 'staff_task_id' => (int) $tid, 'activity' => null,
+                'label' => optional(StaffTask::find($tid))->title ?? "Task #{$tid}", 'hours' => $hours,
+            ];
+        }
+
+        foreach (($grid['activity'] ?? []) as $key => $byDay) {
+            if (! in_array($key, $allowedActivities, true)) {
+                continue;
+            }
+            $hours = $this->cleanHours((array) $byDay, $days, $maxHpd);
+            if (array_sum($hours) <= 0) {
+                continue;
+            }
+            $lines[] = [
+                'kind' => 'activity', 'project_id' => null, 'staff_task_id' => null, 'activity' => $key,
+                'label' => config("planner.activities.$key", $key), 'hours' => $hours,
+            ];
+        }
+
+        $total = array_sum(array_map(fn ($l) => array_sum($l['hours']), $lines));
+
+        // Clean per-day working location to the configured days/options.
         $allowedLocs = array_keys(config('planner.locations'));
         $locations = collect($request->input('locations', []))
-            ->only($allowedDays)
+            ->only($days)
             ->map(fn ($v) => in_array($v, $allowedLocs, true) ? $v : null)
+            ->filter()
             ->toArray();
 
-        $plan->fill([
-            'hours_projects' => $validated['hours_projects'],
-            'hours_development' => $validated['hours_development'],
-            'hours_presale' => $validated['hours_presale'],
-            'locations' => $locations,
-        ]);
+        $submitting = $request->input('action') === 'submit';
+        $required = (int) config('planner.required_hours', 40);
 
-        if ($validated['action'] === 'submit') {
-            $required = (int) config('planner.required_hours', 40);
-            if ($plan->totalHours() !== $required) {
-                return back()->withErrors(['hours' => "Your allocation must total exactly {$required} hours (currently {$plan->totalHours()})."])->withInput();
-            }
-            $wasSubmitted = $plan->status === 'pending' || $plan->status === 'approved';
+        if ($submitting && $total !== $required) {
+            return back()
+                ->withErrors(['hours' => "Your timesheet must total exactly {$required} hours (currently {$total})."])
+                ->withInput();
+        }
 
-            // A manager has no approver above them, so their own plan self-approves
-            // (it never enters anyone's pending queue). Everyone else awaits review.
-            $selfApprove = $user->isManager();
+        $wasSubmitted = in_array($plan->status, ['pending', 'approved'], true);
+        $selfApprove = $user->isManager();
+
+        if ($submitting) {
+            // A manager has no approver above them, so their plan self-approves.
             $plan->status = $selfApprove ? 'approved' : 'pending';
             $plan->submitted_at = now();
             if ($selfApprove) {
                 $plan->reviewed_by = $user->id;
                 $plan->reviewed_at = now();
             }
+        } else {
+            $plan->status = $plan->status === 'rejected' ? 'rejected' : 'draft';
+        }
+        $plan->locations = $locations;
+
+        DB::transaction(function () use ($plan, $lines) {
             $plan->save();
-
-            // Engagement: reward on-time submission, penalise a late one (once).
-            if (! $wasSubmitted) {
-                $onTime = now()->lessThanOrEqualTo(self::deadlineFor($weekStart));
-                $this->engagement->award($user, $onTime ? 'weekly_plan_on_time' : 'weekly_plan_late', $plan, null, 'Weekly plan submitted');
+            $plan->lines()->delete();
+            foreach ($lines as $l) {
+                $plan->lines()->create($l);
             }
+        });
 
-            return redirect()->route('weekly-planner.index')
-                ->with('success', $selfApprove ? 'Weekly plan submitted and auto-approved (no approver above a manager).' : 'Weekly plan submitted for approval.');
+        if ($submitting && ! $wasSubmitted) {
+            $onTime = now()->lessThanOrEqualTo(self::deadlineFor($weekStart));
+            $this->engagement->award($user, $onTime ? 'weekly_plan_on_time' : 'weekly_plan_late', $plan, null, 'Weekly plan submitted');
         }
 
-        $plan->status = $plan->status === 'rejected' ? 'rejected' : 'draft';
-        $plan->save();
+        $msg = $submitting
+            ? ($selfApprove ? 'Timesheet submitted and auto-approved (no approver above a manager).' : 'Timesheet submitted for approval.')
+            : 'Draft saved.';
 
-        return redirect()->route('weekly-planner.index')->with('success', 'Draft saved.');
+        return redirect()->route('weekly-planner.index', ['week' => $weekStart->toDateString()])->with('success', $msg);
     }
 
-    /** Manager review queue + Time-Value breakdown. */
+    /** Clamp/normalise a {day => hours} map to the configured days and cap. */
+    private function cleanHours(array $byDay, array $days, int $max): array
+    {
+        $out = [];
+        foreach ($days as $day) {
+            $v = (int) ($byDay[$day] ?? 0);
+            $v = max(0, min($max, $v));
+            if ($v > 0) {
+                $out[$day] = $v;
+            }
+        }
+
+        return $out;
+    }
+
+    /** Manager review queue + category breakdown across submitted timesheets. */
     public function review(Request $request)
     {
         $user = Auth::user();
         abort_unless($user->isManager(), 403);
 
         $weekStart = self::upcomingWeekStart()->toDateString();
-        $plans = WeeklyPlan::with('user')->where('week_start', $weekStart)->get();
+        $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart)->get();
 
-        // Time-Value totals across all submitted plans.
-        $submitted = $plans->whereIn('status', ['pending', 'approved']);
-        $timeValue = [
-            'projects' => $submitted->sum('hours_projects'),
-            'development' => $submitted->sum('hours_development'),
-            'presale' => $submitted->sum('hours_presale'),
-        ];
+        $breakdown = [];
+        foreach ($plans->whereIn('status', ['pending', 'approved']) as $plan) {
+            foreach ($plan->categoryBreakdown() as $cat => $h) {
+                $breakdown[$cat] = ($breakdown[$cat] ?? 0) + $h;
+            }
+        }
+        arsort($breakdown);
 
         return view('weekly-planner.review', [
             'weekStart' => Carbon::parse($weekStart),
             'plans' => $plans,
             'pending' => $plans->where('status', 'pending'),
-            'timeValue' => $timeValue,
-            'buckets' => config('planner.buckets'),
+            'breakdown' => $breakdown,
+            'breakdownTotal' => array_sum($breakdown),
         ]);
     }
 
@@ -180,7 +331,7 @@ class WeeklyPlannerController extends Controller
         abort_unless($user->isManager(), 403);
 
         $weekStart = self::upcomingWeekStart()->toDateString();
-        $plans = WeeklyPlan::with('user')->where('week_start', $weekStart)
+        $plans = WeeklyPlan::with('user')->whereDate('week_start', $weekStart)
             ->whereIn('status', ['pending', 'approved'])->get();
 
         $days = config('planner.days');
