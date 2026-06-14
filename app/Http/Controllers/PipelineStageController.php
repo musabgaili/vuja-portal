@@ -121,13 +121,18 @@ class PipelineStageController extends Controller
         return redirect()->route('crm-stages.index')->with('success', __('portal.crm_stages.deleted'));
     }
 
-    /** Slugify a label into a unique stage key. */
+    /**
+     * Slugify a label into a unique stage key. 'won'/'lost' are reserved for the
+     * terminal outcomes, so a stage labelled "Won"/"Lost" is suffixed instead of
+     * colliding with the constants that drive isOpen()/the Kanban.
+     */
     private function uniqueKey(string $label): string
     {
+        $reserved = ['won', 'lost'];
         $base = Str::slug($label, '_') ?: 'stage';
         $key = $base;
         $i = 2;
-        while (PipelineStage::where('key', $key)->exists()) {
+        while (in_array($key, $reserved, true) || PipelineStage::where('key', $key)->exists()) {
             $key = $base.'_'.$i++;
         }
 

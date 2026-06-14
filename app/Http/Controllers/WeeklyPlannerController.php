@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EngagementLog;
 use App\Models\Project;
 use App\Models\ProjectPerson;
 use App\Models\StaffTask;
@@ -137,6 +138,12 @@ class WeeklyPlannerController extends Controller
         $weekStart = $this->resolveWeekStart($request);
         $plan = $this->planFor($user->id, $weekStart);
 
+        // Server-side lock: an approved timesheet is immutable (the UI disables
+        // its inputs, but disabled fields are not a security boundary).
+        if ($plan->exists && $plan->status === 'approved') {
+            abort(403, 'This timesheet is approved and locked.');
+        }
+
         $days = config('planner.days');
         $maxHpd = (int) config('planner.max_hours_per_day', 24);
 
@@ -240,9 +247,17 @@ class WeeklyPlannerController extends Controller
             }
         });
 
+        // Reward the first on-time/late submission, once. The existence check
+        // makes this idempotent even under a rapid double-submit (no duplicate IP).
         if ($submitting && ! $wasSubmitted) {
-            $onTime = now()->lessThanOrEqualTo(self::deadlineFor($weekStart));
-            $this->engagement->award($user, $onTime ? 'weekly_plan_on_time' : 'weekly_plan_late', $plan, null, 'Weekly plan submitted');
+            $alreadyAwarded = EngagementLog::where('subject_type', WeeklyPlan::class)
+                ->where('subject_id', $plan->id)
+                ->whereIn('action', ['weekly_plan_on_time', 'weekly_plan_late'])
+                ->exists();
+            if (! $alreadyAwarded) {
+                $onTime = now()->lessThanOrEqualTo(self::deadlineFor($weekStart));
+                $this->engagement->award($user, $onTime ? 'weekly_plan_on_time' : 'weekly_plan_late', $plan, null, 'Weekly plan submitted');
+            }
         }
 
         $msg = $submitting
