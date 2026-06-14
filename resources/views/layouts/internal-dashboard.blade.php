@@ -37,6 +37,12 @@
                         <i class="fas fa-home"></i>
                         {{ __('portal.nav.dashboard') }}
                     </a>
+                    @if(auth()->user()->isManager())
+                    <a href="{{ route('control-tower.index') }}" class="nav-item {{ request()->routeIs('control-tower.*') ? 'active' : '' }}">
+                        <i class="fas fa-tower-observation"></i>
+                        {{ __('portal.nav.control_tower') }}
+                    </a>
+                    @endif
                     <a href="{{ route('engagement.index') }}" class="nav-item {{ request()->routeIs('engagement.*') ? 'active' : '' }}">
                         <i class="fas fa-bolt"></i>
                         {{ __('portal.nav.engagement') }}

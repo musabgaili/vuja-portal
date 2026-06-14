@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ControlTowerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\FinancialReportController;
@@ -36,6 +37,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // ENGAGEMENT — Impact Points (all internal users; managers get the Owner view)
     Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
     Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
+
+    // CONTROL TOWER — owner project-health traffic light + risk alerts (manager)
+    Route::get('/control-tower', [ControlTowerController::class, 'index'])->name('control-tower.index');
 
     // WEEKLY STRATEGIC PLANNER (employees plan; managers review/oversee)
     Route::get('/weekly-planner', [WeeklyPlannerController::class, 'index'])->name('weekly-planner.index');
