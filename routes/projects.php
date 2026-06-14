@@ -80,6 +80,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');
         Route::get('/tasks/{task}/data', [TaskController::class, 'getData'])->name('tasks.data');
         Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+        Route::post('/tasks/{task}/comments', [TaskController::class, 'addComment'])->name('tasks.comments.store');
         Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
         // Scope Change Management

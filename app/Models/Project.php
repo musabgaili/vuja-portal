@@ -189,6 +189,14 @@ class Project extends Model
             return false;
         }
 
+        // A top-level manager can manage any project (consistent with canUserView
+        // / canUserAddComments, which already grant managers). Without this, a
+        // manager who isn't the assigned PM saw projects but couldn't edit/manage
+        // their tasks — the per-task edit modal rendered no manageable fields.
+        if ($user->isManager()) {
+            return true;
+        }
+
         $projectPerson = $this->projectPeople()->where('user_id', $user->id)->first();
 
         if ($projectPerson?->can_edit) {

@@ -27,7 +27,39 @@ class TaskController extends Controller
             'assigned_to' => $task->assigned_to,
             'due_date' => $task->due_date?->format('Y-m-d'),
             'actual_hours' => $task->actual_hours,
+            'can_comment' => $task->project->canUserAddComments($user),
+            'comments' => $this->commentsPayload($task),
         ]);
+    }
+
+    /** Post a comment on a task (visible to the assignee + the team). */
+    public function addComment(Request $request, ProjectTask $task)
+    {
+        $user = Auth::user();
+        abort_unless($task->project->canUserAddComments($user), 403);
+
+        $validated = $request->validate(['comment' => 'required|string|max:2000']);
+
+        $task->comments()->create([
+            'user_id' => $user->id,
+            'comment' => $validated['comment'],
+            'is_internal' => true,
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['ok' => true, 'comments' => $this->commentsPayload($task)]);
+        }
+
+        return back()->with('success', 'Comment added.');
+    }
+
+    private function commentsPayload(ProjectTask $task): array
+    {
+        return $task->comments()->with('user')->latest()->get()->map(fn ($c) => [
+            'user' => $c->user?->name ?? '—',
+            'comment' => $c->comment,
+            'time' => $c->created_at?->diffForHumans(),
+        ])->values()->all();
     }
 
     public function store(Request $request, Project $project)

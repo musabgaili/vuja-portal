@@ -2350,5 +2350,10 @@
     "portal.import.note_opportunities": "Opportunities upsert on email (or name). \"stage\" must be one of your pipeline stage keys; blank defaults to the first stage.",
     "portal.import.note_projects": "client_email must match an existing user. project_manager_email is optional. Projects upsert on title + client.",
     "portal.import.note_staff_tasks": "assignee_email must match an existing user. category: project/sales/presale/management. Tasks upsert on assignee + title.",
-    "portal.import.note_project_tasks": "project_title must match an existing project (not created here). assignee_email is optional. Tasks upsert on project + title."
+    "portal.import.note_project_tasks": "project_title must match an existing project (not created here). assignee_email is optional. Tasks upsert on project + title.",
+    "portal.projects_manager.modals.comments": "Comments",
+    "portal.projects_manager.modals.no_comments": "No comments yet.",
+    "portal.projects_manager.modals.comment_placeholder": "Write a comment to the assignee…",
+    "portal.projects_manager.modals.task_load_failed": "Could not load the task. Please try again.",
+    "portal.projects_manager.modals.comment_failed": "Could not post the comment."
 }

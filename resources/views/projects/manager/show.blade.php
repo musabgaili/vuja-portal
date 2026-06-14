@@ -876,22 +876,71 @@ function markMilestoneCompleted(milestoneId) {
     });
 }
 
+// Null-safe set: some fields only render for users who can manage tasks.
+function setVal(elId, value){ var el = document.getElementById(elId); if (el) el.value = value; }
+
+function renderTaskComments(comments){
+    var box = document.getElementById('task_comments_list');
+    if (!box) return;
+    if (!comments || !comments.length){
+        box.innerHTML = '<p class="text-muted" style="font-size:.85rem;">' + @js(__('portal.projects_manager.modals.no_comments')) + '</p>';
+        return;
+    }
+    box.innerHTML = comments.map(function(c){
+        return '<div style="border-bottom:1px solid var(--gray-200); padding:.4rem 0;">'
+            + '<strong style="font-size:.85rem;">' + (c.user || '') + '</strong> '
+            + '<small class="text-muted">' + (c.time || '') + '</small>'
+            + '<div style="font-size:.9rem;">' + (c.comment || '').replace(/</g,'&lt;') + '</div></div>';
+    }).join('');
+}
+
 function updateTaskStatus(id){
-    fetch(`/internal/projects/tasks/${id}/data`)
-        .then(r => r.json())
+    fetch(`/internal/projects/tasks/${id}/data`, { headers: { 'Accept': 'application/json' } })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(task => {
-            document.getElementById('edit_task_title').value = task.title || '';
-            document.getElementById('edit_task_description').value = task.description || '';
-            document.getElementById('edit_task_status').value = task.status || 'todo';
-            document.getElementById('edit_task_priority').value = task.priority || 'medium';
-            document.getElementById('edit_task_milestone').value = task.milestone_id || '';
-            document.getElementById('edit_task_assigned').value = task.assigned_to || '';
-            document.getElementById('edit_task_due_date').value = task.due_date || '';
-            document.getElementById('edit_task_hours').value = task.actual_hours || '';
-            document.getElementById('taskStatusForm').action = `/internal/projects/tasks/${id}`;
+            setVal('edit_task_title', task.title || '');
+            setVal('edit_task_description', task.description || '');
+            setVal('edit_task_status', task.status || 'todo');
+            setVal('edit_task_priority', task.priority || 'medium');
+            setVal('edit_task_milestone', task.milestone_id || '');
+            setVal('edit_task_assigned', task.assigned_to || '');
+            setVal('edit_task_due_date', task.due_date || '');
+            setVal('edit_task_hours', task.actual_hours || '');
+            var form = document.getElementById('taskStatusForm');
+            if (form) form.action = `/internal/projects/tasks/${id}`;
+            var cform = document.getElementById('taskCommentForm');
+            if (cform) cform.dataset.taskId = id;
+            renderTaskComments(task.comments);
             new bootstrap.Modal(document.getElementById('taskStatusModal')).show();
+        })
+        .catch(err => {
+            console.error('Task load failed:', err);
+            if (window.showAppToast) window.showAppToast(@js(__('portal.projects_manager.modals.task_load_failed')), 'error');
         });
 }
+
+// Post a task comment without leaving the modal.
+document.addEventListener('submit', function(e){
+    if (e.target && e.target.id === 'taskCommentForm'){
+        e.preventDefault();
+        var form = e.target;
+        var id = form.dataset.taskId;
+        var input = document.getElementById('task_comment_input');
+        if (!id || !input || !input.value.trim()) return;
+        fetch(`/internal/projects/tasks/${id}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ comment: input.value.trim() })
+        })
+        .then(r => r.json())
+        .then(data => { if (data.ok){ input.value=''; renderTaskComments(data.comments); } })
+        .catch(err => { console.error('Comment failed:', err); if (window.showAppToast) window.showAppToast(@js(__('portal.projects_manager.modals.comment_failed')), 'error'); });
+    }
+});
 
 function editTeamMember(id, role, canEdit){
     const roleSelect = document.getElementById('edit_member_role');

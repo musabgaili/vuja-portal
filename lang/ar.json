@@ -2349,5 +2349,10 @@
     "portal.import.note_opportunities": "تُحدَّث الفرص بناءً على البريد (أو الاسم). يجب أن تكون \"stage\" أحد مفاتيح مراحل مسارك؛ والفراغ يأخذ المرحلة الأولى.",
     "portal.import.note_projects": "يجب أن يطابق client_email مستخدمًا موجودًا. project_manager_email اختياري. تُحدَّث المشاريع بناءً على العنوان + العميل.",
     "portal.import.note_staff_tasks": "يجب أن يطابق assignee_email مستخدمًا موجودًا. الفئة: project/sales/presale/management. تُحدَّث المهام بناءً على المكلَّف + العنوان.",
-    "portal.import.note_project_tasks": "يجب أن يطابق project_title مشروعًا موجودًا (لا يُنشأ هنا). assignee_email اختياري. تُحدَّث المهام بناءً على المشروع + العنوان."
+    "portal.import.note_project_tasks": "يجب أن يطابق project_title مشروعًا موجودًا (لا يُنشأ هنا). assignee_email اختياري. تُحدَّث المهام بناءً على المشروع + العنوان.",
+    "portal.projects_manager.modals.comments": "التعليقات",
+    "portal.projects_manager.modals.no_comments": "لا توجد تعليقات بعد.",
+    "portal.projects_manager.modals.comment_placeholder": "اكتب تعليقًا للمكلَّف…",
+    "portal.projects_manager.modals.task_load_failed": "تعذّر تحميل المهمة. حاول مرة أخرى.",
+    "portal.projects_manager.modals.comment_failed": "تعذّر نشر التعليق."
 }

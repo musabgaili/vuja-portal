@@ -207,6 +207,20 @@
                     </button>
                 </div>
             </form>
+
+            {{-- Task comments (separate form so it isn't nested in the edit form) --}}
+            <div class="px-3 pb-3" id="task_comments_wrap">
+                <hr>
+                <h6><i class="fas fa-comments"></i> {{ __('portal.projects_manager.modals.comments') }}</h6>
+                <div id="task_comments_list" class="mb-2" style="max-height:180px; overflow:auto;">
+                    <p class="text-muted" style="font-size:.85rem;">{{ __('portal.projects_manager.modals.no_comments') }}</p>
+                </div>
+                <form id="taskCommentForm" class="d-flex gap-2">
+                    @csrf
+                    <input type="text" name="comment" id="task_comment_input" class="form-control" maxlength="2000" placeholder="{{ __('portal.projects_manager.modals.comment_placeholder') }}">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
