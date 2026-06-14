@@ -99,6 +99,25 @@
             </a>
         </div>
     </div>
+
+    <!-- Prototype Development -->
+    <div class="service-card" style="border-left: 4px solid #6366f1;">
+        <div class="service-icon" style="background: #6366f1;">
+            <i class="fas fa-cube"></i>
+        </div>
+        <div class="service-content">
+            <h3>{{ __('portal.services.index.prototype_title') }}</h3>
+            <p>{{ __('portal.services.index.prototype_body') }}</p>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.prototype_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.prototype_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.prototype_f3') }}</li>
+            </ul>
+            <a href="{{ route('prototypes.create') }}" class="btn btn-primary btn-block">
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.prototype_cta') }}
+            </a>
+        </div>
+    </div>
 </div>
 
 <!-- How It Works -->

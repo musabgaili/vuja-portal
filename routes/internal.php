@@ -122,6 +122,13 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/ideas/{idea}/close', [IdeaRequestController::class, 'close'])->name('ideas.close');
     Route::post('/ideas/{idea}/convert-to-project', [IdeaRequestController::class, 'convertToProject'])->name('ideas.convert-to-project');
 
+    // PROTOTYPES - Manager/Employee Routes
+    Route::get('/prototypes/manager', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'managerIndex'])->name('prototypes.manager.index');
+    Route::get('/prototypes/manager/{prototype}', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'managerShow'])->name('prototypes.manager.show');
+    Route::get('/prototypes/files/{file}/download', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'downloadFile'])->name('prototypes.manager.files.download');
+    Route::post('/prototypes/{prototype}/assign', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'assign'])->name('prototypes.assign');
+    Route::post('/prototypes/{prototype}/status', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'updateStatus'])->name('prototypes.update-status');
+
     // CONSULTATIONS - Manager/Employee Routes
     Route::get('/consultations/manager', [ConsultationRequestController::class, 'managerIndex'])->name('consultations.manager.index');
     Route::get('/consultations/manager/{consultation}', [ConsultationRequestController::class, 'managerShow'])->name('consultations.manager.show');

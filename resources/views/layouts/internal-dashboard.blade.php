@@ -125,6 +125,10 @@
                         <i class="fas fa-copyright"></i>
                         {{ __('portal.nav.copyright') }}
                     </a>
+                    <a href="{{ route('prototypes.manager.index') }}" class="nav-item {{ request()->routeIs('prototypes.manager.*') ? 'active' : '' }}">
+                        <i class="fas fa-cube"></i>
+                        {{ __('portal.nav.prototypes') }}
+                    </a>
                 </div>
 
                 <!-- Projects -->

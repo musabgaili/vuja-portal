@@ -5,6 +5,7 @@ use App\Http\Controllers\Services\ConsultationRequestController;
 use App\Http\Controllers\Services\CopyrightRegistrationController;
 use App\Http\Controllers\Services\IdeaRequestController;
 use App\Http\Controllers\Services\IpRegistrationController;
+use App\Http\Controllers\Services\PrototypeRequestController;
 use App\Http\Controllers\Services\ResearchRequestController;
 use Illuminate\Support\Facades\Route;
 
@@ -89,6 +90,17 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
         Route::get('/{research}', [ResearchRequestController::class, 'show'])->name('show');
         Route::post('/{research}/sign-documents', [ResearchRequestController::class, 'signDocuments'])->name('sign-documents');
         Route::post('/{research}/book-meeting', [ResearchRequestController::class, 'bookMeeting'])->name('book-meeting');
+    });
+
+    // ============================================
+    // PROTOTYPE DEVELOPMENT SERVICE
+    // ============================================
+    Route::prefix('prototypes')->name('prototypes.')->group(function () {
+        Route::get('/', [PrototypeRequestController::class, 'index'])->name('index');
+        Route::get('/create', [PrototypeRequestController::class, 'create'])->name('create');
+        Route::post('/', [PrototypeRequestController::class, 'store'])->name('store');
+        Route::get('/files/{file}/download', [PrototypeRequestController::class, 'downloadFile'])->name('files.download');
+        Route::get('/{prototype}', [PrototypeRequestController::class, 'show'])->name('show');
     });
 
     // ============================================
