@@ -1160,3 +1160,12 @@ body {
 [data-bs-theme="dark"] .card h1, [data-bs-theme="dark"] .card h2, [data-bs-theme="dark"] .card h3,
 [data-bs-theme="dark"] .widget h3, [data-bs-theme="dark"] .stat-card-manager * { color: var(--gray-900) !important; }
 [data-bs-theme="dark"] .stat-label, [data-bs-theme="dark"] .stat-label-manager { color: var(--gray-500) !important; }
+/* ===== CRM pipeline Kanban ===== */
+.crm-board{ display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; align-items:flex-start; }
+.crm-col{ flex:1 0 280px; min-width:280px; background:var(--bg-tertiary); border:1px solid var(--gray-200); border-radius:12px; }
+.crm-col-head{ display:flex; justify-content:space-between; align-items:center; padding:12px 14px; font-weight:600; border-bottom:1px solid var(--gray-200); }
+.crm-col-body{ padding:10px; min-height:120px; display:flex; flex-direction:column; gap:10px; }
+.crm-col-body.drop-hint{ background:var(--primary-light); }
+.crm-card{ background:var(--bg-primary); border:1px solid var(--gray-200); border-radius:10px; padding:12px; box-shadow:var(--shadow-sm); cursor:grab; }
+.crm-card:hover{ border-color:var(--primary-color); }
+.crm-card.dragging{ opacity:.5; }

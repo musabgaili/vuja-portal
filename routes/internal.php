@@ -38,6 +38,18 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
     Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
 
+    // CRM — sales pipeline (Leads / Opportunities), all internal staff
+    Route::get('/crm', [\App\Http\Controllers\OpportunityController::class, 'index'])->name('crm.index');
+    Route::get('/crm/create', [\App\Http\Controllers\OpportunityController::class, 'create'])->name('crm.create');
+    Route::post('/crm', [\App\Http\Controllers\OpportunityController::class, 'store'])->name('crm.store');
+    Route::get('/crm/{opportunity}', [\App\Http\Controllers\OpportunityController::class, 'show'])->name('crm.show');
+    Route::get('/crm/{opportunity}/edit', [\App\Http\Controllers\OpportunityController::class, 'edit'])->name('crm.edit');
+    Route::put('/crm/{opportunity}', [\App\Http\Controllers\OpportunityController::class, 'update'])->name('crm.update');
+    Route::post('/crm/{opportunity}/stage', [\App\Http\Controllers\OpportunityController::class, 'updateStage'])->name('crm.stage');
+    Route::post('/crm/{opportunity}/lost', [\App\Http\Controllers\OpportunityController::class, 'markLost'])->name('crm.lost');
+    Route::post('/crm/{opportunity}/convert', [\App\Http\Controllers\OpportunityController::class, 'convert'])->name('crm.convert');
+    Route::delete('/crm/{opportunity}', [\App\Http\Controllers\OpportunityController::class, 'destroy'])->name('crm.destroy');
+
     // AI SCOPE & INVENTORY PLANNER (all internal — front-end of the Pricing Tool)
     Route::get('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'index'])->name('scope-planner.index');
     Route::post('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'plan'])->name('scope-planner.plan');

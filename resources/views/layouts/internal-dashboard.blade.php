@@ -63,6 +63,15 @@
                     @endif
                 </div>
 
+                <!-- Sales / CRM -->
+                <div class="nav-section">
+                    <div class="nav-section-title">{{ __('portal.nav.sales') }}</div>
+                    <a href="{{ route('crm.index') }}" class="nav-item {{ request()->routeIs('crm.*') ? 'active' : '' }}">
+                        <i class="fas fa-funnel-dollar"></i>
+                        {{ __('portal.nav.pipeline') }}
+                    </a>
+                </div>
+
                 <!-- Service Requests -->
                 <div class="nav-section">
                     <div class="nav-section-title">{{ __('portal.nav.services') }}</div>
