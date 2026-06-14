@@ -200,7 +200,13 @@
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
-                
+                {{-- Anti-bot: honeypot (hidden from humans) + signed render-time token. --}}
+                <div aria-hidden="true" style="position:absolute; left:-9999px; top:-9999px; width:0; height:0; overflow:hidden;">
+                    <label for="website">Leave this field empty</label>
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                </div>
+                <input type="hidden" name="form_token" value="{{ encrypt(now()->timestamp) }}">
+
                 <div class="form-floating">
                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
                            id="name" name="name" value="{{ old('name') }}" 

@@ -40,6 +40,8 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+        // Rate-limit registration attempts per IP to blunt bot volume.
+        $this->middleware('throttle:6,1')->only('register');
     }
 
     /**
@@ -54,6 +56,27 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+
+            // ---- Anti-bot (silent; legitimate users never see these) ----
+            // Honeypot: a hidden field. Bots fill it; humans leave it empty.
+            'website' => ['prohibited'],
+            // Signed form token issued when the page rendered. Blind POST bots
+            // don't have it, and it traps too-fast / stale submissions.
+            'form_token' => ['required', 'string', function ($attribute, $value, $fail) {
+                try {
+                    $startedAt = (int) decrypt($value);
+                } catch (\Throwable $e) {
+                    $fail('Invalid submission.');
+
+                    return;
+                }
+                $elapsed = now()->timestamp - $startedAt;
+                if ($elapsed < 3) {
+                    $fail('Form submitted too quickly — please try again.');
+                } elseif ($elapsed > 7200) {
+                    $fail('This form has expired — please reload and try again.');
+                }
+            }],
         ]);
     }
 
