@@ -200,6 +200,11 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
             Route::get('/users', [\App\Http\Controllers\Permissions\PermissionsController::class, 'users'])->name('users');
             Route::get('/portal-clients', [\App\Http\Controllers\Permissions\PermissionsController::class, 'portalClients'])->name('portal-clients');
 
+            // Account cleanup (bot/fake users) — clients only, staff protected
+            Route::post('/users/bulk-delete', [\App\Http\Controllers\Permissions\PermissionsController::class, 'bulkDeleteUsers'])->name('users.bulk-delete');
+            Route::post('/users/delete-unverified', [\App\Http\Controllers\Permissions\PermissionsController::class, 'deleteUnverifiedClients'])->name('users.delete-unverified');
+            Route::delete('/users/{user}', [\App\Http\Controllers\Permissions\PermissionsController::class, 'destroyUser'])->name('users.destroy');
+
             Route::post('/assign-role', [\App\Http\Controllers\Permissions\PermissionsController::class, 'assignRole'])->name('assign-role');
             Route::post('/remove-role', [\App\Http\Controllers\Permissions\PermissionsController::class, 'removeRole'])->name('remove-role');
             Route::post('/assign-permission', [\App\Http\Controllers\Permissions\PermissionsController::class, 'assignPermissionToRole'])->name('assign-permission');

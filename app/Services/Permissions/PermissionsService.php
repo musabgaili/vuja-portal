@@ -155,11 +155,20 @@ class PermissionsService
     /**
      * Get all users with their roles
      */
-    public function getUsersWithRoles(bool $clientsOnly = false)
+    public function getUsersWithRoles(bool $clientsOnly = false, array $filters = [])
     {
+        $verified = $filters['verified'] ?? null;
+        $search = trim((string) ($filters['q'] ?? ''));
+
         return User::with('roles')
             ->when($clientsOnly, fn ($query) => $query->where('role', UserRole::CLIENT))
-            ->orderBy('name')
-            ->paginate(10);
+            ->when($verified === 'unverified', fn ($q) => $q->whereNull('email_verified_at'))
+            ->when($verified === 'verified', fn ($q) => $q->whereNotNull('email_verified_at'))
+            ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
+                ->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")))
+            // Newest first — bot sign-ups cluster at the top for easy cleanup.
+            ->orderByDesc('created_at')
+            ->paginate(25);
     }
 }

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Permissions;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Permissions\PermissionsService;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -65,10 +67,15 @@ class PermissionsController extends Controller
     public function users(Request $request)
     {
         $clientsOnly = $request->query('filter') === 'clients';
-        $users = $this->permissionsService->getUsersWithRoles($clientsOnly)->withQueryString();
+        $filters = [
+            'verified' => $request->query('verified'),
+            'q' => $request->query('q'),
+        ];
+        $users = $this->permissionsService->getUsersWithRoles($clientsOnly, $filters)->withQueryString();
         $roles = Role::all();
+        $unverifiedClients = User::where('role', UserRole::CLIENT)->whereNull('email_verified_at')->count();
 
-        return view('permissions.users', compact('users', 'roles', 'clientsOnly'));
+        return view('permissions.users', compact('users', 'roles', 'clientsOnly', 'filters', 'unverifiedClients'));
     }
 
     /**
@@ -77,6 +84,73 @@ class PermissionsController extends Controller
     public function portalClients(): RedirectResponse
     {
         return redirect()->route('permissions.users', ['filter' => 'clients']);
+    }
+
+    /**
+     * Delete a single account. Only CLIENT accounts are deletable — internal
+     * staff and the current user are always protected.
+     */
+    public function destroyUser(User $user)
+    {
+        if (! $this->isDeletable($user)) {
+            return back()->withErrors(['user' => __('portal.permissions.cannot_delete_user')]);
+        }
+
+        $ok = $this->safelyDeleteUser($user);
+
+        return back()->with(
+            $ok ? 'success' : 'error',
+            $ok ? __('portal.permissions.user_deleted') : __('portal.permissions.user_delete_failed')
+        );
+    }
+
+    /** Delete the checked accounts (clients only; protected accounts are skipped). */
+    public function bulkDeleteUsers(Request $request)
+    {
+        $validated = $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'integer',
+        ]);
+
+        $deleted = 0;
+        $skipped = 0;
+        User::whereIn('id', $validated['user_ids'])->get()->each(function (User $u) use (&$deleted, &$skipped) {
+            ($this->isDeletable($u) && $this->safelyDeleteUser($u)) ? $deleted++ : $skipped++;
+        });
+
+        return back()->with('success', __('portal.permissions.bulk_deleted', ['deleted' => $deleted, 'skipped' => $skipped]));
+    }
+
+    /** One-click bot cleanup: delete every unverified client account. */
+    public function deleteUnverifiedClients()
+    {
+        $deleted = 0;
+        $skipped = 0;
+        User::where('role', UserRole::CLIENT)->whereNull('email_verified_at')->get()
+            ->each(function (User $u) use (&$deleted, &$skipped) {
+                ($this->isDeletable($u) && $this->safelyDeleteUser($u)) ? $deleted++ : $skipped++;
+            });
+
+        return back()->with('success', __('portal.permissions.unverified_deleted', ['deleted' => $deleted, 'skipped' => $skipped]));
+    }
+
+    /** Guard: never the current user, and only client accounts (staff protected). */
+    private function isDeletable(User $user): bool
+    {
+        return $user->id !== Auth::id() && $user->role === UserRole::CLIENT;
+    }
+
+    /** Detach roles then hard-delete; returns false if linked records block it. */
+    private function safelyDeleteUser(User $user): bool
+    {
+        try {
+            $user->roles()->detach();
+            $user->delete();
+
+            return true;
+        } catch (\Throwable $e) {
+            return false; // e.g. a foreign-key restriction from related records
+        }
     }
 
     /**
