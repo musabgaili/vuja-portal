@@ -20,7 +20,7 @@
                 <td>{{ $q->client->name ?? '—' }}</td>
                 <td>{{ $q->opportunity?->name ?? '—' }}</td>
                 <td class="text-end">${{ number_format((float) $q->total_client, 0) }}</td>
-                <td><span class="badge bg-{{ $q->statusColor() }}">{{ ucfirst($q->status) }}</span></td>
+                <td><span class="badge bg-{{ $q->statusColor() }}">{{ $q->statusLabel() }}</span></td>
             </tr>
         @empty
             <tr><td colspan="5" class="text-muted text-center py-3">{{ __('portal.quote.none') }}</td></tr>

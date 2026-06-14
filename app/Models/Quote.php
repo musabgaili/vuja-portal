@@ -10,8 +10,9 @@ class Quote extends Model
 {
     protected $fillable = [
         'opportunity_id', 'company_id', 'contact_id', 'client_id', 'created_by', 'project_id',
+        'approved_by', 'customer_category',
         'title', 'scope', 'status', 'total_internal', 'total_client', 'valid_until',
-        'accepted_signature', 'accepted_at', 'accepted_ip', 'reject_reason',
+        'accepted_signature', 'accepted_at', 'accepted_ip', 'approved_at', 'reject_reason',
     ];
 
     protected $casts = [
@@ -19,11 +20,22 @@ class Quote extends Model
         'total_client' => 'decimal:2',
         'valid_until' => 'date',
         'accepted_at' => 'datetime',
+        'approved_at' => 'datetime',
     ];
 
     public function items(): HasMany
     {
         return $this->hasMany(QuoteItem::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(QuoteComment::class)->latest();
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function opportunity(): BelongsTo
@@ -74,13 +86,32 @@ class Quote extends Model
         return $this->status === 'accepted';
     }
 
+    /** Statuses where the creator may still edit / re-submit the quote. */
+    public function isEditable(): bool
+    {
+        return in_array($this->status, ['draft', 'changes_requested'], true);
+    }
+
+    /** Has cleared internal approval and is ready to send / been sent / accepted. */
+    public function isApproved(): bool
+    {
+        return in_array($this->status, ['approved', 'sent', 'accepted'], true);
+    }
+
     public function statusColor(): string
     {
         return match ($this->status) {
-            'accepted' => 'success',
+            'accepted', 'approved' => 'success',
             'sent' => 'info',
+            'pending_approval' => 'warning',
+            'changes_requested' => 'warning',
             'rejected' => 'danger',
             default => 'secondary',
         };
+    }
+
+    public function statusLabel(): string
+    {
+        return __('portal.quote.status.'.$this->status);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Quote;
+use App\Models\QuoteComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,17 +26,96 @@ class QuoteController extends Controller
     {
         abort_unless(Auth::user()->isInternal(), 403);
 
-        return view('crm.quotes.show', ['quote' => $quote->load(['items', 'client', 'opportunity', 'company', 'project'])]);
+        return view('crm.quotes.show', [
+            'quote' => $quote->load(['items', 'client', 'opportunity', 'company', 'project', 'approver', 'comments.user']),
+            'canApprove' => $this->isApprover(),
+        ]);
     }
 
+    /** Only a draft/changes_requested quote may go to the client AFTER approval. */
     public function send(Quote $quote)
     {
         abort_unless(Auth::user()->isInternal(), 403);
-        if ($quote->status === 'draft') {
-            $quote->update(['status' => 'sent']);
+        if ($quote->status !== 'approved') {
+            return back()->withErrors(['send' => __('portal.quote.must_be_approved')]);
         }
+        $quote->update(['status' => 'sent']);
 
-        return back()->with('success', 'Quote marked as sent to the client.');
+        return back()->with('success', __('portal.quote.marked_sent'));
+    }
+
+    // ---- Internal approval layer (manager / project manager) ----
+
+    /** Creator/staff submits a draft for manager approval. */
+    public function submitForApproval(Quote $quote)
+    {
+        abort_unless(Auth::user()->isInternal(), 403);
+        if (! $quote->isEditable()) {
+            return back()->withErrors(['approval' => __('portal.quote.not_submittable')]);
+        }
+        $quote->update(['status' => 'pending_approval']);
+        $this->logComment($quote, 'submitted', __('portal.quote.log_submitted'));
+
+        return back()->with('success', __('portal.quote.submitted_for_approval'));
+    }
+
+    public function approve(Quote $quote)
+    {
+        abort_unless($this->isApprover(), 403);
+        if ($quote->status !== 'pending_approval') {
+            return back()->withErrors(['approval' => __('portal.quote.not_pending')]);
+        }
+        $quote->update(['status' => 'approved', 'approved_by' => Auth::id(), 'approved_at' => now()]);
+        $this->logComment($quote, 'approval', __('portal.quote.log_approved'));
+
+        return back()->with('success', __('portal.quote.approved'));
+    }
+
+    public function reject(Request $request, Quote $quote)
+    {
+        abort_unless($this->isApprover(), 403);
+        $validated = $request->validate(['comment' => 'required|string|max:2000']);
+        $quote->update(['status' => 'rejected', 'reject_reason' => $validated['comment']]);
+        $this->logComment($quote, 'rejection', $validated['comment']);
+
+        return back()->with('success', __('portal.quote.rejected'));
+    }
+
+    /** Send the quote back to the creator for changes, with a required comment. */
+    public function requestChanges(Request $request, Quote $quote)
+    {
+        abort_unless($this->isApprover(), 403);
+        $validated = $request->validate(['comment' => 'required|string|max:2000']);
+        $quote->update(['status' => 'changes_requested']);
+        $this->logComment($quote, 'changes', $validated['comment']);
+
+        return back()->with('success', __('portal.quote.changes_requested'));
+    }
+
+    public function addComment(Request $request, Quote $quote)
+    {
+        abort_unless(Auth::user()->isInternal(), 403);
+        $validated = $request->validate(['comment' => 'required|string|max:2000']);
+        $this->logComment($quote, 'note', $validated['comment']);
+
+        return back()->with('success', __('portal.quote.comment_added'));
+    }
+
+    private function isApprover(): bool
+    {
+        $u = Auth::user();
+
+        return $u->isManager() || $u->isProjectManager();
+    }
+
+    private function logComment(Quote $quote, string $type, string $comment): void
+    {
+        QuoteComment::create([
+            'quote_id' => $quote->id,
+            'user_id' => Auth::id(),
+            'type' => $type,
+            'comment' => $comment,
+        ]);
     }
 
     /** Internal accept-on-behalf (e.g. verbal/phone acceptance). */

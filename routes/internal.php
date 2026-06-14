@@ -81,6 +81,12 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'show'])->name('quotes.show');
     Route::post('/quotes/{quote}/send', [\App\Http\Controllers\QuoteController::class, 'send'])->name('quotes.send');
     Route::post('/quotes/{quote}/accept', [\App\Http\Controllers\QuoteController::class, 'acceptInternal'])->name('quotes.accept-internal');
+    // Internal approval layer
+    Route::post('/quotes/{quote}/submit', [\App\Http\Controllers\QuoteController::class, 'submitForApproval'])->name('quotes.submit');
+    Route::post('/quotes/{quote}/approve', [\App\Http\Controllers\QuoteController::class, 'approve'])->name('quotes.approve');
+    Route::post('/quotes/{quote}/reject', [\App\Http\Controllers\QuoteController::class, 'reject'])->name('quotes.reject');
+    Route::post('/quotes/{quote}/request-changes', [\App\Http\Controllers\QuoteController::class, 'requestChanges'])->name('quotes.request-changes');
+    Route::post('/quotes/{quote}/comments', [\App\Http\Controllers\QuoteController::class, 'addComment'])->name('quotes.comments.store');
     Route::delete('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'destroy'])->name('quotes.destroy');
 
     // CONTROL TOWER — owner project-health traffic light + risk alerts (manager)

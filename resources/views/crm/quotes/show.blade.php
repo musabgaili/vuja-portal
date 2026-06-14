@@ -8,10 +8,11 @@
             <h1 style="margin:0; font-size:1.4rem;"><i class="fas fa-file-invoice"></i> #{{ $quote->id }} · {{ $quote->title }}</h1>
             <p style="margin:.25rem 0 0; opacity:.9;">{{ $quote->client->name ?? __('portal.quote.no_client') }}@if($quote->opportunity) · {{ $quote->opportunity->name }}@endif</p>
         </div>
-        <span class="badge bg-{{ $quote->statusColor() }}" style="font-size:.85rem;">{{ ucfirst($quote->status) }}</span>
+        <span class="badge bg-{{ $quote->statusColor() }}" style="font-size:.85rem;">{{ $quote->statusLabel() }}</span>
     </div>
 </div>
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+@foreach($errors->all() as $e)<div class="alert alert-danger">{{ $e }}</div>@endforeach
 
 <div class="row g-3">
     <div class="col-lg-8">
@@ -51,14 +52,57 @@
                 <div class="alert alert-success"><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->format('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
                 @if($quote->project)<a href="{{ route('projects.manager.show', $quote->project) }}" class="btn btn-primary w-100 mb-2"><i class="fas fa-folder-open"></i> {{ __('portal.quote.open_order') }}</a>@endif
             @else
-                @if($quote->status === 'draft')
+                {{-- Step 1: creator submits a draft (or a sent-back quote) for approval --}}
+                @if($quote->isEditable())
+                    <form method="POST" action="{{ route('quotes.submit', $quote) }}" class="mb-2">@csrf
+                        <button class="btn btn-primary w-100"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.submit_for_approval') }}</button>
+                    </form>
+                    @if($quote->status === 'changes_requested')
+                        <div class="alert alert-warning" style="font-size:.85rem;">{{ __('portal.quote.changes_requested_note') }}</div>
+                    @endif
+                @endif
+
+                {{-- Step 2: a manager / project manager reviews --}}
+                @if($quote->status === 'pending_approval')
+                    @if($canApprove)
+                        <form method="POST" action="{{ route('quotes.approve', $quote) }}" class="mb-2">@csrf
+                            <button class="btn btn-success w-100"><i class="fas fa-check"></i> {{ __('portal.quote.approve') }}</button>
+                        </form>
+                        <form method="POST" action="{{ route('quotes.request-changes', $quote) }}" class="mb-2">@csrf
+                            <textarea name="comment" class="form-control form-control-sm mb-1" rows="2" required placeholder="{{ __('portal.quote.changes_ph') }}"></textarea>
+                            <button class="btn btn-outline-warning w-100"><i class="fas fa-rotate-left"></i> {{ __('portal.quote.request_changes') }}</button>
+                        </form>
+                        <form method="POST" action="{{ route('quotes.reject', $quote) }}" class="mb-2">@csrf
+                            <textarea name="comment" class="form-control form-control-sm mb-1" rows="2" required placeholder="{{ __('portal.quote.reject_ph') }}"></textarea>
+                            <button class="btn btn-outline-danger w-100"><i class="fas fa-ban"></i> {{ __('portal.quote.reject') }}</button>
+                        </form>
+                    @else
+                        <div class="alert alert-warning" style="font-size:.85rem;"><i class="fas fa-clock"></i> {{ __('portal.quote.awaiting_approval') }}</div>
+                    @endif
+                @endif
+
+                {{-- Step 3: approved -> send to client --}}
+                @if($quote->status === 'approved')
+                    @if($quote->approver)<div class="text-muted small mb-2">{{ __('portal.quote.approved_by') }}: {{ $quote->approver->name }}</div>@endif
                     <form method="POST" action="{{ route('quotes.send', $quote) }}" class="mb-2">@csrf
-                        <button class="btn btn-primary w-100"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.mark_sent') }}</button>
+                        <button class="btn btn-primary w-100"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.send_to_client') }}</button>
                     </form>
                 @endif
-                <form method="POST" action="{{ route('quotes.accept-internal', $quote) }}" class="mb-2" onsubmit="return confirm('{{ __('portal.quote.confirm_accept') }}')">@csrf
-                    <button class="btn btn-outline-primary w-100"><i class="fas fa-handshake"></i> {{ __('portal.quote.accept_onbehalf') }}</button>
-                </form>
+
+                @if($quote->status === 'sent')
+                    <div class="alert alert-info" style="font-size:.85rem;"><i class="fas fa-hourglass-half"></i> {{ __('portal.quote.awaiting_client') }}</div>
+                @endif
+
+                @if($quote->status === 'rejected')
+                    <div class="alert alert-danger" style="font-size:.85rem;">{{ __('portal.quote.was_rejected') }}@if($quote->reject_reason): {{ $quote->reject_reason }}@endif</div>
+                @endif
+
+                {{-- Accept on behalf only once the quote has cleared approval --}}
+                @if($quote->isApproved())
+                    <form method="POST" action="{{ route('quotes.accept-internal', $quote) }}" class="mb-2" onsubmit="return confirm('{{ __('portal.quote.confirm_accept') }}')">@csrf
+                        <button class="btn btn-outline-primary w-100"><i class="fas fa-handshake"></i> {{ __('portal.quote.accept_onbehalf') }}</button>
+                    </form>
+                @endif
             @endif
             @if($quote->client)
                 <div class="text-muted small mt-2">{{ __('portal.quote.client_link') }}:</div>
@@ -76,6 +120,28 @@
                 @endforeach
                 <tr><td><strong>{{ __('portal.quote.total') }}</strong></td><td class="text-end"><strong>${{ number_format((float) $quote->total_client, 2) }}</strong></td></tr>
             </table>
+        </div></div>
+
+        {{-- Internal discussion / approval trail --}}
+        <div class="card mt-3"><div class="card-header"><span class="card-title"><i class="fas fa-comments"></i> {{ __('portal.quote.comments') }}</span></div>
+        <div class="card-content">
+            <form method="POST" action="{{ route('quotes.comments.store', $quote) }}" class="mb-3">@csrf
+                <textarea name="comment" class="form-control form-control-sm mb-1" rows="2" required placeholder="{{ __('portal.quote.comment_ph') }}"></textarea>
+                <button class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.add_comment') }}</button>
+            </form>
+            @forelse($quote->comments as $c)
+                <div style="border-bottom:1px solid var(--gray-200); padding:.5rem 0;">
+                    <div class="d-flex justify-content-between">
+                        <strong style="font-size:.85rem;">{{ $c->user->name ?? '—' }}
+                            @if($c->type !== 'note')<span class="badge bg-{{ $c->type === 'approval' ? 'success' : ($c->type === 'rejection' ? 'danger' : 'warning') }}">{{ __('portal.quote.ctype.'.$c->type) }}</span>@endif
+                        </strong>
+                        <small class="text-muted">{{ $c->created_at->diffForHumans() }}</small>
+                    </div>
+                    <div style="font-size:.9rem;">{{ $c->comment }}</div>
+                </div>
+            @empty
+                <p class="text-muted" style="font-size:.85rem;">{{ __('portal.quote.no_comments') }}</p>
+            @endforelse
         </div></div>
     </div>
 </div>
