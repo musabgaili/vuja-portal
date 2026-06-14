@@ -55,6 +55,10 @@
                         <i class="fas fa-list"></i>
                         {{ __('portal.layout_client.nav_my_requests') }}
                     </a>
+                    <a href="{{ route('quotes.client.index') }}" class="nav-item {{ request()->routeIs('quotes.client.*') ? 'active' : '' }}">
+                        <i class="fas fa-file-invoice"></i>
+                        {{ __('portal.quote.my_quotes') }}
+                    </a>
                     <a href="{{ route('services.index') }}" class="nav-item">
                         <i class="fas fa-plus"></i>
                         {{ __('portal.layout_client.nav_new_request') }}

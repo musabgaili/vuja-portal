@@ -66,6 +66,14 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // AI SCOPE & INVENTORY PLANNER (all internal — front-end of the Pricing Tool)
     Route::get('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'index'])->name('scope-planner.index');
     Route::post('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'plan'])->name('scope-planner.plan');
+    Route::post('/scope-planner/save-quote', [\App\Http\Controllers\ScopePlannerController::class, 'saveQuote'])->name('scope-planner.save-quote');
+
+    // QUOTES (internal) — built from the Scope Planner; accepted -> order/project
+    Route::get('/quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes.index');
+    Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'show'])->name('quotes.show');
+    Route::post('/quotes/{quote}/send', [\App\Http\Controllers\QuoteController::class, 'send'])->name('quotes.send');
+    Route::post('/quotes/{quote}/accept', [\App\Http\Controllers\QuoteController::class, 'acceptInternal'])->name('quotes.accept-internal');
+    Route::delete('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'destroy'])->name('quotes.destroy');
 
     // CONTROL TOWER — owner project-health traffic light + risk alerts (manager)
     Route::get('/control-tower', [ControlTowerController::class, 'index'])->name('control-tower.index');

@@ -62,7 +62,19 @@
                     @endforeach
                 </div>
             @endforeach
-            <button type="submit" class="btn btn-outline-primary"><i class="fas fa-calculator"></i> {{ __('portal.scope_ai.build_quote') }}</button>
+            <div class="d-flex flex-wrap align-items-end gap-2">
+                <button type="submit" class="btn btn-outline-primary"><i class="fas fa-calculator"></i> {{ __('portal.scope_ai.build_quote') }}</button>
+                <div style="min-width:240px;">
+                    <label class="form-label" style="font-size:.78rem;">{{ __('portal.scope_ai.link_opportunity') }}</label>
+                    <select name="opportunity_id" class="form-select">
+                        <option value="">{{ __('portal.scope_ai.no_opportunity') }}</option>
+                        @foreach($opportunities as $op)
+                            <option value="{{ $op->id }}">{{ $op->name }}{{ $op->company_name ? ' — '.$op->company_name : '' }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" formaction="{{ route('scope-planner.save-quote') }}" class="btn btn-primary"><i class="fas fa-file-invoice"></i> {{ __('portal.scope_ai.save_quote') }}</button>
+            </div>
         </div>
     </div>
 </form>

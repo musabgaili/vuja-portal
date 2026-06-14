@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
+use App\Models\Opportunity;
+use App\Models\Quote;
 use App\Services\GeminiScopeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,12 +15,72 @@ class ScopePlannerController extends Controller
     {
     }
 
+    /** Persist the current scope + selected inventory as a Quote (CRM bridge). */
+    public function saveQuote(Request $request)
+    {
+        abort_unless(Auth::user()->isInternal(), 403);
+
+        $validated = $request->validate([
+            'project_type' => 'required|string|max:160',
+            'requirements' => 'nullable|string',
+            'scope' => 'nullable|string',
+            'title' => 'nullable|string|max:200',
+            'items' => 'array',
+            'items.*' => 'integer|exists:inventory_items,id',
+            'qty' => 'array',
+            'opportunity_id' => 'nullable|exists:opportunities,id',
+        ]);
+
+        $items = InventoryItem::whereIn('id', $request->input('items', []))->get();
+        if ($items->isEmpty()) {
+            return back()->withErrors(['items' => 'Select at least one inventory item before saving a quote.'])->withInput();
+        }
+
+        $opp = ! empty($validated['opportunity_id']) ? Opportunity::find($validated['opportunity_id']) : null;
+        $qty = $request->input('qty', []);
+
+        $quote = Quote::create([
+            'title' => $validated['title'] ?? $validated['project_type'],
+            'scope' => $validated['scope'] ?? null,
+            'status' => 'draft',
+            'created_by' => Auth::id(),
+            'opportunity_id' => $opp?->id,
+            'company_id' => $opp?->company_id,
+            'contact_id' => $opp?->contact_id,
+            'client_id' => $opp?->client_id,
+        ]);
+
+        $totalInternal = 0;
+        $totalClient = 0;
+        foreach ($items as $item) {
+            $q = max(1, (int) ($qty[$item->id] ?? 1));
+            $lineInternal = (float) $item->internal_cost * $q;
+            $lineClient = $item->clientPrice() * $q;
+            $totalInternal += $lineInternal;
+            $totalClient += $lineClient;
+            $quote->items()->create([
+                'inventory_item_id' => $item->id,
+                'name' => $item->name,
+                'category' => $item->category,
+                'internal_cost' => $item->internal_cost,
+                'markup_percentage' => $item->markup_percentage,
+                'qty' => $q,
+                'line_internal' => $lineInternal,
+                'line_client' => $lineClient,
+            ]);
+        }
+        $quote->update(['total_internal' => $totalInternal, 'total_client' => $totalClient]);
+
+        return redirect()->route('quotes.show', $quote)->with('success', 'Quote saved from the AI Scope Planner.');
+    }
+
     public function index()
     {
         abort_unless(Auth::user()->isInternal(), 403);
 
         return view('scope-planner.index', [
             'inventory' => InventoryItem::where('active', true)->orderBy('category')->orderBy('name')->get()->groupBy('category'),
+            'opportunities' => Opportunity::whereIn('stage', array_keys(config('crm.stages')))->orderBy('name')->get(),
             'result' => null,
         ]);
     }
@@ -66,6 +128,7 @@ class ScopePlannerController extends Controller
 
         return view('scope-planner.index', [
             'inventory' => InventoryItem::where('active', true)->orderBy('category')->orderBy('name')->get()->groupBy('category'),
+            'opportunities' => Opportunity::whereIn('stage', array_keys(config('crm.stages')))->orderBy('name')->get(),
             'result' => [
                 'project_type' => $validated['project_type'],
                 'requirements' => $validated['requirements'],

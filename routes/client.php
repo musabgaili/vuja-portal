@@ -25,6 +25,12 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
     // My Requests - Unified view of all requests
     Route::get('/my-requests', [\App\Http\Controllers\ClientRequestsController::class, 'index'])->name('client.requests');
 
+    // Quotes — review & accept (digital signature -> becomes an order/project)
+    Route::get('/quotes', [\App\Http\Controllers\QuoteController::class, 'clientIndex'])->name('quotes.client.index');
+    Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'clientShow'])->name('quotes.client.show');
+    Route::post('/quotes/{quote}/accept', [\App\Http\Controllers\QuoteController::class, 'clientAccept'])->name('quotes.client.accept');
+    Route::post('/quotes/{quote}/reject', [\App\Http\Controllers\QuoteController::class, 'clientReject'])->name('quotes.client.reject');
+
     // Projects moved to routes/projects.php
 
     // Meetings - Client Booking
