@@ -118,6 +118,10 @@
                         <i class="fas fa-calculator"></i>
                         {{ __('portal.nav.pricing_tool') }}
                     </a>
+                    <a href="{{ route('scope-planner.index') }}" class="nav-item {{ request()->routeIs('scope-planner.*') ? 'active' : '' }}">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        {{ __('portal.nav.scope_planner') }}
+                    </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('pricing.admin') }}" class="nav-item">
                         <i class="fas fa-cogs"></i>

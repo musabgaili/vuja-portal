@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ServiceRequestTypeSeeder::class,
             PricingRuleSeeder::class,
+            InventoryItemSeeder::class,
         ]);
 
         if (! app()->environment('production')) {
