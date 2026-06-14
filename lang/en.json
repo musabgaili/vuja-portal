@@ -1,4 +1,7 @@
 {
+    "portal.projects_manager.create.assign_employees": "Assign Employees",
+    "portal.projects_manager.create.assign_employees_hint": "Selected employees are added to the project team. You can also manage the team later on the project page.",
+    "portal.projects_manager.create.no_employees": "No employees available.",
     "portal.nav.quotes": "Quotes",
     "portal.scope_ai.link_opportunity": "Link to opportunity",
     "portal.scope_ai.no_opportunity": "— No opportunity —",

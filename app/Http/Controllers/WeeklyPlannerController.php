@@ -88,8 +88,16 @@ class WeeklyPlannerController extends Controller
                 return back()->withErrors(['hours' => "Your allocation must total exactly {$required} hours (currently {$plan->totalHours()})."])->withInput();
             }
             $wasSubmitted = $plan->status === 'pending' || $plan->status === 'approved';
-            $plan->status = 'pending';
+
+            // A manager has no approver above them, so their own plan self-approves
+            // (it never enters anyone's pending queue). Everyone else awaits review.
+            $selfApprove = $user->isManager();
+            $plan->status = $selfApprove ? 'approved' : 'pending';
             $plan->submitted_at = now();
+            if ($selfApprove) {
+                $plan->reviewed_by = $user->id;
+                $plan->reviewed_at = now();
+            }
             $plan->save();
 
             // Engagement: reward on-time submission, penalise a late one (once).
@@ -98,7 +106,8 @@ class WeeklyPlannerController extends Controller
                 $this->engagement->award($user, $onTime ? 'weekly_plan_on_time' : 'weekly_plan_late', $plan, null, 'Weekly plan submitted');
             }
 
-            return redirect()->route('weekly-planner.index')->with('success', 'Weekly plan submitted for approval.');
+            return redirect()->route('weekly-planner.index')
+                ->with('success', $selfApprove ? 'Weekly plan submitted and auto-approved (no approver above a manager).' : 'Weekly plan submitted for approval.');
         }
 
         $plan->status = $plan->status === 'rejected' ? 'rejected' : 'draft';

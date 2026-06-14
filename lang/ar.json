@@ -1,4 +1,7 @@
 {
+    "portal.projects_manager.create.assign_employees": "تعيين الموظفين",
+    "portal.projects_manager.create.assign_employees_hint": "يُضاف الموظفون المحددون إلى فريق المشروع. يمكنك أيضًا إدارة الفريق لاحقًا من صفحة المشروع.",
+    "portal.projects_manager.create.no_employees": "لا يوجد موظفون متاحون.",
     "portal.nav.quotes": "عروض الأسعار",
     "portal.scope_ai.link_opportunity": "ربط بفرصة",
     "portal.scope_ai.no_opportunity": "— بدون فرصة —",

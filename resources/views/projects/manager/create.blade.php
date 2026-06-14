@@ -70,6 +70,25 @@
                     </div>
 
                     <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>{{ __('portal.projects_manager.create.assign_employees') }}</label>
+                                <div style="display:flex; flex-wrap:wrap; gap:10px; max-height:170px; overflow:auto; border:1px solid var(--gray-200); border-radius:8px; padding:12px;">
+                                    @forelse($employees as $employee)
+                                        <label class="d-flex align-items-center gap-2" style="min-width:210px; cursor:pointer;">
+                                            <input type="checkbox" name="team_members[]" value="{{ $employee->id }}" @checked(collect(old('team_members'))->contains($employee->id))>
+                                            <span>{{ $employee->name }}</span>
+                                        </label>
+                                    @empty
+                                        <span class="text-muted">{{ __('portal.projects_manager.create.no_employees') }}</span>
+                                    @endforelse
+                                </div>
+                                <small class="text-muted">{{ __('portal.projects_manager.create.assign_employees_hint') }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('portal.projects_manager.create.start_date') }}</label>
@@ -82,16 +101,6 @@
                                 <input type="date" name="end_date" class="form-control">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>{{ __('portal.projects_manager.create.team_members') }}</label>
-                        <select name="team_members[]" class="form-control" multiple size="5">
-                            @foreach($employees as $employee)
-                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="text-muted">{{ __('portal.projects_manager.create.team_members_help') }}</small>
                     </div>
 
                     <div class="d-flex gap-2">
