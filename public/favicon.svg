@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vujà Dé">
+  <defs>
+    <linearGradient id="vdg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F969C"/>
+      <stop offset="0.55" stop-color="#0C7075"/>
+      <stop offset="1" stop-color="#072E33"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#vdg)"/>
+  <text x="32" y="43" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="-1">vd</text>
+</svg>

@@ -1,5 +1,11 @@
 {{-- Sahem-style theming: Arabic-capable fonts + FOUC-free light/dark init.
      Include this near the top of every layout's <head>. --}}
+{{-- Brand favicon — your logo (public/images/vd-favicon.png) if uploaded, else the SVG mark. --}}
+@if(file_exists(public_path('images/vd-favicon.png')))
+    <link rel="icon" type="image/png" href="{{ asset('images/vd-favicon.png') }}">
+@else
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+@endif
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">

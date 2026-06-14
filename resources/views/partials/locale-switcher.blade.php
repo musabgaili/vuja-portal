@@ -2,11 +2,11 @@
     $current = app()->getLocale();
     $locales = [
         'en' => [
-            'emoji' => '🇬🇧',
+            'emoji' => 'EN',
             'label' => __('portal.locale_switcher.english'),
         ],
         'ar' => [
-            'emoji' => '🇸🇦',
+            'emoji' => 'AR',
             'label' => __('portal.locale_switcher.arabic'),
         ],
     ];

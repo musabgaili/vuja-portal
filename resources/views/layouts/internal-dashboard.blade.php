@@ -25,7 +25,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>VujaDe</h2>
+                @include('partials.brand')
                 <small>Internal</small>
             </div>
 
@@ -37,6 +37,13 @@
                         <i class="fas fa-home"></i>
                         {{ __('portal.nav.dashboard') }}
                     </a>
+                    @if(auth()->user()->isManager() || auth()->user()->isProjectManager())
+                        @php $approvalCount = app(\App\Services\ApprovalService::class)->count(auth()->user()); @endphp
+                        <a href="{{ route('approvals.index') }}" class="nav-item d-flex align-items-center {{ request()->routeIs('approvals.*') ? 'active' : '' }}">
+                            <span><i class="fas fa-clipboard-check"></i> {{ __('portal.nav.approvals') }}</span>
+                            @if($approvalCount > 0)<span class="badge bg-danger ms-auto">{{ $approvalCount }}</span>@endif
+                        </a>
+                    @endif
                     @if(auth()->user()->isManager())
                     <a href="{{ route('control-tower.index') }}" class="nav-item {{ request()->routeIs('control-tower.*') ? 'active' : '' }}">
                         <i class="fas fa-tower-observation"></i>

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\EngagementLog;
 use App\Models\ProjectTask;
+use App\Models\Quote;
 use App\Models\StaffTask;
 use App\Models\User;
 use App\Models\WeeklyPlan;
@@ -68,6 +69,21 @@ class NotificationService
             foreach (WeeklyPlan::where('status', 'pending')->with('user')->whereNotNull('submitted_at')
                 ->latest('submitted_at')->limit(5)->get() as $p) {
                 $push($p->submitted_at, 'fa-clipboard-check', __('portal.notif.plan_review', ['name' => $p->user?->name ?? '—']), route('weekly-planner.review'));
+            }
+        }
+
+        // Outcomes on quotes the user submitted (approved / rejected / sent back).
+        foreach (Quote::where('created_by', $user->id)
+            ->whereIn('status', ['approved', 'rejected', 'changes_requested'])
+            ->latest('updated_at')->limit(5)->get() as $q) {
+            $push($q->updated_at, 'fa-file-invoice', __('portal.notif.quote_'.$q->status, ['title' => $q->title]), route('quotes.show', $q));
+        }
+
+        // Quotes awaiting this approver's decision.
+        if ($user->isManager() || $user->isProjectManager()) {
+            foreach (Quote::where('status', 'pending_approval')->with('creator')
+                ->latest('updated_at')->limit(5)->get() as $q) {
+                $push($q->updated_at, 'fa-gavel', __('portal.notif.quote_pending', ['name' => $q->creator->name ?? '—', 'title' => $q->title]), route('approvals.index'));
             }
         }
 

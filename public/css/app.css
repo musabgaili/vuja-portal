@@ -1135,6 +1135,23 @@ body {
     background: var(--bg-primary) !important; background-image: none !important;
 }
 
+/* ---- Brand logo in the sidebar header (light/dark variants) ---- */
+.sidebar-header .brand-logo { max-height: 46px; width: auto; max-width: 100%; display: block; }
+.sidebar-header .brand-logo--dark { display: none; }
+[data-bs-theme="dark"] .sidebar-header .brand-logo--light { display: none; }
+[data-bs-theme="dark"] .sidebar-header .brand-logo--dark { display: block; }
+.sidebar-header .brand-fallback { display: inline-flex; align-items: center; gap: 10px; }
+.sidebar-header .brand-mark { width: 38px; height: 38px; border-radius: 10px; flex: 0 0 auto; }
+.sidebar-header .brand-word { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px; color: var(--primary-color); }
+
+/* ---- Locale switcher 2-letter code badge (EN / AR) ---- */
+.locale-switcher .locale-switcher__emoji {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 1.6em; height: 1.45em; padding: 0 .35em; border-radius: 5px;
+    font-size: .72rem; font-weight: 800; letter-spacing: .03em;
+    background: var(--primary-light); color: var(--primary-color);
+}
+
 /* ---- Active nav teal ---- */
 .nav-item.active { background: var(--primary-light); color: var(--primary-color); }
 .nav-item.active i { color: var(--primary-color); }

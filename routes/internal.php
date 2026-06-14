@@ -41,6 +41,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
+    // APPROVAL QUEUE — everything awaiting a manager/PM decision
+    Route::get('/approvals', [\App\Http\Controllers\ApprovalController::class, 'index'])->name('approvals.index');
+
     // DIRECT STAFF TASKS — assignee inbox + status updates (all internal);
     // creation / deletion is manager-only (see the is_manager group below).
     Route::get('/staff-tasks', [\App\Http\Controllers\StaffTaskController::class, 'index'])->name('staff-tasks.index');

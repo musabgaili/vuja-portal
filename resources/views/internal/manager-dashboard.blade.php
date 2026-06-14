@@ -99,6 +99,25 @@
     <p style="margin: 0.5rem 0 0 0; opacity: 0.95; font-size: 1.1rem;">{{ __('portal.internal.manager_hero_subtitle') }}</p>
 </div>
 
+{{-- Approval Queue — start the day here --}}
+<a href="{{ route('approvals.index') }}" class="d-flex align-items-center justify-content-between text-decoration-none mb-4"
+   style="background: var(--bg-primary); border:1px solid var(--gray-200); border-inline-start:5px solid {{ ($stats['pending_approvals'] ?? 0) > 0 ? 'var(--warning-color, #d97706)' : 'var(--success-color)' }}; border-radius:12px; padding:1rem 1.25rem; box-shadow:var(--shadow-md);">
+    <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-clipboard-check" style="font-size:1.5rem; color:var(--primary-color);"></i>
+        <div>
+            <div style="font-weight:700; color:var(--gray-900);">{{ __('portal.approvals.title') }}</div>
+            <div class="text-muted" style="font-size:.85rem;">
+                @if(($stats['pending_approvals'] ?? 0) > 0)
+                    {{ __('portal.approvals.dash_pending', ['count' => $stats['pending_approvals']]) }}
+                @else
+                    {{ __('portal.approvals.dash_clear') }}
+                @endif
+            </div>
+        </div>
+    </div>
+    <span class="badge bg-{{ ($stats['pending_approvals'] ?? 0) > 0 ? 'danger' : 'success' }}" style="font-size:1rem; padding:.5rem .8rem;">{{ $stats['pending_approvals'] ?? 0 }}</span>
+</a>
+
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="stat-card-manager" style="border-color: #f59e0b;">

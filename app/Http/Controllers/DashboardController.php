@@ -283,6 +283,7 @@ class DashboardController extends Controller
                 ->whereMonth('updated_at', now()->month)->count() +
                                 ConsultationRequest::where('status', 'completed')
                                     ->whereMonth('updated_at', now()->month)->count(),
+            'pending_approvals' => app(\App\Services\ApprovalService::class)->count(\Illuminate\Support\Facades\Auth::user()),
         ];
 
         // Get latest 5 from each service
