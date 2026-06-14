@@ -30,6 +30,8 @@
             <a href="{{ route('projects.manager.index') }}" class="btn btn-light">{{ __('portal.projects_manager.index.table_view') }}</a>
             <a href="{{ route('projects.kanban') }}" class="btn btn-outline-light">{{ __('portal.projects_manager.index.kanban') }}</a>
             @if(auth()->user()->isManager())
+            <a href="{{ route('imports.form', 'projects') }}" class="btn btn-light"><i class="fas fa-file-excel"></i> {{ __('portal.import.import') }}</a>
+            <a href="{{ route('imports.form', 'project-tasks') }}" class="btn btn-light"><i class="fas fa-list-check"></i> {{ __('portal.import.import_tasks') }}</a>
             <a href="{{ route('projects.create') }}" class="btn btn-warning"><i class="fas fa-plus"></i> {{ __('portal.projects_manager.index.new') }}</a>
             @endif
         </div>

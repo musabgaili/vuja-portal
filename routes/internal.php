@@ -167,6 +167,11 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::post('/staff-tasks', [\App\Http\Controllers\StaffTaskController::class, 'store'])->name('staff-tasks.store');
         Route::delete('/staff-tasks/{staffTask}', [\App\Http\Controllers\StaffTaskController::class, 'destroy'])->name('staff-tasks.destroy');
 
+        // EXCEL/CSV IMPORTS — contacts, companies, opportunities, projects, tasks
+        Route::get('/imports/{entity}/template', [\App\Http\Controllers\ImportController::class, 'template'])->name('imports.template');
+        Route::get('/imports/{entity}', [\App\Http\Controllers\ImportController::class, 'form'])->name('imports.form');
+        Route::post('/imports/{entity}', [\App\Http\Controllers\ImportController::class, 'store'])->name('imports.store');
+
         // CRM PIPELINE STAGES — manager-editable Kanban columns
         Route::get('/crm-stages', [\App\Http\Controllers\PipelineStageController::class, 'index'])->name('crm-stages.index');
         Route::post('/crm-stages', [\App\Http\Controllers\PipelineStageController::class, 'store'])->name('crm-stages.store');

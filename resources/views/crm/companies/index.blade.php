@@ -5,7 +5,12 @@
 <div class="page-hero">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h1 style="margin:0; font-size:1.4rem;"><i class="fas fa-building"></i> {{ __('portal.nav.companies') }}</h1>
-        <a href="{{ route('companies.create') }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-plus"></i> {{ __('portal.crm.new_company') }}</a>
+        <div class="d-flex gap-2">
+            @if(auth()->user()->isManager())
+            <a href="{{ route('imports.form', 'companies') }}" class="btn btn-light"><i class="fas fa-file-excel"></i> {{ __('portal.import.import') }}</a>
+            @endif
+            <a href="{{ route('companies.create') }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-plus"></i> {{ __('portal.crm.new_company') }}</a>
+        </div>
     </div>
 </div>
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif

@@ -17,9 +17,12 @@
         <p style="margin:.25rem 0 0; opacity:.9;">{{ $isManager ? __('portal.staff_tasks.subtitle_manager') : __('portal.staff_tasks.subtitle_employee') }}</p>
     </div>
     @if($isManager)
-    <a href="{{ route('staff-tasks.create') }}" class="btn btn-light">
-        <i class="fas fa-plus"></i> {{ __('portal.staff_tasks.new') }}
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('imports.form', 'staff-tasks') }}" class="btn btn-light"><i class="fas fa-file-excel"></i> {{ __('portal.import.import') }}</a>
+        <a href="{{ route('staff-tasks.create') }}" class="btn btn-light">
+            <i class="fas fa-plus"></i> {{ __('portal.staff_tasks.new') }}
+        </a>
+    </div>
     @endif
 </div>
 

@@ -8,7 +8,12 @@
             <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-funnel-dollar"></i> {{ __('portal.crm.pipeline') }}</h1>
             <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.crm.subtitle') }}</p>
         </div>
-        <a href="{{ route('crm.create') }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-plus"></i> {{ __('portal.crm.new') }}</a>
+        <div class="d-flex gap-2">
+            @if(auth()->user()->isManager())
+            <a href="{{ route('imports.form', 'opportunities') }}" class="btn btn-light"><i class="fas fa-file-excel"></i> {{ __('portal.import.import') }}</a>
+            @endif
+            <a href="{{ route('crm.create') }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-plus"></i> {{ __('portal.crm.new') }}</a>
+        </div>
     </div>
 </div>
 
