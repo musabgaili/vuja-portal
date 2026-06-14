@@ -2480,5 +2480,14 @@
     "portal.quote.ctype.approval": "Approved",
     "portal.quote.ctype.rejection": "Rejected",
     "portal.quote.ctype.changes": "Changes requested",
-    "portal.quote.ctype.submitted": "Submitted"
+    "portal.quote.ctype.submitted": "Submitted",
+    "portal.scope_ai.customer_category": "Customer pricing tier",
+    "portal.scope_ai.customer_category_hint": "Sets which Stock-inventory price (student / entrepreneur / company) is used on the quote.",
+    "portal.scope_ai.cat.company": "Company",
+    "portal.scope_ai.cat.student": "Student",
+    "portal.scope_ai.cat.entrepreneur": "Entrepreneur",
+    "portal.scope_ai.stock_inventory": "Stock Inventory (labs)",
+    "portal.scope_ai.stock_inventory_hint": "Products from the Inventory module — priced by the customer tier above.",
+    "portal.scope_ai.no_stock": "No stock items yet — add them under Admin → Inventory.",
+    "portal.scope_ai.uncategorised": "Uncategorised"
 }

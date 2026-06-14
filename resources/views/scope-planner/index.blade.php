@@ -42,6 +42,19 @@
         </div>
     </div>
 
+    {{-- Customer pricing tier (drives StockItem prices) --}}
+    <div class="card mt-3">
+        <div class="card-content d-flex flex-wrap align-items-center gap-2">
+            <label class="form-label mb-0"><i class="fas fa-tags"></i> {{ __('portal.scope_ai.customer_category') }}</label>
+            <select name="customer_category" class="form-select" style="max-width:240px;">
+                @foreach($categories as $c)
+                    <option value="{{ $c }}" @selected(($result['customer_category'] ?? 'company') === $c)>{{ __('portal.scope_ai.cat.'.$c) }}</option>
+                @endforeach
+            </select>
+            <small class="text-muted">{{ __('portal.scope_ai.customer_category_hint') }}</small>
+        </div>
+    </div>
+
     {{-- Inventory picker --}}
     <div class="card mt-3">
         <div class="card-header"><span class="card-title">{{ __('portal.scope_ai.inventory') }}</span></div>
@@ -62,21 +75,50 @@
                     @endforeach
                 </div>
             @endforeach
-            <div class="d-flex flex-wrap align-items-end gap-2">
-                <button type="submit" class="btn btn-outline-primary"><i class="fas fa-calculator"></i> {{ __('portal.scope_ai.build_quote') }}</button>
-                <div style="min-width:240px;">
-                    <label class="form-label" style="font-size:.78rem;">{{ __('portal.scope_ai.link_opportunity') }}</label>
-                    <select name="opportunity_id" class="form-select">
-                        <option value="">{{ __('portal.scope_ai.no_opportunity') }}</option>
-                        @foreach($opportunities as $op)
-                            <option value="{{ $op->id }}">{{ $op->name }}{{ $op->company_name ? ' — '.$op->company_name : '' }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" formaction="{{ route('scope-planner.save-quote') }}" class="btn btn-primary"><i class="fas fa-file-invoice"></i> {{ __('portal.scope_ai.save_quote') }}</button>
-            </div>
         </div>
     </div>
+
+    {{-- Stock inventory picker (labs + tiered pricing) --}}
+    <div class="card mt-3">
+        <div class="card-header"><span class="card-title"><i class="fas fa-boxes-stacked"></i> {{ __('portal.scope_ai.stock_inventory') }}</span></div>
+        <div class="card-content">
+            <p class="text-muted" style="font-size:.85rem;">{{ __('portal.scope_ai.stock_inventory_hint') }}</p>
+            @forelse($stockInventory as $category => $items)
+                <div class="mb-2"><strong style="font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-500);">{{ $category ?: __('portal.scope_ai.uncategorised') }}</strong></div>
+                <div class="row g-2 mb-3">
+                    @foreach($items as $item)
+                        @php $checked = $result && in_array($item->id, $result['selectedStockIds'] ?? []); @endphp
+                        <div class="col-md-6">
+                            <label class="d-flex align-items-center gap-2 p-2" style="border:1px solid var(--gray-200); border-radius:8px;">
+                                <input type="checkbox" name="stock_items[]" value="{{ $item->id }}" @checked($checked)>
+                                <span style="flex:1;">{{ $item->name }} <small class="text-muted">({{ $item->product_id }})</small></span>
+                                <input type="number" name="stock_qty[{{ $item->id }}]" value="1" min="1" class="form-control" style="width:64px; height:32px; padding:2px 6px;">
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
+            @empty
+                <p class="text-muted">{{ __('portal.scope_ai.no_stock') }}</p>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- Actions --}}
+    <div class="card mt-3"><div class="card-content">
+        <div class="d-flex flex-wrap align-items-end gap-2">
+            <button type="submit" class="btn btn-outline-primary"><i class="fas fa-calculator"></i> {{ __('portal.scope_ai.build_quote') }}</button>
+            <div style="min-width:240px;">
+                <label class="form-label" style="font-size:.78rem;">{{ __('portal.scope_ai.link_opportunity') }}</label>
+                <select name="opportunity_id" class="form-select">
+                    <option value="">{{ __('portal.scope_ai.no_opportunity') }}</option>
+                    @foreach($opportunities as $op)
+                        <option value="{{ $op->id }}">{{ $op->name }}{{ $op->company_name ? ' — '.$op->company_name : '' }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" formaction="{{ route('scope-planner.save-quote') }}" class="btn btn-primary"><i class="fas fa-file-invoice"></i> {{ __('portal.scope_ai.save_quote') }}</button>
+        </div>
+    </div></div>
 </form>
 
 @if($result && count($result['lines']))
@@ -91,9 +133,9 @@
                     <tbody>
                         @foreach($result['lines'] as $l)
                             <tr>
-                                <td>{{ $l['item']->name }} <span class="badge bg-secondary">{{ $l['item']->category }}</span></td>
-                                <td>${{ number_format((float) $l['item']->internal_cost, 2) }}</td>
-                                <td>{{ rtrim(rtrim(number_format((float) $l['item']->markup_percentage, 2), '0'), '.') }}%</td>
+                                <td>{{ $l['name'] }} <span class="badge bg-secondary">{{ $l['category'] }}</span></td>
+                                <td>${{ number_format((float) $l['cost'], 2) }}</td>
+                                <td>{{ rtrim(rtrim(number_format((float) $l['markup'], 2), '0'), '.') }}%</td>
                                 <td class="text-end">{{ $l['qty'] }}</td>
                                 <td class="text-end">${{ number_format($l['line_client'], 2) }}</td>
                             </tr>

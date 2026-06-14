@@ -2479,5 +2479,14 @@
     "portal.quote.ctype.approval": "اعتماد",
     "portal.quote.ctype.rejection": "رفض",
     "portal.quote.ctype.changes": "طلب تعديلات",
-    "portal.quote.ctype.submitted": "إرسال"
+    "portal.quote.ctype.submitted": "إرسال",
+    "portal.scope_ai.customer_category": "فئة تسعير العميل",
+    "portal.scope_ai.customer_category_hint": "تحدد أي سعر من المخزون (طالب / رائد أعمال / شركة) يُستخدم في العرض.",
+    "portal.scope_ai.cat.company": "شركة",
+    "portal.scope_ai.cat.student": "طالب",
+    "portal.scope_ai.cat.entrepreneur": "رائد أعمال",
+    "portal.scope_ai.stock_inventory": "مخزون المعامل",
+    "portal.scope_ai.stock_inventory_hint": "منتجات من وحدة المخزون — مُسعّرة حسب فئة العميل أعلاه.",
+    "portal.scope_ai.no_stock": "لا توجد أصناف مخزون بعد — أضفها من الإدارة ← المخزون.",
+    "portal.scope_ai.uncategorised": "غير مصنّف"
 }
