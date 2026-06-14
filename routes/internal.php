@@ -38,6 +38,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
     Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
 
+    // NOTIFICATIONS — mark the bell feed as seen (all internal users)
+    Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
+
     // DIRECT STAFF TASKS — assignee inbox + status updates (all internal);
     // creation / deletion is manager-only (see the is_manager group below).
     Route::get('/staff-tasks', [\App\Http\Controllers\StaffTaskController::class, 'index'])->name('staff-tasks.index');

@@ -2376,5 +2376,13 @@
     "portal.workload.prio.low": "Low",
     "portal.workload.prio.medium": "Medium",
     "portal.workload.prio.high": "High",
-    "portal.workload.prio.urgent": "Urgent"
+    "portal.workload.prio.urgent": "Urgent",
+    "portal.notif.title": "Notifications",
+    "portal.notif.empty": "Nothing new.",
+    "portal.notif.staff_task": "Task assigned: :title",
+    "portal.notif.project_task": "Project task: :title",
+    "portal.notif.plan_approved": "Your timesheet was approved",
+    "portal.notif.plan_rejected": "Your timesheet was sent back for changes",
+    "portal.notif.plan_review": ":name submitted a timesheet for review",
+    "portal.notif.ip": "Impact Points: :points"
 }
