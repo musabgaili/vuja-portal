@@ -56,7 +56,7 @@
                     @forelse($company->opportunities as $op)
                         <tr>
                             <td><a href="{{ route('crm.show', $op) }}">{{ $op->name }}</a></td>
-                            <td><span class="badge bg-{{ $op->stageColor() }}">{{ ucfirst($op->stage) }}</span></td>
+                            <td><span class="badge bg-{{ $op->stageColor() }}">{{ $op->stageLabel() }}</span></td>
                             <td class="text-end">${{ number_format((float) $op->expected_value, 0) }}</td>
                         </tr>
                     @empty

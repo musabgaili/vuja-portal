@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
 use App\Models\Opportunity;
+use App\Models\PipelineStage;
 use App\Models\Quote;
 use App\Services\GeminiScopeService;
 use Illuminate\Http\Request;
@@ -80,7 +81,7 @@ class ScopePlannerController extends Controller
 
         return view('scope-planner.index', [
             'inventory' => InventoryItem::where('active', true)->orderBy('category')->orderBy('name')->get()->groupBy('category'),
-            'opportunities' => Opportunity::whereIn('stage', array_keys(config('crm.stages')))->orderBy('name')->get(),
+            'opportunities' => Opportunity::whereIn('stage', PipelineStage::keys())->orderBy('name')->get(),
             'result' => null,
         ]);
     }
@@ -128,7 +129,7 @@ class ScopePlannerController extends Controller
 
         return view('scope-planner.index', [
             'inventory' => InventoryItem::where('active', true)->orderBy('category')->orderBy('name')->get()->groupBy('category'),
-            'opportunities' => Opportunity::whereIn('stage', array_keys(config('crm.stages')))->orderBy('name')->get(),
+            'opportunities' => Opportunity::whereIn('stage', PipelineStage::keys())->orderBy('name')->get(),
             'result' => [
                 'project_type' => $validated['project_type'],
                 'requirements' => $validated['requirements'],

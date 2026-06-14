@@ -95,6 +95,10 @@
                         <i class="fas fa-chart-line"></i>
                         {{ __('portal.nav.sales_reports') }}
                     </a>
+                    <a href="{{ route('crm-stages.index') }}" class="nav-item {{ request()->routeIs('crm-stages.*') ? 'active' : '' }}">
+                        <i class="fas fa-sliders"></i>
+                        {{ __('portal.nav.sales_stages') }}
+                    </a>
                     @endif
                 </div>
 

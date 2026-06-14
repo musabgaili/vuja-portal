@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Opportunity;
+use App\Models\PipelineStage;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class OpportunityController extends Controller
 {
@@ -22,7 +24,7 @@ class OpportunityController extends Controller
     {
         $this->guard();
 
-        $stages = config('crm.stages');
+        $stages = PipelineStage::map();
         $open = Opportunity::with('owner')->whereIn('stage', array_keys($stages))->latest()->get();
 
         $columns = [];
@@ -93,7 +95,7 @@ class OpportunityController extends Controller
     {
         $this->guard();
         $validated = $request->validate([
-            'stage' => 'required|in:'.implode(',', array_keys(config('crm.stages'))),
+            'stage' => ['required', Rule::in(PipelineStage::keys())],
         ]);
         $opportunity->update(['stage' => $validated['stage']]);
 
@@ -161,7 +163,7 @@ class OpportunityController extends Controller
             'companies' => Company::orderBy('name')->get(),
             'contacts' => Contact::orderBy('name')->get(),
             'sources' => config('crm.sources'),
-            'stages' => config('crm.stages'),
+            'stages' => PipelineStage::map(),
         ];
     }
 
@@ -174,7 +176,7 @@ class OpportunityController extends Controller
             'email' => 'nullable|email|max:160',
             'phone' => 'nullable|string|max:40',
             'source' => 'nullable|string|max:60',
-            'stage' => 'required|in:new,qualified,proposition',
+            'stage' => ['required', Rule::in(PipelineStage::keys())],
             'expected_value' => 'nullable|numeric|min:0',
             'probability' => 'nullable|integer|min:0|max:100',
             'expected_close_date' => 'nullable|date',

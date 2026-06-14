@@ -8,7 +8,7 @@
             <h1 style="margin:0; font-size:1.4rem;">{{ $opportunity->name }}</h1>
             <p style="margin:.25rem 0 0; opacity:.9;">{{ $opportunity->company_name ?: __('portal.crm.no_company') }}</p>
         </div>
-        <span class="badge bg-{{ $opportunity->stageColor() }}" style="font-size:.85rem;">{{ ucfirst($opportunity->stage) }}</span>
+        <span class="badge bg-{{ $opportunity->stageColor() }}" style="font-size:.85rem;">{{ $opportunity->stageLabel() }}</span>
     </div>
 </div>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Opportunity;
+use App\Models\PipelineStage;
 use Illuminate\Support\Facades\Auth;
 
 class CrmReportController extends Controller
@@ -12,7 +13,7 @@ class CrmReportController extends Controller
     {
         abort_unless(Auth::user()->isManager(), 403);
 
-        $stages = config('crm.stages');
+        $stages = PipelineStage::map();
         $all = Opportunity::with('owner')->get();
         $open = $all->whereIn('stage', array_keys($stages));
         $won = $all->where('stage', 'won');

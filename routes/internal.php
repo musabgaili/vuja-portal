@@ -167,6 +167,13 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::post('/staff-tasks', [\App\Http\Controllers\StaffTaskController::class, 'store'])->name('staff-tasks.store');
         Route::delete('/staff-tasks/{staffTask}', [\App\Http\Controllers\StaffTaskController::class, 'destroy'])->name('staff-tasks.destroy');
 
+        // CRM PIPELINE STAGES — manager-editable Kanban columns
+        Route::get('/crm-stages', [\App\Http\Controllers\PipelineStageController::class, 'index'])->name('crm-stages.index');
+        Route::post('/crm-stages', [\App\Http\Controllers\PipelineStageController::class, 'store'])->name('crm-stages.store');
+        Route::put('/crm-stages/{stage}', [\App\Http\Controllers\PipelineStageController::class, 'update'])->name('crm-stages.update');
+        Route::post('/crm-stages/{stage}/move', [\App\Http\Controllers\PipelineStageController::class, 'move'])->name('crm-stages.move');
+        Route::delete('/crm-stages/{stage}', [\App\Http\Controllers\PipelineStageController::class, 'destroy'])->name('crm-stages.destroy');
+
         // Team Time Slots Overview (Manager Only)
         Route::get('/team-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'teamSlots'])->name('time-slots.team-slots');
 

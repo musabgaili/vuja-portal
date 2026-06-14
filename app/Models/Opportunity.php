@@ -77,9 +77,14 @@ class Opportunity extends Model
         return match ($this->stage) {
             'won' => 'success',
             'lost' => 'danger',
-            'proposition' => 'info',
-            'qualified' => 'primary',
-            default => 'secondary',
+            default => PipelineStage::colorMap()[$this->stage] ?? 'secondary',
         };
+    }
+
+    /** Human label for the current stage (DB stage label, or Won/Lost). */
+    public function stageLabel(): string
+    {
+        return PipelineStage::map()[$this->stage]
+            ?? match ($this->stage) { 'won' => 'Won', 'lost' => 'Lost', default => ucfirst((string) $this->stage) };
     }
 }
