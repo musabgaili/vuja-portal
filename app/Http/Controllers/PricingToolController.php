@@ -63,6 +63,8 @@ class PricingToolController extends Controller
                     ->where('level', $request->input('level'))
                     ->where('unit', $request->input('unit'))),
             ],
+            'name_en' => 'nullable|string|max:255',
+            'name_ar' => 'nullable|string|max:255',
             'rate' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
             'level' => 'required|string|max:100',
@@ -70,6 +72,9 @@ class PricingToolController extends Controller
         ], [
             'item.unique' => 'A pricing rule with this item, level, and unit already exists.',
         ]);
+
+        // Default the English document name to the internal item label.
+        $validated['name_en'] = $validated['name_en'] ?: $validated['item'];
 
         PricingRule::create($validated);
 
@@ -96,6 +101,8 @@ class PricingToolController extends Controller
                     ->where('level', $request->input('level'))
                     ->where('unit', $request->input('unit'))),
             ],
+            'name_en' => 'nullable|string|max:255',
+            'name_ar' => 'nullable|string|max:255',
             'rate' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
             'level' => 'required|string|max:100',
@@ -104,6 +111,8 @@ class PricingToolController extends Controller
         ], [
             'item.unique' => 'A pricing rule with this item, level, and unit already exists.',
         ]);
+
+        $validated['name_en'] = $validated['name_en'] ?: $validated['item'];
 
         $rule->update($validated);
 

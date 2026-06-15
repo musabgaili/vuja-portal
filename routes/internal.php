@@ -79,6 +79,25 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/scope-planner', [\App\Http\Controllers\ScopePlannerController::class, 'plan'])->name('scope-planner.plan');
     Route::post('/scope-planner/save-quote', [\App\Http\Controllers\ScopePlannerController::class, 'saveQuote'])->name('scope-planner.save-quote');
 
+    // Upgraded staged document flow (create -> confirm items -> generate -> preview/edit -> export).
+    // NOTE: /create is declared before /{quote} so it is not bound as a Quote.
+    Route::get('/scope-planner/create', [\App\Http\Controllers\ScopePlannerController::class, 'create'])->name('scope-planner.create');
+    Route::post('/scope-planner/create', [\App\Http\Controllers\ScopePlannerController::class, 'store'])->name('scope-planner.store');
+    Route::get('/scope-planner/{quote}', [\App\Http\Controllers\ScopePlannerController::class, 'show'])->name('scope-planner.show');
+    Route::post('/scope-planner/{quote}/suggest', [\App\Http\Controllers\ScopePlannerController::class, 'suggest'])->name('scope-planner.suggest');
+    Route::put('/scope-planner/{quote}/items', [\App\Http\Controllers\ScopePlannerController::class, 'saveItems'])->name('scope-planner.items');
+    Route::post('/scope-planner/{quote}/generate', [\App\Http\Controllers\ScopePlannerController::class, 'generate'])->name('scope-planner.generate');
+    Route::put('/scope-planner/{quote}', [\App\Http\Controllers\ScopePlannerController::class, 'update'])->name('scope-planner.update');
+    Route::post('/scope-planner/{quote}/regenerate', [\App\Http\Controllers\ScopePlannerController::class, 'regenerateSection'])->name('scope-planner.regenerate');
+    Route::post('/scope-planner/{quote}/finalize', [\App\Http\Controllers\ScopePlannerController::class, 'finalize'])->name('scope-planner.finalize');
+
+    // Document render + export.
+    Route::get('/scope-planner/{quote}/document', [\App\Http\Controllers\Scope\DocumentController::class, 'document'])->name('scope-planner.document');
+    Route::get('/scope-planner/{quote}/export/pdf', [\App\Http\Controllers\Scope\DocumentController::class, 'pdf'])->name('scope-planner.export.pdf');
+    Route::get('/scope-planner/{quote}/view/pdf', [\App\Http\Controllers\Scope\DocumentController::class, 'viewPdf'])->name('scope-planner.view.pdf');
+    Route::get('/scope-planner/{quote}/export/docx', [\App\Http\Controllers\Scope\DocumentController::class, 'docx'])->name('scope-planner.export.docx');
+    Route::get('/scope-planner/{quote}/technical/pdf', [\App\Http\Controllers\Scope\DocumentController::class, 'technicalPdf'])->name('scope-planner.technical.pdf');
+
     // QUOTES (internal) — built from the Scope Planner; accepted -> order/project
     Route::get('/quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes.index');
     Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'show'])->name('quotes.show');

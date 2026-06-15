@@ -8,6 +8,8 @@ use App\ScopePlanner\Adapters\StockItemInventoryAdapter;
 use App\ScopePlanner\Contracts\InventoryContract;
 use App\ScopePlanner\Contracts\PricingToolContract;
 use App\ScopePlanner\Contracts\ScopeAiContract;
+use App\Services\Scope\Render\MpdfRenderer;
+use App\Services\Scope\Render\PdfRenderer;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -21,5 +23,12 @@ class ScopePlannerServiceProvider extends ServiceProvider
         $this->app->bind(InventoryContract::class, StockItemInventoryAdapter::class);
         $this->app->bind(PricingToolContract::class, PricingRuleAdapter::class);
         $this->app->bind(ScopeAiContract::class, GeminiScopeAdapter::class);
+
+        // PDF engine is swappable via config('scope.pdf_engine'); mPDF ships now.
+        $this->app->bind(PdfRenderer::class, function () {
+            return match (config('scope.pdf_engine', 'mpdf')) {
+                default => new MpdfRenderer(),
+            };
+        });
     }
 }

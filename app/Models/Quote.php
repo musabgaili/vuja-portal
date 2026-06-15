@@ -97,6 +97,17 @@ class Quote extends Model
         return (float) ($this->components_client_total ?? $this->components_internal_total);
     }
 
+    /** Derived recipient name/email for documents (client user, else company/contact). */
+    public function getClientNameAttribute(): ?string
+    {
+        return $this->client?->name ?? $this->company?->name ?? $this->contact?->name;
+    }
+
+    public function getClientEmailAttribute(): ?string
+    {
+        return $this->client?->email ?? $this->contact?->email;
+    }
+
     /**
      * Client-facing line items for the document: every inventory COMPONENT row
      * collapsed into one "Electronic Components" line (margin hidden), with
@@ -108,10 +119,10 @@ class Quote extends Model
         $componentsTotal = $this->componentsClientTotal();
 
         if ($this->items->where('type', 'component')->isNotEmpty() || $componentsTotal > 0) {
-            $rows->push([
+            $rows->push((object) [
                 'description' => __('scope.electronic_components'),
                 'unit' => '—',
-                'qty' => 1,
+                'quantity' => 1,
                 'unit_price' => $componentsTotal,
                 'line_total' => $componentsTotal,
             ]);
@@ -119,10 +130,10 @@ class Quote extends Model
 
         foreach ($this->items->whereIn('type', ['service', 'other'])->sortBy('sort_order') as $it) {
             $unit = (float) ($it->unit_price ?: $it->line_client);
-            $rows->push([
+            $rows->push((object) [
                 'description' => $it->name,
                 'unit' => $it->unit ?: '—',
-                'qty' => (float) $it->qty,
+                'quantity' => (float) $it->qty,
                 'unit_price' => $unit,
                 'line_total' => (float) ($it->line_client ?: $unit * $it->qty),
             ]);

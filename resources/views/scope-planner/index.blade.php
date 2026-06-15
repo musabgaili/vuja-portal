@@ -2,9 +2,12 @@
 @section('title', __('portal.scope_ai.title'))
 
 @section('content')
-<div class="page-hero">
-    <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_ai.title') }}</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.scope_ai.subtitle') }}</p>
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_ai.title') }}</h1>
+        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.scope_ai.subtitle') }}</p>
+    </div>
+    <a href="{{ route('scope-planner.create') }}" class="btn btn-light"><i class="fas fa-file-signature"></i> {{ __('portal.scope_planner.new_document') }}</a>
 </div>
 
 @foreach($errors->all() as $e)<div class="alert alert-danger">{{ $e }}</div>@endforeach

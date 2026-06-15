@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\InventoryItem;
 use App\Models\Opportunity;
 use App\Models\PipelineStage;
 use App\Models\Quote;
 use App\Models\StockItem;
+use App\Models\User;
 use App\Services\GeminiScopeService;
+use App\Services\Scope\QuoteGenerationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,8 +18,217 @@ class ScopePlannerController extends Controller
 {
     public const CATEGORIES = ['company', 'student', 'entrepreneur'];
 
-    public function __construct(private GeminiScopeService $gemini)
+    public const LENGTHS = ['short', 'medium', 'long'];
+
+    public const STRUCTURES = ['single', 'multi_scope'];
+
+    public const LANGUAGES = ['ar', 'en'];
+
+    public function __construct(
+        private GeminiScopeService $gemini,
+        private QuoteGenerationService $generator,
+    ) {}
+
+    // ===================================================================
+    // Upgraded staged flow: create → (suggest) → confirm items → generate
+    // prose → online preview/edit → finalize → export.
+    // ===================================================================
+
+    /** The brief form for a new scope document. */
+    public function create()
     {
+        abort_unless(Auth::user()->isInternal(), 403);
+
+        return view('scope-planner.create', [
+            'categories' => self::CATEGORIES,
+            'lengths' => self::LENGTHS,
+            'structures' => self::STRUCTURES,
+            'languages' => self::LANGUAGES,
+            'clients' => User::where('role', 'client')->orderBy('name')->get(),
+            'companies' => Company::orderBy('name')->get(),
+            'opportunities' => Opportunity::whereIn('stage', PipelineStage::keys())->orderBy('name')->get(),
+        ]);
+    }
+
+    /** Create the draft (with Q-number) + run the AI item suggestion, then open the editor. */
+    public function store(Request $request)
+    {
+        abort_unless(Auth::user()->isInternal(), 403);
+
+        $data = $request->validate([
+            'tier' => 'required|in:'.implode(',', self::CATEGORIES),
+            'length' => 'required|in:'.implode(',', self::LENGTHS),
+            'structure' => 'required|in:'.implode(',', self::STRUCTURES),
+            'language' => 'required|in:'.implode(',', self::LANGUAGES),
+            'subject' => 'nullable|string|max:200',
+            'title' => 'nullable|string|max:200',
+            'beneficiary' => 'nullable|string|max:200',
+            'client_ref' => 'nullable|string|max:120',
+            'brief' => 'required|string|min:10',
+            'client_id' => 'nullable|exists:users,id',
+            'company_id' => 'nullable|exists:companies,id',
+            'opportunity_id' => 'nullable|exists:opportunities,id',
+        ]);
+
+        $quote = $this->generator->createDraft($data, Auth::id());
+
+        // Pre-fill the items table with the AI suggestion (employee confirms next).
+        $suggestion = $this->generator->suggestItems($quote);
+        session()->flash('scope_suggestion', $suggestion);
+
+        return redirect()->route('scope-planner.show', $quote)
+            ->with('success', __('portal.scope_planner.draft_created', ['number' => $quote->quote_number]));
+    }
+
+    /** The editor / online preview surface. */
+    public function show(Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+        $quote->load(['items', 'scopes', 'milestones', 'client']);
+
+        return view('scope-planner.editor', [
+            'quote' => $quote,
+            'suggestion' => session('scope_suggestion'),
+            'services' => app(\App\ScopePlanner\Contracts\PricingToolContract::class)->services(),
+            'stockItems' => StockItem::where('is_active', true)->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'unit']),
+            'lengths' => self::LENGTHS,
+        ]);
+    }
+
+    /** Re-suggest items from the brief (AI call 1, on demand). */
+    public function suggest(Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+
+        return redirect()->route('scope-planner.show', $quote)
+            ->with('scope_suggestion', $this->generator->suggestItems($quote))
+            ->with('success', __('portal.scope_planner.suggested'));
+    }
+
+    /** Persist the employee-confirmed components + services, then reprice. */
+    public function saveItems(Request $request, Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+
+        $data = $request->validate([
+            'components' => 'array',
+            'components.*.stock_item_id' => 'nullable|exists:stock_items,id',
+            'components.*.name' => 'nullable|string|max:200',
+            'components.*.qty' => 'nullable|integer|min:1',
+            'components.*.internal_cost' => 'nullable|numeric|min:0',
+            'services' => 'array',
+            'services.*.pricing_rule_id' => 'nullable|exists:pricing_rules,id',
+            'services.*.name' => 'nullable|string|max:200',
+            'services.*.qty' => 'nullable|integer|min:1',
+            'services.*.unit_price' => 'nullable|numeric|min:0',
+            'components_client_total' => 'nullable|numeric|min:0',
+        ]);
+
+        $override = $data['components_client_total'] ?? null;
+        $this->generator->saveItems(
+            $quote,
+            array_values($data['components'] ?? []),
+            array_values($data['services'] ?? []),
+            $override !== null ? (float) $override : null,
+        );
+
+        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.items_saved'));
+    }
+
+    /** Generate the document section prose (AI call 2), then reprice. */
+    public function generate(Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+
+        if ($quote->items()->count() === 0) {
+            return back()->withErrors(['items' => __('portal.scope_planner.confirm_items_first')]);
+        }
+
+        $this->generator->generate($quote);
+
+        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.generated'));
+    }
+
+    /** Edit section text + the components override, then reprice. */
+    public function update(Request $request, Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+
+        $data = $request->validate([
+            'sections' => 'array',
+            'array_sections' => 'array',
+            'subject' => 'nullable|string|max:200',
+            'beneficiary' => 'nullable|string|max:200',
+            'components_client_total' => 'nullable|numeric|min:0',
+        ]);
+
+        // Rebuild ai_content from the edited section text: keys flagged in
+        // array_sections become bullet arrays (split on newlines); the rest stay
+        // strings. Untouched keys (timeline, scopes, …) are preserved.
+        $content = $quote->ai_content ?? [];
+        $arraySections = $data['array_sections'] ?? [];
+        foreach (($data['sections'] ?? []) as $key => $val) {
+            if (in_array($key, $arraySections, true)) {
+                $content[$key] = collect(preg_split('/\r\n|\r|\n/', (string) $val))
+                    ->map(fn ($l) => trim($l))->filter()->values()->all();
+            } else {
+                $content[$key] = trim((string) $val);
+            }
+        }
+
+        $quote->update([
+            'ai_content' => $content,
+            'subject' => $data['subject'] ?? $quote->subject,
+            'beneficiary' => $data['beneficiary'] ?? $quote->beneficiary,
+            'components_client_total' => $data['components_client_total'] ?? $quote->components_client_total,
+        ]);
+
+        app(\App\Services\Scope\PricingService::class)->price($quote->refresh());
+
+        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.saved'));
+    }
+
+    /** Regenerate a single section (replaces only that key in ai_content). */
+    public function regenerateSection(Request $request, Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+        $section = (string) $request->validate(['section' => 'required|string|max:60'])['section'];
+
+        $value = $this->gemini->regenerateSection([
+            'brief' => (string) $quote->brief,
+            'tier' => $quote->customer_category,
+            'length' => $quote->length,
+            'language' => $quote->language,
+            'structure' => $quote->structure,
+            'components' => $quote->items()->where('type', 'component')->pluck('name')->all(),
+            'services' => $quote->items()->where('type', 'service')->pluck('name')->all(),
+        ], $section);
+
+        if ($value !== null) {
+            $content = $quote->ai_content ?? [];
+            $content[$section] = $value;
+            $quote->update(['ai_content' => $content]);
+        }
+
+        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.section_regenerated'));
+    }
+
+    /** Lock the document for export (status → approved/pending per role). */
+    public function finalize(Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+
+        $quote->update(['status' => Auth::user()->isManager() ? 'approved' : 'pending_approval']);
+
+        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.finalized'));
+    }
+
+    /** Internal access guard: internal staff; only the creator or a manager may open a quote. */
+    private function authorizeQuote(Quote $quote): void
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->isInternal(), 403);
+        abort_unless($user->isManager() || $user->isProjectManager() || $quote->created_by === $user->id, 403);
     }
 
     /** Persist the current scope + selected inventory/stock as a Quote (CRM bridge). */

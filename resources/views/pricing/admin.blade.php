@@ -55,6 +55,18 @@ body { font-family: 'Inter', sans-serif; }
                     @enderror
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>{{ __('portal.pricing.name_en') }}</label>
+                    <input type="text" name="name_en" class="form-control" value="{{ old('name_en') }}" placeholder="{{ __('portal.pricing.name_en_ph') }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>{{ __('portal.pricing.name_ar') }}</label>
+                    <input type="text" name="name_ar" class="form-control" value="{{ old('name_ar') }}" dir="rtl" placeholder="{{ __('portal.pricing.name_ar_ph') }}">
+                </div>
+            </div>
             <div class="col-md-2">
                 <div class="form-group">
                     <label>{{ __('portal.pricing.rate') }} *</label>
@@ -133,7 +145,7 @@ body { font-family: 'Inter', sans-serif; }
                         @endif
                     </td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-warning" onclick="editRule({{ $rule->id }}, '{{ $rule->item }}', {{ $rule->rate }}, '{{ $rule->unit }}', '{{ $rule->level }}', '{{ addslashes($rule->note) }}', {{ $rule->is_active ? 'true' : 'false' }})">
+                        <button class="btn btn-sm btn-warning" onclick="editRule({{ $rule->id }}, '{{ $rule->item }}', {{ $rule->rate }}, '{{ $rule->unit }}', '{{ $rule->level }}', '{{ addslashes($rule->note) }}', {{ $rule->is_active ? 'true' : 'false' }}, '{{ addslashes($rule->name_en) }}', '{{ addslashes($rule->name_ar) }}')">
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" action="{{ route('pricing.destroy', $rule) }}" class="js-delete-rule" style="display: inline;" data-rule-item="{{ $rule->item }}">
@@ -178,6 +190,20 @@ body { font-family: 'Inter', sans-serif; }
                             <div class="form-group">
                                 <label>{{ __('portal.pricing.level') }} *</label>
                                 <input type="text" name="level" id="edit_level" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('portal.pricing.name_en') }}</label>
+                                <input type="text" name="name_en" id="edit_name_en" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('portal.pricing.name_ar') }}</label>
+                                <input type="text" name="name_ar" id="edit_name_ar" class="form-control" dir="rtl">
                             </div>
                         </div>
                     </div>
@@ -240,13 +266,15 @@ body { font-family: 'Inter', sans-serif; }
 <script>
 let pendingDeleteRuleForm = null;
 
-function editRule(id, item, rate, unit, level, note, isActive) {
+function editRule(id, item, rate, unit, level, note, isActive, nameEn, nameAr) {
     document.getElementById('edit_item').value = item;
     document.getElementById('edit_rate').value = rate;
     document.getElementById('edit_unit').value = unit;
     document.getElementById('edit_level').value = level;
     document.getElementById('edit_note').value = note;
     document.getElementById('edit_is_active').checked = isActive;
+    document.getElementById('edit_name_en').value = nameEn || '';
+    document.getElementById('edit_name_ar').value = nameAr || '';
     document.getElementById('editRuleForm').action = `/internal/pricing-rules/${id}`;
     new bootstrap.Modal(document.getElementById('editRuleModal')).show();
 }
