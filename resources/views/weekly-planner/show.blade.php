@@ -15,8 +15,31 @@
     <span class="badge bg-{{ $plan->statusColor() }}" style="font-size:.9rem;">{{ __('portal.planner.status.'.$plan->status) }}</span>
 </div>
 
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+
 @if($plan->review_notes)
 <div class="alert alert-warning"><strong>{{ __('portal.planner.review_notes') }}:</strong> {{ $plan->review_notes }}</div>
+@endif
+
+@if(auth()->user()->isManager() && $plan->status === 'pending')
+<div class="card mb-3">
+    <div class="card-content d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <strong><i class="fas fa-clipboard-check"></i> {{ __('portal.planner.review_this_plan') }}</strong>
+        <div class="d-flex gap-2">
+            <form method="POST" action="{{ route('weekly-planner.approve', $plan) }}" class="m-0">@csrf
+                <button class="btn btn-primary"><i class="fas fa-check"></i> {{ __('portal.planner.approve') }}</button>
+            </form>
+            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('planRejectForm').classList.toggle('d-none')">
+                <i class="fas fa-rotate-left"></i> {{ __('portal.planner.send_back') }}
+            </button>
+        </div>
+    </div>
+    <form method="POST" action="{{ route('weekly-planner.reject', $plan) }}" id="planRejectForm" class="card-content d-none" style="border-top:1px solid var(--gray-200);">@csrf
+        <label class="form-label fw-bold">{{ __('portal.planner.review_notes') }}</label>
+        <textarea name="review_notes" rows="2" class="form-control mb-2" placeholder="{{ __('portal.planner.review_notes') }}…"></textarea>
+        <button class="btn btn-warning"><i class="fas fa-paper-plane"></i> {{ __('portal.planner.send_back') }}</button>
+    </form>
+</div>
 @endif
 
 {{-- Working location per day --}}
@@ -25,12 +48,22 @@
     <div class="card-content p-0" style="overflow-x:auto;">
         <table class="table mb-0">
             <thead><tr>@foreach($days as $day)<th style="text-transform:capitalize;">{{ ucfirst($day) }}</th>@endforeach</tr></thead>
-            <tbody><tr>
-                @foreach($days as $day)
-                    @php $lk = $plan->locations[$day] ?? null; @endphp
-                    <td>{{ $lk ? ($locations[$lk] ?? $lk) : '—' }}</td>
-                @endforeach
-            </tr></tbody>
+            <tbody>
+                <tr>
+                    @foreach($days as $day)
+                        @php $lk = $plan->locations[$day] ?? null; @endphp
+                        <td>{{ $lk ? ($locations[$lk] ?? $lk) : '—' }}</td>
+                    @endforeach
+                </tr>
+                <tr>
+                    @foreach($days as $day)
+                        @php $w = $plan->availability[$day] ?? null; @endphp
+                        <td class="text-info" style="white-space:nowrap;">
+                            @if($w && ($w['start'] ?? null) && ($w['end'] ?? null))<i class="fas fa-clock"></i> {{ $w['start'] }}–{{ $w['end'] }}@else <span class="text-muted">—</span>@endif
+                        </td>
+                    @endforeach
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>

@@ -11,12 +11,13 @@ class WeeklyPlan extends Model
     protected $fillable = [
         'user_id', 'week_start', 'status',
         'hours_projects', 'hours_development', 'hours_presale',
-        'locations', 'submitted_at', 'reviewed_by', 'reviewed_at', 'review_notes',
+        'locations', 'availability', 'submitted_at', 'reviewed_by', 'reviewed_at', 'review_notes',
     ];
 
     protected $casts = [
         'week_start' => 'date',
         'locations' => 'array',
+        'availability' => 'array',
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',
         'hours_projects' => 'integer',

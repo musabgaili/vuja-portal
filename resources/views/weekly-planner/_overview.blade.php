@@ -25,11 +25,10 @@
                     @foreach($days as $day)
                         @php $cell = $row['days'][$day]; @endphp
                         <td>
-                            @if($cell['loc'])
-                                <div style="font-weight:600;">{{ $cell['loc'] }}</div>
-                                <small class="text-muted">{{ $cell['hours'] }}h</small>
-                            @elseif($cell['hours'] > 0)
-                                <small class="text-muted">{{ $cell['hours'] }}h</small>
+                            @if($cell['loc'] || ($cell['window'] ?? null) || $cell['hours'] > 0)
+                                @if($cell['loc'])<div style="font-weight:600;">{{ $cell['loc'] }}</div>@endif
+                                @if($cell['window'] ?? null)<small class="text-info d-block" style="white-space:nowrap;"><i class="fas fa-clock"></i> {{ $cell['window'] }}</small>@endif
+                                @if($cell['hours'] > 0)<small class="text-muted">{{ $cell['hours'] }}h</small>@endif
                             @else
                                 <span class="text-muted">—</span>
                             @endif

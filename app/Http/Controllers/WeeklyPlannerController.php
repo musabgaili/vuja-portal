@@ -133,6 +133,7 @@ class WeeklyPlannerController extends Controller
             'week' => 'nullable|date',
             'hours' => 'array',
             'locations' => 'array',
+            'availability' => 'array',
         ]);
 
         $weekStart = $this->resolveWeekStart($request);
@@ -214,6 +215,17 @@ class WeeklyPlannerController extends Controller
             ->filter()
             ->toArray();
 
+        // Clean per-day availability window { day => {start, end} } in HH:MM.
+        $availability = [];
+        foreach ($days as $day) {
+            $start = $this->cleanTime($request->input("availability.$day.start"));
+            $end = $this->cleanTime($request->input("availability.$day.end"));
+            $window = array_filter(['start' => $start, 'end' => $end]);
+            if ($window) {
+                $availability[$day] = $window;
+            }
+        }
+
         $submitting = $request->input('action') === 'submit';
         $required = (int) config('planner.required_hours', 40);
 
@@ -238,6 +250,7 @@ class WeeklyPlannerController extends Controller
             $plan->status = $plan->status === 'rejected' ? 'rejected' : 'draft';
         }
         $plan->locations = $locations;
+        $plan->availability = $availability;
 
         DB::transaction(function () use ($plan, $lines) {
             $plan->save();
@@ -280,6 +293,14 @@ class WeeklyPlannerController extends Controller
         }
 
         return $out;
+    }
+
+    /** Validate a HH:MM (24h) time string, else null. */
+    private function cleanTime(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $value) ? $value : null;
     }
 
     /** Manager review queue + category breakdown across submitted timesheets. */
@@ -436,9 +457,11 @@ class WeeklyPlannerController extends Controller
                     $hours += (int) (($line->hours[$day] ?? 0));
                 }
                 $locKey = $plan->locations[$day] ?? null;
+                $win = $plan->availability[$day] ?? null;
                 $perDay[$day] = [
                     'loc' => $locKey ? ($locations[$locKey] ?? $locKey) : null,
                     'hours' => $hours,
+                    'window' => ($win && ($win['start'] ?? null) && ($win['end'] ?? null)) ? ($win['start'].'–'.$win['end']) : null,
                 ];
             }
             $rows[] = [

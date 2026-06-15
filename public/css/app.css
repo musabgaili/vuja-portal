@@ -1082,6 +1082,11 @@ body {
 [data-bs-theme="dark"] .badge.bg-danger,  [data-bs-theme="dark"] .badge.text-bg-danger  { background: rgba(248,113,113,.16) !important; color: #f87171 !important; }
 [data-bs-theme="dark"] .badge.bg-warning, [data-bs-theme="dark"] .badge.text-bg-warning { background: rgba(251,191,36,.16) !important; color: #fbbf24 !important; }
 [data-bs-theme="dark"] .badge.bg-info,    [data-bs-theme="dark"] .badge.text-bg-info    { background: rgba(103,201,224,.16) !important; color: #67c9e0 !important; }
+/* bg-light / text-bg-light badges (e.g. the plan-review category breakdown chips):
+   pin to a readable tinted chip in both themes — the dark-mode .text-dark safety
+   net was turning their text light, leaving blank white pills. Two classes beat it. */
+.badge.bg-light, .badge.text-bg-light { background: var(--bg-tertiary) !important; color: var(--gray-700) !important; border-color: var(--gray-200) !important; }
+[data-bs-theme="dark"] .badge.bg-light, [data-bs-theme="dark"] .badge.text-bg-light { background: var(--bg-tertiary) !important; color: var(--gray-800) !important; }
 
 /* ---- DARK MODE contrast safety net (fixes invisible / washed-out text) ---- */
 [data-bs-theme="dark"] .text-dark, [data-bs-theme="dark"] .text-black,

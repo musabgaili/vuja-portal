@@ -37,20 +37,25 @@
 <form method="POST" action="{{ route('weekly-planner.store', ['week' => $weekStart->toDateString()]) }}" id="timesheetForm">
     @csrf
 
-    {{-- Working location per day --}}
+    {{-- Working location + availability window per day --}}
     <div class="card mb-3">
         <div class="card-header"><span class="card-title"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.working_location') }}</span></div>
         <div class="card-content">
+            <p class="text-muted mb-2" style="font-size:.85rem;">{{ __('portal.planner.availability_hint') }}</p>
             <div class="row g-2">
                 @foreach($days as $day)
                     <div class="col">
                         <label class="form-label mb-1" style="font-size:.8rem; text-transform:capitalize;">{{ __('portal.planner.day.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->format('M j') }}</small></label>
-                        <select name="locations[{{ $day }}]" class="form-select form-select-sm" @disabled($readonly)>
+                        <select name="locations[{{ $day }}]" class="form-select form-select-sm mb-1" @disabled($readonly)>
                             <option value="">—</option>
                             @foreach($locations as $lk => $ll)
                                 <option value="{{ $lk }}" @selected(($plan->locations[$day] ?? '') === $lk)>{{ $ll }}</option>
                             @endforeach
                         </select>
+                        <div class="d-flex gap-1">
+                            <input type="time" name="availability[{{ $day }}][start]" value="{{ $plan->availability[$day]['start'] ?? '' }}" class="form-control form-control-sm" title="{{ __('portal.planner.from') }}" @disabled($readonly)>
+                            <input type="time" name="availability[{{ $day }}][end]" value="{{ $plan->availability[$day]['end'] ?? '' }}" class="form-control form-control-sm" title="{{ __('portal.planner.to') }}" @disabled($readonly)>
+                        </div>
                     </div>
                 @endforeach
             </div>

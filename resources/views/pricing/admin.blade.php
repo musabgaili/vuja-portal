@@ -17,15 +17,18 @@ body { font-family: 'Inter', sans-serif; }
     padding: 2rem;
     border-radius: 16px;
     margin-bottom: 2rem;
-    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 16px 40px rgba(12, 112, 117, 0.30);
 }
 .admin-card {
-    background: white;
+    background: var(--bg-primary);
+    color: var(--text-color, var(--gray-900));
+    border: 1px solid var(--gray-200);
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow-md);
     margin-bottom: 2rem;
 }
+.admin-card .form-label, .admin-card label { color: var(--text-color, var(--gray-800)); }
 </style>
 
 <div class="admin-header">
