@@ -5,7 +5,7 @@
 <div class="page-hero">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h1 style="margin:0; font-size:1.4rem;"><i class="fas fa-file-invoice"></i> {{ __('portal.quote.title') }}</h1>
-        <a href="{{ route('scope-planner.index') }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.quote.new_from_planner') }}</a>
+        <a href="{{ route('scope-planner.index') }}" class="btn btn-light" style="font-weight:600;"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.quote.new_from_planner') }}</a>
     </div>
 </div>
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif

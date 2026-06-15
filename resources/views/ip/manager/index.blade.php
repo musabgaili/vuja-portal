@@ -52,6 +52,6 @@
 @push('scripts')
 <script>
 function confirmMeeting(id){if(confirm('{{ __('portal.ip.confirm_meeting_question') }}'))fetch(`/internal/ip/${id}/confirm-meeting`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
-function updateStatus(id){window.location.href=`/internal/ip/${id}`;}
+function updateStatus(id){window.location.href=`/internal/ip/manager/${id}`;}
 </script>
 @endpush

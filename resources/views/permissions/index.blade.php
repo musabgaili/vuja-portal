@@ -272,7 +272,7 @@
 }
 
 .permission-item {
-    background: white;
+    background: var(--card-bg, var(--bg-primary));
     padding: var(--space-md);
     border-radius: var(--radius-md);
     border: 1px solid var(--gray-200);
@@ -280,7 +280,7 @@
 
 .permission-name {
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-color, var(--gray-900));
     margin-bottom: var(--space-xs);
 }
 

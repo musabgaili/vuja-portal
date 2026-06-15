@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends(auth()->user()?->isInternal() ? 'layouts.internal-dashboard' : 'layouts.dashboard')
 @section('title', __('portal.profile.my_profile_title'))
 
 @section('content')

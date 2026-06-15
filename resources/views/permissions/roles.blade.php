@@ -126,7 +126,7 @@
 }
 
 .role-card {
-    background: var(--card-bg);
+    background: var(--card-bg, var(--bg-primary));
     padding: var(--space-lg);
     border-radius: var(--radius-md);
     border-left: 4px solid;
@@ -144,7 +144,7 @@
 
 .role-header h4 {
     margin: 0;
-    color: var(--text-color);
+    color: var(--text-color, var(--gray-900));
 }
 
 .role-badge {

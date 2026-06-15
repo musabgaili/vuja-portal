@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends(auth()->user()?->isInternal() ? 'layouts.internal-dashboard' : 'layouts.dashboard')
 @section('title', __('portal.profile.security_settings_title'))
 
 @section('breadcrumbs')
@@ -192,16 +192,17 @@
 
 @push('styles')
 <style>
+/* Brand the section headers in the portal teal palette (was pink/cyan/green). */
 .card-header.bg-gradient-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%) !important;
 }
 
 .card-header.bg-gradient-info {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    background: linear-gradient(135deg, #0C7075 0%, #294D61 100%) !important;
 }
 
 .card-header.bg-gradient-secondary {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+    background: linear-gradient(135deg, #294D61 0%, #0C7075 100%) !important;
 }
 
 .form-control:focus {

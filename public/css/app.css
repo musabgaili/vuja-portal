@@ -1214,4 +1214,29 @@ body {
 .crm-col-body.drop-hint{ background:var(--primary-light); }
 .crm-card{ background:var(--bg-primary); border:1px solid var(--gray-200); border-radius:10px; padding:12px; box-shadow:var(--shadow-sm); cursor:grab; }
 .crm-card:hover{ border-color:var(--primary-color); }
+
+/* ===== fix1: header action button contrast =====
+   The teal page headers (.page-hero / .projects-header) force descendant text
+   white, which made the white `.btn-light` action buttons (Import, +New, Table
+   View, Add availability, etc.) render white-on-light. Pin .btn-light to a solid
+   white chip with brand-teal text in BOTH themes so it is always legible.
+   Specificity (.btn.btn-light) + !important beats `.projects-header *`. */
+.btn.btn-light,
+.btn.btn-light:focus,
+.btn.btn-light:visited {
+    background: #ffffff !important;
+    color: var(--primary-color) !important;
+    border: 1px solid rgba(12, 112, 117, 0.25) !important;
+}
+.btn.btn-light:hover {
+    background: #effbfb !important;
+    color: var(--primary-dark) !important;
+    border-color: var(--primary-color) !important;
+}
+.btn.btn-light i { color: inherit !important; }
+
+/* Outline-light toggles sit on the teal header — keep them white & legible. */
+.btn.btn-outline-light,
+.btn.btn-outline-light:focus { color: #ffffff !important; border-color: rgba(255, 255, 255, 0.75) !important; }
+.btn.btn-outline-light:hover { background: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; }
 .crm-card.dragging{ opacity:.5; }

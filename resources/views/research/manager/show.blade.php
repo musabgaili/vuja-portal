@@ -61,10 +61,12 @@
     </div>
 </div>
 <div class="modal fade" id="assignModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>{{ __('portal.research.manager.show.modal_assign_title') }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form method="POST" action="{{ route('research.assign', $research) }}">@csrf<div class="modal-body"><select name="assigned_to" class="form-control" required><option value="">{{ __('portal.research.manager.show.select_employee') }}</option>@foreach($employees as $emp)<option value="{{ $emp->id }}">{{ $emp->name }}</option>@endforeach</select></div><div class="modal-footer"><button type="submit" class="btn btn-primary">{{ __('portal.research.manager.show.assign_assign') }}</button></div></form></div></div></div>
+
+<div class="modal fade" id="completeModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>{{ __('portal.research.manager.show.mark_complete') }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form method="POST" action="{{ route('research.complete', $research) }}">@csrf<div class="modal-body"><label class="form-label fw-bold">{{ __('portal.research.manager.show.findings_label') }}</label><textarea name="research_findings" rows="6" class="form-control" required placeholder="{{ __('portal.research.manager.show.findings_placeholder') }}">{{ old('research_findings', $research->research_findings) }}</textarea></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.research.manager.show.cancel') }}</button><button type="submit" class="btn btn-success"><i class="fas fa-check"></i> {{ __('portal.research.manager.show.mark_complete') }}</button></div></form></div></div></div>
 @endsection
 @push('scripts')
 <script>
 function showAssignModal(){new bootstrap.Modal(document.getElementById('assignModal')).show();}
-function markComplete(){if(confirm(@json(__('portal.research.manager.show.mark_complete_confirm')))){fetch('{{ route('research.complete', $research) }}',{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}}
+function markComplete(){new bootstrap.Modal(document.getElementById('completeModal')).show();}
 </script>
 @endpush

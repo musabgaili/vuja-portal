@@ -26,7 +26,6 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 @include('partials.brand')
-                <small class="brand-subtitle">{{ __('portal.sidebar.internal_portal') }}</small>
             </div>
 
             <!-- Sidebar Navigation -->

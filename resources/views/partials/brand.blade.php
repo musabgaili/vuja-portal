@@ -1,9 +1,9 @@
 @php
-    $hasLight = file_exists(public_path('images/vd-logo-light.png'));
+    $hasDark = file_exists(public_path('images/vd-logo-dark.png'));
 @endphp
-@if($hasLight)
-    {{-- Light (colour) logo used in both light and dark mode --}}
-    <img src="{{ asset('images/vd-logo-light.png') }}" alt="Vujà Dé" class="brand-logo">
+@if($hasDark)
+    {{-- Dark logo used in both light and dark mode (per brand direction) --}}
+    <img src="{{ asset('images/vd-logo-dark.png') }}" alt="Vujà Dé" class="brand-logo">
 @else
     {{-- Fallback brand mark until the PNG logos are uploaded to public/images/ --}}
     <span class="brand-fallback">

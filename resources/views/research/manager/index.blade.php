@@ -50,7 +50,10 @@
 
 @push('scripts')
 <script>
-function assign(id){if(confirm(@json(__('portal.research.manager.index.assign_confirm'))))fetch(`/internal/research/${id}/assign`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
-function complete(id){if(confirm(@json(__('portal.research.manager.index.complete_confirm'))))fetch(`/internal/research/${id}/complete`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+// Assigning needs an employee and completing needs the research findings, so
+// these actions open the detail page where the proper forms live (a bare POST
+// here failed validation silently).
+function assign(id){window.location.href=`/internal/research/manager/${id}`;}
+function complete(id){window.location.href=`/internal/research/manager/${id}`;}
 </script>
 @endpush

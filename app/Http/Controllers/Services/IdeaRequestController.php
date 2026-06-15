@@ -262,17 +262,26 @@ class IdeaRequestController extends Controller
 
         $this->authorize('manage', $idea);
 
+        // The quote can be sent two ways: the detail page (price + uploaded
+        // quote document) or the quick "send quote" modal on the list page
+        // (price + agreement terms, no file). Both must work, so the file is
+        // optional and we keep any previously attached document.
         $validated = $request->validate([
             'final_quote' => 'required|numeric|min:0',
-            'quote_file' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'quote_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'agreement_terms' => 'nullable|string',
         ]);
 
-        // Store quote file
-        $quotePath = $request->file('quote_file')->store('quotes', 'public');
+        // Store quote file when one was attached, otherwise keep the existing one.
+        $quotePath = $idea->quote_file_path;
+        if ($request->hasFile('quote_file')) {
+            $quotePath = $request->file('quote_file')->store('quotes', 'public');
+        }
 
         $idea->update([
             'final_quote' => $validated['final_quote'],
             'quote_file_path' => $quotePath,
+            'agreement_terms' => $validated['agreement_terms'] ?? $idea->agreement_terms,
             'quote_status' => $user->isManager() ? 'approved' : 'pending_approval',
             'status' => $user->isManager() ? 'quoted' : 'negotiation',
             'quote_approved_by' => $user->isManager() ? $user->id : null,
