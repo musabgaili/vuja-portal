@@ -1137,6 +1137,7 @@ body {
 
 /* ---- Brand logo in the sidebar header (light/dark variants) ---- */
 .sidebar-header .brand-logo { max-height: 110px; width: auto; max-width: 90%; display: block; margin: 0 auto; }
+.sidebar-header .brand-subtitle { display: block; text-align: center; margin-top: .35rem; font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-500); }
 .sidebar-header .brand-logo--dark { display: none; }
 [data-bs-theme="dark"] .sidebar-header .brand-logo--light { display: none; }
 [data-bs-theme="dark"] .sidebar-header .brand-logo--dark { display: block; }

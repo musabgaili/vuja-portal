@@ -2510,5 +2510,6 @@
     "portal.notif.quote_approved": "Your quote \":title\" was approved",
     "portal.notif.quote_rejected": "Your quote \":title\" was rejected",
     "portal.notif.quote_changes_requested": "Changes requested on your quote \":title\"",
-    "portal.notif.quote_pending": ":name submitted a quote for approval: :title"
+    "portal.notif.quote_pending": ":name submitted a quote for approval: :title",
+    "portal.sidebar.internal_portal": "Internal Portal"
 }

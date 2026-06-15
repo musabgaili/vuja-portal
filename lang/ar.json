@@ -2509,5 +2509,6 @@
     "portal.notif.quote_approved": "تم اعتماد عرضك \":title\"",
     "portal.notif.quote_rejected": "تم رفض عرضك \":title\"",
     "portal.notif.quote_changes_requested": "مطلوب تعديلات على عرضك \":title\"",
-    "portal.notif.quote_pending": ":name أرسل عرضًا للاعتماد: :title"
+    "portal.notif.quote_pending": ":name أرسل عرضًا للاعتماد: :title",
+    "portal.sidebar.internal_portal": "البوابة الداخلية"
 }
