@@ -142,6 +142,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/consultations/manager', [ConsultationRequestController::class, 'managerIndex'])->name('consultations.manager.index');
     Route::get('/consultations/manager/{consultation}', [ConsultationRequestController::class, 'managerShow'])->name('consultations.manager.show');
     Route::post('/consultations/{consultation}/assign', [ConsultationRequestController::class, 'assign'])->name('consultations.assign');
+    Route::post('/consultations/{consultation}/assign-and-schedule', [ConsultationRequestController::class, 'assignAndSchedule'])->name('consultations.assign-and-schedule');
     Route::post('/consultations/{consultation}/send-invite', [ConsultationRequestController::class, 'sendMeetingInvite'])->name('consultations.send-invite');
     Route::post('/consultations/{consultation}/complete', [ConsultationRequestController::class, 'complete'])->name('consultations.complete');
 
