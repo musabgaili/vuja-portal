@@ -65,7 +65,7 @@
                     </div>
                 </form>
                 @else
-                <div class="alert alert-success">
+                <div class="alert alert-success" data-persist>
                     <i class="fas fa-check-circle me-2"></i>
                     <strong>{{ __('portal.ideas.payment.uploaded_title') }}</strong>
                     <p class="mb-0 mt-2">{{ __('portal.ideas.payment.uploaded_body') }}</p>

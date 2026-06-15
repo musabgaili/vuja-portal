@@ -41,7 +41,7 @@
         <div class="card"><div class="card-content">
             <h3 class="card-title mb-3">{{ __('portal.crm.actions') }}</h3>
             @if($opportunity->converted_project_id)
-                <div class="alert alert-success"><i class="fas fa-circle-check"></i> {{ __('portal.crm.already_won') }}</div>
+                <div class="alert alert-success" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.crm.already_won') }}</div>
                 <a href="{{ route('projects.manager.show', $opportunity->project) }}" class="btn btn-primary w-100 mb-2"><i class="fas fa-folder-open"></i> {{ __('portal.crm.open_project') }}</a>
             @elseif($opportunity->isOpen())
                 <form method="POST" action="{{ route('crm.convert', $opportunity) }}" class="mb-2" onsubmit="return confirm('{{ __('portal.crm.confirm_win') }}')">

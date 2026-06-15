@@ -431,7 +431,7 @@
                         <p class="mb-0 mt-1">"{{ $milestone->approval_note }}"</p>
                     </div>
                     @elseif($milestone->client_approved === true && $milestone->approval_note)
-                    <div class="alert alert-success mt-2">
+                    <div class="alert alert-success mt-2" data-persist>
                         <strong><i class="fas fa-comment"></i> {{ __('portal.projects_manager.show.client_note') }}:</strong>
                         <p class="mb-0 mt-1">"{{ $milestone->approval_note }}"</p>
                     </div>
@@ -780,7 +780,7 @@
             </div>
             
             @if($project->feedback->would_recommend)
-            <div class="alert alert-success mt-3">
+            <div class="alert alert-success mt-3" data-persist>
                 <i class="fas fa-check-circle"></i> {{ __('portal.projects_manager.show.would_recommend') }}
             </div>
             @endif

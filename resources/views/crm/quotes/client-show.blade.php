@@ -33,7 +33,7 @@
     <div class="col-lg-5">
         <div class="card"><div class="card-content">
             @if($quote->isAccepted())
-                <div class="alert alert-success mb-0"><i class="fas fa-circle-check"></i> {{ __('portal.quote.you_accepted') }} {{ optional($quote->accepted_at)->format('M j, Y') }}.<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
+                <div class="alert alert-success mb-0" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.quote.you_accepted') }} {{ optional($quote->accepted_at)->format('M j, Y') }}.<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
             @elseif($quote->status === 'sent')
                 <h3 class="card-title mb-2">{{ __('portal.quote.accept_title') }}</h3>
                 <p class="text-muted" style="font-size:.85rem;">{{ __('portal.quote.accept_help') }}</p>

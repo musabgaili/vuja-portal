@@ -140,6 +140,12 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/prototypes/{prototype}/status', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'updateStatus'])->name('prototypes.update-status');
     Route::post('/prototypes/{prototype}/convert-to-project', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'convertToProject'])->name('prototypes.convert-to-project');
 
+    // Improvement Ideas — manager review & approval (approval awards Impact Points)
+    Route::get('/improvement-ideas/manager', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'managerIndex'])->name('improvement-ideas.manager.index');
+    Route::get('/improvement-ideas/manager/{improvementIdea}', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'managerShow'])->name('improvement-ideas.manager.show');
+    Route::post('/improvement-ideas/{improvementIdea}/approve', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'approve'])->name('improvement-ideas.approve');
+    Route::post('/improvement-ideas/{improvementIdea}/reject', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'reject'])->name('improvement-ideas.reject');
+
     // CONSULTATIONS - Manager/Employee Routes
     Route::get('/consultations/manager', [ConsultationRequestController::class, 'managerIndex'])->name('consultations.manager.index');
     Route::get('/consultations/manager/{consultation}', [ConsultationRequestController::class, 'managerShow'])->name('consultations.manager.show');

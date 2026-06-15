@@ -88,6 +88,16 @@ Route::middleware(['auth'])->group(function () {
     // Service Request Routes (Legacy - can be removed later)
     Route::resource('service-requests', ServiceRequestController::class);
 
+    // Internal Improvement Ideas — any authenticated user (client, employee or
+    // PM) can suggest portal improvements. Managers review & approve them in the
+    // internal area (see routes/internal.php). Views are role-aware.
+    Route::prefix('improvement-ideas')->name('improvement-ideas.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'store'])->name('store');
+        Route::get('/{improvementIdea}', [\App\Http\Controllers\Services\ImprovementIdeaController::class, 'show'])->name('show');
+    });
+
 });
 
 // ============================================

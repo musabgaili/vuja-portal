@@ -49,7 +49,7 @@
         <div class="card"><div class="card-content">
             <h3 class="card-title mb-3">{{ __('portal.quote.actions') }}</h3>
             @if($quote->isAccepted())
-                <div class="alert alert-success"><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->format('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
+                <div class="alert alert-success" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->format('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
                 @if($quote->project)<a href="{{ route('projects.manager.show', $quote->project) }}" class="btn btn-primary w-100 mb-2"><i class="fas fa-folder-open"></i> {{ __('portal.quote.open_order') }}</a>@endif
             @else
                 {{-- Step 1: creator submits a draft (or a sent-back quote) for approval --}}

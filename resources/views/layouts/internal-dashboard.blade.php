@@ -57,6 +57,10 @@
                         <i class="fas fa-bolt"></i>
                         {{ __('portal.nav.engagement') }}
                     </a>
+                    <a href="{{ route('improvement-ideas.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.index') || request()->routeIs('improvement-ideas.create') || request()->routeIs('improvement-ideas.show') ? 'active' : '' }}">
+                        <i class="fas fa-rocket"></i>
+                        {{ __('portal.nav.improvement_ideas') }}
+                    </a>
                     <a href="{{ route('weekly-planner.index') }}" class="nav-item {{ request()->routeIs('weekly-planner.index') ? 'active' : '' }}">
                         <i class="fas fa-calendar-week"></i>
                         {{ __('portal.nav.weekly_planner') }}
@@ -220,6 +224,10 @@
                         <i class="fas fa-sliders"></i>
                         {{ __('portal.nav.engagement_settings') }}
                     </a>
+                    <a href="{{ route('improvement-ideas.manager.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.manager.*') ? 'active' : '' }}">
+                        <i class="fas fa-clipboard-check"></i>
+                        {{ __('portal.nav.improvement_reviews') }}
+                    </a>
                     <a href="{{ route('inventory.index') }}" class="nav-item {{ request()->routeIs('inventory.*') ? 'active' : '' }}">
                         <i class="fas fa-boxes-stacked"></i>
                         {{ __('portal.nav.inventory') }}
@@ -358,6 +366,7 @@
     };
     </script>
     <x-toast />
+    @include('partials.flash-autodismiss')
     @stack('scripts')
 </body>
 </html>

@@ -34,6 +34,9 @@ return [
         'staff_task_presale'    => 70,   // pre-sale / scoping work
         'staff_task_sales'       => 80,   // sales / revenue work
         'staff_task_management'  => 90,   // management / internal initiatives
+        // Innovation — the HIGHEST award in the system, granted only when a
+        // manager approves a portal-improvement idea (see ImprovementIdeaController).
+        'portal_improvement_idea_approved' => 150,
     ],
 
     // Editor metadata: groups each action under a category and gives it a label
@@ -47,6 +50,7 @@ return [
         'gratitude'    => 'Peer gratitude',
         'planner'      => 'Weekly planner',
         'staff_tasks'  => 'Direct staff tasks',
+        'innovation'   => 'Innovation & ideas',
     ],
     'action_meta' => [
         'task_completed_early'   => ['category' => 'execution',     'label' => 'Task completed early'],
@@ -64,6 +68,7 @@ return [
         'staff_task_presale'    => ['category' => 'staff_tasks',   'label' => 'Direct task — Pre-sale'],
         'staff_task_sales'       => ['category' => 'staff_tasks',   'label' => 'Direct task — Sales'],
         'staff_task_management'  => ['category' => 'staff_tasks',   'label' => 'Direct task — Management'],
+        'portal_improvement_idea_approved' => ['category' => 'innovation', 'label' => 'Portal improvement idea approved'],
     ],
 
     // Levels: name, inclusive point range, unlocked perk.

@@ -63,6 +63,10 @@
                         <i class="fas fa-plus"></i>
                         {{ __('portal.layout_client.nav_new_request') }}
                     </a>
+                    <a href="{{ route('improvement-ideas.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.*') ? 'active' : '' }}">
+                        <i class="fas fa-rocket"></i>
+                        {{ __('portal.improvement_ideas.my_ideas') }}
+                    </a>
                 </div>
 
                 <!-- Meetings -->
@@ -189,6 +193,7 @@
     };
     </script>
     <x-toast />
+    @include('partials.flash-autodismiss')
     @stack('scripts')
 </body>
 </html>

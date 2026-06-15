@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EngagementLog;
+use App\Models\ImprovementIdea;
 use App\Models\ProjectTask;
 use App\Models\Quote;
 use App\Models\StaffTask;
@@ -65,10 +66,25 @@ class NotificationService
             $push($l->created_at, 'fa-bolt', __('portal.notif.ip', ['points' => $sign.$l->points]), route('engagement.index'));
         }
 
+        // Outcomes on the user's own portal-improvement ideas (approved / rejected).
+        foreach (ImprovementIdea::where('user_id', $user->id)
+            ->whereIn('status', ['approved', 'rejected', 'implemented'])
+            ->whereNotNull('reviewed_at')->latest('reviewed_at')->limit(5)->get() as $idea) {
+            $push($idea->reviewed_at, $idea->status === 'rejected' ? 'fa-circle-xmark' : 'fa-rocket',
+                __('portal.notif.improvement_'.$idea->status, ['title' => $idea->title]),
+                route('improvement-ideas.show', $idea));
+        }
+
         if ($user->isManager()) {
             foreach (WeeklyPlan::where('status', 'pending')->with('user')->whereNotNull('submitted_at')
                 ->latest('submitted_at')->limit(5)->get() as $p) {
                 $push($p->submitted_at, 'fa-clipboard-check', __('portal.notif.plan_review', ['name' => $p->user?->name ?? '—']), route('weekly-planner.review'));
+            }
+
+            // New portal-improvement ideas awaiting the manager's review.
+            foreach (ImprovementIdea::where('status', 'submitted')->with('user')
+                ->latest()->limit(5)->get() as $idea) {
+                $push($idea->created_at, 'fa-rocket', __('portal.notif.improvement_new', ['name' => $idea->user?->name ?? '—', 'title' => $idea->title]), route('improvement-ideas.manager.index'));
             }
         }
 

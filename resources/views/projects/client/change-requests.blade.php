@@ -31,7 +31,7 @@
             @endif
 
             @if($cr->isApplied())
-                <div class="alert alert-success mb-0 mt-2" style="font-size:.85rem;">
+                <div class="alert alert-success mb-0 mt-2" style="font-size:.85rem;" data-persist>
                     <i class="fas fa-circle-check"></i> {{ __('portal.change_req.signed_on') }} {{ $cr->client_signed_at->format('M j, Y g:i A') }} — <em>{{ $cr->client_signature }}</em>
                 </div>
             @elseif($cr->needsClientSignature())

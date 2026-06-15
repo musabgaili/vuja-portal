@@ -118,6 +118,25 @@
             </a>
         </div>
     </div>
+
+    <!-- Portal Improvement Idea -->
+    <div class="service-card" style="border-left: 4px solid #8b5cf6;">
+        <div class="service-icon" style="background: #8b5cf6;">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <div class="service-content">
+            <h3>{{ __('portal.improvement_ideas.service_title') }}</h3>
+            <p>{{ __('portal.improvement_ideas.service_body') }}</p>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> {{ __('portal.improvement_ideas.service_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.improvement_ideas.service_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.improvement_ideas.service_f3') }}</li>
+            </ul>
+            <a href="{{ route('improvement-ideas.create') }}" class="btn btn-primary btn-block">
+                <i class="fas fa-arrow-right"></i> {{ __('portal.improvement_ideas.service_cta') }}
+            </a>
+        </div>
+    </div>
 </div>
 
 <!-- How It Works -->

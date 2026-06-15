@@ -154,7 +154,7 @@
                 <textarea name="notes" rows="2" class="form-control" placeholder="{{ __('portal.time_slots.create.notes_placeholder') }}">{{ old('notes') }}</textarea>
             </div>
 
-            <div class="alert alert-success">
+            <div class="alert alert-success" data-persist>
                 <i class="fas fa-check-circle"></i>
                 <strong>{{ __('portal.time_slots.create.preview') }}</strong> <span id="slotPreview"></span>
             </div>
