@@ -11,6 +11,8 @@ class PricingRule extends Model
 
     protected $fillable = [
         'item',
+        'name_en',
+        'name_ar',
         'rate',
         'unit',
         'level',

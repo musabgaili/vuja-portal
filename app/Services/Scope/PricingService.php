@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Services\Scope;
+
+use App\Models\Quote;
+use App\ScopePlanner\Contracts\InventoryContract;
+use App\ScopePlanner\Contracts\PricingToolContract;
+
+/**
+ * The single source of pricing truth for a scope quote (spec §11.1). The AI
+ * never authors a number — every figure here is computed deterministically from
+ * the Inventory tier prices and the Pricing Tool service rates.
+ *
+ *   components (tier price) → components_internal_total
+ *   client components       = employee override ?? internal sum   (margin hidden)
+ *   services (fixed rate)   → summed
+ *   subtotal                = client components + services
+ *   vat_amount              = round(subtotal * vat_rate / 100, 2)
+ *   grand_total             = subtotal + vat
+ *   milestones              = grand_total split by the per-tier % template
+ */
+class PricingService
+{
+    public function __construct(
+        private InventoryContract $inventory,
+        private PricingToolContract $pricing,
+    ) {}
+
+    public function price(Quote $quote): Quote
+    {
+        $quote->loadMissing('items');
+        $tier = $quote->customer_category ?: 'company';
+
+        // --- Components (inventory, tier-priced; rolled up for the client) ---
+        $componentsInternalTotal = 0.0;   // itemised sum at TIER price
+        $internalCost = 0.0;              // purchase cost (margin tracking)
+
+        foreach ($quote->items->where('type', 'component') as $c) {
+            $unit = ($c->source === 'inventory' && $c->stock_item_id)
+                ? $this->inventory->priceFor((int) $c->stock_item_id, $tier)
+                : (float) $c->unit_price;
+
+            $qty = max(1, (int) $c->qty);
+            $line = round($unit * $qty, 2);
+            $cost = round((float) $c->internal_cost * $qty, 2);
+
+            $c->forceFill([
+                'unit_price' => $unit,
+                'line_client' => $line,
+                'line_internal' => $cost,
+                'is_client_visible' => false,
+            ])->save();
+
+            $componentsInternalTotal += $line;
+            $internalCost += $cost;
+        }
+
+        $componentsClientTotal = $quote->components_client_total !== null
+            ? (float) $quote->components_client_total
+            : $componentsInternalTotal;
+
+        // --- Services (fixed Pricing Tool rate; itemised to the client) ---
+        $servicesTotal = 0.0;
+        foreach ($quote->items->whereIn('type', ['service', 'other']) as $s) {
+            $unit = (float) $s->unit_price;
+            if ($unit <= 0 && $s->pricing_rule_id) {
+                $unit = (float) ($this->pricing->rateFor($s->pricing_rule_id)?->unitRate ?? 0);
+            }
+
+            $qty = max(1, (int) $s->qty);
+            $line = round($unit * $qty, 2);
+
+            $s->forceFill([
+                'unit_price' => $unit,
+                'line_client' => $line,
+                'is_client_visible' => true,
+            ])->save();
+
+            $servicesTotal += $line;
+        }
+
+        // --- Totals + 15% VAT ---
+        $subtotal = round($componentsClientTotal + $servicesTotal, 2);
+        $vatRate = (float) ($quote->vat_rate ?? 15);
+        $vatAmount = round($subtotal * $vatRate / 100, 2);
+        $grandTotal = round($subtotal + $vatAmount, 2);
+
+        $quote->forceFill([
+            'components_internal_total' => round($componentsInternalTotal, 2),
+            'subtotal' => $subtotal,
+            'vat_amount' => $vatAmount,
+            'grand_total' => $grandTotal,
+            'total_internal' => round($internalCost, 2),
+            'total_client' => $grandTotal,
+        ])->save();
+
+        $this->buildMilestones($quote, $grandTotal);
+        $this->repriceScopes($quote);
+
+        return $quote->refresh();
+    }
+
+    /** Rebuild the milestone schedule from the per-tier template; last absorbs rounding. */
+    private function buildMilestones(Quote $quote, float $grandTotal): void
+    {
+        $tier = $quote->customer_category ?: 'company';
+        $template = array_values(config('scope.milestones.'.$tier, config('scope.milestones.company', [])));
+
+        $quote->milestones()->delete();
+        if (empty($template)) {
+            return;
+        }
+
+        $last = count($template) - 1;
+        $running = 0.0;
+
+        foreach ($template as $i => $m) {
+            $pct = (float) $m['percentage'];
+            if ($i === $last) {
+                $amount = round($grandTotal - $running, 2); // remainder so they sum exactly
+            } else {
+                $amount = round($grandTotal * $pct / 100, 2);
+                $running += $amount;
+            }
+
+            $quote->milestones()->create([
+                'code' => $m['code'],
+                'trigger' => $m['trigger'] ?? null,
+                'percentage' => $pct,
+                'amount' => $amount,
+                'sort_order' => $i,
+            ]);
+        }
+    }
+
+    /** Each Company scope's price = sum of its own line items (client-facing). */
+    private function repriceScopes(Quote $quote): void
+    {
+        $quote->loadMissing('scopes', 'items');
+        foreach ($quote->scopes as $scope) {
+            $price = $quote->items
+                ->where('quote_scope_id', $scope->id)
+                ->sum(fn ($it) => (float) $it->line_client);
+            $scope->forceFill(['price' => round($price, 2)])->save();
+        }
+    }
+}
