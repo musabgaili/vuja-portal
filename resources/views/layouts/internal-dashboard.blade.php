@@ -61,6 +61,12 @@
                         <i class="fas fa-calendar-week"></i>
                         {{ __('portal.nav.weekly_planner') }}
                     </a>
+                    @if(!auth()->user()->isManager())
+                    <a href="{{ route('weekly-planner.presence') }}" class="nav-item {{ request()->routeIs('weekly-planner.presence') || request()->routeIs('weekly-planner.show') ? 'active' : '' }}">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ __('portal.planner.team_presence') }}
+                    </a>
+                    @endif
                     <a href="{{ route('staff-tasks.index') }}" class="nav-item {{ request()->routeIs('staff-tasks.*') ? 'active' : '' }}">
                         <i class="fas fa-list-check"></i>
                         {{ auth()->user()->isManager() ? __('portal.nav.staff_tasks') : __('portal.nav.my_tasks') }}

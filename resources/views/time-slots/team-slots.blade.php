@@ -6,13 +6,48 @@
 @endsection
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h3>{{ __('portal.time_slots.team_slots.title') }}</h3>
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
+
+{{-- Roster: every internal team member, including those with no availability yet --}}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">{{ __('portal.time_slots.team_slots.roster_title') }}</h3>
         <span class="badge bg-info">{{ __('portal.time_slots.team_slots.manager_badge') }}</span>
     </div>
     <div class="card-content">
+        <div class="row g-3">
+            @foreach($teamMembers as $member)
+            @php $count = (int) ($availableCounts[$member->id] ?? 0); @endphp
+            <div class="col-md-6 col-lg-4">
+                <div class="roster-card">
+                    <div class="roster-info">
+                        <strong>{{ $member->name }}</strong>
+                        <small class="text-muted d-block">{{ $member->email }}</small>
+                        @if($count > 0)
+                            <span class="badge bg-success mt-1">{{ trans_choice('portal.time_slots.team_slots.available_count', $count, ['count' => $count]) }}</span>
+                        @else
+                            <span class="badge bg-secondary mt-1">{{ __('portal.time_slots.team_slots.no_available') }}</span>
+                        @endif
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="addSlots({{ $member->id }}, @js($member->name))">
+                        <i class="fas fa-plus"></i> {{ __('portal.time_slots.team_slots.add_slots') }}
+                    </button>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+{{-- Detailed slot list --}}
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">{{ __('portal.time_slots.team_slots.title') }}</h3>
+    </div>
+    <div class="card-content">
         @if($slots->count() > 0)
+        <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -68,6 +103,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         {{ $slots->links('pagination::bootstrap-5') }}
         @else
         <div class="text-center py-5">
@@ -78,9 +114,46 @@
         @endif
     </div>
 </div>
+
+{{-- Add-availability modal --}}
+<div class="modal fade" id="addSlotsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-plus"></i> <span id="as_title">{{ __('portal.time_slots.team_slots.add_slots') }}</span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <form method="POST" action="{{ route('time-slots.store-for-employee') }}">
+        @csrf
+        <input type="hidden" name="user_id" id="as_user_id">
+        <div class="modal-body">
+            <div class="row g-2">
+                <div class="col-md-4"><label class="form-label fw-bold">{{ __('portal.consultations.manager.index.date') }}</label><input type="date" name="date" class="form-control" required min="{{ now()->toDateString() }}"></div>
+                <div class="col-md-4"><label class="form-label fw-bold">{{ __('portal.consultations.manager.index.start') }}</label><input type="time" name="start_time" class="form-control" required></div>
+                <div class="col-md-4"><label class="form-label fw-bold">{{ __('portal.consultations.manager.index.end') }}</label><input type="time" name="end_time" class="form-control" required></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('portal.consultations.manager.index.cancel') }}</button>
+            <button type="submit" class="btn btn-primary">{{ __('portal.time_slots.team_slots.add_slots') }}</button>
+        </div>
+    </form>
+</div></div></div>
 @endsection
+
+@push('styles')
+<style>
+.roster-card{display:flex;justify-content:space-between;align-items:center;gap:.75rem;padding:1rem;border:1px solid var(--gray-200);border-radius:var(--radius-md);background:var(--bg-primary);height:100%;}
+.roster-info{min-width:0;}
+.roster-info strong{display:block;overflow:hidden;text-overflow:ellipsis;}
+</style>
+@endpush
+
 @push('scripts')
 <script>
 function toggleBlock(id){fetch(`/internal/time-slots/${id}/toggle-block`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+function addSlots(userId, name){
+    document.getElementById('as_user_id').value = userId;
+    document.getElementById('as_title').textContent = @json(__('portal.time_slots.team_slots.add_slots_for')) + ' ' + name;
+    new bootstrap.Modal(document.getElementById('addSlotsModal')).show();
+}
 </script>
 @endpush

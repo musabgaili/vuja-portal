@@ -299,12 +299,39 @@ class WeeklyPlannerController extends Controller
         }
         arsort($breakdown);
 
+        $days = config('planner.days');
+        $locations = config('planner.locations');
+
         return view('weekly-planner.review', [
             'weekStart' => Carbon::parse($weekStart),
             'plans' => $plans,
             'pending' => $plans->where('status', 'pending'),
             'breakdown' => $breakdown,
             'breakdownTotal' => array_sum($breakdown),
+            'days' => $days,
+            'locations' => $locations,
+            // High-level matrix: every employee with a plan, their daily location + hours.
+            'overview' => $this->weekOverview($plans, $days, $locations),
+        ]);
+    }
+
+    /** Read-only detail of a single weekly plan (the click-through target). */
+    public function show(WeeklyPlan $weeklyPlan)
+    {
+        $user = Auth::user();
+        abort_unless($user->isInternal(), 403);
+
+        // Employees may only open their own plan; managers/PMs may open any.
+        if (! $user->isManager() && ! $user->isProjectManager() && $weeklyPlan->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $weeklyPlan->load(['user', 'lines']);
+
+        return view('weekly-planner.show', [
+            'plan' => $weeklyPlan,
+            'days' => config('planner.days'),
+            'locations' => config('planner.locations'),
         ]);
     }
 
@@ -339,15 +366,24 @@ class WeeklyPlannerController extends Controller
         return back()->with('success', "Sent back {$weeklyPlan->user->name}'s plan for changes.");
     }
 
-    /** Team Presence: who is where, per day, for the upcoming week. */
+    /**
+     * Team Presence: who is where, per day, for the upcoming week.
+     *
+     * Visible to all internal staff. Employees and PMs only see approved plans
+     * (high-level), managers also see pending ones. Project managers additionally
+     * get a breakdown of who is allocated to the projects/tasks they manage.
+     */
     public function presence()
     {
         $user = Auth::user();
-        abort_unless($user->isManager(), 403);
+        abort_unless($user->isInternal(), 403);
 
+        $isManager = $user->isManager();
         $weekStart = self::upcomingWeekStart()->toDateString();
-        $plans = WeeklyPlan::with('user')->whereDate('week_start', $weekStart)
-            ->whereIn('status', ['pending', 'approved'])->get();
+
+        $statuses = $isManager ? ['pending', 'approved'] : ['approved'];
+        $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart)
+            ->whereIn('status', $statuses)->get();
 
         $days = config('planner.days');
         $locations = config('planner.locations');
@@ -366,11 +402,84 @@ class WeeklyPlannerController extends Controller
             }
         }
 
+        // PMs (and managers) see allocation detail for the projects/tasks they own.
+        $managedAllocation = null;
+        if ($user->isProjectManager() || $isManager) {
+            $managedAllocation = $this->managedAllocation($user, $plans);
+        }
+
         return view('weekly-planner.presence', [
             'weekStart' => Carbon::parse($weekStart),
             'grid' => $grid,
             'days' => $days,
             'locations' => $locations,
+            'overview' => $this->weekOverview($plans, $days, $locations),
+            'managedAllocation' => $managedAllocation,
+            'canDrillIn' => $isManager || $user->isProjectManager(),
         ]);
+    }
+
+    /**
+     * Build the employee × day matrix: each employee's working location and total
+     * logged hours per day, plus the weekly total. Sorted by name.
+     *
+     * @return array<int, array{plan: WeeklyPlan, name: string, days: array, total: int, status: string}>
+     */
+    private function weekOverview($plans, array $days, array $locations): array
+    {
+        $rows = [];
+        foreach ($plans as $plan) {
+            $perDay = [];
+            foreach ($days as $day) {
+                $hours = 0;
+                foreach ($plan->lines as $line) {
+                    $hours += (int) (($line->hours[$day] ?? 0));
+                }
+                $locKey = $plan->locations[$day] ?? null;
+                $perDay[$day] = [
+                    'loc' => $locKey ? ($locations[$locKey] ?? $locKey) : null,
+                    'hours' => $hours,
+                ];
+            }
+            $rows[] = [
+                'plan' => $plan,
+                'name' => $plan->user->name,
+                'days' => $perDay,
+                'total' => $plan->totalHours(),
+                'status' => $plan->status,
+            ];
+        }
+
+        usort($rows, fn ($a, $b) => strcmp($a['name'], $b['name']));
+
+        return $rows;
+    }
+
+    /**
+     * For a project manager, attribute this week's logged project hours to the
+     * team members working on the projects that PM manages.
+     *
+     * @return array<string, array<int, array{name: string, hours: int}>>
+     */
+    private function managedAllocation($user, $plans): array
+    {
+        $managedProjectIds = ProjectPerson::where('user_id', $user->id)
+            ->where('role', 'project_manager')->pluck('project_id')->map(fn ($id) => (int) $id)->all();
+
+        if (empty($managedProjectIds)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($plans as $plan) {
+            foreach ($plan->lines as $line) {
+                if ($line->kind === 'project' && in_array((int) $line->project_id, $managedProjectIds, true)) {
+                    $title = $line->label ?: ('Project #'.$line->project_id);
+                    $out[$title][] = ['name' => $plan->user->name, 'hours' => $line->totalHours()];
+                }
+            }
+        }
+
+        return $out;
     }
 }

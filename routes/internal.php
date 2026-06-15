@@ -104,6 +104,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/weekly-planner', [WeeklyPlannerController::class, 'store'])->name('weekly-planner.store');
     Route::get('/weekly-planner/review', [WeeklyPlannerController::class, 'review'])->name('weekly-planner.review');
     Route::get('/weekly-planner/presence', [WeeklyPlannerController::class, 'presence'])->name('weekly-planner.presence');
+    Route::get('/weekly-planner/plan/{weeklyPlan}', [WeeklyPlannerController::class, 'show'])->name('weekly-planner.show');
     Route::post('/weekly-planner/{weeklyPlan}/approve', [WeeklyPlannerController::class, 'approve'])->name('weekly-planner.approve');
     Route::post('/weekly-planner/{weeklyPlan}/reject', [WeeklyPlannerController::class, 'reject'])->name('weekly-planner.reject');
 
@@ -202,6 +203,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
 
         // Team Time Slots Overview (Manager Only)
         Route::get('/team-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'teamSlots'])->name('time-slots.team-slots');
+        Route::post('/team-time-slots/add', [\App\Http\Controllers\TimeSlotController::class, 'storeForEmployee'])->name('time-slots.store-for-employee');
 
         // PRICING ADMIN
         Route::get('/pricing-admin', [\App\Http\Controllers\PricingToolController::class, 'admin'])->name('pricing.admin');

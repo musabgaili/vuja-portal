@@ -46,9 +46,55 @@ class TimeSlotController extends Controller
         }
 
         $slots = $this->timeSlotService->getAllTeamTimeSlots();
-        $teamMembers = User::where('type', 'internal')->get();
+        $teamMembers = User::where('type', 'internal')->orderBy('name')->get();
 
-        return view('time-slots.team-slots', compact('slots', 'teamMembers'));
+        // Upcoming available-slot count per member so the roster can show
+        // everyone — including those with no availability yet.
+        $availableCounts = TimeSlot::where('status', 'available')
+            ->whereDate('date', '>=', today())
+            ->selectRaw('user_id, COUNT(*) as c')
+            ->groupBy('user_id')
+            ->pluck('c', 'user_id');
+
+        return view('time-slots.team-slots', compact('slots', 'teamMembers', 'availableCounts'));
+    }
+
+    /**
+     * Manager quick-add: create a single availability slot for another employee.
+     */
+    public function storeForEmployee(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user->isManager()) {
+            abort(403, 'You need manager role to add availability for others.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'notes' => 'nullable|string',
+        ]);
+
+        // Only internal team members can hold availability.
+        $target = User::where('id', $validated['user_id'])->where('type', 'internal')->firstOrFail();
+
+        TimeSlot::firstOrCreate(
+            [
+                'user_id' => $target->id,
+                'date' => $validated['date'],
+                'start_time' => $validated['start_time'],
+            ],
+            [
+                'end_time' => $validated['end_time'],
+                'status' => 'available',
+                'notes' => $validated['notes'] ?? null,
+            ],
+        );
+
+        return back()->with('success', "Availability added for {$target->name}.");
     }
 
     /**

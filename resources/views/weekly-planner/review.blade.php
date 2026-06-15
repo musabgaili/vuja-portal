@@ -13,6 +13,8 @@
     <a href="{{ route('weekly-planner.presence') }}" class="btn btn-outline-primary"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</a>
 </div>
 
+@include('weekly-planner._overview', ['overview' => $overview, 'days' => $days, 'canDrillIn' => true])
+
 <div class="row g-3">
     <div class="col-lg-8">
         <div class="card">
