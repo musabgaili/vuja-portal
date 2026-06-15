@@ -26,7 +26,6 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 @include('partials.brand')
-                <small>Internal</small>
             </div>
 
             <!-- Sidebar Navigation -->
