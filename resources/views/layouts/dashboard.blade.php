@@ -59,7 +59,7 @@
                         <i class="fas fa-file-invoice"></i>
                         {{ __('portal.quote.my_quotes') }}
                     </a>
-                    <a href="{{ route('quotes.client.invoices') }}" class="nav-item {{ request()->routeIs('quotes.client.invoices') ? 'active' : '' }}">
+                    <a href="{{ route('invoices.client.index') }}" class="nav-item {{ request()->routeIs('invoices.client.*') ? 'active' : '' }}">
                         <i class="fas fa-file-invoice-dollar"></i>
                         {{ __('portal.layout_client.nav_invoices') }}
                     </a>

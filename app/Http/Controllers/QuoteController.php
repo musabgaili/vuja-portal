@@ -155,36 +155,6 @@ class QuoteController extends Controller
         return view('crm.quotes.client-show', ['quote' => $quote->load('items')]);
     }
 
-    /** Client Invoices & Payments: accepted quotes act as invoices, linked to their project. */
-    public function clientInvoices()
-    {
-        $user = Auth::user();
-        abort_unless($user->canUseClientProjectPortal(), 403);
-
-        $invoices = Quote::where('client_id', $user->id)
-            ->where('status', 'accepted')
-            ->with('project')
-            ->latest()->get();
-
-        $pending = (float) $invoices->where('payment_status', '!=', 'paid')->sum(fn (Quote $q) => $q->invoiceTotal());
-
-        return view('crm.quotes.client-invoices', compact('invoices', 'pending'));
-    }
-
-    /** Manager: mark an accepted quote (invoice) paid / unpaid. */
-    public function markPaid(Request $request, Quote $quote)
-    {
-        abort_unless(Auth::user()->isManager(), 403);
-
-        $paid = $request->boolean('paid', true);
-        $quote->update([
-            'payment_status' => $paid ? 'paid' : 'unpaid',
-            'paid_at' => $paid ? now() : null,
-        ]);
-
-        return back()->with('success', $paid ? __('portal.quote.marked_paid') : __('portal.quote.marked_unpaid'));
-    }
-
     public function clientAccept(Request $request, Quote $quote)
     {
         $this->guardClient($quote);

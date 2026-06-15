@@ -50,21 +50,9 @@
             <h3 class="card-title mb-3">{{ __('portal.quote.actions') }}</h3>
             @if($quote->isAccepted())
                 <div class="alert alert-success" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->format('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
-                {{-- Invoice payment status (the client sees this under Invoices & Payments) --}}
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span>{{ __('portal.quote.payment') }}:
-                        @if($quote->isPaid())<span class="badge bg-success">{{ __('portal.quote.paid') }}</span>@else<span class="badge bg-warning">{{ __('portal.quote.pending') }}</span>@endif
-                    </span>
-                    @if(auth()->user()->isManager())
-                    <form method="POST" action="{{ route('quotes.mark-paid', $quote) }}" class="m-0">@csrf
-                        <input type="hidden" name="paid" value="{{ $quote->isPaid() ? '0' : '1' }}">
-                        <button class="btn btn-sm {{ $quote->isPaid() ? 'btn-outline-primary' : 'btn-success' }}">
-                            <i class="fas fa-{{ $quote->isPaid() ? 'rotate-left' : 'check' }}"></i>
-                            {{ $quote->isPaid() ? __('portal.quote.mark_unpaid') : __('portal.quote.mark_paid') }}
-                        </button>
-                    </form>
-                    @endif
-                </div>
+                @if(auth()->user()->isManager() || auth()->user()->isProjectManager())
+                <a href="{{ route('invoices.create', ['quote' => $quote->id]) }}" class="btn btn-success w-100 mb-2"><i class="fas fa-file-invoice-dollar"></i> {{ __('portal.invoices.from_quote') }}</a>
+                @endif
                 @if($quote->project)<a href="{{ route('projects.manager.show', $quote->project) }}" class="btn btn-primary w-100 mb-2"><i class="fas fa-folder-open"></i> {{ __('portal.quote.open_order') }}</a>@endif
             @else
                 {{-- Step 1: creator submits a draft (or a sent-back quote) for approval --}}

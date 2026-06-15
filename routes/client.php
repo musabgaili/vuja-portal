@@ -28,7 +28,11 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
 
     // Quotes — review & accept (digital signature -> becomes an order/project)
     Route::get('/quotes', [\App\Http\Controllers\QuoteController::class, 'clientIndex'])->name('quotes.client.index');
-    Route::get('/invoices', [\App\Http\Controllers\QuoteController::class, 'clientInvoices'])->name('quotes.client.invoices');
+    // Invoices & Payments — client views invoices raised for them + uploads receipts
+    Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'clientIndex'])->name('invoices.client.index');
+    Route::post('/invoices/{invoice}/receipt', [\App\Http\Controllers\InvoiceController::class, 'uploadReceipt'])->name('invoices.client.receipt');
+    Route::get('/invoices/{invoice}/file', [\App\Http\Controllers\InvoiceController::class, 'downloadFile'])->name('invoices.client.file');
+    Route::get('/invoices/{invoice}/receipt-file', [\App\Http\Controllers\InvoiceController::class, 'downloadReceipt'])->name('invoices.client.receipt-file');
     Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'clientShow'])->name('quotes.client.show');
     Route::post('/quotes/{quote}/accept', [\App\Http\Controllers\QuoteController::class, 'clientAccept'])->name('quotes.client.accept');
     Route::post('/quotes/{quote}/reject', [\App\Http\Controllers\QuoteController::class, 'clientReject'])->name('quotes.client.reject');
