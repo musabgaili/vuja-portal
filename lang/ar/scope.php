@@ -38,6 +38,7 @@ return [
     'milestone' => 'الدفعة', 'trigger' => 'المُطلِق', 'amount' => 'المبلغ', 'period' => 'الفترة', 'activity' => 'النشاط',
     'phase' => 'المرحلة', 'duration' => 'المدّة',
 
+    'company_tagline' => 'هندسة • تصميم • ابتكار',
     'electronic_components' => 'المكوّنات الإلكترونية',
     'subtotal' => 'المجموع الفرعي (قبل الضريبة)',
     'vat' => 'ضريبة القيمة المضافة (:rate%)',

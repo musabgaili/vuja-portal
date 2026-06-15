@@ -129,7 +129,9 @@ class Quote extends Model
         }
 
         foreach ($this->items->whereIn('type', ['service', 'other'])->sortBy('sort_order') as $it) {
-            $unit = (float) ($it->unit_price ?: $it->line_client);
+            // Recover the unit price from the line total when it wasn't stored,
+            // so the document never shows "lineTotal × qty = lineTotal".
+            $unit = (float) ($it->unit_price ?: ($it->line_client / max(1, (int) $it->qty)));
             $rows->push((object) [
                 'description' => $it->name,
                 'unit' => $it->unit ?: '—',

@@ -163,6 +163,14 @@ class QuoteGenerationService
 
         if ($quote->customer_category === 'company') {
             $this->syncScopes($quote, $content['scopes'] ?? []);
+
+            // Allocate the line items to a scope so per-scope pricing isn't zero.
+            // Default: everything under the first scope (granular item↔scope
+            // allocation is a future UI enhancement); single-scope is then exact.
+            $first = $quote->scopes()->orderBy('sort_order')->first();
+            if ($first) {
+                $quote->items()->update(['quote_scope_id' => $first->id]);
+            }
         }
 
         return $this->pricingService->price($quote->refresh());

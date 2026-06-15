@@ -41,6 +41,7 @@ return [
     'milestone' => 'Milestone', 'trigger' => 'Trigger', 'amount' => 'Amount', 'period' => 'Period', 'activity' => 'Activity',
     'phase' => 'Phase', 'duration' => 'Duration',
 
+    'company_tagline' => 'Engineering • Design • Innovation',
     'electronic_components' => 'Electronic Components',
     'subtotal' => 'Subtotal (excl. VAT)',
     'vat' => 'VAT (:rate%)',

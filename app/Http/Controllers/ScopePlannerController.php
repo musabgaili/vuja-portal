@@ -261,36 +261,46 @@ class ScopePlannerController extends Controller
         $opp = ! empty($validated['opportunity_id']) ? Opportunity::find($validated['opportunity_id']) : null;
         $qty = $request->input('qty', []);
         $stockQty = $request->input('stock_qty', []);
+        $validity = (int) config('scope.validity_days', 30);
 
-        $quote = Quote::create([
-            'title' => $validated['title'] ?? $validated['project_type'],
-            'scope' => $validated['scope'] ?? null,
-            'status' => 'draft',
-            'customer_category' => $category,
-            'created_by' => Auth::id(),
-            'opportunity_id' => $opp?->id,
-            'company_id' => $opp?->company_id,
-            'contact_id' => $opp?->contact_id,
-            'client_id' => $opp?->client_id,
-        ]);
+        $quote = \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $category, $opp, $items, $stock, $qty, $stockQty, $validity) {
+            $quote = Quote::create([
+                'quote_number' => app(\App\Services\Scope\QuoteNumberGenerator::class)->next(),
+                'title' => $validated['title'] ?? $validated['project_type'],
+                'scope' => $validated['scope'] ?? null,
+                'status' => 'draft',
+                'customer_category' => $category,
+                'language' => 'en',
+                'vat_rate' => (float) config('scope.vat_rate', 15),
+                'validity_days' => $validity,
+                'valid_until' => now()->addDays($validity),
+                'created_by' => Auth::id(),
+                'opportunity_id' => $opp?->id,
+                'company_id' => $opp?->company_id,
+                'contact_id' => $opp?->contact_id,
+                'client_id' => $opp?->client_id,
+            ]);
 
-        $totalInternal = 0;
-        $totalClient = 0;
+            $totalInternal = 0;
+            $totalClient = 0;
 
-        foreach ($items as $item) {
-            $line = $this->inventoryLine($item, (int) ($qty[$item->id] ?? 1));
-            $totalInternal += $line['line_internal'];
-            $totalClient += $line['line_client'];
-            $quote->items()->create($line['attrs']);
-        }
-        foreach ($stock as $item) {
-            $line = $this->stockLine($item, (int) ($stockQty[$item->id] ?? 1), $category);
-            $totalInternal += $line['line_internal'];
-            $totalClient += $line['line_client'];
-            $quote->items()->create($line['attrs']);
-        }
+            foreach ($items as $item) {
+                $line = $this->inventoryLine($item, (int) ($qty[$item->id] ?? 1));
+                $totalInternal += $line['line_internal'];
+                $totalClient += $line['line_client'];
+                $quote->items()->create($line['attrs']);
+            }
+            foreach ($stock as $item) {
+                $line = $this->stockLine($item, (int) ($stockQty[$item->id] ?? 1), $category);
+                $totalInternal += $line['line_internal'];
+                $totalClient += $line['line_client'];
+                $quote->items()->create($line['attrs']);
+            }
 
-        $quote->update(['total_internal' => $totalInternal, 'total_client' => $totalClient]);
+            $quote->update(['total_internal' => $totalInternal, 'total_client' => $totalClient]);
+
+            return $quote;
+        });
 
         return redirect()->route('quotes.show', $quote)->with('success', 'Quote saved from the AI Scope Planner.');
     }
@@ -393,11 +403,15 @@ class ScopePlannerController extends Controller
                 'inventory_item_id' => $item->id,
                 'name' => $item->name,
                 'category' => $item->category,
+                'type' => 'component',
+                'source' => 'inventory',
                 'internal_cost' => $item->internal_cost,
                 'markup_percentage' => $item->markup_percentage,
                 'qty' => $q,
+                'unit_price' => $q > 0 ? round($lineClient / $q, 2) : $lineClient,
                 'line_internal' => $lineInternal,
                 'line_client' => $lineClient,
+                'is_client_visible' => false,
             ],
             'preview' => [
                 'name' => $item->name, 'category' => $item->category,
@@ -426,11 +440,16 @@ class ScopePlannerController extends Controller
                 'stock_item_id' => $item->id,
                 'name' => $item->name,
                 'category' => $cat,
+                'type' => 'component',
+                'source' => 'inventory',
+                'unit' => $item->unit,
                 'internal_cost' => $purchase,
                 'markup_percentage' => $markup,
                 'qty' => $q,
+                'unit_price' => $unit,
                 'line_internal' => $lineInternal,
                 'line_client' => $lineClient,
+                'is_client_visible' => false,
             ],
             'preview' => [
                 'name' => $item->name, 'category' => $cat,

@@ -8,7 +8,7 @@
 @section('body')
   {{-- ===== Cover ===== --}}
   <div class="cover-title">@lang('scope.scope_of_work')</div>
-  <div class="cover-sub">Engineering • Design • Innovation</div>
+  <div class="cover-sub">@lang('scope.company_tagline')</div>
   <table class="meta cover-meta">
     <tr><td class="k">@lang('scope.prepared_by')</td><td>{{ config('scope.company_name', 'Vuja De Innovation') }}</td></tr>
     <tr><td class="k">@lang('scope.engagement')</td><td>{{ $quote->subject }}</td></tr>
@@ -31,7 +31,7 @@
           @foreach($quote->scopes as $s)
             <tr><td class="c">{{ $loop->iteration }}</td><td class="desc">{{ $s->title }}</td>
               <td class="c">{{ $s->type === 'sponsored' ? __('scope.sponsored') : __('scope.commercial') }}</td>
-              <td class="c">{{ $s->qty ?? 1 }}</td><td class="money">{{ number_format($s->price,0) }}</td></tr>
+              <td class="c">1</td><td class="money">{{ number_format($s->price,0) }}</td></tr>
           @endforeach
           <tr class="tot"><td class="totlabel" colspan="4">@lang('scope.subtotal')</td><td class="money">{{ number_format($quote->subtotal,0) }}</td></tr>
         </tbody></table>
