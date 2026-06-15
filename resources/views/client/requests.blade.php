@@ -82,36 +82,36 @@
     </div>
     <div class="card-content">
         <div class="service-breakdown">
-            <div class="service-stat" style="border-left-color: #f59e0b;">
-                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
+            <div class="service-stat" style="border-left-color: #0F969C;">
+                <i class="fas fa-lightbulb" style="color: #0F969C;"></i>
                 <div>
                     <strong>{{ $summary['ideas'] }}</strong>
                     <span>{{ __('portal.client.requests.ideas') }}</span>
                 </div>
             </div>
-            <div class="service-stat" style="border-left-color: #10b981;">
-                <i class="fas fa-comments" style="color: #10b981;"></i>
+            <div class="service-stat" style="border-left-color: #0C7075;">
+                <i class="fas fa-comments" style="color: #0C7075;"></i>
                 <div>
                     <strong>{{ $summary['consultations'] }}</strong>
                     <span>{{ __('portal.client.requests.consultations') }}</span>
                 </div>
             </div>
-            <div class="service-stat" style="border-left-color: #3b82f6;">
-                <i class="fas fa-search" style="color: #3b82f6;"></i>
+            <div class="service-stat" style="border-left-color: #294D61;">
+                <i class="fas fa-search" style="color: #294D61;"></i>
                 <div>
                     <strong>{{ $summary['research'] }}</strong>
                     <span>{{ __('portal.client.requests.research') }}</span>
                 </div>
             </div>
-            <div class="service-stat" style="border-left-color: #0C7075;">
-                <i class="fas fa-file-contract" style="color: #0C7075;"></i>
+            <div class="service-stat" style="border-left-color: #2C3F43;">
+                <i class="fas fa-file-contract" style="color: #2C3F43;"></i>
                 <div>
                     <strong>{{ $summary['ip'] }}</strong>
                     <span>{{ __('portal.client.requests.ip_registration') }}</span>
                 </div>
             </div>
-            <div class="service-stat" style="border-left-color: #ec4899;">
-                <i class="fas fa-copyright" style="color: #ec4899;"></i>
+            <div class="service-stat" style="border-left-color: #072E33;">
+                <i class="fas fa-copyright" style="color: #072E33;"></i>
                 <div>
                     <strong>{{ $summary['copyright'] }}</strong>
                     <span>{{ __('portal.client.requests.copyright') }}</span>
@@ -335,12 +335,17 @@
     letter-spacing: 0.05em;
 }
 
-.status-badge.success { background: #d1fae5; color: #065f46; }
-.status-badge.warning { background: #fef3c7; color: #92400e; }
-.status-badge.info { background: #dbeafe; color: #1e40af; }
-.status-badge.error { background: #fee2e2; color: #991b1b; }
-.status-badge.primary { background: #dbeafe; color: #1e40af; }
-.status-badge.secondary { background: #f1f5f9; color: #475569; }
+/* Semantic status tints — brand-harmonised (info/primary read as teal, not blue),
+   theme-aware so they stay legible in dark mode. */
+.status-badge.success { background: rgba(22,163,74,.12); color: #15803d; }
+.status-badge.warning { background: rgba(217,119,6,.14); color: #b45309; }
+.status-badge.info    { background: var(--primary-light); color: var(--primary-color); }
+.status-badge.error   { background: rgba(220,38,38,.12); color: #b91c1c; }
+.status-badge.primary { background: var(--primary-light); color: var(--primary-color); }
+.status-badge.secondary { background: var(--bg-tertiary); color: var(--gray-600); }
+[data-bs-theme="dark"] .status-badge.success { background: rgba(74,222,128,.16); color: #4ade80; }
+[data-bs-theme="dark"] .status-badge.warning { background: rgba(251,191,36,.16); color: #fbbf24; }
+[data-bs-theme="dark"] .status-badge.error   { background: rgba(248,113,113,.16); color: #f87171; }
 
 .text-muted {
     color: var(--gray-500);
