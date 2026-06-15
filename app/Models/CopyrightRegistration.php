@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Models\Concerns\HasServiceProject;
 
 class CopyrightRegistration extends Model
 {
-    use HasFactory, HasUuidRouteKey, LogsActivity;
+    use HasFactory, HasServiceProject, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'user_id',

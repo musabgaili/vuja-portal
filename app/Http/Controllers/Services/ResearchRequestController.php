@@ -154,4 +154,27 @@ class ResearchRequestController extends Controller
 
         return back()->with('success', 'Research marked as completed!');
     }
+
+    /** Turn a completed research request into a project + funnel entry. */
+    public function convertToProject(ResearchRequest $research)
+    {
+        $this->authorize('manage', $research);
+
+        if ($research->status !== 'completed') {
+            return back()->withErrors(['error' => 'Only completed research requests can be converted to projects.']);
+        }
+
+        $already = $research->isConvertedToProject();
+
+        $project = app(\App\Services\ServiceProjectConverter::class)->convert($research, [
+            'title' => $research->title,
+            'description' => $research->research_details ?: $research->research_topic,
+            'client_id' => $research->user_id,
+            'project_manager_id' => $research->assigned_to,
+            'source_label' => 'Research',
+        ]);
+
+        return redirect()->route('projects.manager.show', $project)
+            ->with($already ? 'info' : 'success', $already ? 'Project already exists!' : 'Project created from research — added to the sales funnel.');
+    }
 }

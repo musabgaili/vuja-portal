@@ -56,6 +56,16 @@
                 @if($consultation->isMeetingSent())
                 <button class="btn btn-success btn-block mb-2" onclick="markComplete()"><i class="fas fa-check"></i> {{ __('portal.consultations.manager.show.mark_complete') }}</button>
                 @endif
+                @if($consultation->status === 'completed')
+                    @php $convertedProject = $consultation->convertedProject(); @endphp
+                    @if($convertedProject)
+                    <a href="{{ route('projects.manager.show', $convertedProject) }}" class="btn btn-outline-primary btn-block mb-2"><i class="fas fa-diagram-project"></i> {{ __('portal.services.view_project') }}</a>
+                    @else
+                    <form method="POST" action="{{ route('consultations.convert-to-project', $consultation) }}">@csrf
+                        <button class="btn btn-primary btn-block mb-2"><i class="fas fa-diagram-project"></i> {{ __('portal.services.convert_to_project') }}</button>
+                    </form>
+                    @endif
+                @endif
             </div>
         </div>
     </div>

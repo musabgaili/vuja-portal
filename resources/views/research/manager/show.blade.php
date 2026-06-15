@@ -56,6 +56,16 @@
                 @if($research->assignedTo)
                 <p><strong>{{ __('portal.research.manager.show.assigned_to_label') }}</strong> {{ $research->assignedTo->name }}</p>
                 @endif
+                @if($research->status === 'completed')
+                    @php $convertedProject = $research->convertedProject(); @endphp
+                    @if($convertedProject)
+                    <a href="{{ route('projects.manager.show', $convertedProject) }}" class="btn btn-outline-primary btn-block mb-2"><i class="fas fa-diagram-project"></i> {{ __('portal.services.view_project') }}</a>
+                    @else
+                    <form method="POST" action="{{ route('research.convert-to-project', $research) }}">@csrf
+                        <button class="btn btn-primary btn-block mb-2"><i class="fas fa-diagram-project"></i> {{ __('portal.services.convert_to_project') }}</button>
+                    </form>
+                    @endif
+                @endif
             </div>
         </div>
     </div>

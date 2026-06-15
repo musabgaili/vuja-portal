@@ -155,4 +155,28 @@ class IpRegistrationController extends Controller
 
         return back()->with('success', 'Status updated successfully!');
     }
+
+    /** Turn a registered/completed IP request into a project + funnel entry. */
+    public function convertToProject(IpRegistration $ip)
+    {
+        $this->authorize('manage', $ip);
+
+        if (! in_array($ip->status, ['registered', 'completed'], true)) {
+            return back()->withErrors(['error' => 'Only registered or completed IP requests can be converted to projects.']);
+        }
+
+        $already = $ip->isConvertedToProject();
+
+        $project = app(\App\Services\ServiceProjectConverter::class)->convert($ip, [
+            'title' => $ip->title,
+            'description' => $ip->ip_description,
+            'scope' => 'IP type: '.$ip->ip_type.($ip->registration_number ? "\nRegistration #: ".$ip->registration_number : ''),
+            'client_id' => $ip->user_id,
+            'project_manager_id' => $ip->assigned_to,
+            'source_label' => 'IP Registration',
+        ]);
+
+        return redirect()->route('projects.manager.show', $project)
+            ->with($already ? 'info' : 'success', $already ? 'Project already exists!' : 'Project created from IP registration — added to the sales funnel.');
+    }
 }

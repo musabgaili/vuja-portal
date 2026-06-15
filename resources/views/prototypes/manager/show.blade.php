@@ -77,5 +77,17 @@
     </div>
 </div>
 
+@if($prototype->status === 'completed')
+@php $convertedProject = $prototype->convertedProject(); @endphp
+<div class="card mt-3"><div class="card-content d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div><strong>{{ __('portal.services.convert_to_project') }}</strong><br><small class="text-muted">{{ __('portal.services.convert_hint') }}</small></div>
+    @if($convertedProject)
+    <a href="{{ route('projects.manager.show', $convertedProject) }}" class="btn btn-outline-primary"><i class="fas fa-diagram-project"></i> {{ __('portal.services.view_project') }}</a>
+    @else
+    <form method="POST" action="{{ route('prototypes.convert-to-project', $prototype) }}">@csrf<button class="btn btn-primary"><i class="fas fa-diagram-project"></i> {{ __('portal.services.convert_to_project') }}</button></form>
+    @endif
+</div></div>
+@endif
+
 <div class="mt-3"><a href="{{ route('prototypes.manager.index') }}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> {{ __('portal.prototypes.back_to_queue') }}</a></div>
 @endsection

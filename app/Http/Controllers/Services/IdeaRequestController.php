@@ -404,57 +404,26 @@ class IdeaRequestController extends Controller
      */
     public function convertToProject(IdeaRequest $idea)
     {
-        $user = Auth::user();
-
         $this->authorize('manage', $idea);
 
         if (! $idea->isCompleted()) {
             return back()->withErrors(['error' => 'Only completed ideas can be converted to projects.']);
         }
 
-        // Check if already converted
-        $existingProject = \App\Models\Project::where('source_type', 'App\Models\IdeaRequest')
-            ->where('source_id', $idea->id)
-            ->first();
+        $already = $idea->isConvertedToProject();
 
-        if ($existingProject) {
-            return redirect()->route('projects.manager.show', $existingProject)
-                ->with('info', 'Project already exists!');
-        }
-
-        // Create project
-        $project = \App\Models\Project::create([
-            'client_id' => $idea->user_id,
+        $project = app(\App\Services\ServiceProjectConverter::class)->convert($idea, [
             'title' => $idea->title,
             'description' => $idea->description,
             'scope' => "Target Market: {$idea->target_market}\n\nProblem Solving: {$idea->problem_solving}\n\nUnique Value: {$idea->unique_value}",
-            'source_type' => 'App\Models\IdeaRequest',
-            'source_id' => $idea->id,
-            'status' => 'planning',
+            'client_id' => $idea->user_id,
             'budget' => $idea->final_quote,
             'project_manager_id' => $idea->assigned_to,
+            'source_label' => 'Idea',
         ]);
-
-        // Add client to project_people
-        \App\Models\ProjectPerson::create([
-            'project_id' => $project->id,
-            'user_id' => $idea->user_id,
-            'role' => 'client',
-            'can_edit' => false,
-        ]);
-
-        // Add project manager if assigned
-        if ($idea->assigned_to) {
-            \App\Models\ProjectPerson::create([
-                'project_id' => $project->id,
-                'user_id' => $idea->assigned_to,
-                'role' => 'project_manager',
-                'can_edit' => true,
-            ]);
-        }
 
         return redirect()->route('projects.manager.show', $project)
-            ->with('success', 'Project created from idea!');
+            ->with($already ? 'info' : 'success', $already ? 'Project already exists!' : 'Project created from idea — added to the sales funnel.');
     }
 
     /**

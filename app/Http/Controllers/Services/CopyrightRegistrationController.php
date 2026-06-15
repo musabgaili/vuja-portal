@@ -155,4 +155,28 @@ class CopyrightRegistrationController extends Controller
 
         return back()->with('success', 'Status updated successfully!');
     }
+
+    /** Turn a registered/completed copyright request into a project + funnel entry. */
+    public function convertToProject(CopyrightRegistration $copyright)
+    {
+        $this->authorize('manage', $copyright);
+
+        if (! in_array($copyright->status, ['registered', 'completed'], true)) {
+            return back()->withErrors(['error' => 'Only registered or completed copyright requests can be converted to projects.']);
+        }
+
+        $already = $copyright->isConvertedToProject();
+
+        $project = app(\App\Services\ServiceProjectConverter::class)->convert($copyright, [
+            'title' => $copyright->title,
+            'description' => $copyright->work_description,
+            'scope' => 'Work type: '.$copyright->work_type.($copyright->copyright_number ? "\nCopyright #: ".$copyright->copyright_number : ''),
+            'client_id' => $copyright->user_id,
+            'project_manager_id' => $copyright->assigned_to,
+            'source_label' => 'Copyright',
+        ]);
+
+        return redirect()->route('projects.manager.show', $project)
+            ->with($already ? 'info' : 'success', $already ? 'Project already exists!' : 'Project created from copyright registration — added to the sales funnel.');
+    }
 }

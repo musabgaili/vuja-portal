@@ -138,6 +138,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/prototypes/files/{file}/download', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'downloadFile'])->name('prototypes.manager.files.download');
     Route::post('/prototypes/{prototype}/assign', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'assign'])->name('prototypes.assign');
     Route::post('/prototypes/{prototype}/status', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'updateStatus'])->name('prototypes.update-status');
+    Route::post('/prototypes/{prototype}/convert-to-project', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'convertToProject'])->name('prototypes.convert-to-project');
 
     // CONSULTATIONS - Manager/Employee Routes
     Route::get('/consultations/manager', [ConsultationRequestController::class, 'managerIndex'])->name('consultations.manager.index');
@@ -146,12 +147,14 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/consultations/{consultation}/assign-and-schedule', [ConsultationRequestController::class, 'assignAndSchedule'])->name('consultations.assign-and-schedule');
     Route::post('/consultations/{consultation}/send-invite', [ConsultationRequestController::class, 'sendMeetingInvite'])->name('consultations.send-invite');
     Route::post('/consultations/{consultation}/complete', [ConsultationRequestController::class, 'complete'])->name('consultations.complete');
+    Route::post('/consultations/{consultation}/convert-to-project', [ConsultationRequestController::class, 'convertToProject'])->name('consultations.convert-to-project');
 
     // RESEARCH - Manager/Employee Routes
     Route::get('/research/manager', [ResearchRequestController::class, 'managerIndex'])->name('research.manager.index');
     Route::get('/research/manager/{research}', [ResearchRequestController::class, 'managerShow'])->name('research.manager.show');
     Route::post('/research/{research}/assign', [ResearchRequestController::class, 'assign'])->name('research.assign');
     Route::post('/research/{research}/complete', [ResearchRequestController::class, 'complete'])->name('research.complete');
+    Route::post('/research/{research}/convert-to-project', [ResearchRequestController::class, 'convertToProject'])->name('research.convert-to-project');
 
     // IP REGISTRATION - Manager/Employee Routes
     Route::get('/ip/manager', [IpRegistrationController::class, 'managerIndex'])->name('ip.manager.index');
@@ -159,6 +162,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/ip/{ip}/assign', [IpRegistrationController::class, 'assign'])->name('ip.assign');
     Route::post('/ip/{ip}/confirm-meeting', [IpRegistrationController::class, 'confirmMeeting'])->name('ip.confirm-meeting');
     Route::post('/ip/{ip}/update-status', [IpRegistrationController::class, 'updateStatus'])->name('ip.update-status');
+    Route::post('/ip/{ip}/convert-to-project', [IpRegistrationController::class, 'convertToProject'])->name('ip.convert-to-project');
 
     // COPYRIGHT - Manager/Employee Routes
     Route::get('/copyright/manager', [CopyrightRegistrationController::class, 'managerIndex'])->name('copyright.manager.index');
@@ -173,6 +177,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/projects/{project}/upload-quote', [\App\Http\Controllers\PricingToolController::class, 'uploadQuote'])->name('projects.quote.upload');
     Route::get('/projects/{project}/download-quote', [\App\Http\Controllers\PricingToolController::class, 'downloadQuote'])->name('projects.quote.download');
     Route::post('/copyright/{copyright}/update-status', [CopyrightRegistrationController::class, 'updateStatus'])->name('copyright.update-status');
+    Route::post('/copyright/{copyright}/convert-to-project', [CopyrightRegistrationController::class, 'convertToProject'])->name('copyright.convert-to-project');
 
     // ============================================
     // MANAGER-ONLY ROUTES

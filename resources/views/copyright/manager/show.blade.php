@@ -53,6 +53,16 @@
                 @if($copyright->isMeetingConfirmed())
                 <button class="btn btn-primary btn-block mb-2" onclick="showStatusModal()"><i class="fas fa-edit"></i> {{ __('portal.ip.update_status') }}</button>
                 @endif
+                @if(in_array($copyright->status, ['registered', 'completed'], true))
+                    @php $convertedProject = $copyright->convertedProject(); @endphp
+                    @if($convertedProject)
+                    <a href="{{ route('projects.manager.show', $convertedProject) }}" class="btn btn-outline-primary btn-block mb-2"><i class="fas fa-diagram-project"></i> {{ __('portal.services.view_project') }}</a>
+                    @else
+                    <form method="POST" action="{{ route('copyright.convert-to-project', $copyright) }}">@csrf
+                        <button class="btn btn-primary btn-block mb-2"><i class="fas fa-diagram-project"></i> {{ __('portal.services.convert_to_project') }}</button>
+                    </form>
+                    @endif
+                @endif
             </div>
         </div>
     </div>

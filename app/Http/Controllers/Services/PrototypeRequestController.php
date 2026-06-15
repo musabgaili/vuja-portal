@@ -135,6 +135,30 @@ class PrototypeRequestController extends Controller
         return back()->with('success', __('portal.prototypes.status_updated'));
     }
 
+    /** Turn a completed prototype request into a project + funnel entry. */
+    public function convertToProject(PrototypeRequest $prototype)
+    {
+        $this->authorize('manage', $prototype);
+
+        if ($prototype->status !== 'completed') {
+            return back()->withErrors(['error' => 'Only completed prototype requests can be converted to projects.']);
+        }
+
+        $already = $prototype->isConvertedToProject();
+
+        $project = app(\App\Services\ServiceProjectConverter::class)->convert($prototype, [
+            'title' => $prototype->title,
+            'description' => $prototype->description,
+            'scope' => trim(($prototype->goals ? 'Goals: '.$prototype->goals."\n" : '').($prototype->timeline ? 'Timeline: '.$prototype->timeline : '')),
+            'client_id' => $prototype->user_id,
+            'project_manager_id' => $prototype->assigned_to,
+            'source_label' => 'Prototype',
+        ]);
+
+        return redirect()->route('projects.manager.show', $project)
+            ->with($already ? 'info' : 'success', $already ? 'Project already exists!' : 'Project created from prototype — added to the sales funnel.');
+    }
+
     private function storeFiles(Request $request, PrototypeRequest $prototype): void
     {
         foreach ((array) $request->file('files', []) as $file) {

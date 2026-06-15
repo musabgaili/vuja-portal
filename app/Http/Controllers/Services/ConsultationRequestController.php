@@ -286,6 +286,30 @@ class ConsultationRequestController extends Controller
         return back()->with('success', 'Consultation marked as completed!');
     }
 
+    /** Turn a completed consultation into a project + funnel entry. */
+    public function convertToProject(ConsultationRequest $consultation)
+    {
+        $this->authorize('manage', $consultation);
+
+        if ($consultation->status !== 'completed') {
+            return back()->withErrors(['error' => 'Only completed consultations can be converted to projects.']);
+        }
+
+        $already = $consultation->isConvertedToProject();
+
+        $project = app(\App\Services\ServiceProjectConverter::class)->convert($consultation, [
+            'title' => $consultation->title,
+            'description' => $consultation->description,
+            'scope' => 'Category: '.$consultation->category,
+            'client_id' => $consultation->user_id,
+            'project_manager_id' => $consultation->assigned_to,
+            'source_label' => 'Consultation',
+        ]);
+
+        return redirect()->route('projects.manager.show', $project)
+            ->with($already ? 'info' : 'success', $already ? 'Project already exists!' : 'Project created from consultation — added to the sales funnel.');
+    }
+
     // PRIVATE METHODS
 
     private function autoAssign(ConsultationRequest $consultation)
