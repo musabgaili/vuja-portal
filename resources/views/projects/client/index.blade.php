@@ -4,12 +4,12 @@
 
 <style>
 .projects-hero {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 55%, #294D61 100%);
     color: white;
     padding: 3rem 2rem;
     border-radius: 16px;
     margin-bottom: 2rem;
-    box-shadow: 0 20px 60px rgba(79, 172, 254, 0.3);
+    box-shadow: 0 20px 60px rgba(12, 112, 117, 0.3);
 }
 .projects-hero h1 {
     font-size: 2.5rem;
@@ -17,7 +17,7 @@
     margin-bottom: 0.5rem;
 }
 .stat-card-modern {
-    background: white;
+    background: var(--bg-primary);
     padding: 2rem;
     border-radius: 16px;
     text-align: center;
@@ -31,19 +31,19 @@
 .stat-card-value {
     font-size: 3rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #0F969C 0%, #0C7075 55%, #294D61 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 .stat-card-label {
-    color: #64748b;
+    color: var(--gray-600);
     font-size: 1rem;
     margin-top: 0.5rem;
     font-weight: 500;
 }
 .project-card-modern {
-    background: white;
+    background: var(--bg-primary);
     border-radius: 16px;
     padding: 0;
     margin-bottom: 2rem;
@@ -55,34 +55,34 @@
 .project-card-modern:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-    border-color: #4facfe;
+    border-color: #0C7075;
 }
 .project-card-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    background: var(--bg-tertiary);
     padding: 1.5rem;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--gray-200);
 }
 .project-card-body {
     padding: 1.5rem;
 }
 .project-card-footer {
     padding: 1.25rem 1.5rem;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 .progress-bar-client {
     height: 10px;
-    background: #e2e8f0;
+    background: var(--gray-200);
     border-radius: 10px;
     overflow: hidden;
 }
 .progress-bar-client-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-    box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+    background: linear-gradient(90deg, #0F969C 0%, #0C7075 100%);
+    box-shadow: 0 0 10px rgba(12, 112, 117, 0.4);
 }
 </style>
 

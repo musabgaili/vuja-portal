@@ -109,6 +109,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/quotes/{quote}/reject', [\App\Http\Controllers\QuoteController::class, 'reject'])->name('quotes.reject');
     Route::post('/quotes/{quote}/request-changes', [\App\Http\Controllers\QuoteController::class, 'requestChanges'])->name('quotes.request-changes');
     Route::post('/quotes/{quote}/comments', [\App\Http\Controllers\QuoteController::class, 'addComment'])->name('quotes.comments.store');
+    Route::post('/quotes/{quote}/mark-paid', [\App\Http\Controllers\QuoteController::class, 'markPaid'])->name('quotes.mark-paid');
     Route::delete('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'destroy'])->name('quotes.destroy');
 
     // CONTROL TOWER — owner project-health traffic light + risk alerts (manager)

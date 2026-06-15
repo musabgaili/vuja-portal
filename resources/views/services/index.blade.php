@@ -6,8 +6,8 @@
 @section('content')
 <div class="services-grid">
     <!-- Idea Generation -->
-    <div class="service-card" style="border-left: 4px solid #f59e0b;">
-        <div class="service-icon" style="background: #f59e0b;">
+    <div class="service-card" style="border-left: 4px solid #0F969C;">
+        <div class="service-icon" style="background: #0F969C;">
             <i class="fas fa-lightbulb"></i>
         </div>
         <div class="service-content">
@@ -25,8 +25,8 @@
     </div>
 
     <!-- Consultation -->
-    <div class="service-card" style="border-left: 4px solid #10b981;">
-        <div class="service-icon" style="background: #10b981;">
+    <div class="service-card" style="border-left: 4px solid #0C7075;">
+        <div class="service-icon" style="background: #0C7075;">
             <i class="fas fa-comments"></i>
         </div>
         <div class="service-content">
@@ -44,8 +44,8 @@
     </div>
 
     <!-- Research & IP -->
-    <div class="service-card" style="border-left: 4px solid #3b82f6;">
-        <div class="service-icon" style="background: #3b82f6;">
+    <div class="service-card" style="border-left: 4px solid #294D61;">
+        <div class="service-icon" style="background: #294D61;">
             <i class="fas fa-search"></i>
         </div>
         <div class="service-content">
@@ -82,8 +82,8 @@
     </div>
 
     <!-- Copyright Registration -->
-    <div class="service-card" style="border-left: 4px solid #ec4899;">
-        <div class="service-icon" style="background: #ec4899;">
+    <div class="service-card" style="border-left: 4px solid #0F969C;">
+        <div class="service-icon" style="background: #0F969C;">
             <i class="fas fa-copyright"></i>
         </div>
         <div class="service-content">
@@ -101,8 +101,8 @@
     </div>
 
     <!-- Prototype Development -->
-    <div class="service-card" style="border-left: 4px solid #6366f1;">
-        <div class="service-icon" style="background: #6366f1;">
+    <div class="service-card" style="border-left: 4px solid #294D61;">
+        <div class="service-icon" style="background: #294D61;">
             <i class="fas fa-cube"></i>
         </div>
         <div class="service-content">
@@ -120,8 +120,8 @@
     </div>
 
     <!-- Portal Improvement Idea -->
-    <div class="service-card" style="border-left: 4px solid #8b5cf6;">
-        <div class="service-icon" style="background: #8b5cf6;">
+    <div class="service-card" style="border-left: 4px solid #294D61;">
+        <div class="service-icon" style="background: #294D61;">
             <i class="fas fa-rocket"></i>
         </div>
         <div class="service-content">

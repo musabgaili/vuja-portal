@@ -5,7 +5,7 @@
 <style>
 /* Modern Client Project View */
 .client-project-header {
-    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
+    background: linear-gradient(135deg, #0C7075 0%, #2C3F43 100%);
     color: white;
     padding: 2.5rem;
     border-radius: 16px;
@@ -50,11 +50,11 @@
     color: #2d3748;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 3px solid #10b981;
+    border-bottom: 3px solid #0C7075;
 }
 .milestone-card-client {
-    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-    border-left: 5px solid #10b981;
+    background: var(--bg-tertiary);
+    border-left: 5px solid #0C7075;
     padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
@@ -76,14 +76,14 @@
     transition: all 0.3s;
 }
 .team-member-card:hover {
-    border-color: #10b981;
+    border-color: #0C7075;
     box-shadow: 0 4px 12px rgba(28, 87, 95, 0.12);
 }
 .team-avatar-large {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
+    background: linear-gradient(135deg, #0C7075 0%, #2C3F43 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -94,7 +94,7 @@
 }
 .comment-modern {
     background: #f8fafc;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #0C7075;
     padding: 1.25rem;
     border-radius: 12px;
     margin-bottom: 1rem;
@@ -109,7 +109,7 @@
     background: #fffbeb;
 }
 .action-btn-client {
-    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
+    background: linear-gradient(135deg, #0C7075 0%, #2C3F43 100%);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -146,7 +146,7 @@
 .stat-modern-value {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #10b981 0%, #2C3F43 100%);
+    background: linear-gradient(135deg, #0C7075 0%, #2C3F43 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -165,7 +165,7 @@
 }
 .progress-modern-fill {
     height: 100%;
-    background: linear-gradient(90deg, #10b981 0%, #2C3F43 100%);
+    background: linear-gradient(90deg, #0C7075 0%, #2C3F43 100%);
     transition: width 0.5s ease;
     box-shadow: 0 0 10px rgba(28, 87, 95, 0.28);
 }
@@ -188,7 +188,7 @@
             
             <div class="d-flex gap-3 align-items-center flex-wrap">
                 <span class="badge" style="background: rgba(255,255,255,0.3); font-size: 1rem; padding: 0.5rem 1rem;">
-                    <i class="fas fa-circle" style="color: {{ $project->isActive() ? '#10b981' : '#f59e0b' }};"></i>
+                    <i class="fas fa-circle" style="color: {{ $project->isActive() ? '#0C7075' : '#f59e0b' }};"></i>
                     {{ $project->getStatusLabel() }}
                 </span>
                 @if($project->start_date)
@@ -219,7 +219,7 @@
     </a>
     @endif
     @if($project->isCompleted() && !$project->feedback)
-    <a href="{{ route('projects.client.feedback.create', $project) }}" class="action-btn-client" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);">
+    <a href="{{ route('projects.client.feedback.create', $project) }}" class="action-btn-client" style="background: linear-gradient(135deg, #0F969C 0%, #0C7075 100%);">
         <i class="fas fa-star"></i> {{ __('portal.projects_client.show.rate_project') }}
     </a>
     @endif
@@ -449,7 +449,7 @@
                     <i class="fas fa-file-{{ $doc->file_type === 'pdf' ? 'pdf text-danger' : 'alt text-primary' }}"></i> {{ $doc->title }}
                 </h5>
                 <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-                    <span class="badge" style="background: {{ match($doc->tag) { 'initial' => '#0C7075', 'design' => '#3b82f6', 'development' => '#10b981', 'final' => '#f59e0b', default => '#6b7280' } }};">
+                    <span class="badge" style="background: {{ match($doc->tag) { 'initial' => '#0C7075', 'design' => '#3b82f6', 'development' => '#0C7075', 'final' => '#f59e0b', default => '#6b7280' } }};">
                         {{ ucfirst($doc->tag) }}
                     </span>
                     <small class="text-muted">
@@ -526,7 +526,7 @@
 <div class="section-modern">
     <h3><i class="fas fa-exchange-alt"></i> {{ __('portal.projects_client.show.my_scope_change_requests') }}</h3>
     @foreach($project->scopeChanges->where('requested_by', auth()->id())->sortByDesc('created_at') as $change)
-    <div class="milestone-card-client" style="border-left-color: {{ $change->getStatusBadgeColor() === 'success' ? '#10b981' : ($change->getStatusBadgeColor() === 'danger' ? '#ef4444' : '#f59e0b') }};">
+    <div class="milestone-card-client" style="border-left-color: {{ $change->getStatusBadgeColor() === 'success' ? '#0C7075' : ($change->getStatusBadgeColor() === 'danger' ? '#ef4444' : '#f59e0b') }};">
         <div class="d-flex justify-content-between align-items-start">
             <div style="flex: 1;">
                 <h5 style="font-weight: 600; color: #1e293b;">{{ $change->title }}</h5>

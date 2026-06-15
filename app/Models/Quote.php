@@ -17,6 +17,7 @@ class Quote extends Model
         'quote_number', 'language', 'length', 'structure', 'subject', 'beneficiary', 'client_ref',
         'brief', 'ai_content', 'vat_rate', 'components_internal_total', 'components_client_total',
         'subtotal', 'vat_amount', 'grand_total', 'validity_days',
+        'payment_status', 'paid_at',
     ];
 
     protected $casts = [
@@ -34,7 +35,25 @@ class Quote extends Model
         'vat_amount' => 'decimal:2',
         'grand_total' => 'decimal:2',
         'validity_days' => 'integer',
+        'paid_at' => 'datetime',
     ];
+
+    /** The invoice/headline amount: VAT-inclusive grand total if priced, else the legacy client total. */
+    public function invoiceTotal(): float
+    {
+        return (float) ($this->grand_total > 0 ? $this->grand_total : $this->total_client);
+    }
+
+    /** An accepted quote is the client's invoice. */
+    public function isInvoice(): bool
+    {
+        return $this->status === 'accepted';
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'paid';
+    }
 
     public function items(): HasMany
     {

@@ -28,6 +28,7 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
 
     // Quotes — review & accept (digital signature -> becomes an order/project)
     Route::get('/quotes', [\App\Http\Controllers\QuoteController::class, 'clientIndex'])->name('quotes.client.index');
+    Route::get('/invoices', [\App\Http\Controllers\QuoteController::class, 'clientInvoices'])->name('quotes.client.invoices');
     Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'clientShow'])->name('quotes.client.show');
     Route::post('/quotes/{quote}/accept', [\App\Http\Controllers\QuoteController::class, 'clientAccept'])->name('quotes.client.accept');
     Route::post('/quotes/{quote}/reject', [\App\Http\Controllers\QuoteController::class, 'clientReject'])->name('quotes.client.reject');
