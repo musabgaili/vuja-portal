@@ -17,6 +17,7 @@ use App\Targets\Contracts\ProjectsBridge;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 /**
  * Manager capacity control room (spec §13, §14): team utilization + allocation
@@ -109,7 +110,8 @@ class CapacityController extends Controller
             'weekly_capacity_hours' => 'required|numeric|min:0|max:168',
             'specialization' => 'nullable|in:design,electronics',
             'skills' => 'nullable|array',
-            'skills.*' => 'integer|exists:activity_categories,id',
+            // Skills are the DELIVERY categories an engineer covers (spec §7/§12).
+            'skills.*' => ['integer', Rule::exists('activity_categories', 'id')->where('kind', 'delivery')->where('is_active', true)],
         ]);
 
         $teamMember->update([
@@ -184,7 +186,17 @@ class CapacityController extends Controller
             'activity_category_id' => 'required|integer|exists:activity_categories,id',
             'value' => 'required|numeric|min:0|max:100000000',
         ]);
-        ProjectAssignment::create($data);
+        // Dedupe: one assignment per (project, line, engineer, category) — a repeat
+        // updates the value rather than double-counting recognized revenue.
+        ProjectAssignment::updateOrCreate(
+            [
+                'project_id' => $data['project_id'],
+                'project_line_id' => $data['project_line_id'] ?? null,
+                'team_member_id' => $data['team_member_id'],
+                'activity_category_id' => $data['activity_category_id'],
+            ],
+            ['value' => $data['value']],
+        );
 
         return back()->with('success', __('targets.cap.assignment_saved'));
     }

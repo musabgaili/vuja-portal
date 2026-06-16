@@ -24,6 +24,13 @@ class DatabaseSeeder extends Seeder
             ServiceRequestTypeSeeder::class,
             PricingRuleSeeder::class,
             InventoryItemSeeder::class,
+            // Engagement Points + Performance Targets + Capacity catalogs (all
+            // idempotent firstOrCreate). TeamMembersSeeder reads existing users,
+            // so it runs after UserSeeder.
+            EngagementPointsSeeder::class,
+            TargetMetricsSeeder::class,
+            ActivityCategoriesSeeder::class,
+            TeamMembersSeeder::class,
         ]);
 
         if (! app()->environment('production')) {

@@ -15,12 +15,19 @@ use Illuminate\Support\Collection;
  */
 class ProjectAssignmentsBridge implements ProjectsBridge
 {
+    /** Per-request memo keyed by month (the manager dashboard calls this once per engineer). */
+    private array $cache = [];
+
     public function recognizedRevenue(Carbon $monthStart): Collection
     {
         $start = $monthStart->copy()->startOfMonth();
+        $key = $start->format('Y-m');
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
+        }
         $end = $start->copy()->endOfMonth();
 
-        return ProjectAssignment::with('category')
+        return $this->cache[$key] = ProjectAssignment::with('category')
             ->whereHas('project', fn ($q) => $q->where('status', 'completed')->whereBetween('actual_end_date', [$start, $end]))
             ->get()
             ->map(fn (ProjectAssignment $a) => (object) [

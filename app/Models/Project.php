@@ -39,6 +39,15 @@ class Project extends Model
                 }
             }
         });
+
+        // Stamp the completion date on any path that marks a project completed
+        // (the generic edit form, an import, etc.) — capacity revenue is recognized
+        // by actual_end_date, so it must never be left empty when status=completed.
+        static::saving(function (self $project): void {
+            if ($project->status === 'completed' && empty($project->actual_end_date)) {
+                $project->actual_end_date = now();
+            }
+        });
     }
 
     protected $fillable = [
