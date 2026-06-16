@@ -145,6 +145,13 @@ class ImprovementIdeaController extends Controller
                     'Portal improvement idea approved: '.$idea->title,
                 );
             }
+
+            // Also credit the CLIENT Engagement Points program (the separate,
+            // spendable loyalty currency) when a client's idea is accepted —
+            // first 5 auto, beyond that held for admin review. Idempotent.
+            if ($idea->user && $idea->user->isClient()) {
+                app(\App\Services\Engagement\EarningEngine::class)->recordIdeaAccepted($idea->user, $idea);
+            }
         });
 
         return back()->with('success', __('portal.improvement_ideas.approved_done'));

@@ -97,6 +97,30 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * Client Engagement Points program (separate from the internal staff Impact
+     * Points above): a spendable, ledger-backed loyalty balance. See spec §6.
+     */
+    public function pointsAccount(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PointsAccount::class, 'client_id');
+    }
+
+    /** Get (creating if needed) the client's points account — generates a referral code. */
+    public function ensurePointsAccount(): PointsAccount
+    {
+        return $this->pointsAccount()->firstOrCreate([]);
+    }
+
+    /**
+     * The client's pricing tier (student | entrepreneur | company), read from
+     * their most recent quote; defaults to company. Drives tier-priced rewards.
+     */
+    public function clientTier(): string
+    {
+        return Quote::where('client_id', $this->id)->latest('id')->value('customer_category') ?: 'company';
+    }
+
+    /**
      * Get the activity log options for the model.
      */
     public function getActivitylogOptions(): LogOptions

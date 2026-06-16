@@ -39,6 +39,14 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
 
     // Projects moved to routes/projects.php
 
+    // Engagement Points — client points dashboard, explainer, redeem, claim, refer
+    Route::get('/points', [\App\Http\Controllers\ClientEngagementController::class, 'dashboard'])->name('engagement.client.dashboard');
+    Route::get('/points/about', [\App\Http\Controllers\ClientEngagementController::class, 'about'])->name('engagement.client.about');
+    Route::post('/points/redeem/{option}', [\App\Http\Controllers\ClientEngagementController::class, 'redeem'])->name('engagement.client.redeem');
+    Route::post('/points/vouchers/{redemption}/apply', [\App\Http\Controllers\ClientEngagementController::class, 'applyVoucher'])->name('engagement.client.voucher.apply');
+    Route::post('/points/claims', [\App\Http\Controllers\ClientEngagementController::class, 'storeClaim'])->name('engagement.client.claims.store');
+    Route::get('/points/claims/{claim}/screenshot', [\App\Http\Controllers\ClientEngagementController::class, 'claimScreenshot'])->name('engagement.client.claims.screenshot');
+
     // Meetings - Client Booking
     Route::get('/meetings/book', [\App\Http\Controllers\MeetingController::class, 'availableSlots'])->name('meetings.available-slots');
     Route::get('/meetings/book/{timeSlot}', [\App\Http\Controllers\MeetingController::class, 'create'])->name('meetings.create');

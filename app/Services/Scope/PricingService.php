@@ -79,14 +79,24 @@ class PricingService
             $servicesTotal += $line;
         }
 
-        // --- Totals + 15% VAT ---
-        $subtotal = round($componentsClientTotal + $servicesTotal, 2);
+        // --- Service-discount voucher (engagement reward): SERVICE lines only, capped (spec §9) ---
+        $discountPercent = (float) ($quote->discount_percent ?? 0);
+        $discountAmount = 0.0;
+        if ($discountPercent > 0 && $servicesTotal > 0) {
+            $raw = round($servicesTotal * $discountPercent / 100, 2);
+            $cap = $quote->discount_cap_sar !== null ? (float) $quote->discount_cap_sar : $raw;
+            $discountAmount = round(min($raw, $cap), 2);
+        }
+
+        // --- Totals + 15% VAT (discount applied before VAT) ---
+        $subtotal = round($componentsClientTotal + $servicesTotal - $discountAmount, 2);
         $vatRate = (float) ($quote->vat_rate ?? 15);
         $vatAmount = round($subtotal * $vatRate / 100, 2);
         $grandTotal = round($subtotal + $vatAmount, 2);
 
         $quote->forceFill([
             'components_internal_total' => round($componentsInternalTotal, 2),
+            'discount_amount' => $discountAmount,
             'subtotal' => $subtotal,
             'vat_amount' => $vatAmount,
             'grand_total' => $grandTotal,

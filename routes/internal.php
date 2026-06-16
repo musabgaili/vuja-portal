@@ -38,6 +38,14 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/engagement', [EngagementController::class, 'index'])->name('engagement.index');
     Route::post('/engagement/thank-you', [EngagementController::class, 'thankYou'])->name('engagement.thank-you');
 
+    // ENGAGEMENT POINTS (client loyalty) — discretionary grants: a PM suggests
+    // here; only a Manager may approve (gated in the controller). PMs need to see
+    // the queue, so it lives outside the manager-only group below.
+    Route::get('/engagement-points/grants', [\App\Http\Controllers\Admin\EngagementGrantController::class, 'index'])->name('engagement.admin.grants.index');
+    Route::post('/engagement-points/grants', [\App\Http\Controllers\Admin\EngagementGrantController::class, 'store'])->name('engagement.admin.grants.store');
+    Route::post('/engagement-points/grants/{grant}/approve', [\App\Http\Controllers\Admin\EngagementGrantController::class, 'approve'])->name('engagement.admin.grants.approve');
+    Route::post('/engagement-points/grants/{grant}/reject', [\App\Http\Controllers\Admin\EngagementGrantController::class, 'reject'])->name('engagement.admin.grants.reject');
+
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
@@ -224,6 +232,23 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::get('/engagement/settings', [\App\Http\Controllers\EngagementSettingsController::class, 'edit'])->name('engagement.settings.edit');
         Route::put('/engagement/settings', [\App\Http\Controllers\EngagementSettingsController::class, 'update'])->name('engagement.settings.update');
         Route::post('/engagement/settings/reset', [\App\Http\Controllers\EngagementSettingsController::class, 'reset'])->name('engagement.settings.reset');
+
+        // ENGAGEMENT POINTS (client loyalty program) — admin module (spec §14)
+        Route::get('/engagement-points', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'dashboard'])->name('engagement.admin.dashboard');
+        Route::get('/engagement-points/config', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'config'])->name('engagement.admin.config');
+        Route::put('/engagement-points/rules/{rule}', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'updateRule'])->name('engagement.admin.rules.update');
+        Route::put('/engagement-points/redemptions/{option}', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'updateRedemption'])->name('engagement.admin.redemptions.update');
+        Route::put('/engagement-points/tiers/{tier}', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'updateTier'])->name('engagement.admin.tiers.update');
+        Route::get('/engagement-points/accounts', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'accounts'])->name('engagement.admin.accounts');
+        Route::get('/engagement-points/accounts/{account}', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'account'])->name('engagement.admin.account');
+        Route::post('/engagement-points/accounts/{account}/adjust', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'adjust'])->name('engagement.admin.account.adjust');
+        Route::get('/engagement-points/report', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'report'])->name('engagement.admin.report');
+
+        // ENGAGEMENT POINTS — claims review queue (spec §11)
+        Route::get('/engagement-points/claims', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'index'])->name('engagement.admin.claims.index');
+        Route::post('/engagement-points/claims/{claim}/approve', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'approve'])->name('engagement.admin.claims.approve');
+        Route::post('/engagement-points/claims/{claim}/reject', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'reject'])->name('engagement.admin.claims.reject');
+        Route::get('/engagement-points/claims/{claim}/screenshot', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'screenshot'])->name('engagement.admin.claims.screenshot');
 
         // DIRECT STAFF TASKS — assign / delete (manager only)
         Route::get('/staff-tasks/create', [\App\Http\Controllers\StaffTaskController::class, 'create'])->name('staff-tasks.create');

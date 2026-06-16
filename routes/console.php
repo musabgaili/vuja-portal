@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Weekly Planner: enforce the Saturday 18:00 deadline (run at 18:01).
 Schedule::command('planner:mark-overdue')->saturdays()->at('18:01');
+
+// Engagement Points: expire earns past their 24-month window (FIFO).
+Schedule::command('engagement:expire-points')->dailyAt('02:00');

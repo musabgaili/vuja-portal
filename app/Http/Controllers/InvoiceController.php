@@ -105,6 +105,11 @@ class InvoiceController extends Controller
 
         $invoice->update(['status' => 'paid', 'paid_at' => now()]);
 
+        // Vest any referral payment reward once the client's project is paid in full.
+        if ($invoice->project_id) {
+            app(\App\Services\Engagement\EarningEngine::class)->recordPaidInFull((int) $invoice->project_id);
+        }
+
         return back()->with('success', __('portal.invoices.marked_paid'));
     }
 

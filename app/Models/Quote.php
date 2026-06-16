@@ -17,6 +17,7 @@ class Quote extends Model
         'quote_number', 'language', 'length', 'structure', 'subject', 'beneficiary', 'client_ref',
         'brief', 'ai_content', 'vat_rate', 'components_internal_total', 'components_client_total',
         'subtotal', 'vat_amount', 'grand_total', 'validity_days',
+        'discount_percent', 'discount_cap_sar', 'discount_amount',
         'payment_status', 'paid_at',
     ];
 
@@ -35,6 +36,9 @@ class Quote extends Model
         'vat_amount' => 'decimal:2',
         'grand_total' => 'decimal:2',
         'validity_days' => 'integer',
+        'discount_percent' => 'decimal:2',
+        'discount_cap_sar' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
 

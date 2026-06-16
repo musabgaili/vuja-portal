@@ -187,6 +187,12 @@
                         {{ __('portal.invoices.manage_title') }}
                     </a>
                     @endif
+                    @if(auth()->user()->isProjectManager())
+                    <a href="{{ route('engagement.admin.grants.index') }}" class="nav-item {{ request()->routeIs('engagement.admin.grants.*') ? 'active' : '' }}">
+                        <i class="fas fa-hand-holding-dollar"></i>
+                        {{ __('engagement.admin.grants') }}
+                    </a>
+                    @endif
                     @if(auth()->user()->isManager())
                     <a href="{{ route('pricing.admin') }}" class="nav-item">
                         <i class="fas fa-cogs"></i>
@@ -229,6 +235,10 @@
                     <a href="{{ route('engagement.settings.edit') }}" class="nav-item {{ request()->routeIs('engagement.settings.*') ? 'active' : '' }}">
                         <i class="fas fa-sliders"></i>
                         {{ __('portal.nav.engagement_settings') }}
+                    </a>
+                    <a href="{{ route('engagement.admin.dashboard') }}" class="nav-item {{ request()->routeIs('engagement.admin.*') ? 'active' : '' }}">
+                        <i class="fas fa-award"></i>
+                        {{ __('engagement.admin.title') }}
                     </a>
                     <a href="{{ route('improvement-ideas.manager.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.manager.*') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-check"></i>

@@ -71,6 +71,10 @@
                         <i class="fas fa-rocket"></i>
                         {{ __('portal.improvement_ideas.my_ideas') }}
                     </a>
+                    <a href="{{ route('engagement.client.dashboard') }}" class="nav-item {{ request()->routeIs('engagement.client.*') ? 'active' : '' }}">
+                        <i class="fas fa-award"></i>
+                        {{ __('engagement.my_points') }}
+                    </a>
                 </div>
 
                 <!-- Meetings -->
