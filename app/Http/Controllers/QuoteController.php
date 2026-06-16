@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Quote;
 use App\Models\QuoteComment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,17 @@ class QuoteController extends Controller
         if ($quote->status !== 'approved') {
             return back()->withErrors(['send' => __('portal.quote.must_be_approved')]);
         }
-        $quote->update(['status' => 'sent']);
+        $firstSend = $quote->sent_at === null;
+        $quote->update(['status' => 'sent', 'sent_at' => $quote->sent_at ?? now()]);
+
+        // "Quote produced" = a quote sent to the client. Credit the author, gated
+        // behind their monthly quotes target. Only on first send (idempotent).
+        if ($firstSend && $quote->created_by) {
+            if ($creator = User::find($quote->created_by)) {
+                app(\App\Services\Targets\TargetPointsGate::class)
+                    ->awardIfEarned($creator, 'quote_produced', $quote, 'Quote sent: '.$quote->title);
+            }
+        }
 
         return back()->with('success', __('portal.quote.marked_sent'));
     }
@@ -189,7 +200,7 @@ class QuoteController extends Controller
             return $quote->project;
         }
 
-        return DB::transaction(function () use ($quote, $signature, $ip) {
+        $project = DB::transaction(function () use ($quote, $signature, $ip) {
             $project = Project::create([
                 'title' => $quote->title,
                 'description' => $quote->scope ? \Illuminate\Support\Str::limit(strip_tags($quote->scope), 4000) : $quote->title,
@@ -217,5 +228,28 @@ class QuoteController extends Controller
 
             return $project;
         });
+
+        // "Project won" — credit everyone who owns the win (quote author, opportunity
+        // owner, project PM), gated behind each one's monthly wins target. Deduped
+        // per person by the gate's distinct-project count.
+        $this->creditProjectWin($quote, $project);
+
+        return $project;
+    }
+
+    private function creditProjectWin(Quote $quote, Project $project): void
+    {
+        $gate = app(\App\Services\Targets\TargetPointsGate::class);
+        $userIds = collect([
+            $quote->created_by,
+            $quote->opportunity?->owner_id,
+            $project->project_manager_id,
+        ])->filter()->unique();
+
+        foreach ($userIds as $uid) {
+            if ($u = User::find($uid)) {
+                $gate->awardIfEarned($u, 'project_won', $project, 'Project won: '.$project->title);
+            }
+        }
     }
 }

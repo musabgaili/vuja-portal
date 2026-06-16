@@ -53,9 +53,13 @@
                         {{ __('portal.nav.workload') }}
                     </a>
                     @endif
-                    <a href="{{ route('engagement.index') }}" class="nav-item {{ request()->routeIs('engagement.*') ? 'active' : '' }}">
+                    <a href="{{ route('engagement.index') }}" class="nav-item {{ request()->routeIs('engagement.index') || request()->routeIs('engagement.thank-you') ? 'active' : '' }}">
                         <i class="fas fa-bolt"></i>
                         {{ __('portal.nav.engagement') }}
+                    </a>
+                    <a href="{{ route('targets.my') }}" class="nav-item {{ request()->routeIs('targets.my') ? 'active' : '' }}">
+                        <i class="fas fa-bullseye"></i>
+                        {{ __('targets.my_title') }}
                     </a>
                     <a href="{{ route('improvement-ideas.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.index') || request()->routeIs('improvement-ideas.create') || request()->routeIs('improvement-ideas.show') ? 'active' : '' }}">
                         <i class="fas fa-rocket"></i>
@@ -240,6 +244,10 @@
                         <i class="fas fa-award"></i>
                         {{ __('engagement.admin.title') }}
                     </a>
+                    <a href="{{ route('targets.admin.index') }}" class="nav-item {{ request()->routeIs('targets.admin.*') ? 'active' : '' }}">
+                        <i class="fas fa-bullseye"></i>
+                        {{ __('targets.admin.title') }}
+                    </a>
                     <a href="{{ route('improvement-ideas.manager.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.manager.*') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-check"></i>
                         {{ __('portal.nav.improvement_reviews') }}
@@ -287,6 +295,7 @@
                 </div>
                 <div class="header-right d-flex align-items-center gap-2">
                     @include('partials.xp-bar')
+                    @include('partials.target-chip')
                     @include('partials.notifications')
                     @include('partials.theme-toggle')
                     @include('partials.locale-switcher')

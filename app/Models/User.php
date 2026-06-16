@@ -121,6 +121,20 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * Performance Targets — monthly KPI goals the manager sets for internal staff.
+     */
+    public function performanceTargets(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PerformanceTarget::class, 'user_id');
+    }
+
+    /** Staff who hold performance targets: internal employees and project managers (not managers/clients). */
+    public function holdsTargets(): bool
+    {
+        return $this->isInternal() && ($this->isEmployee() || $this->isProjectManager());
+    }
+
+    /**
      * Get the activity log options for the model.
      */
     public function getActivitylogOptions(): LogOptions

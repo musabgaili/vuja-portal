@@ -346,6 +346,17 @@ class ProjectController extends Controller
             'completion_percentage' => $validated['status'] === 'completed' ? 100 : $project->completion_percentage,
         ]);
 
+        // "Project closed" — credit the PM / account manager, gated behind their
+        // monthly closed target (points only for closing beyond the goal).
+        if ($validated['status'] === 'completed') {
+            $gate = app(\App\Services\Targets\TargetPointsGate::class);
+            foreach (collect([$project->project_manager_id, $project->account_manager_id])->filter()->unique() as $uid) {
+                if ($u = \App\Models\User::find($uid)) {
+                    $gate->awardIfEarned($u, 'project_closed', $project, 'Project completed: '.$project->title);
+                }
+            }
+        }
+
         return back()->with('success', 'Project closed successfully.');
     }
 

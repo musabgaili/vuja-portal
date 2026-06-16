@@ -21,7 +21,7 @@ class EngagementService
      * Award points for an action. Points are looked up from config unless
      * $overridePoints is given. Returns the created log (or null if no-op).
      */
-    public function award(User $user, string $action, ?Model $subject = null, ?int $overridePoints = null, ?string $description = null): ?EngagementLog
+    public function award(User $user, string $action, ?Model $subject = null, ?int $overridePoints = null, ?string $description = null, bool $silent = false): ?EngagementLog
     {
         $points = $overridePoints ?? $this->pointsFor($action);
         if ($points === null) {
@@ -48,7 +48,9 @@ class EngagementService
         });
 
         // Real-time toast (consumed by the layout) — best-effort, never blocks.
-        if (function_exists('session')) {
+        // Suppressed when crediting someone other than the current actor (e.g. an
+        // engineer credited because a client accepted their quote).
+        if (! $silent && function_exists('session')) {
             $toasts = session()->get('ip_toasts', []);
             $toasts[] = ['points' => $points, 'action' => $action];
             session()->flash('ip_toasts', $toasts);

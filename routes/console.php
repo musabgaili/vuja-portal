@@ -13,3 +13,6 @@ Schedule::command('planner:mark-overdue')->saturdays()->at('18:01');
 
 // Engagement Points: expire earns past their 24-month window (FIFO).
 Schedule::command('engagement:expire-points')->dailyAt('02:00');
+
+// Performance Targets: snapshot the just-ended month into the trend log (safety net).
+Schedule::command('targets:snapshot-month')->monthlyOn(1, '00:30');

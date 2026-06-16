@@ -46,6 +46,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/engagement-points/grants/{grant}/approve', [\App\Http\Controllers\Admin\EngagementGrantController::class, 'approve'])->name('engagement.admin.grants.approve');
     Route::post('/engagement-points/grants/{grant}/reject', [\App\Http\Controllers\Admin\EngagementGrantController::class, 'reject'])->name('engagement.admin.grants.reject');
 
+    // PERFORMANCE TARGETS — my targets + live progress + 6-month trend (all internal staff)
+    Route::get('/my-targets', [\App\Http\Controllers\StaffTargetController::class, 'index'])->name('targets.my');
+
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
@@ -157,6 +160,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // MEETINGS
     Route::get('/my-meetings', [\App\Http\Controllers\MeetingController::class, 'myMeetings'])->name('meetings.internal.my-meetings');
     Route::post('/meetings/{meeting}/confirm', [\App\Http\Controllers\MeetingController::class, 'confirm'])->name('meetings.confirm');
+    Route::post('/meetings/{meeting}/complete', [\App\Http\Controllers\MeetingController::class, 'complete'])->name('meetings.complete');
 
     // Projects moved to routes/projects.php
 
@@ -248,6 +252,17 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::get('/engagement-points/pending-earns', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'pendingEarns'])->name('engagement.admin.pending-earns');
         Route::post('/engagement-points/earns/{transaction}/approve', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'approveEarn'])->name('engagement.admin.earns.approve');
         Route::post('/engagement-points/earns/{transaction}/reject', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'rejectEarn'])->name('engagement.admin.earns.reject');
+
+        // PERFORMANCE TARGETS — manager control room (set/adjust, record month, trends, catalog)
+        Route::get('/targets-admin', [\App\Http\Controllers\Admin\TargetController::class, 'index'])->name('targets.admin.index');
+        Route::post('/targets-admin/set', [\App\Http\Controllers\Admin\TargetController::class, 'setTarget'])->name('targets.admin.set');
+        Route::delete('/targets-admin/targets/{target}', [\App\Http\Controllers\Admin\TargetController::class, 'deleteTarget'])->name('targets.admin.delete');
+        Route::post('/targets-admin/record-month', [\App\Http\Controllers\Admin\TargetController::class, 'recordMonth'])->name('targets.admin.record-month');
+        Route::post('/targets-admin/carry-forward', [\App\Http\Controllers\Admin\TargetController::class, 'carryForward'])->name('targets.admin.carry-forward');
+        Route::get('/targets-admin/staff/{user}', [\App\Http\Controllers\Admin\TargetController::class, 'show'])->name('targets.admin.show');
+        Route::get('/targets-admin/metrics', [\App\Http\Controllers\Admin\TargetController::class, 'metrics'])->name('targets.admin.metrics');
+        Route::post('/targets-admin/metrics', [\App\Http\Controllers\Admin\TargetController::class, 'storeMetric'])->name('targets.admin.metrics.store');
+        Route::put('/targets-admin/metrics/{metric}', [\App\Http\Controllers\Admin\TargetController::class, 'updateMetric'])->name('targets.admin.metrics.update');
 
         // ENGAGEMENT POINTS — claims review queue (spec §11)
         Route::get('/engagement-points/claims', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'index'])->name('engagement.admin.claims.index');

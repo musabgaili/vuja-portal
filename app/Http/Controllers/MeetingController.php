@@ -353,6 +353,29 @@ class MeetingController extends Controller
     }
 
     /**
+     * Mark a meeting as attended/completed. This is the discrete "it happened"
+     * event behind the "meetings attended" target + its gated points.
+     */
+    public function complete(Meeting $meeting)
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->isInternal(), 403);
+        // Only the assigned staff member or a manager may close out a meeting.
+        abort_unless($meeting->team_member_id === $user->id || $user->isManager(), 403);
+
+        if ($meeting->status !== 'completed') {
+            $meeting->update(['status' => 'completed', 'completed_at' => now()]);
+
+            if ($staff = \App\Models\User::find($meeting->team_member_id)) {
+                app(\App\Services\Targets\TargetPointsGate::class)
+                    ->awardIfEarned($staff, 'meeting_attended', $meeting, 'Meeting attended');
+            }
+        }
+
+        return back()->with('success', __('targets.meeting_marked'));
+    }
+
+    /**
      * Cancel a meeting (BOTH SIDES)
      */
     public function cancel(Meeting $meeting)

@@ -18,7 +18,7 @@ class Quote extends Model
         'brief', 'ai_content', 'vat_rate', 'components_internal_total', 'components_client_total',
         'subtotal', 'vat_amount', 'grand_total', 'validity_days',
         'discount_percent', 'discount_cap_sar', 'discount_amount',
-        'payment_status', 'paid_at',
+        'payment_status', 'paid_at', 'sent_at',
     ];
 
     protected $casts = [
@@ -40,6 +40,7 @@ class Quote extends Model
         'discount_cap_sar' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'sent_at' => 'datetime',
     ];
 
     /** The invoice/headline amount: VAT-inclusive grand total if priced, else the legacy client total. */

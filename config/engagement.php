@@ -37,6 +37,13 @@ return [
         // Innovation — the HIGHEST award in the system, granted only when a
         // manager approves a portal-improvement idea (see ImprovementIdeaController).
         'portal_improvement_idea_approved' => 150,
+        // Target-gated activities — these award ONLY for activity beyond the
+        // employee's monthly target for that metric (see TargetPointsGate). Doing
+        // your expected baseline earns no points; exceeding it does.
+        'quote_produced'   => 25,   // a quote sent to a client (beyond the quotes target)
+        'project_won'      => 120,  // a quote/opportunity/project won (beyond the wins target)
+        'meeting_attended' => 15,   // a completed client meeting (beyond the meetings target)
+        'project_closed'   => 80,   // a project completed (beyond the closed target)
     ],
 
     // Editor metadata: groups each action under a category and gives it a label
@@ -51,6 +58,7 @@ return [
         'planner'      => 'Weekly planner',
         'staff_tasks'  => 'Direct staff tasks',
         'innovation'   => 'Innovation & ideas',
+        'targets'      => 'Targets (beyond goal)',
     ],
     'action_meta' => [
         'task_completed_early'   => ['category' => 'execution',     'label' => 'Task completed early'],
@@ -69,6 +77,10 @@ return [
         'staff_task_sales'       => ['category' => 'staff_tasks',   'label' => 'Direct task — Sales'],
         'staff_task_management'  => ['category' => 'staff_tasks',   'label' => 'Direct task — Management'],
         'portal_improvement_idea_approved' => ['category' => 'innovation', 'label' => 'Portal improvement idea approved'],
+        'quote_produced'   => ['category' => 'targets', 'label' => 'Quote produced (beyond target)'],
+        'project_won'      => ['category' => 'targets', 'label' => 'Project won (beyond target)'],
+        'meeting_attended' => ['category' => 'targets', 'label' => 'Meeting attended (beyond target)'],
+        'project_closed'   => ['category' => 'targets', 'label' => 'Project closed (beyond target)'],
     ],
 
     // Levels: name, inclusive point range, unlocked perk.
