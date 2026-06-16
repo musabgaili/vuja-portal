@@ -1245,3 +1245,78 @@ body {
 .btn.btn-outline-light:focus { color: #ffffff !important; border-color: rgba(255, 255, 255, 0.75) !important; }
 .btn.btn-outline-light:hover { background: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; }
 .crm-card.dragging{ opacity:.5; }
+/* =====================================================================
+   DESIGN-REVIEW POLISH (Tier 1+2+3) — global, theme-aware, RTL-safe
+   ===================================================================== */
+
+/* Slim the top bar: the teal page-hero banner carries the prominent title,
+   so the header title is compact + single-line (de-duplicates without
+   leaving banner-less pages title-less). */
+.content-header { padding-block: var(--space-md); }
+.content-header h1,
+.internal-dashboard .content-header .header-left h1 {
+    font-size: 1.05rem; font-weight: 600; color: var(--gray-700); margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: min(46ch, 100%);
+}
+/* Let the title shrink/truncate first, and let the action row wrap rather than
+   overflow the viewport on small screens. */
+.content-header { flex-wrap: wrap; row-gap: .4rem; }
+.content-header .header-left { min-width: 0; flex: 1 1 auto; }
+.content-header .header-right { gap: .5rem; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 600px) {
+    .content-header .user-menu .user-name { display: none; }
+}
+.content-header .user-menu { border-inline-start: 1px solid var(--gray-200); padding-inline-start: .6rem; }
+
+/* Sidebar section labels: subtle divider + readable color that FLIPS with the
+   theme — the sidebar bg is white in light, deep teal in dark, so a hardcoded
+   white would be invisible in light mode. */
+.sidebar .nav-section-title {
+    color: var(--gray-500);
+    border-top: 1px solid var(--gray-200);
+    padding-top: .65rem; margin-top: .35rem;
+}
+[data-bs-theme="dark"] .sidebar .nav-section-title {
+    color: rgba(255,255,255,.55);
+    border-top-color: rgba(255,255,255,.08);
+}
+/* Full nav labels — never clip the menu text. */
+.sidebar .nav-item { white-space: normal; }
+
+/* Reusable empty-state (icon + title + text + CTA). */
+.empty-state { text-align: center; padding: 3rem 1.5rem; }
+.empty-state__icon { font-size: 2.5rem; color: var(--gray-400); margin-bottom: .75rem; }
+.empty-state__title { font-size: 1.05rem; font-weight: 700; color: var(--text-color, var(--gray-900)); margin-bottom: .25rem; }
+.empty-state__text { color: var(--gray-600); font-size: .9rem; margin: 0 auto 1rem; max-width: 42ch; }
+
+/* Table affordances: row hover everywhere + opt-in zebra striping. */
+.table tbody tr { transition: background-color .12s ease; }
+.table tbody tr:hover { background: rgba(var(--primary-rgb), .05); }
+.table-zebra tbody tr:nth-child(even) { background: rgba(var(--primary-rgb), .035); }
+.table-zebra tbody tr:nth-child(even):hover { background: rgba(var(--primary-rgb), .07); }
+/* Sortable header affordance. */
+th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+th.sortable::after { content: '\f0dc'; font-family: 'Font Awesome 6 Free'; font-weight: 900; opacity: .35; margin-inline-start: .35rem; font-size: .75em; }
+th.sortable.sort-asc::after { content: '\f0de'; opacity: .9; }
+th.sortable.sort-desc::after { content: '\f0dd'; opacity: .9; }
+
+/* Horizontal-scroll fade cue (kanban / wide tables). The fade is OFF by default
+   and turned on by JS (.is-fade) only while the inner scroller actually
+   overflows and is not scrolled to the end — so it never permanently dims the
+   last column nor shows when there is nothing to scroll. */
+.scroll-fade-x { position: relative; }
+.scroll-fade-x::after {
+    content: ''; position: absolute; top: 0; bottom: 0; inset-inline-end: 0; width: 40px;
+    background: linear-gradient(to var(--_fade, left), var(--bg-primary), transparent);
+    pointer-events: none; opacity: 0; transition: opacity .2s ease;
+}
+.scroll-fade-x.is-fade::after { opacity: .9; }
+[dir="rtl"] .scroll-fade-x::after { --_fade: right; }
+
+/* Equal-height stat cards in a row. */
+.stat-grid { display: flex; flex-wrap: wrap; }
+.stat-grid > [class*="col"] { display: flex; }
+.stat-grid > [class*="col"] > .card { width: 100%; }
+
+/* Arabic text inside otherwise-LTR cards reads correctly. */
+[dir="ltr"] [data-content] { unicode-bidi: plaintext; }

@@ -7,10 +7,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root { --vd-teal: #0F969C; --vd-teal-bright: #0BABB5; --vd-slate: #2C3F43; --vd-deep: #072E33; }
         body {
-            background: linear-gradient(135deg, #2C3F43 0%, #1d2a2d 100%);
+            background: var(--vd-deep);
+            background-image:
+                radial-gradient(900px circle at 12% 18%, rgba(15,150,156,.35), transparent 45%),
+                radial-gradient(800px circle at 88% 88%, rgba(11,171,181,.22), transparent 45%),
+                linear-gradient(135deg, var(--vd-slate) 0%, var(--vd-deep) 100%);
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        /* faint dotted brand texture over the gradient */
+        body::before {
+            content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .5;
+            background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 22px 22px;
         }
         .auth-container {
             min-height: 100vh;
@@ -18,28 +29,34 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
         }
         .auth-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(28, 87, 95, 0.3);
+            box-shadow: 0 24px 70px rgba(7, 46, 51, 0.45);
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 410px;
             border: 1px solid rgba(28, 87, 95, 0.1);
         }
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
+        .logo { text-align: center; margin-bottom: 28px; }
+        .logo .vd-mark {
+            width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--vd-teal-bright) 0%, var(--vd-teal) 55%, var(--vd-slate) 100%);
+            color: #fff; font-weight: 800; font-size: 26px; letter-spacing: -1px;
+            box-shadow: 0 10px 24px rgba(15,150,156,.4);
         }
         .logo h1 {
-            color: #2C3F43;
+            color: var(--vd-slate);
             font-weight: 700;
-            font-size: 32px;
-            margin-bottom: 5px;
+            font-size: 30px;
+            margin-bottom: 4px;
             letter-spacing: -0.5px;
         }
+        .logo h1 span { color: var(--vd-teal); }
         .logo p {
             color: #64748b;
             font-size: 14px;
@@ -55,24 +72,24 @@
             transition: all 0.3s ease;
         }
         .form-control:focus {
-            border-color: #2C3F43;
-            box-shadow: 0 0 0 0.2rem rgba(28, 87, 95, 0.25);
+            border-color: var(--vd-teal);
+            box-shadow: 0 0 0 0.2rem rgba(15, 150, 156, 0.25);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #2C3F43 0%, #1d2a2d 100%);
+            background: linear-gradient(135deg, var(--vd-teal-bright) 0%, var(--vd-teal) 100%);
             border: none;
             border-radius: 12px;
-            padding: 12px 24px;
-            font-weight: 600;
+            padding: 13px 24px;
+            font-weight: 700;
             font-size: 16px;
             width: 100%;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
+            margin-bottom: 18px;
+            transition: all 0.25s ease;
         }
-        .btn-primary:hover {
+        .btn-primary:hover, .btn-primary:focus {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(28, 87, 95, 0.4);
-            background: linear-gradient(135deg, #0BABB5 0%, #2C3F43 100%);
+            box-shadow: 0 12px 24px rgba(15, 150, 156, 0.45);
+            background: linear-gradient(135deg, var(--vd-teal) 0%, var(--vd-slate) 100%);
         }
         .social-login {
             margin: 20px 0;
@@ -123,16 +140,20 @@
         }
         .auth-links {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #eef2f2;
+            font-size: 14.5px;
+            line-height: 2;
         }
         .auth-links a {
-            color: #2C3F43;
+            color: var(--vd-teal);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
         }
         .auth-links a:hover {
             text-decoration: underline;
-            color: #0BABB5;
+            color: var(--vd-slate);
         }
         .remember-me {
             display: flex;
@@ -179,14 +200,15 @@
                 @include('partials.locale-switcher')
             </div>
             <div class="logo">
-                <h1>VujaDe</h1>
+                <div class="vd-mark" aria-hidden="true">vd</div>
+                <h1>Vuja<span>De</span></h1>
                 <p>{{ __('portal.welcome_back') }}</p>
             </div>
 
             @if ($errors->any())
                 <div class="alert alert-danger" role="alert">
                     @foreach ($errors->all() as $error)
-                        {{ $error }}
+                        <div>{{ $error }}</div>
                     @endforeach
                 </div>
             @endif
@@ -194,24 +216,24 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 
-                <div class="form-floating">
-                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                           id="email" name="email" value="{{ old('email') }}" 
-                           placeholder="{{ __('portal.email_address') }}" required autofocus>
-                    <label for="email">
+                <div class="mb-3">
+                    <label for="email" class="form-label">
                         <i class="fas fa-envelope me-2"></i>{{ __('portal.email_address') }}
                     </label>
+                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                           id="email" name="email" value="{{ old('email') }}"
+                           placeholder="{{ __('portal.email_address') }}" required autofocus>
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="form-floating">
-                    <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                           id="password" name="password" placeholder="{{ __('portal.password') }}" required>
-                    <label for="password">
+                <div class="mb-3">
+                    <label for="password" class="form-label">
                         <i class="fas fa-lock me-2"></i>{{ __('portal.password') }}
                     </label>
+                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                           id="password" name="password" placeholder="{{ __('portal.password') }}" required>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

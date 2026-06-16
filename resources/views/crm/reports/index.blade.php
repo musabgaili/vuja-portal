@@ -10,9 +10,9 @@
 {{-- Summary --}}
 <div class="row g-3 mb-3">
     @foreach([
-        [__('portal.crm_rep.open_value'), '$'.number_format($summary['open_value'],0)],
-        [__('portal.crm_rep.weighted'), '$'.number_format($summary['weighted'],0)],
-        [__('portal.crm_rep.won_value'), '$'.number_format($summary['won_value'],0)],
+        [__('portal.crm_rep.open_value'), number_format($summary['open_value'],0).' '.config('scope.currency','SAR')],
+        [__('portal.crm_rep.weighted'), number_format($summary['weighted'],0).' '.config('scope.currency','SAR')],
+        [__('portal.crm_rep.won_value'), number_format($summary['won_value'],0).' '.config('scope.currency','SAR')],
         [__('portal.crm_rep.win_rate'), $summary['win_rate'].'%'],
     ] as $c)
         <div class="col-md-3"><div class="card"><div class="card-content">
@@ -31,7 +31,7 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between" style="font-size:.85rem;">
                         <span>{{ $s['label'] }} <span class="text-muted">({{ $s['count'] }})</span></span>
-                        <strong>${{ number_format($s['value'],0) }}</strong>
+                        <strong>{{ number_format($s['value'],0) }} {{ config('scope.currency','SAR') }}</strong>
                     </div>
                     <div style="height:12px; border-radius:999px; background:var(--bg-tertiary); overflow:hidden; margin-top:4px;">
                         <div style="height:100%; width:{{ $maxStageValue>0 ? round($s['value']/$maxStageValue*100) : 0 }}%; background:var(--grad-header); border-radius:999px;"></div>
@@ -73,7 +73,7 @@
                     <div style="flex:1; height:18px; background:var(--bg-tertiary); border-radius:6px; overflow:hidden;">
                         <div style="height:100%; width:{{ round($val/$fmax*100) }}%; background:var(--primary-color);"></div>
                     </div>
-                    <span style="width:80px; text-align:end; font-weight:600;">${{ number_format($val,0) }}</span>
+                    <span style="width:80px; text-align:end; font-weight:600;">{{ number_format($val,0) }} {{ config('scope.currency','SAR') }}</span>
                 </div>
             @empty
                 <p class="text-muted mb-0">{{ __('portal.crm_rep.no_forecast') }}</p>
@@ -91,8 +91,8 @@
                 @forelse($perRep as $r)
                     <tr>
                         <td>{{ $r['owner']->name }}</td>
-                        <td class="text-end">${{ number_format($r['open_value'],0) }} <span class="text-muted">({{ $r['open'] }})</span></td>
-                        <td class="text-end">${{ number_format($r['won_value'],0) }} <span class="text-muted">({{ $r['won'] }})</span></td>
+                        <td class="text-end">{{ number_format($r['open_value'],0) }} {{ config('scope.currency','SAR') }} <span class="text-muted">({{ $r['open'] }})</span></td>
+                        <td class="text-end">{{ number_format($r['won_value'],0) }} {{ config('scope.currency','SAR') }} <span class="text-muted">({{ $r['won'] }})</span></td>
                         <td class="text-end"><span class="badge bg-primary">{{ $r['win_rate'] }}%</span></td>
                     </tr>
                 @empty

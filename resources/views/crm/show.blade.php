@@ -19,8 +19,8 @@
     <div class="col-lg-7">
         <div class="card"><div class="card-content">
             <div class="row g-3">
-                <div class="col-6"><div class="text-muted small">{{ __('portal.crm.expected_value') }}</div><div style="font-size:1.4rem; font-weight:800; color:var(--primary-color);">${{ number_format((float)$opportunity->expected_value,2) }}</div></div>
-                <div class="col-6"><div class="text-muted small">{{ __('portal.crm.weighted') }}</div><div style="font-size:1.4rem; font-weight:700;">${{ number_format($opportunity->weightedValue(),2) }} <small class="text-muted">({{ $opportunity->probability }}%)</small></div></div>
+                <div class="col-6"><div class="text-muted small">{{ __('portal.crm.expected_value') }}</div><div style="font-size:1.4rem; font-weight:800; color:var(--primary-color);">{{ number_format((float)$opportunity->expected_value,2) }} {{ config('scope.currency','SAR') }}</div></div>
+                <div class="col-6"><div class="text-muted small">{{ __('portal.crm.weighted') }}</div><div style="font-size:1.4rem; font-weight:700;">{{ number_format($opportunity->weightedValue(),2) }} {{ config('scope.currency','SAR') }} <small class="text-muted">({{ $opportunity->probability }}%)</small></div></div>
                 <div class="col-6"><div class="text-muted small">{{ __('portal.crm.owner') }}</div><div>{{ $opportunity->owner->name ?? '—' }}</div></div>
                 <div class="col-6"><div class="text-muted small">{{ __('portal.crm.close_date') }}</div><div>{{ optional($opportunity->expected_close_date)->format('M j, Y') ?? '—' }}</div></div>
                 <div class="col-6"><div class="text-muted small">{{ __('portal.crm.contact') }}</div><div>{{ $opportunity->contact_name ?: '—' }}</div></div>

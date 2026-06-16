@@ -57,7 +57,7 @@
                         <tr>
                             <td><a href="{{ route('crm.show', $op) }}">{{ $op->name }}</a></td>
                             <td><span class="badge bg-{{ $op->stageColor() }}">{{ $op->stageLabel() }}</span></td>
-                            <td class="text-end">${{ number_format((float) $op->expected_value, 0) }}</td>
+                            <td class="text-end">{{ number_format((float) $op->expected_value, 0) }} {{ config('scope.currency','SAR') }}</td>
                         </tr>
                     @empty
                         <tr><td class="text-muted text-center py-3">{{ __('portal.crm.no_deals') }}</td></tr>

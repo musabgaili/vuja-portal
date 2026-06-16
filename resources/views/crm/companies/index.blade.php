@@ -32,7 +32,11 @@
                 <td>@foreach($co->tags as $t)<span class="badge" style="background:{{ $t->color }}22; color:{{ $t->color }};">{{ $t->name }}</span> @endforeach</td>
             </tr>
         @empty
-            <tr><td colspan="5" class="text-muted text-center py-3">{{ __('portal.crm.no_companies') }}</td></tr>
+            <tr><td colspan="5" class="p-0">
+                <x-empty-state icon="fa-building" :title="__('portal.crm.no_companies')" :text="__('portal.crm.no_companies_hint')">
+                    <a href="{{ route('companies.create') }}" class="btn btn-sm btn-primary mt-3"><i class="fas fa-plus"></i> {{ __('portal.crm.new_company') }}</a>
+                </x-empty-state>
+            </td></tr>
         @endforelse
         </tbody>
     </table>

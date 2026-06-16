@@ -23,7 +23,11 @@
                 <td><span class="badge bg-{{ $q->statusColor() }}">{{ $q->statusLabel() }}</span></td>
             </tr>
         @empty
-            <tr><td colspan="5" class="text-muted text-center py-3">{{ __('portal.quote.none') }}</td></tr>
+            <tr><td colspan="5" class="p-0">
+                <x-empty-state icon="fa-file-invoice" :title="__('portal.quote.none')" :text="__('portal.quote.none_hint')">
+                    <a href="{{ route('scope-planner.index') }}" class="btn btn-sm btn-primary mt-3"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.quote.new_from_planner') }}</a>
+                </x-empty-state>
+            </td></tr>
         @endforelse
         </tbody>
     </table>

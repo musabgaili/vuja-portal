@@ -33,7 +33,11 @@
                 <td class="text-end"><a href="{{ route('contacts.edit', $ct) }}" class="text-muted"><i class="fas fa-pen"></i></a></td>
             </tr>
         @empty
-            <tr><td colspan="6" class="text-muted text-center py-3">{{ __('portal.crm.no_contacts') }}</td></tr>
+            <tr><td colspan="6" class="p-0">
+                <x-empty-state icon="fa-address-book" :title="__('portal.crm.no_contacts')" :text="__('portal.crm.no_contacts_hint')">
+                    <a href="{{ route('contacts.create') }}" class="btn btn-sm btn-primary mt-3"><i class="fas fa-plus"></i> {{ __('portal.crm.new_contact') }}</a>
+                </x-empty-state>
+            </td></tr>
         @endforelse
         </tbody>
     </table>
