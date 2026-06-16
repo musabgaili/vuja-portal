@@ -5,12 +5,12 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">©️ {{ $copyright->title }}</h3>
+                <h3 class="card-title">©️ {{ $copyright->tr('title') }}</h3>
                 <span class="status-badge {{ $copyright->getStatusBadgeColor() }}">{{ $copyright->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
                 <div class="info-section"><h5><i class="fas fa-tag"></i> {{ __('portal.copyright.show.type') }}</h5><p>{{ $copyright->workTypeLabel() }}</p></div>
-                <div class="info-section"><h5><i class="fas fa-align-left"></i> {{ __('portal.copyright.show.description') }}</h5><p>{{ $copyright->work_description }}</p></div>
+                <div class="info-section"><h5><i class="fas fa-align-left"></i> {{ __('portal.copyright.show.description') }}</h5><p>{{ $copyright->tr('work_description') }}</p></div>
                 @if($copyright->copyright_number)
                 <div class="info-section"><h5><i class="fas fa-certificate"></i> {{ __('portal.copyright.show.copyright_number') }}</h5><p class="text-success"><strong>{{ $copyright->copyright_number }}</strong></p></div>
                 @endif

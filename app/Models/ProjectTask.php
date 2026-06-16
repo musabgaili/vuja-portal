@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoTranslations;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +13,10 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class ProjectTask extends Model
 {
+    use HasAutoTranslations;
+
+    protected array $translatable = ['title', 'description'];
+
     use HasFactory, LogsActivity;
 
     protected $fillable = [

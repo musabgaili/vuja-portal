@@ -5,18 +5,18 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">🔍 {{ $research->title }}</h3>
+                <h3 class="card-title">🔍 {{ $research->tr('title') }}</h3>
                 <span class="status-badge {{ $research->getStatusBadgeColor() }}">{{ $research->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
                 <div class="info-section">
                     <h5><i class="fas fa-search"></i> {{ __('portal.research.show.research_topic') }}</h5>
-                    <p>{{ $research->research_topic }}</p>
+                    <p>{{ $research->tr('research_topic') }}</p>
                 </div>
                 @if($research->research_details)
                 <div class="info-section">
                     <h5><i class="fas fa-align-left"></i> {{ __('portal.research.show.details') }}</h5>
-                    <p>{{ $research->research_details }}</p>
+                    <p>{{ $research->tr('research_details') }}</p>
                 </div>
                 @endif
                 @if($research->relevant_links)

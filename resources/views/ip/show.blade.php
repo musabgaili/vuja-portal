@@ -5,12 +5,12 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">📄 {{ $ip->title }}</h3>
+                <h3 class="card-title">📄 {{ $ip->tr('title') }}</h3>
                 <span class="status-badge {{ $ip->getStatusBadgeColor() }}">{{ $ip->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
                 <div class="info-section"><h5><i class="fas fa-tag"></i> {{ __('portal.ip.type') }}</h5><p>{{ $ip->ipTypeLabel() }}</p></div>
-                <div class="info-section"><h5><i class="fas fa-align-left"></i> {{ __('portal.ip.description') }}</h5><p>{{ $ip->ip_description }}</p></div>
+                <div class="info-section"><h5><i class="fas fa-align-left"></i> {{ __('portal.ip.description') }}</h5><p>{{ $ip->tr('ip_description') }}</p></div>
                 @if($ip->registration_number)
                 <div class="info-section"><h5><i class="fas fa-certificate"></i> {{ __('portal.ip.registration_number') }}</h5><p class="text-success"><strong>{{ $ip->registration_number }}</strong></p></div>
                 @endif

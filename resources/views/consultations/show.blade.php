@@ -1,14 +1,14 @@
 @extends('layouts.dashboard')
 
 @section('title', __('portal.consultations.show.title'))
-@section('page-title', $consultation->title)
+@section('page-title', $consultation->tr('title'))
 
 @section('content')
 <div class="row">
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">💬 {{ $consultation->title }}</h3>
+                <h3 class="card-title">💬 {{ $consultation->tr('title') }}</h3>
                 <span class="status-badge {{ $consultation->getStatusBadgeColor() }}">
                     {{ $consultation->getStatusLabel() }}
                 </span>
@@ -21,7 +21,7 @@
 
                 <div class="info-section">
                     <h5><i class="fas fa-align-left"></i> {{ __('portal.consultations.show.description') }}</h5>
-                    <p>{{ $consultation->description }}</p>
+                    <p>{{ $consultation->tr('description') }}</p>
                 </div>
 
                 @if($consultation->specific_questions)

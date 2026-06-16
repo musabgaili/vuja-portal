@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('title', __('portal.ideas.show.page_title'))
-@section('page-title', $idea->title)
+@section('page-title', $idea->tr('title'))
 
 @section('content')
 <div class="row">
@@ -10,7 +10,7 @@
         <!-- Idea Details -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3 class="card-title">💡 {{ $idea->title }}</h3>
+                <h3 class="card-title">💡 {{ $idea->tr('title') }}</h3>
                 <span class="status-badge {{ $idea->getStatusBadgeColor() }}">
                     {{ $idea->getStatusLabel() }}
                 </span>
@@ -37,7 +37,7 @@
 
                 <div class="idea-section">
                     <h5><i class="fas fa-align-left"></i> {{ __('portal.ideas.show.description') }}</h5>
-                    <p>{{ $idea->description }}</p>
+                    <p>{{ $idea->tr('description') }}</p>
                 </div>
 
                 @if($idea->target_market)

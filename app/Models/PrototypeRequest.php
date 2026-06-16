@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoTranslations;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +14,10 @@ use App\Models\Concerns\HasServiceProject;
 
 class PrototypeRequest extends Model
 {
+    use HasAutoTranslations;
+
+    protected array $translatable = ['title', 'description'];
+
     use HasFactory, HasServiceProject, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [

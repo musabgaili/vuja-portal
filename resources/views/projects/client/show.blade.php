@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', $project->title)
+@section('title', $project->tr('title'))
 @section('content')
 
 <style>
@@ -175,8 +175,8 @@
 <div class="client-project-header">
     <div class="row align-items-center">
         <div class="col-md-9">
-            <h1>{{ $project->title }}</h1>
-            <p style="opacity: 0.95; font-size: 1.1rem; margin-bottom: 1.5rem;">{{ $project->description }}</p>
+            <h1>{{ $project->tr('title') }}</h1>
+            <p style="opacity: 0.95; font-size: 1.1rem; margin-bottom: 1.5rem;">{{ $project->tr('description') }}</p>
             <div class="d-flex gap-2">
                 <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white;" onclick="showRequestModal()">
                     <i class="fas fa-hand-paper"></i> {{ __('portal.projects_client.show.submit_request') }}
@@ -261,13 +261,13 @@
         <div class="d-flex justify-content-between align-items-start mb-2">
             <div style="flex: 1;">
                 <h5 style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">
-                    {{ $milestone->title }}
+                    {{ $milestone->tr('title') }}
                     @if($milestone->client_approved)
                     <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> {{ __('portal.projects_client.show.approved') }}</span>
                     @endif
                 </h5>
                 @if($milestone->description)
-                <p style="color: #64748b; margin-bottom: 1rem;">{{ $milestone->description }}</p>
+                <p style="color: #64748b; margin-bottom: 1rem;">{{ $milestone->tr('description') }}</p>
                 @endif
             </div>
             <div class="d-flex gap-2 align-items-start flex-wrap">

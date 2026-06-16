@@ -126,7 +126,7 @@
     <div class="project-card-header">
         <div class="d-flex justify-content-between align-items-start">
             <div style="flex: 1;">
-                <h4 style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">{{ $project->title }}</h4>
+                <h4 style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">{{ $project->tr('title') }}</h4>
                 <small style="color: #64748b;">
                     <i class="fas fa-calendar"></i> {{ __('portal.projects_client.index.started') }} {{ $project->created_at->translatedFormat('M d, Y') }}
                 </small>
@@ -139,7 +139,7 @@
     
     <div class="project-card-body">
         <p style="color: #64748b; line-height: 1.6; margin-bottom: 1.5rem;">
-            {{ Str::limit($project->description, 180) }}
+            {{ Str::limit($project->tr('description'), 180) }}
         </p>
         
         <div class="row mb-3">

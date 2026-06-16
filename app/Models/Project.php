@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoTranslations;
+
 use App\Exceptions\BudgetLockedException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +15,10 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends Model
 {
+    use HasAutoTranslations;
+
+    protected array $translatable = ['title', 'description'];
+
     use HasFactory, HasUuidRouteKey, LogsActivity;
 
     /** Statuses at/after which the budget is locked (client approval onward). */

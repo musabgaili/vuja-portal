@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', $prototype->title)
+@section('title', $prototype->tr('title'))
 @section('page-title', __('portal.prototypes.detail_title'))
 
 @section('content')
@@ -8,7 +8,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">{{ $prototype->title }}</h3>
+        <h3 class="card-title">{{ $prototype->tr('title') }}</h3>
         <span class="badge bg-{{ $prototype->getStatusBadgeColor() }}">{{ $prototype->getStatusLabel() }}</span>
     </div>
     <div class="card-content">
@@ -19,7 +19,7 @@
         </div>
 
         <h6>{{ __('portal.prototypes.field.description') }}</h6>
-        <p style="white-space:pre-line;">{{ $prototype->description }}</p>
+        <p style="white-space:pre-line;">{{ $prototype->tr('description') }}</p>
 
         @if($prototype->goals)
             <h6>{{ __('portal.prototypes.field.goals') }}</h6>
