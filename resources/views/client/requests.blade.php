@@ -174,7 +174,7 @@
                             </span>
                             @if($req['has_quote'])
                             <div class="quote-badge">
-                                <i class="fas fa-dollar-sign"></i>
+                                <i class="fas fa-file-invoice"></i>
                                 {{ number_format($req['quote_amount'], 2) }} {{ config('scope.currency','SAR') }}
                             </div>
                             @endif
