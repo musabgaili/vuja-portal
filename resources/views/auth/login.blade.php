@@ -42,24 +42,17 @@
             border: 1px solid rgba(28, 87, 95, 0.1);
         }
         .logo { text-align: center; margin-bottom: 28px; }
-        .logo .vd-mark {
-            width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, var(--vd-teal-bright) 0%, var(--vd-teal) 55%, var(--vd-slate) 100%);
-            color: #fff; font-weight: 800; font-size: 26px; letter-spacing: -1px;
-            box-shadow: 0 10px 24px rgba(15,150,156,.4);
+        .logo .vd-logo-img {
+            display: block;
+            width: 190px;
+            max-width: 70%;
+            height: auto;
+            margin: 0 auto 6px;
         }
-        .logo h1 {
-            color: var(--vd-slate);
-            font-weight: 700;
-            font-size: 30px;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-        .logo h1 span { color: var(--vd-teal); }
         .logo p {
             color: #64748b;
             font-size: 14px;
+            margin: 0;
         }
         .form-floating {
             margin-bottom: 20px;
@@ -200,8 +193,8 @@
                 @include('partials.locale-switcher')
             </div>
             <div class="logo">
-                <div class="vd-mark" aria-hidden="true">vd</div>
-                <h1>Vuja<span>De</span></h1>
+                <img src="{{ asset('images/vd-logo-light.png') }}?v={{ @filemtime(public_path('images/vd-logo-light.png')) }}"
+                     alt="Vujà Dé Innovation" class="vd-logo-img">
                 <p>{{ __('portal.welcome_back') }}</p>
             </div>
 
