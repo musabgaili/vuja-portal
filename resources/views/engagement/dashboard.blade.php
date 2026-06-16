@@ -51,8 +51,6 @@
     </div>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="row g-3">
     {{-- Left column: redeem + claim --}}
@@ -163,7 +161,7 @@
                             </span>
                         </div>
                         @if($v->voucher_code)<div class="text-muted" style="font-size:.8rem;">{{ __('engagement.voucher_code') }}: <code>{{ $v->voucher_code }}</code></div>@endif
-                        @if($v->expires_at && $v->isIssued())<div class="text-muted" style="font-size:.75rem;">{{ __('engagement.expires') }} {{ $v->expires_at->format('M d, Y') }}</div>@endif
+                        @if($v->expires_at && $v->isIssued())<div class="text-muted" style="font-size:.75rem;">{{ __('engagement.expires') }} {{ $v->expires_at->translatedFormat('M d, Y') }}</div>@endif
 
                         @if($v->isIssued() && ! $v->isExpired() && $v->option->type === 'service_discount')
                             @if($eligibleQuotes->isNotEmpty())
@@ -227,7 +225,7 @@
                             <tr>
                                 <td>
                                     <div style="font-size:.85rem;">{{ $t->description ?: __('engagement.direction.'.$t->direction) }}</div>
-                                    <small class="text-muted">{{ $t->created_at->format('M d, Y') }}@if($t->status === 'pending') · {{ __('engagement.pending_review') }}@endif</small>
+                                    <small class="text-muted">{{ $t->created_at->translatedFormat('M d, Y') }}@if($t->status === 'pending') · {{ __('engagement.pending_review') }}@endif</small>
                                 </td>
                                 <td class="text-end" style="white-space:nowrap; font-weight:700; color: {{ $t->points >= 0 ? 'var(--success-color)' : 'var(--danger-color)' }};">
                                     {{ $t->points >= 0 ? '+' : '' }}{{ number_format($t->points) }}

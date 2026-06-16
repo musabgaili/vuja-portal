@@ -79,6 +79,8 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
         // Quote Actions
         Route::post('/{idea}/accept-quote', [IdeaRequestController::class, 'acceptQuote'])->name('accept-quote');
         Route::post('/{idea}/reject-quote', [IdeaRequestController::class, 'rejectQuote'])->name('reject-quote');
+        // Authorized download of the quote PDF (private disk; replaces the public /storage URL)
+        Route::get('/{idea}/quote-file', [IdeaRequestController::class, 'downloadQuote'])->name('quote.download');
 
         // Payment
         Route::get('/{idea}/payment', [IdeaRequestController::class, 'showPayment'])->name('payment');

@@ -40,7 +40,7 @@ class EngagementAdminController extends Controller
         $stats = [
             'accounts' => PointsAccount::count(),
             'liability' => (int) (clone $approvedEarns)->sum('remaining'),
-            'lifetime_awarded' => (int) (clone $approvedEarns)->sum('points'),
+            'lifetime_awarded' => (int) (clone $approvedEarns)->where('source', '!=', 'reversal')->sum('points'),
             'pending_claims' => EngagementClaim::where('status', 'submitted')->count(),
             'pending_grants' => PointGrantRequest::where('status', 'suggested')->count(),
             'pending_earns' => PointsTransaction::where('direction', 'earn')->where('status', 'pending')->count(),
@@ -210,7 +210,7 @@ class EngagementAdminController extends Controller
 
         $report = [
             'liability_points' => (int) (clone $approvedEarns)->sum('remaining'),
-            'lifetime_awarded' => (int) (clone $approvedEarns)->sum('points'),
+            'lifetime_awarded' => (int) (clone $approvedEarns)->where('source', '!=', 'reversal')->sum('points'),
             'spent' => (int) abs(PointsTransaction::where('direction', 'spend')->sum('points')),
             'expired' => (int) abs(PointsTransaction::where('direction', 'expire')->sum('points')),
             'redemptions_by_type' => Redemption::selectRaw('redemption_options.type, count(*) as n, sum(redemptions.cost_points) as pts')

@@ -15,19 +15,18 @@
     <span class="badge bg-{{ $invoice->statusColor() }}" style="font-size:.9rem;">{{ $invoice->statusLabel() }}</span>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="row g-3">
     <div class="col-lg-7">
         <div class="card mb-3">
             <div class="card-header"><span class="card-title">{{ __('portal.invoices.details') }}</span></div>
-            <div class="card-content">
+            <div class="card-content" style="overflow-x:auto;">
                 <table class="table mb-0">
                     <tr><td>{{ __('portal.invoices.client') }}</td><td class="text-end">{{ $invoice->client?->name }} <small class="text-muted">{{ $invoice->client?->email }}</small></td></tr>
                     <tr><td>{{ __('portal.invoices.project') }}</td><td class="text-end">@if($invoice->project)<a href="{{ route('projects.manager.show', $invoice->project) }}">{{ $invoice->project->title }}</a>@else — @endif</td></tr>
                     <tr><td>{{ __('portal.invoices.amount') }}</td><td class="text-end"><strong>{{ number_format($invoice->amount, 2) }} {{ $invoice->currency }}</strong></td></tr>
-                    @if($invoice->due_date)<tr><td>{{ __('portal.invoices.due_date') }}</td><td class="text-end">{{ $invoice->due_date->format('M d, Y') }}</td></tr>@endif
-                    <tr><td>{{ __('portal.invoices.raised_by') }}</td><td class="text-end">{{ $invoice->creator?->name }} · {{ $invoice->created_at->format('M d, Y') }}</td></tr>
+                    @if($invoice->due_date)<tr><td>{{ __('portal.invoices.due_date') }}</td><td class="text-end">{{ $invoice->due_date->translatedFormat('M d, Y') }}</td></tr>@endif
+                    <tr><td>{{ __('portal.invoices.raised_by') }}</td><td class="text-end">{{ $invoice->creator?->name }} · {{ $invoice->created_at->translatedFormat('M d, Y') }}</td></tr>
                 </table>
                 @if($invoice->description)<p class="text-muted mt-3 mb-0">{{ $invoice->description }}</p>@endif
                 @if($invoice->hasInvoiceFile())
@@ -41,7 +40,7 @@
             <div class="card-header"><span class="card-title"><i class="fas fa-receipt"></i> {{ __('portal.invoices.payment_proof') }}</span></div>
             <div class="card-content">
                 @if($invoice->hasReceipt())
-                    <p class="mb-2">{{ __('portal.invoices.receipt_submitted_on') }} <strong>{{ optional($invoice->receipt_uploaded_at)->format('M d, Y g:i A') }}</strong></p>
+                    <p class="mb-2">{{ __('portal.invoices.receipt_submitted_on') }} <strong>{{ optional($invoice->receipt_uploaded_at)->translatedFormat('M d, Y g:i A') }}</strong></p>
                     <a href="{{ route('invoices.receipt', $invoice) }}" class="btn btn-sm btn-light"><i class="fas fa-download"></i> {{ __('portal.invoices.view_receipt') }}</a>
                 @else
                     <p class="text-muted mb-0">{{ __('portal.invoices.no_receipt_yet') }}</p>
@@ -56,7 +55,7 @@
             <div class="card-header"><span class="card-title">{{ __('portal.invoices.actions') }}</span></div>
             <div class="card-content">
                 @if($invoice->isPaid())
-                    <div class="alert alert-success"><i class="fas fa-circle-check"></i> {{ __('portal.invoices.paid_on') }} {{ optional($invoice->paid_at)->format('M d, Y') }}</div>
+                    <div class="alert alert-success"><i class="fas fa-circle-check"></i> {{ __('portal.invoices.paid_on') }} {{ optional($invoice->paid_at)->translatedFormat('M d, Y') }}</div>
                     <form method="POST" action="{{ route('invoices.reopen', $invoice) }}">@csrf
                         <button class="btn btn-outline-primary w-100"><i class="fas fa-rotate-left"></i> {{ __('portal.invoices.reopen') }}</button>
                     </form>

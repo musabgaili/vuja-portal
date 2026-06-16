@@ -10,8 +10,6 @@
     <a href="{{ route('engagement.admin.dashboard') }}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> {{ __('engagement.admin.dashboard') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="row g-3">
     @if($canSuggest)
@@ -55,11 +53,11 @@
                             @if($g->isSuggested())
                                 @if($canApprove)
                                     <div class="d-flex gap-1 justify-content-end">
-                                        <form method="POST" action="{{ route('engagement.admin.grants.approve', $g) }}">@csrf
+                                        <form method="POST" action="{{ route('engagement.admin.grants.approve', $g) }}" onsubmit="return confirm('{{ __('engagement.admin.approve_grant_confirm') }}')">@csrf
                                             <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> {{ __('engagement.admin.approve_grant') }}</button>
                                         </form>
                                         <form method="POST" action="{{ route('engagement.admin.grants.reject', $g) }}">@csrf
-                                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-xmark"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" title="{{ __('engagement.admin.reject_grant') }}" aria-label="{{ __('engagement.admin.reject_grant') }}"><i class="fas fa-xmark"></i></button>
                                         </form>
                                     </div>
                                 @else

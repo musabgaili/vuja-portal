@@ -10,8 +10,6 @@
     <a href="{{ route('engagement.admin.dashboard') }}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> {{ __('engagement.admin.dashboard') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 {{-- Forms live outside the tables; inputs associate via the HTML5 form="" attribute. --}}
 @foreach($rules as $rule)<form id="rule-{{ $rule->id }}" method="POST" action="{{ route('engagement.admin.rules.update', $rule) }}" class="d-none">@csrf @method('PUT')</form>@endforeach

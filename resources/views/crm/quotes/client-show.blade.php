@@ -17,15 +17,15 @@
         @endif
 
         <div class="card"><div class="card-header"><span class="card-title">{{ __('portal.quote.investment') }}</span></div>
-        <div class="card-content p-0">
+        <div class="card-content p-0" style="overflow-x:auto;">
             <table class="table mb-0">
                 <thead><tr><th>{{ __('portal.quote.category') }}</th><th class="text-end">{{ __('portal.quote.amount') }}</th></tr></thead>
                 <tbody>
                 @foreach($quote->clientGrouped() as $cat => $amount)
-                    <tr><td>{{ $cat }}</td><td class="text-end">${{ number_format($amount, 2) }}</td></tr>
+                    <tr><td>{{ $cat }}</td><td class="text-end">{{ number_format($amount, 2) }} {{ config('scope.currency','SAR') }}</td></tr>
                 @endforeach
                 </tbody>
-                <tfoot><tr><td><strong>{{ __('portal.quote.total') }}</strong></td><td class="text-end"><strong>${{ number_format((float) $quote->total_client, 2) }}</strong></td></tr></tfoot>
+                <tfoot><tr><td><strong>{{ __('portal.quote.total') }}</strong></td><td class="text-end"><strong>{{ number_format((float) $quote->total_client, 2) }} {{ config('scope.currency','SAR') }}</strong></td></tr></tfoot>
             </table>
         </div></div>
     </div>

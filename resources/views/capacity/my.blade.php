@@ -18,8 +18,6 @@
     </div>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="row g-3">
     {{-- Weekly allocation form --}}
@@ -43,6 +41,7 @@
                             <td style="width:110px;">
                                 <div class="input-group input-group-sm">
                                     <input type="number" min="0" max="100" step="1" name="allocations[{{ $cat->id }}]"
+                                        aria-label="{{ $cat->localizedName() }} %"
                                         value="{{ optional($lineByCat->get($cat->id))->percent ? rtrim(rtrim(number_format($lineByCat->get($cat->id)->percent, 1), '0'), '.') : '' }}"
                                         class="form-control alloc-pct" data-cat="{{ $cat->id }}">
                                     <span class="input-group-text">%</span>
@@ -97,7 +96,7 @@
             <div class="col-sm-4"><div class="card h-100"><div class="card-content text-center">
                 <div class="text-muted" style="font-size:.75rem;">{{ __('targets.cap.revenue') }}</div>
                 <div style="font-size:1.5rem; font-weight:800;">{{ number_format($revenue['total']) }}</div>
-                <div class="text-muted" style="font-size:.7rem;">{{ config('targets.currency', 'SAR') }}</div>
+                <div class="text-muted" style="font-size:.7rem;">{{ config('scope.currency', 'SAR') }}</div>
             </div></div></div>
             <div class="col-sm-4"><div class="card h-100"><div class="card-content text-center">
                 <div class="text-muted" style="font-size:.75rem;">{{ __('targets.cap.presales_output') }}</div>

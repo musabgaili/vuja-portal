@@ -13,8 +13,8 @@
 </head>
 <body class="internal-dashboard">
     <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
+    <button type="button" class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="{{ __('portal.app.toggle_nav') }}">
+        <i class="fas fa-bars" aria-hidden="true"></i>
     </button>
     
     <!-- Sidebar Overlay for Mobile -->

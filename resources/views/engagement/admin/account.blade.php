@@ -10,8 +10,6 @@
     <a href="{{ route('engagement.admin.accounts') }}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> {{ __('engagement.admin.accounts') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="row g-3">
     <div class="col-lg-4">
@@ -23,7 +21,7 @@
 
         <div class="card"><div class="card-header"><span class="card-title"><i class="fas fa-pen"></i> {{ __('engagement.admin.manual_adjust') }}</span></div>
         <div class="card-content">
-            <form method="POST" action="{{ route('engagement.admin.account.adjust', $account) }}">@csrf
+            <form method="POST" action="{{ route('engagement.admin.account.adjust', $account) }}" onsubmit="return confirm('{{ __('engagement.admin.adjust_confirm') }}')">@csrf
                 <label class="form-label">{{ __('engagement.admin.adjust_points') }}</label>
                 <input type="number" name="points" class="form-control mb-2" required placeholder="e.g. 50 or -20">
                 <label class="form-label">{{ __('engagement.admin.reason') }}</label>

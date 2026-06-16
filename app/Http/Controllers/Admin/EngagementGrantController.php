@@ -20,7 +20,9 @@ class EngagementGrantController extends Controller
 
     public function index()
     {
-        abort_unless(Auth::user()?->isInternal(), 403);
+        // Only PMs (who suggest) and managers (who approve) may see the queue +
+        // client roster — not every internal employee.
+        abort_unless(Gate::allows('suggest-grant'), 403);
 
         $requests = PointGrantRequest::with('client', 'suggestedBy', 'approvedBy')->latest()->paginate(20);
         $clients = User::where('role', 'client')->orderBy('name')->get(['id', 'name', 'email']);

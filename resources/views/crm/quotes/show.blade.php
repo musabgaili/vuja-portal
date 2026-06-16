@@ -24,17 +24,17 @@
                 @foreach($quote->items as $it)
                     <tr>
                         <td>{{ $it->name }} <span class="badge bg-secondary">{{ $it->category }}</span></td>
-                        <td>${{ number_format((float) $it->internal_cost, 2) }}</td>
+                        <td>{{ number_format((float) $it->internal_cost, 2) }} {{ config('scope.currency','SAR') }}</td>
                         <td>{{ rtrim(rtrim(number_format((float) $it->markup_percentage, 2), '0'), '.') }}%</td>
                         <td class="text-end">{{ $it->qty }}</td>
-                        <td class="text-end">${{ number_format((float) $it->line_client, 2) }}</td>
+                        <td class="text-end">{{ number_format((float) $it->line_client, 2) }} {{ config('scope.currency','SAR') }}</td>
                     </tr>
                 @endforeach
                 </tbody>
                 <tfoot>
-                    <tr><td colspan="4" class="text-end">{{ __('portal.quote.internal_cost') }}</td><td class="text-end">${{ number_format((float) $quote->total_internal, 2) }}</td></tr>
-                    <tr><td colspan="4" class="text-end"><strong>{{ __('portal.quote.client_total') }}</strong></td><td class="text-end"><strong>${{ number_format((float) $quote->total_client, 2) }}</strong></td></tr>
-                    <tr><td colspan="4" class="text-end">{{ __('portal.quote.margin') }}</td><td class="text-end" style="color:var(--success-color);">${{ number_format($quote->margin(), 2) }}</td></tr>
+                    <tr><td colspan="4" class="text-end">{{ __('portal.quote.internal_cost') }}</td><td class="text-end">{{ number_format((float) $quote->total_internal, 2) }} {{ config('scope.currency','SAR') }}</td></tr>
+                    <tr><td colspan="4" class="text-end"><strong>{{ __('portal.quote.client_total') }}</strong></td><td class="text-end"><strong>{{ number_format((float) $quote->total_client, 2) }} {{ config('scope.currency','SAR') }}</strong></td></tr>
+                    <tr><td colspan="4" class="text-end">{{ __('portal.quote.margin') }}</td><td class="text-end" style="color:var(--success-color);">{{ number_format($quote->margin(), 2) }} {{ config('scope.currency','SAR') }}</td></tr>
                 </tfoot>
             </table>
         </div></div>
@@ -119,9 +119,9 @@
         <div class="card-content p-0">
             <table class="table mb-0">
                 @foreach($quote->clientGrouped() as $cat => $amount)
-                    <tr><td>{{ $cat }}</td><td class="text-end">${{ number_format($amount, 2) }}</td></tr>
+                    <tr><td>{{ $cat }}</td><td class="text-end">{{ number_format($amount, 2) }} {{ config('scope.currency','SAR') }}</td></tr>
                 @endforeach
-                <tr><td><strong>{{ __('portal.quote.total') }}</strong></td><td class="text-end"><strong>${{ number_format((float) $quote->total_client, 2) }}</strong></td></tr>
+                <tr><td><strong>{{ __('portal.quote.total') }}</strong></td><td class="text-end"><strong>{{ number_format((float) $quote->total_client, 2) }} {{ config('scope.currency','SAR') }}</strong></td></tr>
             </table>
         </div></div>
 

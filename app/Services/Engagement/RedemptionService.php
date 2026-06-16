@@ -74,8 +74,11 @@ class RedemptionService
             if (! $redemption->isIssued() || $redemption->isExpired()) {
                 throw new \RuntimeException('This voucher is not redeemable.');
             }
-            // Never re-price a quote that has already been accepted/converted or declined.
-            if (in_array($quote->status, ['accepted', 'rejected'], true)) {
+            // A voucher may only be applied to a quote awaiting the client's decision
+            // ('sent') — not a draft / in-approval / already accepted/declined quote.
+            // This mirrors the dashboard's eligible-quote filter and stops a client
+            // from discounting an in-flight quote whose price staff haven't finalised.
+            if ($quote->status !== 'sent') {
                 throw new \RuntimeException('This quote can no longer be discounted.');
             }
             if ($quote->discount_amount > 0 || $quote->discount_percent > 0) {
@@ -109,6 +112,33 @@ class RedemptionService
                     'reversal',
                     $redemption,
                     $reason,
+                );
+            }
+        });
+    }
+
+    /**
+     * Release an applied service-discount voucher when its quote is declined /
+     * abandoned: clear the discount on the quote and REFUND the spent points, so
+     * a normal decline never strands the client's loyalty currency.
+     */
+    public function releaseForQuote(Quote $quote): void
+    {
+        $redemption = Redemption::where('applied_to_quote_id', $quote->id)->where('status', 'applied')->first();
+        if (! $redemption) {
+            return;
+        }
+
+        DB::transaction(function () use ($redemption, $quote) {
+            $this->discounts->removeDiscount($quote->id);
+            $redemption->forceFill(['status' => 'cancelled', 'applied_to_quote_id' => null, 'applied_at' => null])->save();
+            if ($redemption->cost_points > 0) {
+                $this->points->awardPoints(
+                    $redemption->account,
+                    (int) $redemption->cost_points,
+                    'reversal',
+                    $redemption,
+                    'Discount voucher released — quote not accepted',
                 );
             }
         });

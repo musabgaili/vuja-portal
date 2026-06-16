@@ -15,9 +15,14 @@ class PrototypeRequestFile extends Model
         return $this->belongsTo(PrototypeRequest::class);
     }
 
+    /**
+     * Files live on the PRIVATE disk and are served only through the authorize()-
+     * gated download route, so there is no public URL to expose. Use
+     * route('prototypes.files.download', $file) in views.
+     */
     public function getUrlAttribute(): ?string
     {
-        return $this->path ? Storage::disk('public')->url($this->path) : null;
+        return null;
     }
 
     /** Human-readable file size. */

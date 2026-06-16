@@ -57,13 +57,9 @@ Route::get('/r/{code}', function (string $code) {
     return redirect()->route('register');
 })->name('referral.capture');
 
-Route::get('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect()->route('login');
-});
+// NOTE: logout is POST-only (Auth::routes registers `POST /logout` named 'logout').
+// The nav submits a CSRF-protected POST form; a GET logout route was removed to
+// close a logout-CSRF vector (a state change on an unprotected GET).
 
 // Social Authentication Routes
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');

@@ -21,7 +21,7 @@ class DeliverableController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'file' => 'required|file|max:51200', // 50MB
+            'file' => 'required|file|max:51200|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,png,jpg,jpeg,gif,zip,txt,csv,dwg', // 50MB
         ]);
 
         $file = $request->file('file');

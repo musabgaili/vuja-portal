@@ -10,7 +10,7 @@
 </div>
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
-<div class="card"><div class="card-content p-0">
+<div class="card"><div class="card-content p-0" style="overflow-x:auto;">
     <table class="table mb-0">
         <thead><tr><th>{{ __('portal.quote.quote') }}</th><th>{{ __('portal.quote.client') }}</th><th>{{ __('portal.quote.deal') }}</th><th class="text-end">{{ __('portal.quote.total') }}</th><th>{{ __('portal.quote.status') }}</th></tr></thead>
         <tbody>
@@ -19,7 +19,7 @@
                 <td><a href="{{ route('quotes.show', $q) }}" style="font-weight:600;">#{{ $q->id }} · {{ $q->title }}</a></td>
                 <td>{{ $q->client->name ?? '—' }}</td>
                 <td>{{ $q->opportunity?->name ?? '—' }}</td>
-                <td class="text-end">${{ number_format((float) $q->total_client, 0) }}</td>
+                <td class="text-end">{{ number_format((float) $q->total_client, 0) }} {{ config('scope.currency','SAR') }}</td>
                 <td><span class="badge bg-{{ $q->statusColor() }}">{{ $q->statusLabel() }}</span></td>
             </tr>
         @empty

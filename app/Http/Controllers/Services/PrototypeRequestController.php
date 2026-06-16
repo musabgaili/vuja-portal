@@ -76,9 +76,9 @@ class PrototypeRequestController extends Controller
     {
         $this->authorize('view', $file->prototypeRequest);
 
-        abort_unless(Storage::disk('public')->exists($file->path), 404);
+        abort_unless(Storage::disk('private')->exists($file->path), 404);
 
-        return Storage::disk('public')->download($file->path, $file->original_name);
+        return Storage::disk('private')->download($file->path, $file->original_name);
     }
 
     // ---------------- MANAGER / EMPLOYEE SIDE ----------------
@@ -165,7 +165,9 @@ class PrototypeRequestController extends Controller
             if (! $file) {
                 continue;
             }
-            $path = $file->store('prototypes/'.$prototype->id, 'public');
+            // Private disk: client business plans/specs must only be reachable via
+            // the authorize()-gated downloadFile route, never a public /storage URL.
+            $path = $file->store('prototypes/'.$prototype->id, 'private');
             PrototypeRequestFile::create([
                 'prototype_request_id' => $prototype->id,
                 'path' => $path,

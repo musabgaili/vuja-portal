@@ -13,7 +13,6 @@
     </form>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="d-flex gap-2 flex-wrap mb-3">
     <a href="{{ route('capacity.admin.engineers') }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-user-gear"></i> {{ __('targets.cap.engineers') }}</a>
@@ -41,7 +40,7 @@
                 <td><span class="badge bg-{{ $uRag }}">{{ (int) $row->utilization }}%</span></td>
                 @foreach($categories as $c)
                     @php $pct = $row->alloc[$c->id]['pct'] ?? 0; @endphp
-                    <td style="text-align:center; {{ $pct > 0 ? 'background: rgba(15,150,156,'.min(0.85, $pct/100 + 0.12).'); color:'.($pct >= 45 ? '#fff' : 'inherit').';' : '' }} font-size:.8rem;">
+                    <td style="text-align:center; {{ $pct > 0 ? 'background: rgba(var(--primary-rgb), '.min(0.85, $pct/100 + 0.12).'); color:'.($pct >= 45 ? '#fff' : 'var(--text-color)').';' : '' }} font-size:.8rem;">
                         {{ $pct > 0 ? (int) $pct.'%' : '—' }}
                     </td>
                 @endforeach
@@ -76,6 +75,10 @@
     @empty
         <p class="text-muted mb-0" style="font-size:.85rem;">{{ __('targets.cap.no_engineers') }}</p>
     @endforelse
+    <div class="d-flex gap-3 mb-1" style="font-size:.72rem; color:var(--gray-600);">
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--primary-bright);vertical-align:middle;"></span> {{ __('targets.cap.delivery') }}</span>
+        <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--warning-color);vertical-align:middle;"></span> {{ __('targets.cap.presales') }}</span>
+    </div>
     <small class="text-muted">{{ __('targets.cap.balance_hint') }}</small>
 </div></div>
 @endsection

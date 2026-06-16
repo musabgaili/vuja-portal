@@ -75,7 +75,7 @@
     <div class="col-lg-{{ $isManager ? 7 : 12 }}">
         <div class="card">
             <div class="card-header"><span class="card-title"><i class="fas fa-trophy"></i> {{ __('portal.engagement.leaderboard') }}</span></div>
-            <div class="card-content p-0">
+            <div class="card-content p-0" style="overflow-x:auto;">
                 <table class="table mb-0">
                     <thead><tr><th style="width:60px;">#</th><th>{{ __('portal.engagement.name') }}</th><th>{{ __('portal.engagement.level_col') }}</th><th class="text-end">{{ __('portal.engagement.ip') }}</th></tr></thead>
                     <tbody>

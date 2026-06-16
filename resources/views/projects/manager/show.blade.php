@@ -886,11 +886,13 @@ function renderTaskComments(comments){
         box.innerHTML = '<p class="text-muted" style="font-size:.85rem;">' + @js(__('portal.projects_manager.modals.no_comments')) + '</p>';
         return;
     }
+    var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(ch){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]; }); };
     box.innerHTML = comments.map(function(c){
         return '<div style="border-bottom:1px solid var(--gray-200); padding:.4rem 0;">'
-            + '<strong style="font-size:.85rem;">' + (c.user || '') + '</strong> '
-            + '<small class="text-muted">' + (c.time || '') + '</small>'
-            + '<div style="font-size:.9rem;">' + (c.comment || '').replace(/</g,'&lt;') + '</div></div>';
+            + '<strong style="font-size:.85rem;">' + esc(c.user) + '</strong> '
+            + '<small class="text-muted">' + esc(c.time) + '</small>'
+            + '<div style="font-size:.9rem;">' + esc(c.comment) + '</div></div>';
     }).join('');
 }
 

@@ -105,7 +105,7 @@
                 <div class="card-content">
                     @if($idea->quote_status === 'pending_approval' && auth()->user()->isManager())
                         <button id="approveQuoteButton" class="btn btn-warning btn-block mb-2" onclick="approveQuote()"><i class="fas fa-check-circle"></i> {{ __('portal.ideas.manager.show.approve_quote') }}</button>
-                        <a href="{{ asset('storage/' . $idea->quote_file_path) }}" target="_blank" class="btn btn-secondary btn-block mb-2">
+                        <a href="{{ route('ideas.quote.download', $idea) }}" class="btn btn-secondary btn-block mb-2">
                             <i class="fas fa-file-pdf"></i> {{ __('portal.ideas.manager.show.view_quote_file') }}
                         </a>
                     @endif

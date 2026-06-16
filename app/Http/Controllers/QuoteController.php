@@ -184,6 +184,10 @@ class QuoteController extends Controller
         $validated = $request->validate(['reject_reason' => 'nullable|string|max:255']);
         $quote->update(['status' => 'rejected', 'reject_reason' => $validated['reject_reason'] ?? null]);
 
+        // If the client had applied a discount voucher to this quote, release it and
+        // refund the points — declining must never strand their loyalty currency.
+        app(\App\Services\Engagement\RedemptionService::class)->releaseForQuote($quote);
+
         return back()->with('success', 'Quote declined.');
     }
 
@@ -200,8 +204,15 @@ class QuoteController extends Controller
             return $quote->project;
         }
 
-        $project = DB::transaction(function () use ($quote, $signature, $ip) {
-            $project = Project::create([
+        // One deal = one project. If this quote's opportunity was already converted
+        // to a project (e.g. the manager clicked "Win & convert"), reuse THAT project
+        // instead of creating a duplicate that double-books budget/revenue.
+        $existingProject = $quote->opportunity?->converted_project_id
+            ? Project::find($quote->opportunity->converted_project_id)
+            : null;
+
+        $project = DB::transaction(function () use ($quote, $signature, $ip, $existingProject) {
+            $project = $existingProject ?: Project::create([
                 'title' => $quote->title,
                 'description' => $quote->scope ? \Illuminate\Support\Str::limit(strip_tags($quote->scope), 4000) : $quote->title,
                 'client_id' => $quote->client_id,

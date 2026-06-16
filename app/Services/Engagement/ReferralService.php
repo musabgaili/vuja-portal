@@ -122,6 +122,30 @@ class ReferralService
         });
     }
 
+    /** Claw back a vested referral payment reward (e.g. the invoice was reopened/cancelled). */
+    public function reversePaymentReward(\App\Models\Referral $referral, string $reason): void
+    {
+        if (! $referral->payment_rewarded_at) {
+            return;
+        }
+        DB::transaction(function () use ($referral, $reason) {
+            $referral = \App\Models\Referral::lockForUpdate()->find($referral->id);
+            if (! $referral || ! $referral->payment_rewarded_at) {
+                return;
+            }
+            $txn = \App\Models\PointsTransaction::where('source', 'referral_payment')
+                ->where('reference_type', $referral->getMorphClass())
+                ->where('reference_id', $referral->id)
+                ->where('direction', 'earn')->where('status', 'approved')
+                ->latest('id')->first();
+            if ($txn) {
+                $this->points->reverse($txn, $reason);
+            }
+            // Back to 'signed_up' so the reward can re-vest if the project is genuinely paid again.
+            $referral->update(['status' => 'signed_up', 'payment_rewarded_at' => null, 'qualifying_project_id' => null]);
+        });
+    }
+
     /** When a referred client's project is paid in full, reward the referrer once. */
     public function rewardPaymentIfReferred(User $client, int $projectId): void
     {

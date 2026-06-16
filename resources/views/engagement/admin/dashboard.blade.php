@@ -7,7 +7,6 @@
     <p style="margin:.25rem 0 0; opacity:.9;">{{ __('engagement.admin.subtitle') }}</p>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="row g-3 mb-3">
     @php

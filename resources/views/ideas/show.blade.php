@@ -68,7 +68,7 @@
                         <div class="quote-amount">${{ number_format($idea->final_quote, 2) }}</div>
                         @if($idea->quote_file_path)
                         <div class="mt-3">
-                            <a href="{{ asset('storage/' . $idea->quote_file_path) }}" target="_blank" class="btn btn-primary">
+                            <a href="{{ route('ideas.quote.download', $idea) }}" class="btn btn-primary">
                                 <i class="fas fa-file-pdf"></i> {{ __('portal.ideas.show.download_quote') }}
                             </a>
                         </div>

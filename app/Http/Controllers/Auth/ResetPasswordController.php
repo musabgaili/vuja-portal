@@ -26,4 +26,10 @@ class ResetPasswordController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    public function __construct()
+    {
+        // Rate-limit reset attempts per IP (token brute-force / abuse).
+        $this->middleware('throttle:6,1')->only('reset');
+    }
 }

@@ -9,8 +9,6 @@
     <a href="{{ route('engagement.admin.dashboard') }}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> {{ __('engagement.admin.dashboard') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="mb-3 d-flex gap-2 flex-wrap">
     @foreach(['submitted','approved','rejected','all'] as $s)
@@ -41,8 +39,8 @@
                 <td style="white-space:nowrap;">{{ $claim->created_at->format('Y-m-d') }}</td>
                 <td class="text-end">
                     <div class="d-flex gap-1 justify-content-end flex-wrap">
-                        @if($claim->post_url)<a href="{{ $claim->post_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-light"><i class="fas fa-link"></i></a>@endif
-                        @if($claim->screenshot_path)<a href="{{ route('engagement.admin.claims.screenshot', $claim) }}" class="btn btn-sm btn-light"><i class="fas fa-image"></i></a>@endif
+                        @if($claim->post_url)<a href="{{ $claim->post_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-light" title="{{ __('engagement.admin.view_post') }}" aria-label="{{ __('engagement.admin.view_post') }}"><i class="fas fa-link"></i></a>@endif
+                        @if($claim->screenshot_path)<a href="{{ route('engagement.admin.claims.screenshot', $claim) }}" class="btn btn-sm btn-light" title="{{ __('engagement.admin.view_screenshot') }}" aria-label="{{ __('engagement.admin.view_screenshot') }}"><i class="fas fa-image"></i></a>@endif
                         @if($claim->isSubmitted())
                             <button class="btn btn-sm btn-success" type="button" onclick="document.getElementById('rev-{{ $claim->id }}').classList.toggle('d-none')"><i class="fas fa-gavel"></i> {{ __('engagement.admin.approve') }}/{{ __('engagement.admin.reject') }}</button>
                         @else

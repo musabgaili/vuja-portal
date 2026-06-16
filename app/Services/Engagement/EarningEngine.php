@@ -72,6 +72,28 @@ class EarningEngine
         $this->referrals->rewardPaymentIfReferred($client, $projectId);
     }
 
+    /**
+     * A project's payment was reopened/cancelled. If it's no longer paid in full,
+     * claw back any referral payment reward that vested on it.
+     */
+    public function recordPaymentReopened(int $projectId): void
+    {
+        if ($this->billing->isProjectPaidInFull($projectId)) {
+            return; // still paid in full — nothing to undo
+        }
+        $clientId = $this->billing->clientOf($projectId);
+        if (! $clientId) {
+            return;
+        }
+        $referral = \App\Models\Referral::where('referred_client_id', $clientId)
+            ->where('status', 'rewarded')
+            ->where('qualifying_project_id', $projectId)
+            ->first();
+        if ($referral) {
+            $this->referrals->reversePaymentReward($referral, 'Referral reward reversed — project no longer paid in full');
+        }
+    }
+
     /** One-time award when a client has filled in their core profile (name, email, phone). */
     public function recordProfileComplete(User $client): ?PointsTransaction
     {

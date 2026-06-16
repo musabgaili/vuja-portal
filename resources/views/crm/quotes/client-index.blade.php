@@ -13,7 +13,7 @@
                 <h3 style="font-size:1.05rem; font-weight:600; margin:0;">{{ $q->title }}</h3>
                 <span class="badge bg-{{ $q->statusColor() }}">{{ ucfirst($q->status) }}</span>
             </div>
-            <div style="font-size:1.5rem; font-weight:800; color:var(--primary-color); margin:.5rem 0;">${{ number_format((float) $q->total_client, 2) }}</div>
+            <div style="font-size:1.5rem; font-weight:800; color:var(--primary-color); margin:.5rem 0;">{{ number_format((float) $q->total_client, 2) }} {{ config('scope.currency','SAR') }}</div>
             <a href="{{ route('quotes.client.show', $q) }}" class="btn btn-primary btn-sm">{{ __('portal.quote.review') }} <i class="fas fa-arrow-right"></i></a>
         </div></div>
     </div>

@@ -32,7 +32,7 @@
                     <div class="text-muted" style="font-size:.85rem;">
                         <strong>{{ $inv->invoice_number }}</strong>
                         @if($inv->project) · <a href="{{ route('projects.client.show', $inv->project) }}" style="color:var(--primary-color);text-decoration:none;">{{ $inv->project->title }}</a>@endif
-                        @if($inv->due_date) · {{ __('portal.invoices.due') }} {{ $inv->due_date->format('M d, Y') }}@endif
+                        @if($inv->due_date) · {{ __('portal.invoices.due') }} {{ $inv->due_date->translatedFormat('M d, Y') }}@endif
                     </div>
                     @if($inv->description)<p class="text-muted mt-1 mb-0" style="font-size:.85rem;">{{ $inv->description }}</p>@endif
                 </div>
@@ -53,7 +53,7 @@
                 </div>
 
                 @if($inv->isPaid())
-                    <span class="text-success"><i class="fas fa-circle-check"></i> {{ __('portal.invoices.paid_on') }} {{ optional($inv->paid_at)->format('M d, Y') }}</span>
+                    <span class="text-success"><i class="fas fa-circle-check"></i> {{ __('portal.invoices.paid_on') }} {{ optional($inv->paid_at)->translatedFormat('M d, Y') }}</span>
                 @elseif($inv->isProofSubmitted())
                     <span class="text-info"><i class="fas fa-hourglass-half"></i> {{ __('portal.invoices.under_review') }}</span>
                 @endif

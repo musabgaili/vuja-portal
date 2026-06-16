@@ -59,6 +59,15 @@ class IdeaRequestController extends Controller
         return view('ideas.show', compact('idea'));
     }
 
+    /** Authorized download of the (private-disk) quote PDF — replaces the old public /storage URL. */
+    public function downloadQuote(IdeaRequest $idea)
+    {
+        $this->authorize('view', $idea);
+        abort_unless($idea->quote_file_path && \Illuminate\Support\Facades\Storage::disk('private')->exists($idea->quote_file_path), 404);
+
+        return \Illuminate\Support\Facades\Storage::disk('private')->download($idea->quote_file_path);
+    }
+
     /**
      * Show AI assessment page.
      */
@@ -273,9 +282,11 @@ class IdeaRequestController extends Controller
         ]);
 
         // Store quote file when one was attached, otherwise keep the existing one.
+        // Private disk: a commercial quote PDF must only be reachable via the
+        // authorize()-gated download route, never a public /storage URL.
         $quotePath = $idea->quote_file_path;
         if ($request->hasFile('quote_file')) {
-            $quotePath = $request->file('quote_file')->store('quotes', 'public');
+            $quotePath = $request->file('quote_file')->store('quotes', 'private');
         }
 
         $idea->update([

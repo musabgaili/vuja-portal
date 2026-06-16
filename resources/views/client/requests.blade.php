@@ -175,7 +175,7 @@
                             @if($req['has_quote'])
                             <div class="quote-badge">
                                 <i class="fas fa-dollar-sign"></i>
-                                ${{ number_format($req['quote_amount'], 2) }}
+                                {{ number_format($req['quote_amount'], 2) }} {{ config('scope.currency','SAR') }}
                             </div>
                             @endif
                             @if(isset($req['meeting_date']) && $req['meeting_date'])

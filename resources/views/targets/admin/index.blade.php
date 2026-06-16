@@ -14,8 +14,6 @@
     </form>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="row g-3">
     {{-- Set / adjust a target --}}
@@ -93,7 +91,7 @@
                                 <strong style="color: {{ $r->overall >= 100 ? 'var(--success-color)' : ($r->overall >= 70 ? 'var(--warning-color)' : 'var(--danger-color)') }};">{{ (int) $r->overall }}%</strong>
                             @else <span class="text-muted">—</span> @endif
                         </td>
-                        <td class="text-end"><a href="{{ route('targets.admin.show', $r->user) }}" class="btn btn-sm btn-light"><i class="fas fa-chart-line"></i></a></td>
+                        <td class="text-end"><a href="{{ route('targets.admin.show', $r->user) }}" class="btn btn-sm btn-light" title="{{ __('targets.trend_6mo') }}" aria-label="{{ __('targets.trend_6mo') }} — {{ $r->user->name }}"><i class="fas fa-chart-line"></i></a></td>
                     </tr>
                 @endforeach
                 </tbody>

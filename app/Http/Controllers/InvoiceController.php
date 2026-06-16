@@ -125,14 +125,24 @@ class InvoiceController extends Controller
             'note' => $validated['note'] ?? $invoice->note,
         ]);
 
+        // If this un-pays the project, claw back any referral reward that vested on it.
+        if ($invoice->project_id) {
+            app(\App\Services\Engagement\EarningEngine::class)->recordPaymentReopened((int) $invoice->project_id);
+        }
+
         return back()->with('success', __('portal.invoices.reopened'));
     }
 
     public function cancel(Invoice $invoice)
     {
         $this->guardManage();
+        $wasPaid = $invoice->status === 'paid';
 
         $invoice->update(['status' => 'cancelled']);
+
+        if ($wasPaid && $invoice->project_id) {
+            app(\App\Services\Engagement\EarningEngine::class)->recordPaymentReopened((int) $invoice->project_id);
+        }
 
         return back()->with('success', __('portal.invoices.cancelled_done'));
     }

@@ -19,4 +19,11 @@ class ForgotPasswordController extends Controller
     */
 
     use SendsPasswordResetEmails;
+
+    public function __construct()
+    {
+        // Rate-limit reset-link requests per IP to blunt account enumeration and
+        // mail-bombing (mirrors RegisterController / VerificationController).
+        $this->middleware('throttle:6,1')->only('sendResetLinkEmail');
+    }
 }

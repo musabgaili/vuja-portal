@@ -8,8 +8,6 @@
     <a href="{{ route('capacity.admin.dashboard') }}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> {{ __('targets.cap.admin_title') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="row g-3">
     <div class="col-lg-4"><div class="card"><div class="card-header"><span class="card-title"><i class="fas fa-plus"></i> {{ __('targets.cap.add_leave') }}</span></div>

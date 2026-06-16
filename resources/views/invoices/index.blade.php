@@ -14,7 +14,6 @@
     <a href="{{ route('invoices.create') }}" class="btn btn-light"><i class="fas fa-plus"></i> {{ __('portal.invoices.new_invoice') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -51,7 +50,7 @@
                             <span class="badge bg-{{ $inv->statusColor() }}">{{ $inv->statusLabel() }}</span>
                             @if($inv->isProofSubmitted())<i class="fas fa-receipt text-info" title="{{ __('portal.invoices.receipt_attached') }}"></i>@endif
                         </td>
-                        <td class="text-end"><a href="{{ route('invoices.show', $inv) }}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a></td>
+                        <td class="text-end"><a href="{{ route('invoices.show', $inv) }}" class="btn btn-sm btn-primary" title="{{ $inv->invoice_number }}" aria-label="{{ __('portal.invoices.invoice') }} {{ $inv->invoice_number }}"><i class="fas fa-eye"></i></a></td>
                     </tr>
                 @endforeach
                 </tbody>

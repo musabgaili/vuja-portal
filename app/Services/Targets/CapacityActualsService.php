@@ -20,17 +20,31 @@ class CapacityActualsService
 {
     public function __construct(private ProjectsBridge $projects, private QuotesBridge $quotes) {}
 
+    /** Per-request memos so the dashboard doesn't re-query per metric per engineer. */
+    private array $allocCache = [];
+
+    private ?array $billableIds = null;
+
     /** @return Collection<int, WeeklyAllocation> submitted allocations whose week starts in the month */
     public function monthAllocations(TeamMember $member, Carbon $month): Collection
     {
+        $key = $member->id.'|'.$month->format('Y-m');
+        if (isset($this->allocCache[$key])) {
+            return $this->allocCache[$key];
+        }
         $start = $month->copy()->startOfMonth();
         $end = $start->copy()->endOfMonth();
 
-        return WeeklyAllocation::with('lines')
+        return $this->allocCache[$key] = WeeklyAllocation::with('lines')
             ->where('team_member_id', $member->id)
             ->where('status', 'submitted')
             ->whereBetween('week_start', [$start, $end])
             ->get();
+    }
+
+    private function billableCategoryIds(): array
+    {
+        return $this->billableIds ??= ActivityCategory::where('is_billable', true)->pluck('id')->all();
     }
 
     public function availableHours(TeamMember $member, Carbon $month): float
@@ -67,7 +81,7 @@ class CapacityActualsService
             return 0.0;
         }
 
-        $billableIds = ActivityCategory::where('is_billable', true)->pluck('id')->all();
+        $billableIds = $this->billableCategoryIds();
         $billableHours = 0.0;
         foreach ($allocations as $a) {
             foreach ($a->lines as $line) {

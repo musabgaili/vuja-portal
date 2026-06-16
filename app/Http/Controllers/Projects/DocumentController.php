@@ -31,7 +31,7 @@ class DocumentController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'file' => 'required|file|max:20480', // 20MB
+            'file' => 'required|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,png,jpg,jpeg,gif,zip,txt,csv,dwg', // 20MB
             'tag' => 'required|string|in:initial,design,development,final,other',
             'comment' => 'nullable|string',
         ]);
@@ -64,7 +64,7 @@ class DocumentController extends Controller
             'title' => 'required|string|max:255',
             'tag' => 'required|string|in:initial,design,development,final,other',
             'comment' => 'nullable|string',
-            'file' => 'nullable|file|max:20480',
+            'file' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,png,jpg,jpeg,gif,zip,txt,csv,dwg',
         ]);
 
         // Update file if provided

@@ -8,8 +8,6 @@
     <a href="{{ route('capacity.admin.dashboard') }}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> {{ __('targets.cap.admin_title') }}</a>
 </div>
 
-@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 <div class="card mb-3"><div class="card-content">
     <form method="GET" class="d-flex gap-2 align-items-end flex-wrap">
@@ -56,7 +54,7 @@
                 <select name="activity_category_id" class="form-select mb-2" required>
                     @foreach($categories as $c)<option value="{{ $c->id }}">{{ $c->localizedName() }}</option>@endforeach
                 </select>
-                <label class="form-label">{{ __('targets.cap.value') }} ({{ config('targets.currency','SAR') }})</label>
+                <label class="form-label">{{ __('targets.cap.value') }} ({{ config('scope.currency','SAR') }})</label>
                 <input type="number" step="0.01" min="0" name="value" class="form-control mb-2" id="asg-value" required>
                 <button class="btn btn-primary w-100">{{ __('targets.cap.assign') }}</button>
             </form>
