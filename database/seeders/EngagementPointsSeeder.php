@@ -70,10 +70,10 @@ class EngagementPointsSeeder extends Seeder
     private function tiers(): array
     {
         return [
-            ['key' => 'explorer', 'name' => 'Explorer', 'name_ar' => 'مستكشف', 'min_lifetime_points' => 0, 'badge' => 'compass', 'perks' => ['Base access']],
-            ['key' => 'innovator', 'name' => 'Innovator', 'name_ar' => 'مبتكر', 'min_lifetime_points' => 200, 'badge' => 'lightbulb', 'perks' => ['Featured idea', 'AI-engine trial pass']],
-            ['key' => 'pioneer', 'name' => 'Pioneer', 'name_ar' => 'رائد', 'min_lifetime_points' => 600, 'badge' => 'rocket', 'perks' => ['Priority scheduling', 'Event invites']],
-            ['key' => 'partner', 'name' => 'Partner', 'name_ar' => 'شريك', 'min_lifetime_points' => 1500, 'badge' => 'crown', 'perks' => ['Top perks', 'Advisory invites', 'Case-study feature', 'Dedicated contact']],
+            ['key' => 'explorer', 'name' => 'Explorer', 'name_ar' => 'مستكشف', 'min_lifetime_points' => 0, 'badge' => 'compass', 'perks' => ['en' => ['Base access'], 'ar' => ['وصول أساسي']]],
+            ['key' => 'innovator', 'name' => 'Innovator', 'name_ar' => 'مبتكر', 'min_lifetime_points' => 200, 'badge' => 'lightbulb', 'perks' => ['en' => ['Featured idea', 'AI-engine trial pass'], 'ar' => ['فكرة مميّزة', 'تجربة محرك الأفكار']]],
+            ['key' => 'pioneer', 'name' => 'Pioneer', 'name_ar' => 'رائد', 'min_lifetime_points' => 600, 'badge' => 'rocket', 'perks' => ['en' => ['Priority scheduling', 'Event invites'], 'ar' => ['أولوية الجدولة', 'دعوات الفعاليات']]],
+            ['key' => 'partner', 'name' => 'Partner', 'name_ar' => 'شريك', 'min_lifetime_points' => 1500, 'badge' => 'crown', 'perks' => ['en' => ['Top perks', 'Advisory invites', 'Case-study feature', 'Dedicated contact'], 'ar' => ['أفضل المزايا', 'دعوات استشارية', 'عرض دراسة حالة', 'مسؤول مخصص']]],
         ];
     }
 }

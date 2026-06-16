@@ -41,7 +41,12 @@ class ReferralService
         }
     }
 
-    /** On a new client account: attribute the referral, reward the referrer, give a welcome perk. */
+    /**
+     * On a new client account: record the referral attribution (status 'pending').
+     * The signup reward + welcome perk vest only when the referred client VERIFIES
+     * their email (confirmSignup) — this blunts throwaway-account farming, since a
+     * farmer must control and verify each email.
+     */
     public function attributeSignup(User $newClient): void
     {
         $code = $this->rememberedCode();
@@ -50,8 +55,14 @@ class ReferralService
         }
 
         $referrer = PointsAccount::where('referral_code', $code)->first();
-        // Anti-abuse: unknown code or self-referral.
-        if (! $referrer || $referrer->client_id === $newClient->id) {
+        if (! $referrer) {
+            return;
+        }
+
+        // Anti-abuse: a referrer cannot refer themselves (same account or same email).
+        $referrerEmail = strtolower(trim((string) $referrer->client?->email));
+        $referredEmail = strtolower(trim((string) $newClient->email));
+        if ($referrer->client_id === $newClient->id || ($referrerEmail !== '' && $referrerEmail === $referredEmail)) {
             return;
         }
 
@@ -60,46 +71,65 @@ class ReferralService
             return;
         }
 
-        DB::transaction(function () use ($referrer, $newClient, $code) {
-            $referral = Referral::create([
-                'referrer_account_id' => $referrer->id,
-                'referred_client_id' => $newClient->id,
-                'referred_email' => $newClient->email,
-                'code_used' => $code,
-                'status' => 'signed_up',
-                'signup_rewarded_at' => now(),
-            ]);
-
-            $this->points->awardByRule($referrer, 'referral_signup', $referral, 'Referral signup: '.$newClient->name);
-
-            // Two-sided: the referred client gets starter points.
-            $welcome = (int) config('engagement_points.welcome_points', 0);
-            if ($welcome > 0) {
-                $this->points->awardPoints(
-                    $this->points->accountFor($newClient),
-                    $welcome,
-                    'welcome',
-                    $referral,
-                    'Welcome bonus',
-                );
-            }
-        });
+        Referral::create([
+            'referrer_account_id' => $referrer->id,
+            'referred_client_id' => $newClient->id,
+            'referred_email' => $newClient->email,
+            'code_used' => $code,
+            'status' => 'pending',
+        ]);
 
         try {
             session()->forget('referral_code');
         } catch (\Throwable $e) {
             // ignore
         }
+
+        // If the account is already verified at creation (admin-created / OAuth), vest now.
+        if ($newClient->hasVerifiedEmail()) {
+            $this->confirmSignup($newClient);
+        }
+    }
+
+    /** Vest the signup reward + welcome perk once the referred client verifies their email. */
+    public function confirmSignup(User $client): void
+    {
+        if (! $client->isClient()) {
+            return;
+        }
+        $pending = Referral::where('referred_client_id', $client->id)
+            ->where('status', 'pending')
+            ->whereNull('signup_rewarded_at')
+            ->first();
+        if (! $pending) {
+            return;
+        }
+
+        DB::transaction(function () use ($pending, $client) {
+            $referral = Referral::lockForUpdate()->find($pending->id);
+            if (! $referral || $referral->status !== 'pending' || $referral->signup_rewarded_at) {
+                return; // already vested by a concurrent call
+            }
+
+            $this->points->awardByRule($referral->referrer, 'referral_signup', $referral, 'Referral signup: '.$client->name);
+            $referral->update(['status' => 'signed_up', 'signup_rewarded_at' => now()]);
+
+            // Two-sided: the referred client gets starter points.
+            $welcome = (int) config('engagement_points.welcome_points', 0);
+            if ($welcome > 0) {
+                $this->points->awardPoints($this->points->accountFor($client), $welcome, 'welcome', $referral, 'Welcome bonus');
+            }
+        });
     }
 
     /** When a referred client's project is paid in full, reward the referrer once. */
     public function rewardPaymentIfReferred(User $client, int $projectId): void
     {
-        $referral = Referral::where('referred_client_id', $client->id)
+        $candidate = Referral::where('referred_client_id', $client->id)
             ->whereIn('status', ['signed_up', 'qualified'])
             ->whereNull('payment_rewarded_at')
             ->first();
-        if (! $referral) {
+        if (! $candidate) {
             return;
         }
 
@@ -111,7 +141,12 @@ class ReferralService
         $threshold = (float) config('engagement_points.referral_value_threshold', 20000);
         $ruleKey = $value >= $threshold ? 'referral_payment_large' : 'referral_payment_small';
 
-        DB::transaction(function () use ($referral, $ruleKey, $projectId) {
+        DB::transaction(function () use ($candidate, $ruleKey, $projectId) {
+            // Lock + re-check so two concurrent paid-in-full triggers can't double-award.
+            $referral = Referral::lockForUpdate()->find($candidate->id);
+            if (! $referral || $referral->payment_rewarded_at || ! in_array($referral->status, ['signed_up', 'qualified'], true)) {
+                return;
+            }
             $this->points->awardByRule($referral->referrer, $ruleKey, $referral, 'Referral first payment');
             $referral->update([
                 'status' => 'rewarded',

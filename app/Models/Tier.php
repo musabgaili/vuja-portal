@@ -20,4 +20,22 @@ class Tier extends Model
     {
         return app()->getLocale() === 'ar' && $this->name_ar ? $this->name_ar : $this->name;
     }
+
+    /**
+     * Perks for the current locale. Supports the bilingual shape
+     * ['en' => [...], 'ar' => [...]] and falls back to a legacy flat array.
+     */
+    public function localizedPerks(): array
+    {
+        $perks = $this->perks;
+        if (is_array($perks) && (isset($perks['en']) || isset($perks['ar']))) {
+            $set = app()->getLocale() === 'ar'
+                ? ($perks['ar'] ?? $perks['en'] ?? [])
+                : ($perks['en'] ?? []);
+
+            return (array) $set;
+        }
+
+        return (array) ($perks ?? []);
+    }
 }

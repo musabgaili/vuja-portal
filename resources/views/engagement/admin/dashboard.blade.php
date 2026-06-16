@@ -17,6 +17,7 @@
             ['label' => __('engagement.admin.lifetime_awarded'), 'value' => number_format($stats['lifetime_awarded']), 'icon' => 'star', 'color' => 'var(--primary-bright)'],
             ['label' => __('engagement.admin.pending_claims'), 'value' => number_format($stats['pending_claims']), 'icon' => 'bullhorn', 'color' => 'var(--info-color)', 'link' => route('engagement.admin.claims.index')],
             ['label' => __('engagement.admin.pending_grants'), 'value' => number_format($stats['pending_grants']), 'icon' => 'hand-holding-dollar', 'color' => 'var(--info-color)', 'link' => route('engagement.admin.grants.index')],
+            ['label' => __('engagement.admin.pending_earns'), 'value' => number_format($stats['pending_earns']), 'icon' => 'hourglass-half', 'color' => 'var(--info-color)', 'link' => route('engagement.admin.pending-earns')],
             ['label' => __('engagement.admin.redemptions_made'), 'value' => number_format($stats['redemptions']), 'icon' => 'gift', 'color' => 'var(--success-color)'],
         ];
     @endphp
@@ -37,6 +38,7 @@
     <a href="{{ route('engagement.admin.config') }}" class="btn btn-primary"><i class="fas fa-sliders"></i> {{ __('engagement.admin.config') }}</a>
     <a href="{{ route('engagement.admin.claims.index') }}" class="btn btn-outline-primary"><i class="fas fa-bullhorn"></i> {{ __('engagement.admin.claims_queue') }}</a>
     <a href="{{ route('engagement.admin.grants.index') }}" class="btn btn-outline-primary"><i class="fas fa-hand-holding-dollar"></i> {{ __('engagement.admin.grants') }}</a>
+    <a href="{{ route('engagement.admin.pending-earns') }}" class="btn btn-outline-primary"><i class="fas fa-hourglass-half"></i> {{ __('engagement.admin.pending_earns') }}</a>
     <a href="{{ route('engagement.admin.accounts') }}" class="btn btn-outline-primary"><i class="fas fa-users"></i> {{ __('engagement.admin.accounts') }}</a>
     <a href="{{ route('engagement.admin.report') }}" class="btn btn-outline-primary"><i class="fas fa-chart-column"></i> {{ __('engagement.admin.report') }}</a>
 </div>

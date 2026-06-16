@@ -61,29 +61,37 @@ class RedemptionService
         if ($redemption->option->type !== 'service_discount') {
             throw new \RuntimeException('This voucher is not a service discount.');
         }
-        if (! $redemption->isIssued() || $redemption->isExpired()) {
-            throw new \RuntimeException('This voucher is not redeemable.');
-        }
-        // Never re-price a quote that has already been accepted/converted or declined.
-        if (in_array($quote->status, ['accepted', 'rejected'], true)) {
-            throw new \RuntimeException('This quote can no longer be discounted.');
-        }
-        if ($quote->discount_amount > 0 || $quote->discount_percent > 0) {
-            throw new \RuntimeException('This quote already has a discount applied.');
-        }
 
         $percent = (float) $redemption->meta('percent', 0);
         $cap = (float) $redemption->meta('cap_sar', config('engagement_points.discount_cap_sar', 2500));
 
-        $discount = $this->discounts->applyServiceDiscount($quote->id, $percent, $cap);
+        // Serialise the check-then-act so two requests can't both apply a discount
+        // (one voucher per quote, spec §9).
+        return DB::transaction(function () use ($redemption, $quote, $percent, $cap) {
+            $redemption = Redemption::lockForUpdate()->findOrFail($redemption->id);
+            $quote = Quote::lockForUpdate()->findOrFail($quote->id);
 
-        $redemption->forceFill([
-            'status' => 'applied',
-            'applied_to_quote_id' => $quote->id,
-            'applied_at' => now(),
-        ])->save();
+            if (! $redemption->isIssued() || $redemption->isExpired()) {
+                throw new \RuntimeException('This voucher is not redeemable.');
+            }
+            // Never re-price a quote that has already been accepted/converted or declined.
+            if (in_array($quote->status, ['accepted', 'rejected'], true)) {
+                throw new \RuntimeException('This quote can no longer be discounted.');
+            }
+            if ($quote->discount_amount > 0 || $quote->discount_percent > 0) {
+                throw new \RuntimeException('This quote already has a discount applied.');
+            }
 
-        return $discount;
+            $discount = $this->discounts->applyServiceDiscount($quote->id, $percent, $cap);
+
+            $redemption->forceFill([
+                'status' => 'applied',
+                'applied_to_quote_id' => $quote->id,
+                'applied_at' => now(),
+            ])->save();
+
+            return $discount;
+        });
     }
 
     /** Cancel an unused voucher and refund the points. */

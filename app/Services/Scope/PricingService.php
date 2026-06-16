@@ -80,7 +80,10 @@ class PricingService
         }
 
         // --- Service-discount voucher (engagement reward): SERVICE lines only, capped (spec §9) ---
-        $discountPercent = (float) ($quote->discount_percent ?? 0);
+        // Hard-clamp the percent to the contractual maximum (15%) regardless of how
+        // it reached the quote — margin protection that holds even if a bad value slips in.
+        $maxPct = (float) config('engagement_points.discount_percent_max', 15);
+        $discountPercent = min((float) ($quote->discount_percent ?? 0), $maxPct);
         $discountAmount = 0.0;
         if ($discountPercent > 0 && $servicesTotal > 0) {
             $raw = round($servicesTotal * $discountPercent / 100, 2);

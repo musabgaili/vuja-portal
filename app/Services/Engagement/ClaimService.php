@@ -36,6 +36,17 @@ class ClaimService
             }
         }
 
+        // Anti-fraud: recency window (spec §11) — no claiming stale posts.
+        $recency = (int) config('engagement_points.claim_recency_days', 30);
+        if ($recency > 0 && ! empty($data['posted_at'])) {
+            $posted = $data['posted_at'] instanceof \DateTimeInterface
+                ? \Illuminate\Support\Carbon::instance($data['posted_at'])
+                : \Illuminate\Support\Carbon::parse($data['posted_at']);
+            if ($posted->lt(now()->subDays($recency))) {
+                throw new \RuntimeException('This post is older than the '.$recency.'-day claim window.');
+            }
+        }
+
         return EngagementClaim::create([
             'points_account_id' => $account->id,
             'earning_rule_key' => $ruleKey,
@@ -97,10 +108,13 @@ class ClaimService
         if (empty($rule->cap_count)) {
             return true;
         }
+        // Bucket by when points were CREDITED (the linked transaction), not when the
+        // claim was submitted — otherwise a backlog submitted in one month but
+        // approved the next would evade the per-period cap.
         $count = EngagementClaim::where('points_account_id', $account->id)
             ->where('earning_rule_key', $rule->key)
             ->where('status', 'approved')
-            ->where('created_at', '>=', $this->periodStart($rule->cap_period))
+            ->whereHas('transaction', fn ($q) => $q->where('created_at', '>=', $this->periodStart($rule->cap_period)))
             ->count();
 
         return $count < $rule->cap_count;

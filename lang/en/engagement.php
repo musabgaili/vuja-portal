@@ -151,6 +151,11 @@ return [
         'lifetime_awarded' => 'Lifetime points awarded',
         'pending_claims' => 'Claims to review',
         'pending_grants' => 'Grants to approve',
+        'pending_earns' => 'Earns to review',
+        'pending_earns_sub' => 'Points held for review (e.g. a client\'s 6th+ accepted idea) — approve to credit.',
+        'no_pending_earns' => 'No earns awaiting review.',
+        'earn_approved' => 'Points approved and credited.',
+        'earn_rejected' => 'Earn rejected — no points credited.',
         'redemptions_made' => 'Redemptions',
         'top_advocates' => 'Top advocates',
 

@@ -244,6 +244,11 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::post('/engagement-points/accounts/{account}/adjust', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'adjust'])->name('engagement.admin.account.adjust');
         Route::get('/engagement-points/report', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'report'])->name('engagement.admin.report');
 
+        // ENGAGEMENT POINTS — pending earns review (e.g. 6th+ accepted idea, spec §7)
+        Route::get('/engagement-points/pending-earns', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'pendingEarns'])->name('engagement.admin.pending-earns');
+        Route::post('/engagement-points/earns/{transaction}/approve', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'approveEarn'])->name('engagement.admin.earns.approve');
+        Route::post('/engagement-points/earns/{transaction}/reject', [\App\Http\Controllers\Admin\EngagementAdminController::class, 'rejectEarn'])->name('engagement.admin.earns.reject');
+
         // ENGAGEMENT POINTS — claims review queue (spec §11)
         Route::get('/engagement-points/claims', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'index'])->name('engagement.admin.claims.index');
         Route::post('/engagement-points/claims/{claim}/approve', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'approve'])->name('engagement.admin.claims.approve');

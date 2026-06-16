@@ -69,8 +69,9 @@
                             <strong>{{ $tier->localizedName() }} @if($isMine)<span class="badge bg-primary">{{ __('engagement.your_status') }}</span>@endif</strong>
                             <span class="text-muted" style="font-size:.85rem;">{{ number_format($tier->min_lifetime_points) }}+ {{ __('engagement.min_lifetime') }}</span>
                         </div>
-                        @if(!empty($tier->perks))
-                            <div class="text-muted" style="font-size:.8rem;">{{ implode(' · ', (array) $tier->perks) }}</div>
+                        @php $perks = $tier->localizedPerks(); @endphp
+                        @if(!empty($perks))
+                            <div class="text-muted" style="font-size:.8rem;">{{ implode(' · ', $perks) }}</div>
                         @endif
                     </div>
                 @endforeach

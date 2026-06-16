@@ -196,6 +196,10 @@ class PointsService
 
         foreach ($earns as $earn) {
             DB::transaction(function () use ($earn, &$expired) {
+                // Serialise on the account so a concurrent spend()/reverse() can't
+                // race this earn's remaining (mirrors spend()'s lock).
+                PointsAccount::lockForUpdate()->findOrFail($earn->points_account_id);
+                $earn->refresh();
                 $amount = (int) $earn->remaining;
                 if ($amount <= 0) {
                     return;
@@ -225,7 +229,10 @@ class PointsService
     public function reverse(PointsTransaction $earn, string $reason): PointsTransaction
     {
         return DB::transaction(function () use ($earn, $reason) {
-            $remaining = (int) $earn->remaining;
+            // Serialise on the account so a concurrent spend()/expire() can't race
+            // this earn's remaining.
+            PointsAccount::lockForUpdate()->findOrFail($earn->points_account_id);
+            $earn->refresh();
 
             $rev = new PointsTransaction([
                 'direction' => 'reverse',
@@ -253,7 +260,11 @@ class PointsService
         $approvedEarns = $account->transactions()
             ->where('direction', 'earn')->where('status', 'approved');
 
-        $lifetime = (int) (clone $approvedEarns)->sum('points');
+        // Lifetime = genuinely EARNED points only. A 'reversal'-sourced credit is a
+        // refund of a spend (e.g. a cancelled voucher) — it restores spendable
+        // balance but must NOT inflate lifetime (which would farm tiers). Balance
+        // still counts it, since the points are spendable again.
+        $lifetime = (int) (clone $approvedEarns)->where('source', '!=', 'reversal')->sum('points');
         $balance = (int) (clone $approvedEarns)->sum('remaining');
 
         $account->forceFill([

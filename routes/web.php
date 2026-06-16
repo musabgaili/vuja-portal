@@ -49,6 +49,14 @@ Route::get('/', function () {
 
 Auth::routes(['verify' => true]);
 
+// Referral share link (spec §10): <APP_URL>/r/<code> remembers the code for the
+// next registration, then sends the visitor to sign up.
+Route::get('/r/{code}', function (string $code) {
+    app(\App\Services\Engagement\ReferralService::class)->rememberCode($code);
+
+    return redirect()->route('register');
+})->name('referral.capture');
+
 Route::get('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();

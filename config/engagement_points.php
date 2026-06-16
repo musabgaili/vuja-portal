@@ -20,7 +20,9 @@ return [
     'referral_min_qualifying' => 1000,     // min project value to count as a qualifying referral
 
     'discount_cap_sar' => 2500,            // default per-redemption SAR cap on service discounts
+    'discount_percent_max' => 15,          // hard ceiling on a service discount (spec §3/§9: 15% max)
     'voucher_validity_days' => 180,        // issued voucher lifetime
+    'claim_recency_days' => 30,            // a claimed post must be within this many days (spec §11)
 
     'welcome_points' => 25,                // starter points for a referred client (two-sided perk)
 

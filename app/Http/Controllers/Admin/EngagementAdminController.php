@@ -43,6 +43,7 @@ class EngagementAdminController extends Controller
             'lifetime_awarded' => (int) (clone $approvedEarns)->sum('points'),
             'pending_claims' => EngagementClaim::where('status', 'submitted')->count(),
             'pending_grants' => PointGrantRequest::where('status', 'suggested')->count(),
+            'pending_earns' => PointsTransaction::where('direction', 'earn')->where('status', 'pending')->count(),
             'redemptions' => Redemption::count(),
         ];
 
@@ -88,7 +89,7 @@ class EngagementAdminController extends Controller
         $this->guard();
         $data = $request->validate([
             'cost_points' => 'required|integer|min:0|max:100000',
-            'percent' => 'nullable|numeric|min:0|max:100',
+            'percent' => 'nullable|numeric|min:0|max:'.(int) config('engagement_points.discount_percent_max', 15),
             'cap_sar' => 'nullable|numeric|min:0|max:1000000',
             'days' => 'nullable|integer|min:0|max:3650',
             'minutes' => 'nullable|integer|min:0|max:1440',
@@ -173,6 +174,33 @@ class EngagementAdminController extends Controller
         $this->points->spend($account, $deduct, 'reversal', null, $data['reason']);
 
         return back()->with('success', __('engagement.admin.adjusted'));
+    }
+
+    /** Queue of earns held for review (e.g. a client's 6th+ accepted idea). */
+    public function pendingEarns()
+    {
+        $this->guard();
+        $earns = PointsTransaction::with('account.client', 'reference')
+            ->where('direction', 'earn')->where('status', 'pending')
+            ->latest()->paginate(20);
+
+        return view('engagement.admin.pending-earns', compact('earns'));
+    }
+
+    public function approveEarn(PointsTransaction $transaction)
+    {
+        $this->guard();
+        $this->points->approveEarn($transaction, Auth::id());
+
+        return back()->with('success', __('engagement.admin.earn_approved'));
+    }
+
+    public function rejectEarn(PointsTransaction $transaction)
+    {
+        $this->guard();
+        $this->points->rejectEarn($transaction, Auth::id());
+
+        return back()->with('success', __('engagement.admin.earn_rejected'));
     }
 
     public function report()

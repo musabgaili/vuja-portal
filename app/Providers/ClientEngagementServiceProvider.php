@@ -12,6 +12,8 @@ use App\Engagement\Contracts\IdeasBridge;
 use App\Engagement\Contracts\QuoteDiscountBridge;
 use App\Models\User;
 use App\Services\Engagement\ReferralService;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -37,10 +39,19 @@ class ClientEngagementServiceProvider extends ServiceProvider
         // A Project Manager may suggest a discretionary grant (Manager approves).
         Gate::define('suggest-grant', fn (User $u) => $u->isProjectManager() || $u->isManager());
 
-        // Attribute a referral when a referred client account is created.
+        // Attribute a referral when a referred client account is created (records
+        // the attribution; the reward vests on email verification, below).
         User::created(function (User $user) {
             if ($user->isClient()) {
                 app(ReferralService::class)->attributeSignup($user);
+            }
+        });
+
+        // Vest the referral signup reward + welcome perk once the referred client
+        // verifies their email — blunts throwaway-account farming.
+        Event::listen(Verified::class, function (Verified $event) {
+            if ($event->user instanceof User && $event->user->isClient()) {
+                app(ReferralService::class)->confirmSignup($event->user);
             }
         });
     }
