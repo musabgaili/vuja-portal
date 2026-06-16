@@ -117,7 +117,7 @@ class TargetService
                 $log = $logs->get($key);
                 $points->push((object) [
                     'period' => $period,
-                    'label' => $period->format('M'),
+                    'label' => $period->locale(app()->getLocale())->isoFormat('MMM'),
                     'target' => (float) $log->target_value,
                     'actual' => (float) $log->actual_value,
                     'live' => false,
@@ -128,7 +128,7 @@ class TargetService
                     ->where('target_metric_id', $metric->id)->whereDate('period', $period)->first();
                 $points->push((object) [
                     'period' => $period,
-                    'label' => $period->format('M'),
+                    'label' => $period->locale(app()->getLocale())->isoFormat('MMM'),
                     'target' => (float) ($target->target_value ?? 0),
                     'actual' => $target ? $this->actuals->actualFor($user, $metric, $period) : 0.0,
                     'live' => true,
@@ -136,7 +136,7 @@ class TargetService
             } else {
                 $points->push((object) [
                     'period' => $period,
-                    'label' => $period->format('M'),
+                    'label' => $period->locale(app()->getLocale())->isoFormat('MMM'),
                     'target' => 0.0,
                     'actual' => 0.0,
                     'live' => false,

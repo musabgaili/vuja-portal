@@ -4,6 +4,7 @@ return [
     // Shared / chip / trend
     'chip' => 'الأهداف',
     'chip_title' => 'أهدافك الشهرية — التقدّم الإجمالي',
+    'chip_none' => 'لا أهداف بعد',
     'actual' => 'الفعلي',
     'target' => 'المستهدف',
     'auto' => 'تلقائي',
@@ -65,5 +66,10 @@ return [
         'active' => 'مفعّل',
         'save' => 'حفظ',
         'manual_metric_hint' => 'المقاييس التي تضيفها يدوية — تُدخل القيمة الفعلية عند التسجيل.',
+        'role' => [
+            'employee' => 'موظف',
+            'project_manager' => 'مدير مشروع',
+            'manager' => 'مدير',
+        ],
     ],
 ];

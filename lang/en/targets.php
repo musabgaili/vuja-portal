@@ -4,6 +4,7 @@ return [
     // Shared / chip / trend
     'chip' => 'Targets',
     'chip_title' => 'Your monthly targets — overall progress',
+    'chip_none' => 'No targets yet',
     'actual' => 'Actual',
     'target' => 'Target',
     'auto' => 'auto',
@@ -65,5 +66,10 @@ return [
         'active' => 'Active',
         'save' => 'Save',
         'manual_metric_hint' => 'Metrics you add are manual — you enter the actual when recording.',
+        'role' => [
+            'employee' => 'Employee',
+            'project_manager' => 'Project Manager',
+            'manager' => 'Manager',
+        ],
     ],
 ];

@@ -114,6 +114,7 @@ class ActualsService
         return PerformanceTarget::with('metric')
             ->where('user_id', $user->id)
             ->whereDate('period', $month->copy()->startOfMonth())
+            ->whereHas('metric', fn ($q) => $q->where('is_active', true))
             ->get()
             ->map(function (PerformanceTarget $t) use ($user, $month) {
                 $actual = $this->actualFor($user, $t->metric, $month);

@@ -340,6 +340,8 @@ class ProjectController extends Controller
             ]);
         }
 
+        $wasCompleted = $project->status === 'completed';
+
         $project->update([
             'status' => $validated['status'],
             'actual_end_date' => now(),
@@ -347,11 +349,16 @@ class ProjectController extends Controller
         ]);
 
         // "Project closed" — credit the PM / account manager, gated behind their
-        // monthly closed target (points only for closing beyond the goal).
-        if ($validated['status'] === 'completed') {
+        // monthly closed target. Only on the transition INTO completed, and once
+        // per project per user (so reopen→reclose can never re-award).
+        if ($validated['status'] === 'completed' && ! $wasCompleted) {
             $gate = app(\App\Services\Targets\TargetPointsGate::class);
             foreach (collect([$project->project_manager_id, $project->account_manager_id])->filter()->unique() as $uid) {
-                if ($u = \App\Models\User::find($uid)) {
+                $alreadyAwarded = \App\Models\EngagementLog::where('action', 'project_closed')
+                    ->where('subject_type', \App\Models\Project::class)
+                    ->where('subject_id', $project->id)
+                    ->where('user_id', $uid)->exists();
+                if (! $alreadyAwarded && ($u = \App\Models\User::find($uid))) {
                     $gate->awardIfEarned($u, 'project_closed', $project, 'Project completed: '.$project->title);
                 }
             }

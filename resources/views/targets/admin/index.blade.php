@@ -73,7 +73,8 @@
                 <tbody>
                 @foreach($rows as $r)
                     <tr>
-                        <td><strong>{{ $r->user->name }}</strong><div class="text-muted" style="font-size:.72rem;">{{ ucfirst(str_replace('_',' ', $r->user->role->value ?? '')) }}</div></td>
+                        @php $roleVal = $r->user->role->value ?? ''; $roleKey = 'targets.admin.role.'.$roleVal; @endphp
+                        <td><strong>{{ $r->user->name }}</strong><div class="text-muted" style="font-size:.72rem;">{{ \Illuminate\Support\Facades\Lang::has($roleKey) ? __($roleKey) : ucfirst(str_replace('_', ' ', $roleVal)) }}</div></td>
                         @foreach($metrics as $m)
                             @php $cell = $r->summary->get($m->id); @endphp
                             <td>
