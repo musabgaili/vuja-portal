@@ -134,6 +134,12 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $this->isInternal() && ($this->isEmployee() || $this->isProjectManager());
     }
 
+    /** Capacity layer: the engineer (team member) record for this user, if tracked. */
+    public function teamMember(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(TeamMember::class, 'user_id');
+    }
+
     /**
      * Get the activity log options for the model.
      */

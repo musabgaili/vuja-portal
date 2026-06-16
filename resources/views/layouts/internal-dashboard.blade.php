@@ -61,6 +61,12 @@
                         <i class="fas fa-bullseye"></i>
                         {{ __('targets.my_title') }}
                     </a>
+                    @if(auth()->user()->teamMember)
+                    <a href="{{ route('capacity.my') }}" class="nav-item {{ request()->routeIs('capacity.my') ? 'active' : '' }}">
+                        <i class="fas fa-gauge-high"></i>
+                        {{ __('targets.cap.my_title') }}
+                    </a>
+                    @endif
                     <a href="{{ route('improvement-ideas.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.index') || request()->routeIs('improvement-ideas.create') || request()->routeIs('improvement-ideas.show') ? 'active' : '' }}">
                         <i class="fas fa-rocket"></i>
                         {{ __('portal.nav.improvement_ideas') }}
@@ -247,6 +253,10 @@
                     <a href="{{ route('targets.admin.index') }}" class="nav-item {{ request()->routeIs('targets.admin.*') ? 'active' : '' }}">
                         <i class="fas fa-bullseye"></i>
                         {{ __('targets.admin.title') }}
+                    </a>
+                    <a href="{{ route('capacity.admin.dashboard') }}" class="nav-item {{ request()->routeIs('capacity.admin.*') ? 'active' : '' }}">
+                        <i class="fas fa-gauge-high"></i>
+                        {{ __('targets.cap.admin_title') }}
                     </a>
                     <a href="{{ route('improvement-ideas.manager.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.manager.*') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-check"></i>

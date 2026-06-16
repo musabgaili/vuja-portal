@@ -49,6 +49,10 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // PERFORMANCE TARGETS — my targets + live progress + 6-month trend (all internal staff)
     Route::get('/my-targets', [\App\Http\Controllers\StaffTargetController::class, 'index'])->name('targets.my');
 
+    // CAPACITY — my weekly allocation + monthly capacity (team members / engineers)
+    Route::get('/capacity', [\App\Http\Controllers\CapacityController::class, 'index'])->name('capacity.my');
+    Route::post('/capacity/week', [\App\Http\Controllers\CapacityController::class, 'save'])->name('capacity.save');
+
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
@@ -263,6 +267,19 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::get('/targets-admin/metrics', [\App\Http\Controllers\Admin\TargetController::class, 'metrics'])->name('targets.admin.metrics');
         Route::post('/targets-admin/metrics', [\App\Http\Controllers\Admin\TargetController::class, 'storeMetric'])->name('targets.admin.metrics.store');
         Route::put('/targets-admin/metrics/{metric}', [\App\Http\Controllers\Admin\TargetController::class, 'updateMetric'])->name('targets.admin.metrics.update');
+
+        // CAPACITY — manager control room (dashboard, engineers/skills, leave, assignments, submissions)
+        Route::get('/capacity-admin', [\App\Http\Controllers\Admin\CapacityController::class, 'dashboard'])->name('capacity.admin.dashboard');
+        Route::get('/capacity-admin/engineers', [\App\Http\Controllers\Admin\CapacityController::class, 'engineers'])->name('capacity.admin.engineers');
+        Route::post('/capacity-admin/engineers', [\App\Http\Controllers\Admin\CapacityController::class, 'storeEngineer'])->name('capacity.admin.engineers.store');
+        Route::put('/capacity-admin/engineers/{teamMember}', [\App\Http\Controllers\Admin\CapacityController::class, 'updateEngineer'])->name('capacity.admin.engineers.update');
+        Route::get('/capacity-admin/leave', [\App\Http\Controllers\Admin\CapacityController::class, 'leave'])->name('capacity.admin.leave');
+        Route::post('/capacity-admin/leave', [\App\Http\Controllers\Admin\CapacityController::class, 'storeLeave'])->name('capacity.admin.leave.store');
+        Route::delete('/capacity-admin/leave/{leaveEntry}', [\App\Http\Controllers\Admin\CapacityController::class, 'deleteLeave'])->name('capacity.admin.leave.delete');
+        Route::get('/capacity-admin/assignments', [\App\Http\Controllers\Admin\CapacityController::class, 'assignments'])->name('capacity.admin.assignments');
+        Route::post('/capacity-admin/assignments', [\App\Http\Controllers\Admin\CapacityController::class, 'storeAssignment'])->name('capacity.admin.assignments.store');
+        Route::delete('/capacity-admin/assignments/{assignment}', [\App\Http\Controllers\Admin\CapacityController::class, 'deleteAssignment'])->name('capacity.admin.assignments.delete');
+        Route::get('/capacity-admin/submissions', [\App\Http\Controllers\Admin\CapacityController::class, 'submissions'])->name('capacity.admin.submissions');
 
         // ENGAGEMENT POINTS — claims review queue (spec §11)
         Route::get('/engagement-points/claims', [\App\Http\Controllers\Admin\EngagementClaimController::class, 'index'])->name('engagement.admin.claims.index');
