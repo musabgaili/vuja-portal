@@ -15,7 +15,7 @@
                 <span class="status-badge {{ $consultation->getStatusBadgeColor() }}">{{ $consultation->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
-                <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.category') }}:</strong> <span class="badge bg-info">{{ $consultation->category }}</span></div>
+                <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.category') }}:</strong> <span class="badge bg-info">{{ $consultation->categoryLabel() }}</span></div>
                 <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.description') }}:</strong><p>{{ $consultation->description }}</p></div>
                 @if($consultation->preferred_date)
                 <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.preferred_date') }}:</strong> {{ $consultation->preferred_date }}</div>
@@ -24,7 +24,7 @@
                 <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.preferred_time') }}:</strong> {{ $consultation->preferred_time }}</div>
                 @endif
                 @if($consultation->meeting_scheduled_at)
-                <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.meeting_scheduled') }}:</strong> {{ $consultation->meeting_scheduled_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.meeting_scheduled') }}:</strong> {{ $consultation->meeting_scheduled_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($consultation->meeting_link)
                 <div class="mb-3"><strong>{{ __('portal.consultations.manager.show.meeting_link') }}:</strong> <a href="{{ $consultation->meeting_link }}" target="_blank">{{ $consultation->meeting_link }}</a></div>
@@ -39,7 +39,7 @@
                 <p><strong>{{ __('portal.consultations.manager.show.name') }}:</strong> {{ $consultation->user->name }}</p>
                 <p><strong>{{ __('portal.consultations.manager.show.email') }}:</strong> <a href="mailto:{{ $consultation->user->email }}">{{ $consultation->user->email }}</a></p>
                 @if($consultation->user->phone)<p><strong>{{ __('portal.consultations.manager.show.phone') }}:</strong> <a href="tel:{{ $consultation->user->phone }}">{{ $consultation->user->phone }}</a></p>@endif
-                <p><strong>{{ __('portal.consultations.manager.show.submitted') }}:</strong> {{ $consultation->created_at->format('M d, Y H:i') }}</p>
+                <p><strong>{{ __('portal.consultations.manager.show.submitted') }}:</strong> {{ $consultation->created_at->translatedFormat('M d, Y H:i') }}</p>
             </div>
         </div>
         <div class="card mb-3">

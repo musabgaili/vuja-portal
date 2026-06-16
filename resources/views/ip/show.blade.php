@@ -9,13 +9,13 @@
                 <span class="status-badge {{ $ip->getStatusBadgeColor() }}">{{ $ip->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
-                <div class="info-section"><h5><i class="fas fa-tag"></i> {{ __('portal.ip.type') }}</h5><p>{{ $ip->ip_type }}</p></div>
+                <div class="info-section"><h5><i class="fas fa-tag"></i> {{ __('portal.ip.type') }}</h5><p>{{ $ip->ipTypeLabel() }}</p></div>
                 <div class="info-section"><h5><i class="fas fa-align-left"></i> {{ __('portal.ip.description') }}</h5><p>{{ $ip->ip_description }}</p></div>
                 @if($ip->registration_number)
                 <div class="info-section"><h5><i class="fas fa-certificate"></i> {{ __('portal.ip.registration_number') }}</h5><p class="text-success"><strong>{{ $ip->registration_number }}</strong></p></div>
                 @endif
                 @if($ip->meeting_confirmed_at)
-                <div class="info-section"><h5><i class="fas fa-calendar"></i> {{ __('portal.ip.meeting') }}</h5><p>{{ $ip->meeting_requested_at->format('M d, Y g:i A') }}</p>
+                <div class="info-section"><h5><i class="fas fa-calendar"></i> {{ __('portal.ip.meeting') }}</h5><p>{{ $ip->meeting_requested_at->translatedFormat('M d, Y g:i A') }}</p>
                 @if($ip->meeting_link)<a href="{{ $ip->meeting_link }}" class="btn btn-primary" target="_blank"><i class="fas fa-video"></i> {{ __('portal.meetings.join') }}</a>@endif</div>
                 @endif
             </div>

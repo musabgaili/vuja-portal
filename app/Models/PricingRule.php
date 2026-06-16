@@ -29,4 +29,14 @@ class PricingRule extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /** Display name for the current locale; falls back to name_en then the legacy item. */
+    public function localizedName(): string
+    {
+        if (app()->getLocale() === 'ar' && filled($this->name_ar)) {
+            return $this->name_ar;
+        }
+
+        return $this->name_en ?: $this->item;
+    }
 }

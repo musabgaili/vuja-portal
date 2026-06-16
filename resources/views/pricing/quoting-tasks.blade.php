@@ -85,7 +85,7 @@ body { font-family: 'Inter', sans-serif; }
                 <br><small class="text-muted ms-3">{{ __('portal.pricing.by') }} {{ $project->quotedBy->name }}</small>
                 @endif
                 @if($project->quoted_at)
-                <br><small class="text-muted ms-3">{{ $project->quoted_at->format('M d, Y H:i') }}</small>
+                <br><small class="text-muted ms-3">{{ $project->quoted_at->translatedFormat('M d, Y H:i') }}</small>
                 @endif
             </div>
             @endif

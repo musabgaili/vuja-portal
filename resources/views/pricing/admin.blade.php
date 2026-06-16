@@ -135,7 +135,7 @@ body { font-family: 'Inter', sans-serif; }
             <tbody>
                 @forelse($rules as $rule)
                 <tr>
-                    <td><strong>{{ $rule->item }}</strong></td>
+                    <td><strong>{{ $rule->localizedName() }}</strong></td>
                     <td><strong class="text-success">${{ number_format($rule->rate, 2) }}</strong></td>
                     <td><span class="badge bg-secondary">{{ $rule->unit }}</span></td>
                     <td><span class="badge bg-info">{{ $rule->level }}</span></td>

@@ -11,7 +11,7 @@
                 <div class="alert alert-info mb-4">
                     <h5>{{ __('portal.meetings.selected_time_slot') }}</h5>
                     <p class="mb-0">
-                        <i class="fas fa-calendar"></i> {{ $timeSlot->date->format('l, F d, Y') }}
+                        <i class="fas fa-calendar"></i> {{ $timeSlot->date->translatedFormat('l, F d, Y') }}
                         <br>
                         <i class="fas fa-clock"></i> {{ $timeSlot->getFormattedTimeRange() }}
                         <br>

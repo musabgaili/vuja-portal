@@ -33,7 +33,7 @@
             <tr>
                 <td><strong style="color:#ef4444;">#{{ $c->id }}</strong></td>
                 <td><strong style="color:#1e293b;">{{ $c->title }}</strong></td>
-                <td><span class="badge bg-danger">{{ $c->work_type }}</span></td>
+                <td><span class="badge bg-danger">{{ $c->workTypeLabel() }}</span></td>
                 <td><strong>{{ $c->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $c->user->email }}</small></td>
                 <td><span class="status-badge {{ $c->getStatusBadgeColor() }}">{{ $c->getStatusLabel() }}</span></td>
                 <td>{{ $c->copyright_number ?? __('portal.copyright.manager.index.none_dash') }}</td>

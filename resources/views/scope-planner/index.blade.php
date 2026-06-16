@@ -21,10 +21,10 @@
                 <div class="card-content">
                     <label class="form-label">{{ __('portal.scope_ai.project_type') }}</label>
                     <input type="text" name="project_type" class="form-control mb-2" required
-                           value="{{ $result['project_type'] ?? old('project_type') }}" placeholder="IoT Kiosk, Mobile App, 3D Design…">
+                           value="{{ $result['project_type'] ?? old('project_type') }}" placeholder="{{ __('portal.scope_ai.project_type_ph') }}">
                     <label class="form-label">{{ __('portal.scope_ai.requirements') }}</label>
                     <textarea name="requirements" rows="5" class="form-control mb-2" required
-                              placeholder="• Core requirements, one per line">{{ $result['requirements'] ?? old('requirements') }}</textarea>
+                              placeholder="{{ __('portal.scope_ai.requirements_ph') }}">{{ $result['requirements'] ?? old('requirements') }}</textarea>
                     <label class="form-label">{{ __('portal.scope_ai.budget') }}</label>
                     <input type="text" name="budget" class="form-control mb-3" value="{{ $result['budget'] ?? old('budget') }}" placeholder="$10,000">
                     <button type="submit" class="btn btn-primary w-100"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_ai.draft') }}</button>

@@ -57,8 +57,8 @@
                         @endif
                     </td>
                     <td>
-                        {{ $meeting->scheduled_at->format('M d, Y') }}
-                        <br><small class="text-muted">{{ $meeting->scheduled_at->format('g:i A') }}</small>
+                        {{ $meeting->scheduled_at->translatedFormat('M d, Y') }}
+                        <br><small class="text-muted">{{ $meeting->scheduled_at->translatedFormat('g:i A') }}</small>
                     </td>
                     <td>{{ $meeting->duration_minutes }} {{ __('portal.meetings.min') }}</td>
                     <td>

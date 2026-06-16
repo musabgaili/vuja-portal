@@ -330,7 +330,7 @@
                     <br>
                     <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
                     @if($milestone->due_date)
-                    <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d') }}</small>
+                    <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->translatedFormat('M d') }}</small>
                     @endif
                 </div>
                 @empty
@@ -358,7 +358,7 @@
                     <div class="mb-2">
                         <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
                         @if($milestone->due_date)
-                        <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}</small>
+                        <small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->translatedFormat('M d, Y') }}</small>
                         @endif
                     </div>
                     @php

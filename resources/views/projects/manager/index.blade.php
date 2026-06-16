@@ -137,14 +137,14 @@
                 </td>
                 <td>
                     @if($p->budget)
-                        <strong style="color:#10b981;">${{ number_format($p->budget,2) }}</strong>
+                        <strong style="color:#10b981;">{{ number_format($p->budget,2) }} {{ config('scope.currency','SAR') }}</strong>
                     @else
                         <span class="text-muted">—</span>
                     @endif
                 </td>
                 <td>
                     @if($p->start_date)
-                        <small class="text-muted">{{ $p->start_date->format('M d, Y') }}</small>
+                        <small class="text-muted">{{ $p->start_date->translatedFormat('M d, Y') }}</small>
                     @else
                         <span class="text-muted">—</span>
                     @endif

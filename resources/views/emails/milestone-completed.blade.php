@@ -20,7 +20,7 @@
             <ul>
                 <li><strong>{{ __('portal.emails.labels.title') }}:</strong> {{ $milestone->title }}</li>
                 <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $milestone->project->title }}</li>
-                <li><strong>{{ __('portal.emails.milestone_completed.completed') }}:</strong> {{ $milestone->completed_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.milestone_completed.completed') }}:</strong> {{ $milestone->completed_at->translatedFormat('F j, Y \a\t g:i A') }}</li>
                 <li><strong>{{ __('portal.projects_manager.show.progress') }}:</strong> {{ $milestone->completion_percentage }}%</li>
             </ul>
 

@@ -103,7 +103,7 @@
                             <div class="user-avatars">
                                 @foreach($role->users->take(5) as $user)
                                 <span class="user-avatar-sm" title="{{ $user->name }}">
-                                    {{ strtoupper(substr($user->name, 0, 2)) }}
+                                    {{ $user->initials() }}
                                 </span>
                                 @endforeach
                                 @if($role->users->count() > 5)

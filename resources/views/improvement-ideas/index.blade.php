@@ -34,7 +34,7 @@
             <td><a href="{{ route('improvement-ideas.show', $idea) }}" style="color:var(--primary-color); text-decoration:none; font-weight:600;">{{ $idea->title }}</a></td>
             <td>{{ $idea->category }}</td>
             <td><span class="badge bg-{{ $idea->getStatusBadgeColor() }}">{{ $idea->getStatusLabel() }}</span></td>
-            <td>{{ $idea->created_at->format('M d, Y') }}</td>
+            <td>{{ $idea->created_at->translatedFormat('M d, Y') }}</td>
         </tr>
         @endforeach
         </tbody>

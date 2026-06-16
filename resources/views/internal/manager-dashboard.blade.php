@@ -189,7 +189,7 @@
                             <br><small class="text-muted"><i class="fas fa-user"></i> {{ $consultation->user->name }} • {{ $consultation->created_at->diffForHumans() }}</small>
                         </div>
                         <div class="text-end">
-                            <span class="badge bg-info">{{ $consultation->category }}</span>
+                            <span class="badge bg-info">{{ $consultation->categoryLabel() }}</span>
                             <br>
                             <a href="{{ route('consultations.manager.show', $consultation) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
@@ -243,7 +243,7 @@
                             <br><small class="text-muted"><i class="fas fa-user"></i> {{ $ip->user->name }} • {{ $ip->created_at->diffForHumans() }}</small>
                         </div>
                         <div class="text-end">
-                            <span class="badge bg-primary">{{ $ip->ip_type }}</span>
+                            <span class="badge bg-primary">{{ $ip->ipTypeLabel() }}</span>
                             <br>
                             <a href="{{ route('ip.manager.show', $ip) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>
@@ -269,7 +269,7 @@
                             <br><small class="text-muted"><i class="fas fa-user"></i> {{ $copyright->user->name }} • {{ $copyright->created_at->diffForHumans() }}</small>
                         </div>
                         <div class="text-end">
-                            <span class="badge bg-danger">{{ $copyright->work_type }}</span>
+                            <span class="badge bg-danger">{{ $copyright->workTypeLabel() }}</span>
                             <br>
                             <a href="{{ route('copyright.manager.show', $copyright) }}" class="btn btn-xs btn-secondary mt-1"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a>
                         </div>

@@ -263,4 +263,24 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             }
         });
     }
+
+    /**
+     * Avatar initials: first letter of the first and last name parts (e.g.
+     * "John Client" -> "JC"). Falls back to the first two letters of a single
+     * word, or "?" when the name is empty.
+     */
+    public function initials(): string
+    {
+        $parts = array_values(array_filter(preg_split('/\s+/', trim((string) $this->name)) ?: []));
+
+        if (count($parts) === 0) {
+            return '?';
+        }
+
+        if (count($parts) === 1) {
+            return mb_strtoupper(mb_substr($parts[0], 0, 2));
+        }
+
+        return mb_strtoupper(mb_substr($parts[0], 0, 1).mb_substr(end($parts), 0, 1));
+    }
 }

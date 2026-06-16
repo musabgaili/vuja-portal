@@ -118,4 +118,12 @@ class CopyrightRegistration extends Model
             default => str_replace('_', ' ', $this->status)
         };
     }
+
+    /** Locale-aware work-type label (maps the stored English value to a key, falls back to raw). */
+    public function workTypeLabel(): string
+    {
+        $key = 'portal.copyright.types.'.\Illuminate\Support\Str::slug((string) $this->work_type, '_');
+
+        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : (string) $this->work_type;
+    }
 }

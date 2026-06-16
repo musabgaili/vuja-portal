@@ -33,7 +33,7 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h5>{{ $project->title }}</h5>
-                        <small class="text-muted">{{ __('portal.projects_client.index.started') }}: {{ $project->created_at->format('M d, Y') }}</small>
+                        <small class="text-muted">{{ __('portal.projects_client.index.started') }}: {{ $project->created_at->translatedFormat('M d, Y') }}</small>
                     </div>
                     <span class="status-badge {{ $project->getStatusBadgeColor() }}">{{ $project->getStatusLabel() }}</span>
                 </div>

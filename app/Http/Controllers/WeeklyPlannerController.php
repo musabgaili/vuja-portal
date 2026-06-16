@@ -459,7 +459,11 @@ class WeeklyPlannerController extends Controller
                 $locKey = $plan->locations[$day] ?? null;
                 $win = $plan->availability[$day] ?? null;
                 $perDay[$day] = [
-                    'loc' => $locKey ? ($locations[$locKey] ?? $locKey) : null,
+                    'loc' => $locKey
+                        ? (\Illuminate\Support\Facades\Lang::has('portal.planner.location.'.$locKey)
+                            ? __('portal.planner.location.'.$locKey)
+                            : ($locations[$locKey] ?? $locKey))
+                        : null,
                     'hours' => $hours,
                     'window' => ($win && ($win['start'] ?? null) && ($win['end'] ?? null)) ? ($win['start'].'–'.$win['end']) : null,
                 ];

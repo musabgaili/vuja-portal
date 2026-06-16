@@ -87,8 +87,8 @@
             <div class="card-header"><h3>{{ __('portal.projects_client.show_old.project_details') }}</h3></div>
             <div class="card-content">
                 <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.status') }}:</strong><span class="status-badge {{ $project->getStatusBadgeColor() }}">{{ $project->getStatusLabel() }}</span></div>
-                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.start_date') }}:</strong><span>{{ $project->start_date?->format('M d, Y') ?? __('portal.projects_client.show_old.tbd') }}</span></div>
-                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.end_date') }}:</strong><span>{{ $project->end_date?->format('M d, Y') ?? __('portal.projects_client.show_old.tbd') }}</span></div>
+                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.start_date') }}:</strong><span>{{ $project->start_date?->translatedFormat('M d, Y') ?? __('portal.projects_client.show_old.tbd') }}</span></div>
+                <div class="detail-item"><strong>{{ __('portal.projects_client.show_old.end_date') }}:</strong><span>{{ $project->end_date?->translatedFormat('M d, Y') ?? __('portal.projects_client.show_old.tbd') }}</span></div>
                 @if($project->projectManager)<div class="detail-item"><strong>{{ __('portal.projects_client.show_old.pm') }}:</strong><span>{{ $project->projectManager->name }}</span></div>@endif
                 @if($project->budget)<div class="detail-item"><strong>{{ __('portal.projects_client.show_old.budget') }}:</strong><span>${{ number_format($project->budget, 2) }}</span></div>@endif
             </div>
@@ -98,7 +98,7 @@
             <div class="card-header"><h3>{{ __('portal.projects_client.show_old.team') }}</h3></div>
             <div class="card-content">
                 @forelse($project->getTeamMembers() as $member)
-                <div class="team-member"><div class="user-avatar-sm">{{ strtoupper(substr($member->name, 0, 2)) }}</div><span>{{ $member->name }}</span></div>
+                <div class="team-member"><div class="user-avatar-sm">{{ $member->initials() }}</div><span>{{ $member->name }}</span></div>
                 @empty
                 <p class="text-muted">{{ __('portal.projects_client.show_old.no_team_assigned') }}</p>
                 @endforelse

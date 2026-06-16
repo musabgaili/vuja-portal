@@ -20,13 +20,13 @@
                 <div class="mb-3"><strong>{{ __('portal.research.manager.show.requirements') }}</strong><p>{{ $research->requirements }}</p></div>
                 @endif
                 @if($research->nda_signed_at)
-                <div class="mb-3"><strong>{{ __('portal.research.manager.show.nda_signed') }}</strong> {{ $research->nda_signed_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.research.manager.show.nda_signed') }}</strong> {{ $research->nda_signed_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($research->sla_signed_at)
-                <div class="mb-3"><strong>{{ __('portal.research.manager.show.sla_signed') }}</strong> {{ $research->sla_signed_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.research.manager.show.sla_signed') }}</strong> {{ $research->sla_signed_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($research->meeting_scheduled_at)
-                <div class="mb-3"><strong>{{ __('portal.research.manager.show.meeting_scheduled') }}</strong> {{ $research->meeting_scheduled_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.research.manager.show.meeting_scheduled') }}</strong> {{ $research->meeting_scheduled_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($research->meeting_link)
                 <div class="mb-3"><strong>{{ __('portal.research.manager.show.meeting_link') }}</strong> <a href="{{ $research->meeting_link }}" target="_blank">{{ $research->meeting_link }}</a></div>
@@ -41,7 +41,7 @@
                 <p><strong>{{ __('portal.research.manager.show.name') }}</strong> {{ $research->user->name }}</p>
                 <p><strong>{{ __('portal.research.manager.show.email') }}</strong> <a href="mailto:{{ $research->user->email }}">{{ $research->user->email }}</a></p>
                 @if($research->user->phone)<p><strong>{{ __('portal.research.manager.show.phone') }}</strong> <a href="tel:{{ $research->user->phone }}">{{ $research->user->phone }}</a></p>@endif
-                <p><strong>{{ __('portal.research.manager.show.submitted') }}</strong> {{ $research->created_at->format('M d, Y H:i') }}</p>
+                <p><strong>{{ __('portal.research.manager.show.submitted') }}</strong> {{ $research->created_at->translatedFormat('M d, Y H:i') }}</p>
             </div>
         </div>
         <div class="card mb-3">

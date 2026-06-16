@@ -15,13 +15,13 @@
                 <span class="status-badge {{ $copyright->getStatusBadgeColor() }}">{{ $copyright->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
-                <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.work_type') }}:</strong> <span class="badge bg-primary">{{ $copyright->work_type }}</span></div>
+                <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.work_type') }}:</strong> <span class="badge bg-primary">{{ $copyright->workTypeLabel() }}</span></div>
                 <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.description') }}:</strong><p>{{ $copyright->description }}</p></div>
                 @if($copyright->meeting_requested_at)
-                <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.meeting_requested') }}:</strong> {{ $copyright->meeting_requested_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.meeting_requested') }}:</strong> {{ $copyright->meeting_requested_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($copyright->meeting_confirmed_at)
-                <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.meeting_confirmed') }}:</strong> {{ $copyright->meeting_confirmed_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.copyright.manager.show.meeting_confirmed') }}:</strong> {{ $copyright->meeting_confirmed_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($copyright->registration_number)
                 <div class="mb-3"><strong>{{ __('portal.ip.registration_number') }}:</strong> <span class="text-success">{{ $copyright->registration_number }}</span></div>
@@ -36,7 +36,7 @@
                 <p><strong>{{ __('portal.ip.name') }}:</strong> {{ $copyright->user->name }}</p>
                 <p><strong>{{ __('portal.ip.email') }}:</strong> <a href="mailto:{{ $copyright->user->email }}">{{ $copyright->user->email }}</a></p>
                 @if($copyright->user->phone)<p><strong>{{ __('portal.ip.phone') }}:</strong> <a href="tel:{{ $copyright->user->phone }}">{{ $copyright->user->phone }}</a></p>@endif
-                <p><strong>{{ __('portal.copyright.manager.show.submitted') }}:</strong> {{ $copyright->created_at->format('M d, Y H:i') }}</p>
+                <p><strong>{{ __('portal.copyright.manager.show.submitted') }}:</strong> {{ $copyright->created_at->translatedFormat('M d, Y H:i') }}</p>
             </div>
         </div>
         <div class="card mb-3">

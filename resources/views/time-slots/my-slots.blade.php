@@ -99,8 +99,8 @@
             @foreach($slots as $slot)
             <tr>
                 <td>
-                    <div class="slot-date">{{ $slot->date->format('M d, Y') }}</div>
-                    <small class="text-muted">{{ $slot->date->format('l') }}</small>
+                    <div class="slot-date">{{ $slot->date->translatedFormat('M d, Y') }}</div>
+                    <small class="text-muted">{{ $slot->date->translatedFormat('l') }}</small>
                 </td>
                 <td>
                     <span class="slot-time">

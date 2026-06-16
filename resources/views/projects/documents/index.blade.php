@@ -232,7 +232,7 @@
                             {{ __('portal.projects_documents.tag_' . $doc->tag) }}
                         </span>
                         <span><i class="fas fa-user"></i> {{ $doc->uploadedBy->name }}</span>
-                        <span><i class="fas fa-calendar"></i> {{ $doc->created_at->format('M d, Y') }}</span>
+                        <span><i class="fas fa-calendar"></i> {{ $doc->created_at->translatedFormat('M d, Y') }}</span>
                         <span><i class="fas fa-file"></i> {{ number_format($doc->file_size / 1024, 1) }} KB</span>
                     </div>
                     @if($doc->comment)

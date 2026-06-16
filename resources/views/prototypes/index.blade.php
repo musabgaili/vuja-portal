@@ -25,7 +25,7 @@
                         <td><strong>{{ $p->title }}</strong></td>
                         <td>{{ $p->category ?: '—' }}</td>
                         <td><span class="badge bg-{{ $p->getStatusBadgeColor() }}">{{ $p->getStatusLabel() }}</span></td>
-                        <td><small class="text-muted">{{ $p->created_at->format('M j, Y') }}</small></td>
+                        <td><small class="text-muted">{{ $p->created_at->translatedFormat('M j, Y') }}</small></td>
                         <td class="text-end"><a href="{{ route('prototypes.show', $p) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a></td>
                     </tr>
                 @empty

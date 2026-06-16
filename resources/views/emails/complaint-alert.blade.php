@@ -23,7 +23,7 @@
                 <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $complaint->project->title }}</li>
                 <li><strong>{{ __('portal.emails.labels.client') }}:</strong> {{ $complaint->client->name }}</li>
                 <li><strong>{{ __('portal.emails.labels.subject') }}:</strong> {{ $complaint->subject }}</li>
-                <li><strong>{{ __('portal.emails.labels.submitted') }}:</strong> {{ $complaint->created_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.labels.submitted') }}:</strong> {{ $complaint->created_at->translatedFormat('F j, Y \a\t g:i A') }}</li>
             </ul>
 
             <h4>{{ __('portal.emails.complaint_alert.complaint') }}:</h4>

@@ -186,9 +186,9 @@
                 @if($project->start_date)
                 <span style="opacity: 0.9;">
                     <i class="fas fa-calendar"></i> 
-                    {{ $project->start_date->format('M d, Y') }}
+                    {{ $project->start_date->translatedFormat('M d, Y') }}
                     @if($project->end_date)
-                    → {{ $project->end_date->format('M d, Y') }}
+                    → {{ $project->end_date->translatedFormat('M d, Y') }}
                     @endif
                 </span>
                 @endif
@@ -275,7 +275,7 @@
             </small>
             @if($milestone->due_date)
             <small style="color: #64748b;">
-                <i class="fas fa-calendar"></i> {{ __('portal.projects_client.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}
+                <i class="fas fa-calendar"></i> {{ __('portal.projects_client.show.due') }}: {{ $milestone->due_date->translatedFormat('M d, Y') }}
             </small>
             @endif
         </div>
@@ -398,7 +398,7 @@
             <div style="flex: 1;">
                 <h5 style="font-weight: 600; color: #1e293b;">{{ $change->title }}</h5>
                 <p style="color: #64748b; margin-bottom: 0.5rem;">{{ $change->description }}</p>
-                <small style="color: #94a3b8;">{{ __('portal.projects_client.show.submitted') }}: {{ $change->created_at->format('M d, Y') }}</small>
+                <small style="color: #94a3b8;">{{ __('portal.projects_client.show.submitted') }}: {{ $change->created_at->translatedFormat('M d, Y') }}</small>
             </div>
             <span class="status-badge {{ $change->getStatusBadgeColor() }}">
                 {{ ucfirst($change->status) }}

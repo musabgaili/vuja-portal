@@ -9,13 +9,13 @@
                 <span class="status-badge {{ $copyright->getStatusBadgeColor() }}">{{ $copyright->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
-                <div class="info-section"><h5><i class="fas fa-tag"></i> {{ __('portal.copyright.show.type') }}</h5><p>{{ $copyright->work_type }}</p></div>
+                <div class="info-section"><h5><i class="fas fa-tag"></i> {{ __('portal.copyright.show.type') }}</h5><p>{{ $copyright->workTypeLabel() }}</p></div>
                 <div class="info-section"><h5><i class="fas fa-align-left"></i> {{ __('portal.copyright.show.description') }}</h5><p>{{ $copyright->work_description }}</p></div>
                 @if($copyright->copyright_number)
                 <div class="info-section"><h5><i class="fas fa-certificate"></i> {{ __('portal.copyright.show.copyright_number') }}</h5><p class="text-success"><strong>{{ $copyright->copyright_number }}</strong></p></div>
                 @endif
                 @if($copyright->meeting_confirmed_at)
-                <div class="info-section"><h5><i class="fas fa-calendar"></i> {{ __('portal.copyright.show.meeting') }}</h5><p>{{ $copyright->meeting_requested_at->format('M d, Y g:i A') }}</p>
+                <div class="info-section"><h5><i class="fas fa-calendar"></i> {{ __('portal.copyright.show.meeting') }}</h5><p>{{ $copyright->meeting_requested_at->translatedFormat('M d, Y g:i A') }}</p>
                 @if($copyright->meeting_link)<a href="{{ $copyright->meeting_link }}" class="btn btn-primary" target="_blank"><i class="fas fa-video"></i> {{ __('portal.meetings.join') }}</a>@endif</div>
                 @endif
             </div>

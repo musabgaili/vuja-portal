@@ -42,14 +42,20 @@ class WeeklyPlanLine extends Model
 
     /**
      * The reporting category this line rolls up into: project/task lines count as
-     * "Projects"; activity lines use their own activity label.
+     * "Projects & Tasks"; activity lines use their own activity label. Returns the
+     * locale-aware label (falls back to the English config label for any activity
+     * key without a translation).
      */
     public function category(): string
     {
         if ($this->kind === 'activity') {
-            return config("planner.activities.$this->activity", $this->label);
+            $key = 'portal.planner.cat.'.$this->activity;
+
+            return \Illuminate\Support\Facades\Lang::has($key)
+                ? __($key)
+                : config("planner.activities.$this->activity", $this->label);
         }
 
-        return 'Projects & Tasks';
+        return __('portal.planner.cat.projects_tasks');
     }
 }

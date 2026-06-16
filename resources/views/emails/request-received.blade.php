@@ -23,7 +23,7 @@
                 <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $projectRequest->project->title }}</li>
                 <li><strong>{{ __('portal.emails.labels.client') }}:</strong> {{ $projectRequest->client->name }}</li>
                 <li><strong>{{ __('portal.emails.labels.subject') }}:</strong> {{ $projectRequest->subject }}</li>
-                <li><strong>{{ __('portal.emails.labels.submitted') }}:</strong> {{ $projectRequest->created_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.labels.submitted') }}:</strong> {{ $projectRequest->created_at->translatedFormat('F j, Y \a\t g:i A') }}</li>
             </ul>
 
             <h4>{{ __('portal.emails.request_received.request') }}:</h4>

@@ -54,7 +54,7 @@
                             {{ ucfirst($member->status->value) }}
                         </span>
                     </td>
-                    <td>{{ $member->created_at->format('M d, Y') }}</td>
+                    <td>{{ $member->created_at->translatedFormat('M d, Y') }}</td>
                     <td>
                         @if($member->id !== auth()->id())
                         <form method="POST" action="{{ route('team.destroy', $member) }}" style="display: inline;" onsubmit="return confirm('{{ __('portal.team.confirm_remove_member') }}')">

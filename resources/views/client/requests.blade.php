@@ -160,7 +160,7 @@
                                     <span class="badge" style="background: {{ $req['type_color'] }}; color: white;">
                                         {{ $req['type_label'] }}
                                     </span>
-                                    • {{ __('portal.client.requests.submitted') }} {{ $req['created_at']->format('M d, Y') }}
+                                    • {{ __('portal.client.requests.submitted') }} {{ $req['created_at']->translatedFormat('M d, Y') }}
                                     @if($req['assigned_to'])
                                         • {{ __('portal.client.requests.assigned_to') }} {{ $req['assigned_to'] }}
                                     @endif
@@ -181,7 +181,7 @@
                             @if(isset($req['meeting_date']) && $req['meeting_date'])
                             <div class="meeting-badge">
                                 <i class="fas fa-calendar"></i>
-                                {{ $req['meeting_date']->format('M d') }}
+                                {{ $req['meeting_date']->translatedFormat('M d') }}
                             </div>
                             @endif
                             @if(isset($req['registration_number']) && $req['registration_number'])

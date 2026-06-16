@@ -16,7 +16,7 @@
             <div class="card-content">
                 <div class="info-section">
                     <h5><i class="fas fa-tag"></i> {{ __('portal.consultations.show.category') }}</h5>
-                    <p class="category-badge">{{ $consultation->category }}</p>
+                    <p class="category-badge">{{ $consultation->categoryLabel() }}</p>
                 </div>
 
                 <div class="info-section">
@@ -37,7 +37,7 @@
                     <div class="meeting-box">
                         <div class="meeting-time">
                             <i class="fas fa-clock"></i>
-                            {{ $consultation->meeting_scheduled_at->format('l, F d, Y \a\t g:i A') }}
+                            {{ $consultation->meeting_scheduled_at->translatedFormat('l, F d, Y \a\t g:i A') }}
                         </div>
                         @if($consultation->meeting_link)
                         <div class="meeting-link">
@@ -76,11 +76,11 @@
                 </div>
                 <div class="detail-item">
                     <strong>{{ __('portal.consultations.show.category') }}:</strong>
-                    <span>{{ $consultation->category }}</span>
+                    <span>{{ $consultation->categoryLabel() }}</span>
                 </div>
                 <div class="detail-item">
                     <strong>{{ __('portal.consultations.show.submitted') }}:</strong>
-                    <span>{{ $consultation->created_at->format('M d, Y') }}</span>
+                    <span>{{ $consultation->created_at->translatedFormat('M d, Y') }}</span>
                 </div>
                 @if($consultation->assignedTo)
                 <div class="detail-item">

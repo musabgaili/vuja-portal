@@ -19,7 +19,7 @@
                     @forelse($idea->comments()->orderBy('created_at')->get() as $comment)
                     <div class="message {{ $comment->user_id === auth()->id() ? 'message-sent' : 'message-received' }}">
                         <div class="message-avatar">
-                            {{ strtoupper(substr($comment->user->name, 0, 2)) }}
+                            {{ $comment->user->initials() }}
                         </div>
                         <div class="message-content">
                             <div class="message-header">

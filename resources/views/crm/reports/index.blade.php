@@ -69,7 +69,7 @@
             @php $fmax = collect($forecast)->max() ?: 1; @endphp
             @forelse($forecast as $month => $val)
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="text-muted" style="width:72px; font-size:.8rem;">{{ \Carbon\Carbon::parse($month.'-01')->format('M Y') }}</span>
+                    <span class="text-muted" style="width:72px; font-size:.8rem;">{{ \Carbon\Carbon::parse($month.'-01')->translatedFormat('M Y') }}</span>
                     <div style="flex:1; height:18px; background:var(--bg-tertiary); border-radius:6px; overflow:hidden;">
                         <div style="height:100%; width:{{ round($val/$fmax*100) }}%; background:var(--primary-color);"></div>
                     </div>

@@ -7,7 +7,7 @@
             <thead>
                 <tr>
                     <th>{{ __('portal.planner.employee') }}</th>
-                    @foreach($days as $day)<th style="text-transform:capitalize;">{{ ucfirst($day) }}</th>@endforeach
+                    @foreach($days as $day)<th style="text-transform:capitalize;">{{ __('portal.planner.day.'.$day) }}</th>@endforeach
                     <th class="text-end">{{ __('portal.planner.total') }}</th>
                 </tr>
             </thead>

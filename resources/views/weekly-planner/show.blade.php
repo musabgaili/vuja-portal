@@ -10,7 +10,7 @@
 <div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-2">
     <div>
         <h1 style="margin:0; font-size:1.4rem;"><i class="fas fa-calendar-week"></i> {{ $plan->user->name }}</h1>
-        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ \Illuminate\Support\Carbon::parse($plan->week_start)->format('D, M j, Y') }}</p>
+        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ \Illuminate\Support\Carbon::parse($plan->week_start)->translatedFormat('D, M j, Y') }}</p>
     </div>
     <span class="badge bg-{{ $plan->statusColor() }}" style="font-size:.9rem;">{{ __('portal.planner.status.'.$plan->status) }}</span>
 </div>

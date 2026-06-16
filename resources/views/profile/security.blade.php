@@ -182,7 +182,7 @@
                 </div>
                 <div class="mb-0">
                     <strong>{{ __('portal.profile.member_since') }}:</strong>
-                    <br><small class="text-muted">{{ $user->created_at->format('M d, Y') }}</small>
+                    <br><small class="text-muted">{{ $user->created_at->translatedFormat('M d, Y') }}</small>
                 </div>
             </div>
         </div>

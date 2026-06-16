@@ -169,7 +169,7 @@
                         <span class="text-muted">{{ __('portal.ideas.manager.index.not_assigned') }}</span>
                     @endif
                 </td>
-                <td>{{ $idea->created_at->format('M d, Y') }}</td>
+                <td>{{ $idea->created_at->translatedFormat('M d, Y') }}</td>
                 <td>
                     <div class="action-btn-group">
                         <a href="{{ route('ideas.manager.show', $idea) }}" class="btn btn-sm btn-secondary" title="{{ __('portal.ideas.manager.index.title_view') }}">

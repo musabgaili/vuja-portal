@@ -26,7 +26,7 @@
             <h4>{{ __('portal.emails.complaint_resolved.resolution') }}:</h4>
             <p style="background: white; padding: 15px; border-left: 4px solid #10b981;">{{ $complaint->resolution_note }}</p>
 
-            <p>{{ __('portal.emails.complaint_resolved.resolved_by', ['name' => $complaint->resolvedBy->name, 'date' => $complaint->resolved_at->format('F j, Y')]) }}</p>
+            <p>{{ __('portal.emails.complaint_resolved.resolved_by', ['name' => $complaint->resolvedBy->name, 'date' => $complaint->resolved_at->translatedFormat('F j, Y')]) }}</p>
 
             <p style="margin-top: 30px;">
                 <a href="{{ route('projects.client.show', $complaint->project) }}" 

@@ -56,13 +56,13 @@
                     <div class="col-md-6">
                         <div class="info-item mb-3">
                             <label class="form-label fw-bold text-muted">{{ __('portal.profile.member_since') }}</label>
-                            <p class="mb-0">{{ $user->created_at->format('M d, Y') }}</p>
+                            <p class="mb-0">{{ $user->created_at->translatedFormat('M d, Y') }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
                             <label class="form-label fw-bold text-muted">{{ __('portal.profile.last_updated') }}</label>
-                            <p class="mb-0">{{ $user->updated_at->format('M d, Y H:i') }}</p>
+                            <p class="mb-0">{{ $user->updated_at->translatedFormat('M d, Y H:i') }}</p>
                         </div>
                     </div>
                 </div>

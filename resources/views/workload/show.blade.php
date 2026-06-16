@@ -47,7 +47,7 @@
                             <div style="font-size:.78rem;">
                                 <span class="badge bg-primary">{{ __('portal.staff_tasks.category.'.$t->category) }}</span>
                                 <span class="badge bg-secondary">{{ __('portal.staff_tasks.priority.'.$t->priority) }}</span>
-                                @if($t->due_date)<span class="text-muted">{{ $t->due_date->format('M d') }}</span>@endif
+                                @if($t->due_date)<span class="text-muted">{{ $t->due_date->translatedFormat('M d') }}</span>@endif
                             </div>
                         </div>
                         <div class="d-flex gap-1 align-items-center">
@@ -106,7 +106,7 @@
                             <div style="font-size:.78rem;">
                                 @if($t->project)<a href="{{ route('projects.manager.show', $t->project) }}" class="badge bg-info text-decoration-none">{{ $t->project->title }}</a>@endif
                                 <span class="badge bg-secondary">{{ $t->status }}</span>
-                                @if($t->due_date)<span class="text-muted">{{ $t->due_date->format('M d') }}</span>@endif
+                                @if($t->due_date)<span class="text-muted">{{ $t->due_date->translatedFormat('M d') }}</span>@endif
                             </div>
                         </div>
                         <div class="d-flex gap-1">

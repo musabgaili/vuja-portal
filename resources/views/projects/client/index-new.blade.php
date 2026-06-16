@@ -128,7 +128,7 @@
             <div style="flex: 1;">
                 <h4 style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">{{ $project->title }}</h4>
                 <small style="color: #64748b;">
-                    <i class="fas fa-calendar"></i> {{ __('portal.projects_client.index.started') }} {{ $project->created_at->format('M d, Y') }}
+                    <i class="fas fa-calendar"></i> {{ __('portal.projects_client.index.started') }} {{ $project->created_at->translatedFormat('M d, Y') }}
                 </small>
             </div>
             <span class="status-badge {{ $project->getStatusBadgeColor() }}" style="font-size: 0.9rem;">

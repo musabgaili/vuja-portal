@@ -34,7 +34,7 @@ class ProjectHealthService
             ->filter()->max();
         if ($lastActivity && $lastActivity->lt(Carbon::now()->subDays(self::STALE_DAYS))) {
             $flags[] = ['key' => 'stale', 'severity' => 'yellow',
-                'label' => 'No update in '.$lastActivity->diffInDays(Carbon::now()).' days'];
+                'label' => __('portal.control_tower.flag.stale', ['days' => round($lastActivity->diffInDays(Carbon::now()))])];
         }
 
         // 2) Milestones overdue / due within 24h.
@@ -42,28 +42,28 @@ class ProjectHealthService
             $due = Carbon::parse($m->due_date)->startOfDay();
             if ($due->lt($today)) {
                 $flags[] = ['key' => 'milestone_overdue', 'severity' => 'red',
-                    'label' => 'Milestone overdue: '.$m->title];
+                    'label' => __('portal.control_tower.flag.milestone_overdue', ['name' => $m->title])];
             } elseif ($due->lte($today->copy()->addDay())) {
                 $flags[] = ['key' => 'milestone_due_soon', 'severity' => 'yellow',
-                    'label' => 'Milestone due within 24h: '.$m->title];
+                    'label' => __('portal.control_tower.flag.milestone_due_soon', ['name' => $m->title])];
             }
         }
 
         // 3) Over budget.
         if ($project->budget && (float) $project->spent > (float) $project->budget) {
             $flags[] = ['key' => 'over_budget', 'severity' => 'red',
-                'label' => 'Over budget by '.number_format((float) $project->spent - (float) $project->budget)];
+                'label' => __('portal.control_tower.flag.over_budget', ['amount' => number_format((float) $project->spent - (float) $project->budget)])];
         }
 
         // 4) Past end date and not finished.
         if ($project->end_date && Carbon::parse($project->end_date)->lt($today)
             && ! in_array($project->status, ['completed', 'lost', 'cancelled'], true)) {
-            $flags[] = ['key' => 'past_due', 'severity' => 'red', 'label' => 'Past its end date'];
+            $flags[] = ['key' => 'past_due', 'severity' => 'red', 'label' => __('portal.control_tower.flag.past_due')];
         }
 
         // 5) Pending scope change awaiting decision.
         if (method_exists($project, 'hasPendingScopeChanges') && $project->hasPendingScopeChanges()) {
-            $flags[] = ['key' => 'pending_scope', 'severity' => 'yellow', 'label' => 'Pending scope change'];
+            $flags[] = ['key' => 'pending_scope', 'severity' => 'yellow', 'label' => __('portal.control_tower.flag.pending_scope')];
         }
 
         $health = 'green';

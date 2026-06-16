@@ -4,7 +4,7 @@
 @section('content')
 <div class="page-hero">
     <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-clipboard-check"></i> {{ __('portal.planner.review_title') }}</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ $weekStart->format('D, M j, Y') }}</p>
+    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ $weekStart->translatedFormat('D, M j, Y') }}</p>
 </div>
 
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif

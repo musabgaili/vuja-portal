@@ -55,7 +55,7 @@
             <td>{{ $idea->user?->name }}</td>
             <td>{{ $idea->category }}</td>
             <td><span class="badge bg-{{ $idea->getStatusBadgeColor() }}">{{ $idea->getStatusLabel() }}</span></td>
-            <td>{{ $idea->created_at->format('M d, Y') }}</td>
+            <td>{{ $idea->created_at->translatedFormat('M d, Y') }}</td>
         </tr>
         @endforeach
         </tbody>

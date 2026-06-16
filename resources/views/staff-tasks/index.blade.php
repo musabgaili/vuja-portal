@@ -104,7 +104,7 @@
                         <td><span class="badge bg-{{ $priorityBadge[$task->priority] ?? 'secondary' }}">{{ __('portal.staff_tasks.priority.'.$task->priority) }}</span></td>
                         <td>
                             @if($task->due_date)
-                                <span class="{{ $task->isOverdue() ? 'text-danger fw-bold' : '' }}">{{ $task->due_date->format('M d, Y') }}</span>
+                                <span class="{{ $task->isOverdue() ? 'text-danger fw-bold' : '' }}">{{ $task->due_date->translatedFormat('M d, Y') }}</span>
                                 @if($task->isOverdue())<i class="fas fa-triangle-exclamation text-danger" title="{{ __('portal.staff_tasks.overdue') }}"></i>@endif
                             @else
                                 <span class="text-muted">—</span>
@@ -125,7 +125,7 @@
                                         <button class="btn btn-sm btn-success" title="{{ __('portal.staff_tasks.mark_done') }}"><i class="fas fa-check"></i> {{ __('portal.staff_tasks.done') }}</button>
                                     </form>
                                 @elseif($task->status === 'done')
-                                    <span class="text-success" style="font-size:.8rem;"><i class="fas fa-circle-check"></i> {{ $task->completed_at?->format('M d') }}</span>
+                                    <span class="text-success" style="font-size:.8rem;"><i class="fas fa-circle-check"></i> {{ $task->completed_at?->translatedFormat('M d') }}</span>
                                     <form method="POST" action="{{ route('staff-tasks.status', $task) }}">
                                         @csrf <input type="hidden" name="status" value="in_progress">
                                         <button class="btn btn-sm btn-outline-secondary" title="{{ __('portal.staff_tasks.reopen') }}"><i class="fas fa-rotate-left"></i></button>

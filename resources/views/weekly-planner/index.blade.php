@@ -11,7 +11,7 @@
 @section('content')
 <div class="page-hero">
     <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-calendar-week"></i> {{ __('portal.planner.title') }}</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">{{ $weekStart->format('D, M j') }} — {{ $weekStart->copy()->addDays(4)->format('D, M j, Y') }}</p>
+    <p style="margin:.25rem 0 0; opacity:.9;">{{ $weekStart->translatedFormat('D, M j') }} — {{ $weekStart->copy()->addDays(4)->translatedFormat('D, M j, Y') }}</p>
 </div>
 
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
@@ -26,7 +26,7 @@
     </div>
     <div class="d-flex align-items-center gap-3 flex-wrap">
         <span class="badge bg-{{ $plan->statusColor() }}" style="font-size:.8rem;">{{ __('portal.planner.status.'.($plan->status ?? 'draft')) }}</span>
-        <small class="text-muted"><i class="fas fa-clock"></i> {{ __('portal.planner.deadline') }}: {{ $deadline->format('l, M j \a\t g:i A') }}</small>
+        <small class="text-muted"><i class="fas fa-clock"></i> {{ __('portal.planner.deadline') }}: {{ $deadline->translatedFormat('l, M j \a\t g:i A') }}</small>
     </div>
 </div>
 
@@ -45,7 +45,7 @@
             <div class="row g-2">
                 @foreach($days as $day)
                     <div class="col">
-                        <label class="form-label mb-1" style="font-size:.8rem; text-transform:capitalize;">{{ __('portal.planner.day.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->format('M j') }}</small></label>
+                        <label class="form-label mb-1" style="font-size:.8rem; text-transform:capitalize;">{{ __('portal.planner.day.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->translatedFormat('M j') }}</small></label>
                         <select name="locations[{{ $day }}]" class="form-select form-select-sm mb-1" @disabled($readonly)>
                             <option value="">—</option>
                             @foreach($locations as $lk => $ll)
@@ -73,7 +73,7 @@
                         <tr>
                             <th style="min-width:240px;">{{ __('portal.planner.col_item') }}</th>
                             @foreach($days as $day)
-                                <th class="text-center">{{ __('portal.planner.day_short.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->format('M j') }}</small></th>
+                                <th class="text-center">{{ __('portal.planner.day_short.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->translatedFormat('M j') }}</small></th>
                             @endforeach
                             <th class="text-center">{{ __('portal.planner.row_total') }}</th>
                         </tr>
@@ -129,7 +129,7 @@
                         <tr>
                             <th style="min-width:240px;">{{ __('portal.planner.col_activity') }}</th>
                             @foreach($days as $day)
-                                <th class="text-center">{{ __('portal.planner.day_short.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->format('M j') }}</small></th>
+                                <th class="text-center">{{ __('portal.planner.day_short.'.$day) }}<br><small class="text-muted">{{ $dayDates[$day]->translatedFormat('M j') }}</small></th>
                             @endforeach
                             <th class="text-center">{{ __('portal.planner.row_total') }}</th>
                         </tr>
@@ -184,7 +184,7 @@
             <tbody>
             @forelse($history as $h)
                 <tr>
-                    <td>{{ $h->week_start->format('M j, Y') }}</td>
+                    <td>{{ $h->week_start->translatedFormat('M j, Y') }}</td>
                     <td>{{ $h->totalHours() }}h</td>
                     <td><span class="badge bg-{{ $h->statusColor() }}">{{ __('portal.planner.status.'.$h->status) }}</span></td>
                     <td class="text-end"><a href="{{ route('weekly-planner.index', ['week' => $h->week_start->toDateString()]) }}" class="btn btn-sm btn-link">{{ __('portal.planner.open') }}</a></td>

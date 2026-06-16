@@ -53,7 +53,7 @@
                         <div style="font-weight:600;">{{ $a->summary }}</div>
                         @if($a->notes)<div class="text-muted small">{{ $a->notes }}</div>@endif
                         <div class="small {{ $a->isOverdue() ? 'text-danger' : 'text-muted' }}">
-                            @if($a->due_at)<i class="fas fa-calendar"></i> {{ $a->due_at->format('M j, g:i A') }} @if($a->isOverdue())· {{ __('portal.crm_act.overdue') }}@endif @endif
+                            @if($a->due_at)<i class="fas fa-calendar"></i> {{ $a->due_at->translatedFormat('M j, g:i A') }} @if($a->isOverdue())· {{ __('portal.crm_act.overdue') }}@endif @endif
                             · {{ $a->user->name ?? '' }}
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                     <div style="flex:1;">
                         <div>{{ $a->summary }}</div>
                         @if($a->notes)<div class="text-muted small">{{ $a->notes }}</div>@endif
-                        <div class="text-muted small">{{ optional($a->done_at)->format('M j, Y g:i A') }} · {{ $a->creator->name ?? '' }}</div>
+                        <div class="text-muted small">{{ optional($a->done_at)->translatedFormat('M j, Y g:i A') }} · {{ $a->creator->name ?? '' }}</div>
                     </div>
                 </div>
             @endforeach

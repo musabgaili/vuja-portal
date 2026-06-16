@@ -33,7 +33,7 @@
             <tr>
                 <td><strong style="color:#0C7075;">#{{ $ip->id }}</strong></td>
                 <td><strong style="color:#1e293b;">{{ $ip->title }}</strong></td>
-                <td><span class="badge bg-primary">{{ $ip->ip_type }}</span></td>
+                <td><span class="badge bg-primary">{{ $ip->ipTypeLabel() }}</span></td>
                 <td><strong>{{ $ip->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $ip->user->email }}</small></td>
                 <td><span class="status-badge {{ $ip->getStatusBadgeColor() }}">{{ $ip->getStatusLabel() }}</span></td>
                 <td>{{ $ip->registration_number??'—' }}</td>

@@ -65,7 +65,7 @@
                 @foreach($plans as $p)
                     <tr>
                         <td><strong>{{ $p->user->name ?? '—' }}</strong></td>
-                        <td>{{ $p->week_start->format('M j, Y') }}</td>
+                        <td>{{ $p->week_start->translatedFormat('M j, Y') }}</td>
                         <td class="text-end">{{ $p->totalHours() }}h</td>
                         <td><small class="text-muted">{{ optional($p->submitted_at)->diffForHumans() }}</small></td>
                         <td class="text-end"><a href="{{ route('weekly-planner.review') }}" class="btn btn-sm btn-primary"><i class="fas fa-gavel"></i> {{ __('portal.approvals.review') }}</a></td>

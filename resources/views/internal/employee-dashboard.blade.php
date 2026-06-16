@@ -195,7 +195,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <strong style="color: #1e293b;">{{ $meeting->title }}</strong>
-                            <br><small class="text-muted"><i class="fas fa-clock"></i> {{ $meeting->scheduled_at->format('M d, g:i A') }}</small>
+                            <br><small class="text-muted"><i class="fas fa-clock"></i> {{ $meeting->scheduled_at->translatedFormat('M d, g:i A') }}</small>
                             <br><small class="text-info"><i class="fas fa-user"></i> {{ $meeting->client->name }}</small>
                         </div>
                         <span class="badge-modern bg-{{ $meeting->getStatusBadgeColor() }}">{{ $meeting->getStatusLabel() }}</span>

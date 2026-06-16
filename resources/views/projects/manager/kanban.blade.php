@@ -198,7 +198,7 @@
                     @endphp
                     <div class="info-row">
                         <span class="deadline-badge {{ $class }}">
-                            <i class="fas fa-calendar-alt"></i> {{ $endDate->format('M d, Y') }} â€¢ {{ $daysText }}
+                            <i class="fas fa-calendar-alt"></i> {{ $endDate->translatedFormat('M d, Y') }} â€¢ {{ $daysText }}
                         </span>
                     </div>
                     @endif

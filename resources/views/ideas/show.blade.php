@@ -165,7 +165,7 @@
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
                             <h6>{{ __('portal.ideas.show.timeline_submitted') }}</h6>
-                            <small>{{ $idea->created_at->format('M d, Y') }}</small>
+                            <small>{{ $idea->created_at->translatedFormat('M d, Y') }}</small>
                         </div>
                     </div>
                     
@@ -194,7 +194,7 @@
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
                             <h6>{{ __('portal.ideas.show.timeline_quote_accepted') }}</h6>
-                            <small>{{ $idea->agreement_accepted_at?->format('M d, Y') }}</small>
+                            <small>{{ $idea->agreement_accepted_at?->translatedFormat('M d, Y') }}</small>
                         </div>
                     </div>
                     @endif
@@ -214,7 +214,7 @@
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
                             <h6>{{ __('portal.ideas.show.timeline_approved') }}</h6>
-                            <small>{{ $idea->payment_verified_at?->format('M d, Y') }}</small>
+                            <small>{{ $idea->payment_verified_at?->translatedFormat('M d, Y') }}</small>
                         </div>
                     </div>
                     @endif
@@ -236,7 +236,7 @@
                 </div>
                 <div class="info-item">
                     <strong>{{ __('portal.ideas.show.submitted') }}</strong>
-                    <span>{{ $idea->created_at->format('M d, Y g:i A') }}</span>
+                    <span>{{ $idea->created_at->translatedFormat('M d, Y g:i A') }}</span>
                 </div>
                 @if($idea->assignedTo)
                 <div class="info-item">

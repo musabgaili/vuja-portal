@@ -5,7 +5,7 @@
 <div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-2" style="padding:1.5rem 1.75rem; margin-bottom:1.5rem;">
     <div>
         <h1 style="margin:0; font-size:1.35rem;"><i class="fas fa-rocket"></i> {{ $idea->title }}</h1>
-        <p style="margin:.25rem 0 0; opacity:.9;">{{ $idea->category }} · {{ $idea->created_at->format('M d, Y') }}</p>
+        <p style="margin:.25rem 0 0; opacity:.9;">{{ $idea->category }} · {{ $idea->created_at->translatedFormat('M d, Y') }}</p>
     </div>
     <span class="badge bg-{{ $idea->getStatusBadgeColor() }}" style="font-size:.9rem;">{{ $idea->getStatusLabel() }}</span>
 </div>
@@ -34,7 +34,7 @@
                 <p><strong>{{ __('portal.improvement_ideas.col_status') }}:</strong> <span class="badge bg-{{ $idea->getStatusBadgeColor() }}">{{ $idea->getStatusLabel() }}</span></p>
                 <p><strong>{{ __('portal.improvement_ideas.submitted_by') }}:</strong> {{ $idea->user?->name }}</p>
                 @if($idea->reviewer)
-                <p class="mb-0"><strong>{{ __('portal.improvement_ideas.reviewed_by') }}:</strong> {{ $idea->reviewer->name }} · {{ optional($idea->reviewed_at)->format('M d, Y') }}</p>
+                <p class="mb-0"><strong>{{ __('portal.improvement_ideas.reviewed_by') }}:</strong> {{ $idea->reviewer->name }} · {{ optional($idea->reviewed_at)->translatedFormat('M d, Y') }}</p>
                 @endif
                 @if($idea->review_notes)
                 <div class="alert alert-info mt-3" data-persist><strong>{{ __('portal.improvement_ideas.review_notes') }}:</strong><br>{{ $idea->review_notes }}</div>

@@ -44,10 +44,10 @@
                 <td><strong style="color:#3b82f6;">#{{ $c->id }}</strong></td>
                 <td><a href="{{ route('consultations.manager.show',$c) }}" class="consul-title-link"><strong>{{ $c->title }}</strong></a><br><small class="text-muted">{{ Str::limit($c->description,50) }}</small></td>
                 <td><strong>{{ $c->user->name }}</strong><br><small class="text-muted"><i class="fas fa-envelope"></i> {{ $c->user->email }}</small></td>
-                <td><span class="badge bg-info">{{ $c->category }}</span></td>
+                <td><span class="badge bg-info">{{ $c->categoryLabel() }}</span></td>
                 <td><span class="status-badge {{ $c->getStatusBadgeColor() }}">{{ $c->getStatusLabel() }}</span></td>
                 <td>@if($c->assignedTo)<span class="badge bg-success">{{ $c->assignedTo->name }}</span>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
-                <td>@if($c->meeting_scheduled_at)<small class="text-info"><i class="fas fa-calendar"></i> {{ $c->meeting_scheduled_at->format('M d, g:i A') }}</small>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
+                <td>@if($c->meeting_scheduled_at)<small class="text-info"><i class="fas fa-calendar"></i> {{ $c->meeting_scheduled_at->translatedFormat('M d, g:i A') }}</small>@else<span class="text-muted">{{ __('portal.consultations.manager.index.none_dash') }}</span>@endif</td>
                 <td><div class="d-flex gap-2 flex-wrap"><a href="{{ route('consultations.manager.show',$c) }}" class="btn btn-sm btn-secondary" title="{{ __('portal.consultations.manager.index.view') }}"><i class="fas fa-eye"></i></a>@if($c->isSubmitted() || $c->isFiltered() || $c->isAssigned())<button class="btn btn-sm btn-primary" onclick="showAssignModal(@js($c->getRouteKey()))"><i class="fas fa-user-plus"></i> {{ __('portal.consultations.manager.index.assign_employee') }}</button>@endif</div></td>
             </tr>
             @endforeach

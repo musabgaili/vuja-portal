@@ -29,7 +29,7 @@
                         <td>{{ $p->category ?: '—' }}</td>
                         <td>{{ $p->assignedTo->name ?? '—' }}</td>
                         <td><span class="badge bg-{{ $p->getStatusBadgeColor() }}">{{ $p->getStatusLabel() }}</span></td>
-                        <td><small class="text-muted">{{ $p->created_at->format('M j, Y') }}</small></td>
+                        <td><small class="text-muted">{{ $p->created_at->translatedFormat('M j, Y') }}</small></td>
                         <td class="text-end"><a href="{{ route('prototypes.manager.show', $p) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i> {{ __('portal.internal.view') }}</a></td>
                     </tr>
                 @empty

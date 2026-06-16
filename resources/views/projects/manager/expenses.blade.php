@@ -39,7 +39,7 @@
             <tbody>
                 @foreach($expenses as $expense)
                 <tr>
-                    <td>{{ $expense->expense_date->format('M d, Y') }}</td>
+                    <td>{{ $expense->expense_date->translatedFormat('M d, Y') }}</td>
                     <td>
                         <strong>{{ $expense->title }}</strong>
                         @if($expense->description)

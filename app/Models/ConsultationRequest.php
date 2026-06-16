@@ -110,4 +110,12 @@ class ConsultationRequest extends Model
             default => str_replace('_', ' ', $this->status)
         };
     }
+
+    /** Locale-aware category label (maps the stored English value to a key, falls back to raw). */
+    public function categoryLabel(): string
+    {
+        $key = 'portal.consultations.categories.'.\Illuminate\Support\Str::slug((string) $this->category, '_');
+
+        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : (string) $this->category;
+    }
 }

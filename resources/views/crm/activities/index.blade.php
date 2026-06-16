@@ -33,7 +33,7 @@
                         <a href="{{ $linkFor($a) }}" class="text-muted small">{{ optional($a->subject)->name ?? optional($a->subject)->title ?? '—' }}</a>
                     </td>
                     <td class="{{ $key === 'overdue' ? 'text-danger' : 'text-muted' }}" style="white-space:nowrap;">
-                        @if($a->due_at)<i class="fas fa-calendar"></i> {{ $a->due_at->format('M j, g:i A') }}@endif
+                        @if($a->due_at)<i class="fas fa-calendar"></i> {{ $a->due_at->translatedFormat('M j, g:i A') }}@endif
                     </td>
                     <td class="text-end">
                         <form method="POST" action="{{ route('crm-activities.complete', $a) }}">@csrf

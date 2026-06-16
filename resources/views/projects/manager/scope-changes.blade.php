@@ -37,7 +37,7 @@
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <small>
                         {{ __('portal.projects_manager.scope_changes.requested_by') }}: <strong>{{ $change->requestedBy->name }}</strong> 
-                        {{ __('portal.projects_manager.scope_changes.on') }} {{ $change->created_at->format('M d, Y') }}
+                        {{ __('portal.projects_manager.scope_changes.on') }} {{ $change->created_at->translatedFormat('M d, Y') }}
                     </small>
                     
                     @if($change->isPending())

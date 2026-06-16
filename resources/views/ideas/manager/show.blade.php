@@ -95,7 +95,7 @@
                     @if ($idea->user->phone)
                         <p><strong>{{ __('portal.ideas.manager.show.phone') }}</strong> <a href="tel:{{ $idea->user->phone }}">{{ $idea->user->phone }}</a></p>
                     @endif
-                    <p><strong>{{ __('portal.ideas.manager.show.submitted') }}</strong> {{ $idea->created_at->format('M d, Y H:i') }}</p>
+                    <p><strong>{{ __('portal.ideas.manager.show.submitted') }}</strong> {{ $idea->created_at->translatedFormat('M d, Y H:i') }}</p>
                 </div>
             </div>
             <div class="card mb-3">

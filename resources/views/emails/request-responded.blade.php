@@ -26,7 +26,7 @@
             <h4>{{ __('portal.emails.request_responded.response') }}:</h4>
             <p style="background:white;padding:15px;border-left:4px solid #10b981;">{{ $projectRequest->response }}</p>
 
-            <p>{{ __('portal.emails.request_responded.handled_by', ['name' => $projectRequest->handledBy->name, 'date' => $projectRequest->handled_at->format('F j, Y')]) }}</p>
+            <p>{{ __('portal.emails.request_responded.handled_by', ['name' => $projectRequest->handledBy->name, 'date' => $projectRequest->handled_at->translatedFormat('F j, Y')]) }}</p>
 
             <p style="margin-top:30px;">
                 <a href="{{ route('projects.client.show', $projectRequest->project) }}" 

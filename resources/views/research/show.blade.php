@@ -34,7 +34,7 @@
                 @if($research->meeting_scheduled_at)
                 <div class="info-section">
                     <h5><i class="fas fa-calendar"></i> {{ __('portal.research.show.meeting') }}</h5>
-                    <p>{{ $research->meeting_scheduled_at->format('l, F d, Y \a\t g:i A') }}</p>
+                    <p>{{ $research->meeting_scheduled_at->translatedFormat('l, F d, Y \a\t g:i A') }}</p>
                     @if($research->meeting_link)
                     <a href="{{ $research->meeting_link }}" class="btn btn-primary" target="_blank">
                         <i class="fas fa-video"></i> {{ __('portal.research.show.join_meeting') }}

@@ -120,7 +120,7 @@
                         <td>{{ $idea->title }}</td>
                         <td>{{ $idea->user->name }}</td>
                         <td><span class="status-badge {{ $idea->getStatusBadgeColor() }}">{{ $idea->getStatusLabel() }}</span></td>
-                        <td>{{ $idea->created_at->format('M d') }}</td>
+                        <td>{{ $idea->created_at->translatedFormat('M d') }}</td>
                         <td><a href="{{ route('ideas.show', $idea) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a></td>
                     </tr>
                     @endforeach
@@ -130,7 +130,7 @@
                         <td>{{ $consultation->title }}</td>
                         <td>{{ $consultation->user->name }}</td>
                         <td><span class="status-badge {{ $consultation->getStatusBadgeColor() }}">{{ $consultation->getStatusLabel() }}</span></td>
-                        <td>{{ $consultation->created_at->format('M d') }}</td>
+                        <td>{{ $consultation->created_at->translatedFormat('M d') }}</td>
                         <td><a href="{{ route('consultations.show', $consultation) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a></td>
                     </tr>
                     @endforeach

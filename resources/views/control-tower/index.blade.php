@@ -46,7 +46,7 @@
                             <td><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:{{ $lights[$row['health']]['color'] }};" title="{{ $lights[$row['health']]['label'] }}"></span></td>
                             <td>
                                 <a href="{{ route('projects.manager.show', $row['project']) }}" style="font-weight:600;">{{ $row['project']->title }}</a>
-                                <div class="text-muted" style="font-size:.75rem;">{{ ucfirst($row['project']->status) }}</div>
+                                <div class="text-muted" style="font-size:.75rem;">{{ $row['project']->getStatusLabel() }}</div>
                             </td>
                             <td>{{ $row['project']->projectManager->name ?? '—' }}</td>
                             <td>

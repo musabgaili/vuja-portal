@@ -49,7 +49,7 @@
         <div class="card"><div class="card-content">
             <h3 class="card-title mb-3">{{ __('portal.quote.actions') }}</h3>
             @if($quote->isAccepted())
-                <div class="alert alert-success" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->format('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
+                <div class="alert alert-success" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->translatedFormat('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
                 @if(auth()->user()->isManager() || auth()->user()->isProjectManager())
                 <a href="{{ route('invoices.create', ['quote' => $quote->id]) }}" class="btn btn-success w-100 mb-2"><i class="fas fa-file-invoice-dollar"></i> {{ __('portal.invoices.from_quote') }}</a>
                 @endif

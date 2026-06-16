@@ -94,7 +94,7 @@
                             </td>
                             <td>
                                 <div class="d-flex align-center">
-                                    <div class="user-avatar-sm me-2">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
+                                    <div class="user-avatar-sm me-2">{{ $user->initials() }}</div>
                                     <strong>{{ $user->name }}</strong>
                                 </div>
                             </td>
@@ -112,7 +112,7 @@
                                     <span class="status-badge warning">{{ __('portal.permissions.unverified') }}</span>
                                 @endif
                             </td>
-                            <td><span class="text-muted" style="font-size:.82rem;">{{ $user->created_at?->format('M j, Y') }}</span></td>
+                            <td><span class="text-muted" style="font-size:.82rem;">{{ $user->created_at?->translatedFormat('M j, Y') }}</span></td>
                             <td>
                                 <div class="d-flex gap-1">
                                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="changeUserRole({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ $user->roles->first()?->name ?? $user->role->value }}')">

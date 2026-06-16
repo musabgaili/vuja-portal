@@ -92,7 +92,7 @@ body { font-family: 'Inter', sans-serif; }
                     <tbody id="rulesTableBody">
                         @foreach($rules as $rule)
                         <tr style="cursor: pointer;" title="{{ $rule->note }}">
-                            <td><strong>{{ $rule->item }}</strong><br><small class="text-muted">{{ $rule->level }}</small></td>
+                            <td><strong>{{ $rule->localizedName() }}</strong><br><small class="text-muted">{{ $rule->level }}</small></td>
                             <td><strong class="text-success">${{ number_format($rule->rate, 2) }}</strong></td>
                             <td><span class="badge bg-secondary">{{ $rule->unit }}</span></td>
                             <td><small class="text-muted">{{ Str::limit($rule->note, 50) }}</small></td>

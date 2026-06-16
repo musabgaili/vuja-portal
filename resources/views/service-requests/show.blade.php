@@ -27,7 +27,7 @@
                             <strong>{{ __('portal.service_requests_page.show.service_type') }}</strong> {{ $serviceRequest->getTypeDisplayName() }}
                         </div>
                         <div class="col-md-6">
-                            <strong>{{ __('portal.service_requests_page.show.submitted') }}</strong> {{ $serviceRequest->created_at->format('M d, Y \a\t g:i A') }}
+                            <strong>{{ __('portal.service_requests_page.show.submitted') }}</strong> {{ $serviceRequest->created_at->translatedFormat('M d, Y \a\t g:i A') }}
                         </div>
                         @if($serviceRequest->assignedTo)
                         <div class="col-md-6">
@@ -143,7 +143,7 @@
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
                             <h6>{{ __('portal.service_requests_page.show.timeline_submitted') }}</h6>
-                            <small class="text-muted">{{ $serviceRequest->created_at->format('M d, Y g:i A') }}</small>
+                            <small class="text-muted">{{ $serviceRequest->created_at->translatedFormat('M d, Y g:i A') }}</small>
                         </div>
                     </div>
                     
@@ -152,7 +152,7 @@
                         <div class="timeline-marker {{ $serviceRequest->isApproved() ? 'success' : 'error' }}"></div>
                         <div class="timeline-content">
                             <h6>{{ $serviceRequest->isApproved() ? __('portal.service_requests_page.show.timeline_approved') : __('portal.service_requests_page.show.timeline_rejected') }}</h6>
-                            <small class="text-muted">{{ $serviceRequest->reviewed_at->format('M d, Y g:i A') }}</small>
+                            <small class="text-muted">{{ $serviceRequest->reviewed_at->translatedFormat('M d, Y g:i A') }}</small>
                         </div>
                     </div>
                     @endif
@@ -162,7 +162,7 @@
                         <div class="timeline-marker primary"></div>
                         <div class="timeline-content">
                             <h6>{{ __('portal.service_requests_page.show.timeline_started') }}</h6>
-                            <small class="text-muted">{{ $serviceRequest->started_at->format('M d, Y g:i A') }}</small>
+                            <small class="text-muted">{{ $serviceRequest->started_at->translatedFormat('M d, Y g:i A') }}</small>
                         </div>
                     </div>
                     @endif
@@ -172,7 +172,7 @@
                         <div class="timeline-marker success"></div>
                         <div class="timeline-content">
                             <h6>{{ __('portal.service_requests_page.show.timeline_completed') }}</h6>
-                            <small class="text-muted">{{ $serviceRequest->completed_at->format('M d, Y g:i A') }}</small>
+                            <small class="text-muted">{{ $serviceRequest->completed_at->translatedFormat('M d, Y g:i A') }}</small>
                         </div>
                     </div>
                     @endif

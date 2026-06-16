@@ -15,13 +15,13 @@
                 <span class="status-badge {{ $ip->getStatusBadgeColor() }}">{{ $ip->getStatusLabel() }}</span>
             </div>
             <div class="card-content">
-                <div class="mb-3"><strong>{{ __('portal.ip.ip_type') }}:</strong> <span class="badge bg-primary">{{ $ip->ip_type }}</span></div>
+                <div class="mb-3"><strong>{{ __('portal.ip.ip_type') }}:</strong> <span class="badge bg-primary">{{ $ip->ipTypeLabel() }}</span></div>
                 <div class="mb-3"><strong>{{ __('portal.ip.description') }}:</strong><p>{{ $ip->description }}</p></div>
                 @if($ip->meeting_requested_at)
-                <div class="mb-3"><strong>{{ __('portal.ip.meeting_requested') }}:</strong> {{ $ip->meeting_requested_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.ip.meeting_requested') }}:</strong> {{ $ip->meeting_requested_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($ip->meeting_confirmed_at)
-                <div class="mb-3"><strong>{{ __('portal.ip.meeting_confirmed') }}:</strong> {{ $ip->meeting_confirmed_at->format('M d, Y H:i') }}</div>
+                <div class="mb-3"><strong>{{ __('portal.ip.meeting_confirmed') }}:</strong> {{ $ip->meeting_confirmed_at->translatedFormat('M d, Y H:i') }}</div>
                 @endif
                 @if($ip->registration_number)
                 <div class="mb-3"><strong>{{ __('portal.ip.registration_number') }}:</strong> <span class="text-success">{{ $ip->registration_number }}</span></div>
@@ -36,7 +36,7 @@
                 <p><strong>{{ __('portal.ip.name') }}:</strong> {{ $ip->user->name }}</p>
                 <p><strong>{{ __('portal.ip.email') }}:</strong> <a href="mailto:{{ $ip->user->email }}">{{ $ip->user->email }}</a></p>
                 @if($ip->user->phone)<p><strong>{{ __('portal.ip.phone') }}:</strong> <a href="tel:{{ $ip->user->phone }}">{{ $ip->user->phone }}</a></p>@endif
-                <p><strong>{{ __('portal.ip.submitted') }}:</strong> {{ $ip->created_at->format('M d, Y H:i') }}</p>
+                <p><strong>{{ __('portal.ip.submitted') }}:</strong> {{ $ip->created_at->translatedFormat('M d, Y H:i') }}</p>
             </div>
         </div>
         <div class="card mb-3">

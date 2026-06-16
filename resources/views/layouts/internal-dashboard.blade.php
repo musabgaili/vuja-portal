@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Internal Dashboard') - VujaDe Platform</title>
+    <title>@yield('title', __('portal.dashboard')) - {{ __('portal.platform_name') }}</title>
     @include('partials.theme-head')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -322,7 +322,7 @@
                 @if(isset($breadcrumbs) || View::hasSection('breadcrumbs'))
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('internal.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('internal.dashboard') }}"><i class="fas fa-home"></i> {{ __('portal.nav.dashboard') }}</a></li>
                         @yield('breadcrumbs')
                     </ol>
                 </nav>

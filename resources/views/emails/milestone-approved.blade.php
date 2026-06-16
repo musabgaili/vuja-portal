@@ -29,7 +29,7 @@
                 <li><strong>{{ __('portal.emails.labels.milestone') }}:</strong> {{ $milestone->title }}</li>
                 <li><strong>{{ __('portal.emails.labels.project') }}:</strong> {{ $milestone->project->title }}</li>
                 <li><strong>{{ __('portal.emails.labels.client') }}:</strong> {{ $approver->name }}</li>
-                <li><strong>{{ __('portal.emails.labels.date') }}:</strong> {{ $milestone->client_approved_at->format('F j, Y \a\t g:i A') }}</li>
+                <li><strong>{{ __('portal.emails.labels.date') }}:</strong> {{ $milestone->client_approved_at->translatedFormat('F j, Y \a\t g:i A') }}</li>
             </ul>
 
             @if($milestone->approval_note)

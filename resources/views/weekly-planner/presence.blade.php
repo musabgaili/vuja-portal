@@ -4,7 +4,7 @@
 @section('content')
 <div class="page-hero">
     <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.presence_subtitle') }} {{ $weekStart->format('D, M j, Y') }}</p>
+    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.presence_subtitle') }} {{ $weekStart->translatedFormat('D, M j, Y') }}</p>
 </div>
 
 {{-- High-level: everyone's place of work + hours per day --}}
@@ -19,14 +19,14 @@
                 <tr>
                     <th>{{ __('portal.planner.location') }}</th>
                     @foreach($days as $day)
-                        <th style="text-transform:capitalize;">{{ ucfirst($day) }}</th>
+                        <th style="text-transform:capitalize;">{{ __('portal.planner.day.'.$day) }}</th>
                     @endforeach
                 </tr>
             </thead>
             <tbody>
                 @foreach($locations as $lk => $ll)
                     <tr>
-                        <td><strong>{{ $ll }}</strong></td>
+                        <td><strong>{{ \Illuminate\Support\Facades\Lang::has('portal.planner.location.'.$lk) ? __('portal.planner.location.'.$lk) : $ll }}</strong></td>
                         @foreach($days as $day)
                             @php $people = $grid[$day][$lk] ?? []; @endphp
                             <td>

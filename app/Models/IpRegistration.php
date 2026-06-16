@@ -125,4 +125,12 @@ class IpRegistration extends Model
             default => str_replace('_', ' ', $this->status)
         };
     }
+
+    /** Locale-aware IP-type label (maps the stored English value to a key, falls back to raw). */
+    public function ipTypeLabel(): string
+    {
+        $key = 'portal.ip.types.'.\Illuminate\Support\Str::slug((string) $this->ip_type, '_');
+
+        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : (string) $this->ip_type;
+    }
 }

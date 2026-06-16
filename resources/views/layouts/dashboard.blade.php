@@ -26,7 +26,7 @@
             <div class="sidebar-header">
                 @include('partials.brand')
                 <div class="user-info">
-                    <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
+                    <div class="user-avatar">{{ auth()->user()->initials() }}</div>
                     <div class="user-details">
                         <h3>{{ auth()->user()->name }}</h3>
                         <p>{{ __('portal.layout_client.role_badge') }}</p>

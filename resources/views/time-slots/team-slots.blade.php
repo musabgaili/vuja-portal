@@ -66,7 +66,7 @@
                         <strong>{{ $slot->user->name }}</strong>
                         <br><small class="text-muted">{{ $slot->user->email }}</small>
                     </td>
-                    <td><strong>{{ $slot->date->format('M d, Y') }}</strong><br><small class="text-muted">{{ $slot->date->format('l') }}</small></td>
+                    <td><strong>{{ $slot->date->translatedFormat('M d, Y') }}</strong><br><small class="text-muted">{{ $slot->date->translatedFormat('l') }}</small></td>
                     <td>{{ $slot->getFormattedTimeRange() }}</td>
                     <td>
                         <span class="status-badge {{ $slot->getStatusBadgeColor() }}">

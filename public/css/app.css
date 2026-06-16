@@ -1202,10 +1202,16 @@ body {
 [data-bs-theme="dark"] .service-card-modern, [data-bs-theme="dark"] .stat-card,
 [data-bs-theme="dark"] .stat-card-modern, [data-bs-theme="dark"] .stat-card-manager,
 [data-bs-theme="dark"] .stat-box, [data-bs-theme="dark"] .pricing-card, [data-bs-theme="dark"] .cart-card,
-[data-bs-theme="dark"] .role-card, [data-bs-theme="dark"] .request-item-modern, [data-bs-theme="dark"] .cart-item {
+[data-bs-theme="dark"] .role-card, [data-bs-theme="dark"] .request-item-modern, [data-bs-theme="dark"] .cart-item,
+[data-bs-theme="dark"] .card-modern, [data-bs-theme="dark"] .item-modern {
     background: var(--bg-primary) !important; background-image: none !important;
     border-color: var(--gray-200) !important; color: var(--gray-700) !important;
 }
+/* Internal-dashboard widget card titles (inline #1e293b gets theme-flipped by the
+   content-body override); keep them strong on the now-dark card surface. */
+[data-bs-theme="dark"] .card-modern h3,
+[data-bs-theme="dark"] .card-modern-header h3,
+[data-bs-theme="dark"] .item-modern strong { color: var(--gray-900) !important; }
 [data-bs-theme="dark"] .stat-number, [data-bs-theme="dark"] .stat-number-manager,
 [data-bs-theme="dark"] .stat-value, [data-bs-theme="dark"] .stat-card h3,
 [data-bs-theme="dark"] .card h1, [data-bs-theme="dark"] .card h2, [data-bs-theme="dark"] .card h3,
@@ -1320,3 +1326,11 @@ th.sortable.sort-desc::after { content: '\f0dd'; opacity: .9; }
 
 /* Arabic text inside otherwise-LTR cards reads correctly. */
 [dir="ltr"] [data-content] { unicode-bidi: plaintext; }
+
+/* Dark-mode contrast polish (client 4-mode report): give the sidebar a visible
+   edge against the near-black body, and lighten progress-bar tracks so the teal
+   fill reads against them. (Attribute-prefixed selectors out-specify the
+   per-view track rules, so these win regardless of stylesheet order.) */
+[data-bs-theme="dark"] .sidebar { border-color: rgba(255, 255, 255, .12); }
+[data-bs-theme="dark"] .progress,
+[data-bs-theme="dark"] .progress-bar-client { background: rgba(255, 255, 255, .16); }

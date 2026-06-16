@@ -39,7 +39,7 @@
                             <h5>{{ $milestone->title }}</h5>
                             @if($milestone->description)<p class="text-muted">{{ $milestone->description }}</p>@endif
                             <span class="status-badge {{ $milestone->getStatusBadgeColor() }}">{{ ucfirst($milestone->status) }}</span>
-                            @if($milestone->due_date)<small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->format('M d, Y') }}</small>@endif
+                            @if($milestone->due_date)<small class="text-muted">• {{ __('portal.projects_manager.show.due') }}: {{ $milestone->due_date->translatedFormat('M d, Y') }}</small>@endif
                             
                             @php
                                 $milestoneTasks = $milestone->tasks;
@@ -92,7 +92,7 @@
                             <br>
                             @if($task->milestone)<small class="text-muted">📍 {{ $task->milestone->title }}</small>@endif
                             @if($task->assignedTo)<br><small>👤 {{ $task->assignedTo->name }}</small>@endif
-                            @if($task->due_date)<br><small>📅 {{ __('portal.projects_manager.show.due') }}: {{ $task->due_date->format('M d, Y') }}</small>@endif
+                            @if($task->due_date)<br><small>📅 {{ __('portal.projects_manager.show.due') }}: {{ $task->due_date->translatedFormat('M d, Y') }}</small>@endif
                         </div>
                         <div>
                             <button class="btn btn-sm btn-secondary" onclick="updateTaskStatus({{ $task->id }})">

@@ -38,7 +38,7 @@
         <div class="slots-grid">
             @foreach($slots->groupBy(fn($s) => $s->date->format('Y-m-d')) as $date => $daySlots)
             <div class="day-section mb-4">
-                <h5 class="mb-3">{{ \Carbon\Carbon::parse($date)->format('l, F d, Y') }}</h5>
+                <h5 class="mb-3">{{ \Carbon\Carbon::parse($date)->translatedFormat('l, F d, Y') }}</h5>
                 <div class="row">
                     @foreach($daySlots as $slot)
                     <div class="col-md-4 col-lg-3 mb-3">
