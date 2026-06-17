@@ -555,9 +555,17 @@
             <input type="hidden" name="commentable_type" value="App\Models\Project">
             <input type="hidden" name="commentable_id" value="{{ $project->id }}">
             <div class="form-group">
-                <textarea name="comment" class="form-control" rows="3" placeholder="{{ __('portal.projects_manager.show.add_comment_placeholder') }}" required></textarea>
+                <textarea name="comment" id="pcCommentBox" class="form-control" rows="3" placeholder="{{ __('portal.projects_manager.show.add_comment_placeholder') }}" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">
+            <div class="form-check mt-2 mb-1">
+                <input type="checkbox" name="internal_note" value="1" id="pcInternalNote" class="form-check-input"
+                       onchange="(function(c){var b=document.getElementById('pcCommentBox'),h=document.getElementById('pcInternalHint'),s=document.getElementById('pcSubmitBtn');if(c.checked){b.style.border='2px solid #f59e0b';b.style.background='#fffbeb';h.style.display='block';s.classList.add('btn-warning');s.classList.remove('btn-primary');}else{b.style.border='';b.style.background='';h.style.display='none';s.classList.add('btn-primary');s.classList.remove('btn-warning');}})(this)">
+                <label for="pcInternalNote" class="form-check-label"><i class="fas fa-lock"></i> {{ __('portal.projects_manager.show.internal_note_label') }}</label>
+            </div>
+            <div id="pcInternalHint" class="small mb-2" style="display:none; color:#92400e;">
+                <i class="fas fa-eye-slash"></i> {{ __('portal.projects_manager.show.internal_note_hint') }}
+            </div>
+            <button type="submit" id="pcSubmitBtn" class="btn btn-primary">
                 <i class="fas fa-paper-plane"></i> {{ __('portal.projects_client.show.post_comment') }}
             </button>
         </form>
@@ -569,7 +577,7 @@
 
         <!-- Comments List -->
         @forelse($project->comments->sortByDesc('created_at') as $comment)
-        <div class="comment-box" style="border-left-color: {{ $comment->is_internal ? 'var(--warning-color)' : 'var(--info-color)' }};">
+        <div class="comment-box" style="border-left-color: {{ $comment->internal_note ? '#f59e0b' : ($comment->is_internal ? 'var(--warning-color)' : 'var(--info-color)') }};{{ $comment->internal_note ? 'background:#fffbeb;' : '' }}">
             <div class="comment-header">
                 <span class="comment-author">
                     {{ $comment->user->name }}
@@ -577,6 +585,9 @@
                     <span class="badge bg-warning" style="font-size: 0.7rem;">{{ __('portal.projects_manager.show.team_badge') }}</span>
                     @else
                     <span class="badge bg-info" style="font-size: 0.7rem;">{{ __('portal.projects_client.show.client') }}</span>
+                    @endif
+                    @if($comment->internal_note)
+                    <span class="badge" style="font-size: 0.7rem; background:#92400e;"><i class="fas fa-lock"></i> {{ __('portal.projects_manager.show.internal_note_badge') }}</span>
                     @endif
                 </span>
                 <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>

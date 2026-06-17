@@ -17,10 +17,12 @@ class ProjectComment extends Model
         'user_id',
         'comment',
         'is_internal',
+        'internal_note',
     ];
 
     protected $casts = [
         'is_internal' => 'boolean',
+        'internal_note' => 'boolean',
     ];
 
     public function commentable(): MorphTo

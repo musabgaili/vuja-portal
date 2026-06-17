@@ -111,6 +111,7 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            @include('partials.verify-banner')
             <!-- Top Header -->
             <header class="content-header">
                 <div class="header-left">

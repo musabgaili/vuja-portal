@@ -403,7 +403,7 @@
 
             <!-- Comments List -->
             <div style="max-height: 500px; overflow-y: auto;">
-                @forelse($project->comments->sortByDesc('created_at') as $comment)
+                @forelse($project->comments->where('internal_note', false)->sortByDesc('created_at') as $comment)
                 <div class="comment-modern {{ $comment->is_internal ? 'internal' : '' }}">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>

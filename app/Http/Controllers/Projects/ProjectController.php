@@ -79,6 +79,7 @@ class ProjectController extends Controller
             'comment' => 'required|string',
             'commentable_type' => 'required|in:App\Models\Project,App\Models\ProjectMilestone,App\Models\ProjectTask',
             'commentable_id' => 'required|integer',
+            'internal_note' => 'sometimes|boolean',
         ]);
 
         // Prevent IDOR: the comment target must belong to the authorized project,
@@ -101,6 +102,8 @@ class ProjectController extends Controller
             'user_id' => $user->id,
             'comment' => $validated['comment'],
             'is_internal' => $user->isInternal(),
+            // Internal note (hidden from client) — only staff may flag one.
+            'internal_note' => $user->isInternal() && $request->boolean('internal_note'),
         ]);
 
         // Engagement: an internal team member leaving a comment is a "solution comment".
