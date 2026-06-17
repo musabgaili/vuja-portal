@@ -117,6 +117,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/quotes', [\App\Http\Controllers\QuoteController::class, 'index'])->name('quotes.index');
     Route::get('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'show'])->name('quotes.show');
     Route::post('/quotes/{quote}/send', [\App\Http\Controllers\QuoteController::class, 'send'])->name('quotes.send');
+    Route::post('/quotes/{quote}/assign-client', [\App\Http\Controllers\QuoteController::class, 'assignClient'])->name('quotes.assign-client');
     Route::post('/quotes/{quote}/accept', [\App\Http\Controllers\QuoteController::class, 'acceptInternal'])->name('quotes.accept-internal');
     // Internal approval layer
     Route::post('/quotes/{quote}/submit', [\App\Http\Controllers\QuoteController::class, 'submitForApproval'])->name('quotes.submit');

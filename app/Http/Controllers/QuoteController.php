@@ -30,7 +30,20 @@ class QuoteController extends Controller
         return view('crm.quotes.show', [
             'quote' => $quote->load(['items', 'client', 'opportunity', 'company', 'project', 'approver', 'comments.user']),
             'canApprove' => $this->isApprover(),
+            'clients' => User::where('role', \App\Enums\UserRole::CLIENT)->orderBy('name')->get(['id', 'name', 'email']),
         ]);
+    }
+
+    /** Link a client account to a quote so it can be sent to / accepted for them. */
+    public function assignClient(Request $request, Quote $quote)
+    {
+        abort_unless(Auth::user()->isInternal(), 403);
+        $validated = $request->validate([
+            'client_id' => ['required', \Illuminate\Validation\Rule::exists('users', 'id')->where('role', \App\Enums\UserRole::CLIENT->value)],
+        ]);
+        $quote->update(['client_id' => $validated['client_id']]);
+
+        return back()->with('success', __('portal.quote.client_assigned'));
     }
 
     /** Only a draft/changes_requested quote may go to the client AFTER approval. */
@@ -39,6 +52,10 @@ class QuoteController extends Controller
         abort_unless(Auth::user()->isInternal(), 403);
         if ($quote->status !== 'approved') {
             return back()->withErrors(['send' => __('portal.quote.must_be_approved')]);
+        }
+        // Can't send a quote to "the client" if no client is linked yet.
+        if (! $quote->client_id) {
+            return back()->withErrors(['send' => __('portal.quote.no_client_link_warning')]);
         }
         $firstSend = $quote->sent_at === null;
         $quote->update(['status' => 'sent', 'sent_at' => $quote->sent_at ?? now()]);

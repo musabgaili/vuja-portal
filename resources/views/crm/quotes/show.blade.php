@@ -48,6 +48,23 @@
     <div class="col-lg-4">
         <div class="card"><div class="card-content">
             <h3 class="card-title mb-3">{{ __('portal.quote.actions') }}</h3>
+            @unless($quote->isAccepted())
+                @unless($quote->client)
+                    <div class="alert alert-warning" style="font-size:.85rem;"><i class="fas fa-user-slash"></i> {{ __('portal.quote.no_client_assign_hint') }}</div>
+                    <form method="POST" action="{{ route('quotes.assign-client', $quote) }}" class="mb-3">@csrf
+                        <label class="form-label small fw-bold mb-1">{{ __('portal.quote.assign_client') }}</label>
+                        <div class="d-flex gap-1">
+                            <select name="client_id" class="form-select form-select-sm" required>
+                                <option value="">{{ __('portal.quote.choose_client') }}</option>
+                                @foreach($clients as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->email }})</option>
+                                @endforeach
+                            </select>
+                            <button class="btn btn-sm btn-primary" title="{{ __('portal.quote.assign_client') }}"><i class="fas fa-link"></i></button>
+                        </div>
+                    </form>
+                @endunless
+            @endunless
             @if($quote->isAccepted())
                 <div class="alert alert-success" data-persist><i class="fas fa-circle-check"></i> {{ __('portal.quote.accepted_on') }} {{ optional($quote->accepted_at)->translatedFormat('M j, Y') }}<br><small>{{ __('portal.quote.signed_by') }}: {{ $quote->accepted_signature }}</small></div>
                 @if(auth()->user()->isManager() || auth()->user()->isProjectManager())
@@ -87,9 +104,14 @@
                 {{-- Step 3: approved -> send to client --}}
                 @if($quote->status === 'approved')
                     @if($quote->approver)<div class="text-muted small mb-2">{{ __('portal.quote.approved_by') }}: {{ $quote->approver->name }}</div>@endif
-                    <form method="POST" action="{{ route('quotes.send', $quote) }}" class="mb-2">@csrf
-                        <button class="btn btn-primary w-100"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.send_to_client') }}</button>
-                    </form>
+                    @if($quote->client)
+                        <div class="text-muted small mb-1">{{ __('portal.quote.will_send_to') }}: <strong>{{ $quote->client->name }}</strong></div>
+                        <form method="POST" action="{{ route('quotes.send', $quote) }}" class="mb-2">@csrf
+                            <button class="btn btn-primary w-100"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.send_to_client') }}</button>
+                        </form>
+                    @else
+                        <div class="alert alert-info" style="font-size:.85rem;"><i class="fas fa-arrow-up"></i> {{ __('portal.quote.assign_client_before_send') }}</div>
+                    @endif
                 @endif
 
                 @if($quote->status === 'sent')
@@ -112,6 +134,18 @@
                 <div style="word-break:break-all; font-size:.8rem;">{{ route('quotes.client.show', $quote) }}</div>
             @endif
             <a href="{{ route('quotes.index') }}" class="btn btn-secondary w-100 mt-2">{{ __('portal.quote.back') }}</a>
+        </div></div>
+
+        {{-- Scope / quotation document: view online or export as PDF / Word --}}
+        <div class="card mt-3"><div class="card-content">
+            <h3 class="card-title mb-2"><i class="fas fa-file-lines"></i> {{ __('portal.quote.document') }}</h3>
+            <a href="{{ route('scope-planner.document', $quote) }}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2"><i class="fas fa-up-right-from-square"></i> {{ __('portal.quote.view_document') }}</a>
+            <a href="{{ route('scope-planner.view.pdf', $quote) }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 mb-2"><i class="fas fa-file-pdf"></i> {{ __('portal.quote.view_pdf') }}</a>
+            <a href="{{ route('scope-planner.export.pdf', $quote) }}" class="btn btn-primary btn-sm w-100 mb-2"><i class="fas fa-download"></i> {{ __('portal.quote.download_pdf') }}</a>
+            <a href="{{ route('scope-planner.export.docx', $quote) }}" class="btn btn-secondary btn-sm w-100"><i class="fas fa-file-word"></i> {{ __('portal.quote.download_docx') }}</a>
+            @if($quote->customer_category === 'company')
+                <a href="{{ route('scope-planner.technical.pdf', $quote) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2"><i class="fas fa-file-pdf"></i> {{ __('portal.quote.download_technical') }}</a>
+            @endif
         </div></div>
 
         {{-- Client-facing preview --}}

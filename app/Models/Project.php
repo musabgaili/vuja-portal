@@ -181,6 +181,16 @@ class Project extends Model
             return true;
         }
 
+        // The assigned project / account manager can always view their project,
+        // even when only the column is set (e.g. a quote accepted -> order
+        // conversion sets project_manager_id without a projectPeople pivot row).
+        // hasAssignedManagementAccess() already trusts these columns for editing,
+        // so viewing must too — otherwise the PM who accepts a quote is locked out
+        // of (gets 403 on) the very project they just created.
+        if ($this->project_manager_id === $user->id || $this->account_manager_id === $user->id) {
+            return true;
+        }
+
         // Check if user is part of project team
         return $this->projectPeople()->where('user_id', $user->id)->exists();
     }
