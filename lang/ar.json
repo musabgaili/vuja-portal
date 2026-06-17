@@ -2565,6 +2565,8 @@
     "portal.permissions.verification": "التحقق",
     "portal.permissions.all": "الكل",
     "portal.permissions.verified": "مُوثَّق",
+    "portal.permissions.activate": "تفعيل / اعتماد الحساب",
+    "portal.permissions.user_activated": "تم تفعيل :name.",
     "portal.permissions.unverified": "غير موثّق",
     "portal.permissions.apply": "تطبيق",
     "portal.permissions.registered": "تاريخ التسجيل",

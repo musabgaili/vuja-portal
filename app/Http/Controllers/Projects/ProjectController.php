@@ -187,12 +187,12 @@ class ProjectController extends Controller
 
         // Get all internal users (employees, managers, etc.)
         $employees = User::where('type', 'internal')
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'pending'])
             ->orderBy('name')
             ->get();
 
         $managers = User::where('type', 'internal')
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'pending'])
             ->orderBy('name')
             ->get();
 
@@ -239,7 +239,7 @@ class ProjectController extends Controller
 
         // Get all internal users for team management (not just employees)
         $employees = User::where('type', 'internal')
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'pending'])
             ->orderBy('name')
             ->get();
 

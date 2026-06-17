@@ -336,6 +336,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
             Route::post('/users/delete-unverified', [\App\Http\Controllers\Permissions\PermissionsController::class, 'deleteUnverifiedClients'])->name('users.delete-unverified');
             Route::delete('/users/{user}', [\App\Http\Controllers\Permissions\PermissionsController::class, 'destroyUser'])->name('users.destroy');
 
+            // Manually approve/activate a pending account (sets status active + verifies email).
+            Route::post('/users/{user}/activate', [\App\Http\Controllers\Permissions\PermissionsController::class, 'activateUser'])->name('users.activate');
+
             Route::post('/assign-role', [\App\Http\Controllers\Permissions\PermissionsController::class, 'assignRole'])->name('assign-role');
             Route::post('/remove-role', [\App\Http\Controllers\Permissions\PermissionsController::class, 'removeRole'])->name('remove-role');
             Route::post('/assign-permission', [\App\Http\Controllers\Permissions\PermissionsController::class, 'assignPermissionToRole'])->name('assign-permission');

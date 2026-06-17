@@ -243,9 +243,13 @@ class IdeaRequestController extends Controller
             abort(403);
         }
 
-        $ideas = IdeaRequest::with(['user', 'assignedTo'])
-            ->latest()
-            ->paginate(15);
+        // Employees only see ideas assigned to them; managers/PMs see all
+        // (matches the consultation/research/ip/copyright/prototype controllers).
+        $query = IdeaRequest::with(['user', 'assignedTo']);
+        if ($user->isEmployee()) {
+            $query->where('assigned_to', $user->id);
+        }
+        $ideas = $query->latest()->paginate(15);
 
         return view('ideas.manager.index', compact('ideas'));
     }
@@ -255,6 +259,12 @@ class IdeaRequestController extends Controller
         $user = Auth::user();
 
         $this->authorize('manage', $idea);
+
+        // An employee may only open an idea assigned to them (the 'manage' policy
+        // only checks is-internal, so guard the per-record access here too).
+        if ($user->isEmployee() && $idea->assigned_to !== $user->id) {
+            abort(403);
+        }
 
         $idea->load(['user', 'assignedTo', 'comments.user']);
         $employees = User::where('role', 'employee')->get();

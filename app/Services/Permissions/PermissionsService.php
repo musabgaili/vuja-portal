@@ -3,6 +3,7 @@
 namespace App\Services\Permissions;
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
@@ -44,6 +45,14 @@ class PermissionsService
             return;
         }
 
+        // Internal staff are trusted: activate them on promotion so a client who is
+        // made an employee/PM/manager is never left stranded as "pending" waiting on
+        // an email-verification link they may never receive.
+        if (($profile['type'] ?? null) === 'internal') {
+            $profile['status'] = UserStatus::ACTIVE;
+            $profile['email_verified_at'] = $user->email_verified_at ?? now();
+        }
+
         $user->forceFill($profile)->save();
     }
 
@@ -74,7 +83,7 @@ class PermissionsService
 
         $profile = $this->mapSpatieRoleToUserProfile($remaining->name);
         if ($profile !== null) {
-            $user->forceFill($profile)->save();
+            $this->applySpatieMappedProfileToUser($user, $profile);
         } else {
             $this->setUserToDefaultClient($user);
         }

@@ -67,7 +67,7 @@
                 <label class="form-label fw-bold">{{ __('portal.consultations.manager.index.select_employee') }} *</label>
                 <select name="assigned_to" id="ae_employee" class="form-control" required onchange="loadEmployeeSlots(this.value)">
                     <option value="">{{ __('portal.consultations.manager.index.choose') }}</option>
-                    @foreach(\App\Models\User::where('type','internal')->where('status','active')->orderBy('name')->get() as $e)
+                    @foreach(\App\Models\User::where('type','internal')->whereIn('status',['active','pending'])->orderBy('name')->get() as $e)
                     <option value="{{ $e->id }}">{{ $e->name }}</option>
                     @endforeach
                 </select>

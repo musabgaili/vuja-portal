@@ -111,6 +111,7 @@
                                 @else
                                     <span class="status-badge warning">{{ __('portal.permissions.unverified') }}</span>
                                 @endif
+                                <div class="mt-1"><span class="status-badge {{ $user->status->color() }}">{{ $user->status->label() }}</span></div>
                             </td>
                             <td><span class="text-muted" style="font-size:.82rem;">{{ $user->created_at?->translatedFormat('M j, Y') }}</span></td>
                             <td>
@@ -118,6 +119,14 @@
                                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="changeUserRole({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ $user->roles->first()?->name ?? $user->role->value }}')">
                                         <i class="fas fa-user-tag"></i>
                                     </button>
+                                    @if($user->status !== \App\Enums\UserStatus::ACTIVE)
+                                        <form method="POST" action="{{ route('permissions.users.activate', $user) }}" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="{{ __('portal.permissions.activate') }}">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                     @if($deletable($user))
                                         <button type="submit" form="del-{{ $user->id }}" class="btn btn-sm btn-outline-danger"
                                                 onclick="return confirm('{{ __('portal.permissions.delete_user_confirm') }}');" title="{{ __('portal.permissions.delete_user') }}">
@@ -201,6 +210,8 @@
 .status-badge { padding: 4px 12px; border-radius: 4px; font-size: var(--font-size-xs); font-weight: 600; text-transform: uppercase; }
 .status-badge.success { background: #d1fae5; color: #065f46; }
 .status-badge.warning { background: #fef3c7; color: #92400e; }
+.status-badge.danger { background: #fee2e2; color: #991b1b; }
+.status-badge.secondary { background: #e2e8f0; color: #475569; }
 </style>
 @endpush
 

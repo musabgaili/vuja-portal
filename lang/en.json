@@ -2566,6 +2566,8 @@
     "portal.permissions.verification": "Verification",
     "portal.permissions.all": "All",
     "portal.permissions.verified": "Verified",
+    "portal.permissions.activate": "Activate / approve account",
+    "portal.permissions.user_activated": ":name has been activated.",
     "portal.permissions.unverified": "Unverified",
     "portal.permissions.apply": "Apply",
     "portal.permissions.registered": "Registered",

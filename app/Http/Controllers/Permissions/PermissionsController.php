@@ -154,6 +154,21 @@ class PermissionsController extends Controller
     }
 
     /**
+     * Manually approve/activate a pending account. Sets status to ACTIVE and marks
+     * the email verified so the user can sign in without the verification email —
+     * useful when the mail never arrived or for staff created/promoted in-app.
+     */
+    public function activateUser(User $user): RedirectResponse
+    {
+        $user->forceFill([
+            'status' => \App\Enums\UserStatus::ACTIVE,
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ])->save();
+
+        return back()->with('success', __('portal.permissions.user_activated', ['name' => $user->name]));
+    }
+
+    /**
      * Assign a role to a user.
      */
     public function assignRole(Request $request)

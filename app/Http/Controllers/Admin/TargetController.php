@@ -44,7 +44,7 @@ class TargetController extends Controller
     {
         return User::where('type', 'internal')
             ->whereIn('role', ['employee', 'project_manager'])
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'pending'])
             ->orderBy('name')->get();
     }
 
