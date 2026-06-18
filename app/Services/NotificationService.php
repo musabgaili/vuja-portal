@@ -6,6 +6,7 @@ use App\Models\EngagementLog;
 use App\Models\ImprovementIdea;
 use App\Models\ProjectTask;
 use App\Models\Quote;
+use App\Models\SpendRequest;
 use App\Models\StaffTask;
 use App\Models\User;
 use App\Models\WeeklyPlan;
@@ -100,6 +101,21 @@ class NotificationService
             foreach (Quote::where('status', 'pending_approval')->with('creator')
                 ->latest('updated_at')->limit(5)->get() as $q) {
                 $push($q->updated_at, 'fa-gavel', __('portal.notif.quote_pending', ['name' => $q->creator->name ?? '—', 'title' => $q->title]), route('approvals.index'));
+            }
+        }
+
+        // Spend/reimbursement: outcomes on the user's own requests.
+        foreach (SpendRequest::where('requester_id', $user->id)
+            ->whereIn('status', ['approved', 'rejected', 'completed'])
+            ->latest('updated_at')->limit(5)->get() as $sr) {
+            $push($sr->updated_at, 'fa-receipt', __('portal.notif.spend_'.$sr->status, ['title' => $sr->title]), route('spend.index'));
+        }
+
+        // Spend requests routed to this user to review.
+        foreach (SpendRequest::with(['requester', 'project'])->where('status', 'pending')
+            ->where('requester_id', '!=', $user->id)->latest()->limit(10)->get() as $sr) {
+            if ($sr->isApprovableBy($user)) {
+                $push($sr->created_at, 'fa-inbox', __('portal.notif.spend_review', ['name' => $sr->requester->name ?? '—', 'title' => $sr->title]), route('spend.approvals'));
             }
         }
 

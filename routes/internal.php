@@ -127,6 +127,19 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/quotes/{quote}/comments', [\App\Http\Controllers\QuoteController::class, 'addComment'])->name('quotes.comments.store');
     Route::delete('/quotes/{quote}', [\App\Http\Controllers\QuoteController::class, 'destroy'])->name('quotes.destroy');
 
+    // Spend & reimbursement requests (employee/PM/manager) — project + general,
+    // reimbursement + purchase, role-routed approvals.
+    Route::get('/spend', [\App\Http\Controllers\SpendRequestController::class, 'index'])->name('spend.index');
+    Route::get('/spend/create', [\App\Http\Controllers\SpendRequestController::class, 'create'])->name('spend.create');
+    Route::post('/spend', [\App\Http\Controllers\SpendRequestController::class, 'store'])->name('spend.store');
+    Route::get('/spend/approvals', [\App\Http\Controllers\SpendRequestController::class, 'approvals'])->name('spend.approvals');
+    Route::post('/spend/{spendRequest}/approve', [\App\Http\Controllers\SpendRequestController::class, 'approve'])->name('spend.approve');
+    Route::post('/spend/{spendRequest}/reject', [\App\Http\Controllers\SpendRequestController::class, 'reject'])->name('spend.reject');
+    Route::post('/spend/{spendRequest}/purchase', [\App\Http\Controllers\SpendRequestController::class, 'purchase'])->name('spend.purchase');
+    Route::post('/spend/{spendRequest}/reimburse', [\App\Http\Controllers\SpendRequestController::class, 'reimburse'])->name('spend.reimburse');
+    Route::get('/spend/{spendRequest}/receipt/{which?}', [\App\Http\Controllers\SpendRequestController::class, 'receipt'])->name('spend.receipt');
+    Route::delete('/spend/{spendRequest}', [\App\Http\Controllers\SpendRequestController::class, 'destroy'])->name('spend.destroy');
+
     // Customer Invoices (PM + manager create/manage; client uploads receipts elsewhere)
     Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/create', [\App\Http\Controllers\InvoiceController::class, 'create'])->name('invoices.create');

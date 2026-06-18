@@ -126,6 +126,18 @@ class Project extends Model
         return $this->hasMany(ProjectScopeChange::class);
     }
 
+    /** Approved-but-not-yet-bought purchase requests = money committed against the budget. */
+    public function committedSpend(): float
+    {
+        return (float) \App\Models\SpendRequest::where('project_id', $this->id)
+            ->where('type', 'purchase')->where('status', 'approved')->sum('amount');
+    }
+
+    public function spendRequests(): HasMany
+    {
+        return $this->hasMany(SpendRequest::class);
+    }
+
     public function expenses(): HasMany
     {
         return $this->hasMany(ProjectExpense::class);
