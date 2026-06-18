@@ -60,7 +60,8 @@ class MpdfRenderer implements PdfRenderer
         $mpdf->showImageErrors = false;
 
         // Full-page letterhead behind every page ('F' fills the page, 'P' centres it).
-        $letterhead = storage_path('app/public/'.config('scope.letterhead', 'scope/letterhead.png'));
+        // Path is relative to public/ (git-tracked) so it ships with the repo.
+        $letterhead = public_path(config('scope.letterhead', 'images/scope-letterhead.png'));
         if (is_file($letterhead)) {
             $mpdf->showWatermarkImage = true;
             $mpdf->watermarkImageAlpha = 1;

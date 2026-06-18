@@ -33,7 +33,12 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // serve => true is intentionally OFF: it auto-registers an
+            // UNAUTHENTICATED `GET /storage/{path}` route that would expose this
+            // disk's root — which is shared with the `private` disk holding 3D
+            // uploads, prototype docs, invoices, receipts, etc. All private files
+            // are served only through their authorize()-gated controller routes.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

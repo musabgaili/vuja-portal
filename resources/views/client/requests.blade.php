@@ -117,6 +117,13 @@
                     <span>{{ __('portal.client.requests.copyright') }}</span>
                 </div>
             </div>
+            <div class="service-stat" style="border-left-color: #0C7075;">
+                <i class="fas fa-cubes" style="color: #0C7075;"></i>
+                <div>
+                    <strong>{{ $summary['threed'] ?? 0 }}</strong>
+                    <span>{{ __('portal.client.requests.threed') }}</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -133,6 +140,7 @@
                 <option value="research" {{ $typeFilter === 'research' ? 'selected' : '' }}>{{ __('portal.client.requests.research') }}</option>
                 <option value="ip" {{ $typeFilter === 'ip' ? 'selected' : '' }}>{{ __('portal.client.requests.ip_registration') }}</option>
                 <option value="copyright" {{ $typeFilter === 'copyright' ? 'selected' : '' }}>{{ __('portal.client.requests.copyright') }}</option>
+                <option value="threed" {{ $typeFilter === 'threed' ? 'selected' : '' }}>{{ __('portal.client.requests.threed') }}</option>
             </select>
             <select class="form-control" style="width: auto;" onchange="filterByStatus(this.value)">
                 <option value="">{{ __('portal.client.requests.all_status') }}</option>

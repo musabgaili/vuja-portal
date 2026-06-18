@@ -53,7 +53,8 @@ class DocxRenderer
         ]);
 
         // Letterhead behind text (repeats every page via the header).
-        $letterhead = storage_path('app/public/'.config('scope.letterhead', 'scope/letterhead.png'));
+        // Path is relative to public/ (git-tracked) so it ships with the repo.
+        $letterhead = public_path(config('scope.letterhead', 'images/scope-letterhead.png'));
         if (is_file($letterhead)) {
             $section->addHeader()->addImage($letterhead, [
                 'width' => 612, 'height' => 792, 'wrappingStyle' => 'behind',

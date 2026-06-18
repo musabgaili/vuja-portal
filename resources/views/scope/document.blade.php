@@ -27,7 +27,7 @@
     html,body{margin:0;padding:0}
     body{font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;color:{{ $ink }};font-size:12.5px}
 
-    .lh{position:fixed;inset:0;z-index:-1;background:url('{{ asset('storage/'.config('scope.letterhead', 'scope/letterhead.png')) }}') center/cover no-repeat;
+    .lh{position:fixed;inset:0;z-index:-1;background:url('{{ asset(config('scope.letterhead', 'images/scope-letterhead.png')) }}') center/cover no-repeat;
         -webkit-print-color-adjust:exact;print-color-adjust:exact}
     .docfoot{position:fixed;left:0;right:0;bottom:11mm;z-index:1;text-align:center;font-size:9.5px;color:{{ $muted }};letter-spacing:.2px}
 

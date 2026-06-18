@@ -14,6 +14,11 @@
 
 @if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
+@php $prefill = $prefill ?? ['subject' => '', 'brief' => '']; @endphp
+@if(!empty($prefill['subject']) || !empty($prefill['brief']))
+<div class="alert alert-info"><i class="fas fa-arrow-right-arrow-left me-1"></i> {{ __('portal.scope_planner.carried_over') }}</div>
+@endif
+
 <form method="POST" action="{{ route('scope-planner.store') }}" class="card">
     @csrf
     <div class="card-content">
@@ -46,7 +51,7 @@
             </div>
             <div class="col-md-8">
                 <label class="form-label fw-bold">{{ __('portal.scope_planner.subject') }}</label>
-                <input type="text" name="subject" class="form-control" value="{{ old('subject') }}" placeholder="{{ __('portal.scope_planner.subject_ph') }}">
+                <input type="text" name="subject" class="form-control" value="{{ old('subject', $prefill['subject'] ?? '') }}" placeholder="{{ __('portal.scope_planner.subject_ph') }}">
             </div>
 
             <div class="col-md-4">
@@ -70,7 +75,7 @@
 
             <div class="col-12">
                 <label class="form-label fw-bold">{{ __('portal.scope_planner.brief') }} *</label>
-                <textarea name="brief" rows="6" class="form-control" required placeholder="{{ __('portal.scope_planner.brief_ph') }}">{{ old('brief') }}</textarea>
+                <textarea name="brief" rows="6" class="form-control" required placeholder="{{ __('portal.scope_planner.brief_ph') }}">{{ old('brief', $prefill['brief'] ?? '') }}</textarea>
                 <small class="text-muted">{{ __('portal.scope_planner.brief_hint') }}</small>
             </div>
         </div>

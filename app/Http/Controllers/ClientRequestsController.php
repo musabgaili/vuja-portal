@@ -7,6 +7,7 @@ use App\Models\CopyrightRegistration;
 use App\Models\IdeaRequest;
 use App\Models\IpRegistration;
 use App\Models\ResearchRequest;
+use App\Models\ThreeDRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -166,6 +167,32 @@ class ClientRequestsController extends Controller
             ]);
         }
 
+        // Get 3D Lab requests (printing + design)
+        $threeDQuery = ThreeDRequest::where('user_id', $user->id);
+        if ($statusFilter) {
+            $threeDQuery->where('status', $statusFilter);
+        }
+        foreach ($threeDQuery->get() as $threed) {
+            $allRequests->push([
+                'id' => $threed->id,
+                'type' => 'threed',
+                'type_label' => $threed->typeLabel(),
+                'type_icon' => $threed->isPrinting() ? 'print' : 'pen-ruler',
+                'type_color' => '#0C7075',
+                'title' => $threed->tr('title'),
+                'description' => $threed->tr('description'),
+                'status' => $threed->status,
+                'status_label' => $threed->getStatusLabel(),
+                'status_color' => $threed->getStatusBadgeColor(),
+                'created_at' => $threed->created_at,
+                'updated_at' => $threed->updated_at,
+                'view_url' => route('threed.show', $threed),
+                'has_quote' => false,
+                'quote_amount' => null,
+                'assigned_to' => $threed->assignedTo?->name,
+            ]);
+        }
+
         // Filter by type if specified
         if ($typeFilter) {
             $allRequests = $allRequests->where('type', $typeFilter);
@@ -182,6 +209,7 @@ class ClientRequestsController extends Controller
             'research' => $allRequests->where('type', 'research')->count(),
             'ip' => $allRequests->where('type', 'ip')->count(),
             'copyright' => $allRequests->where('type', 'copyright')->count(),
+            'threed' => $allRequests->where('type', 'threed')->count(),
             'pending' => $allRequests->whereIn('status', ['submitted', 'draft', 'nda_pending'])->count(),
             'in_progress' => $allRequests->whereIn('status', ['negotiation', 'assigned', 'in_progress', 'meeting_scheduled'])->count(),
             'completed' => $allRequests->where('status', 'completed')->count(),

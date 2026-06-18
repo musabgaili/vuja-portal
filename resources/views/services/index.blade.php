@@ -6,7 +6,7 @@
 @section('content')
 <div class="services-grid">
     <!-- Idea Generation -->
-    <div class="service-card" style="border-left: 4px solid #0F969C;">
+    <div class="service-card" style="border-inline-start: 4px solid #0F969C;">
         <div class="service-icon" style="background: #0F969C;">
             <i class="fas fa-lightbulb"></i>
         </div>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Consultation -->
-    <div class="service-card" style="border-left: 4px solid #0C7075;">
+    <div class="service-card" style="border-inline-start: 4px solid #0C7075;">
         <div class="service-icon" style="background: #0C7075;">
             <i class="fas fa-comments"></i>
         </div>
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Research & IP -->
-    <div class="service-card" style="border-left: 4px solid #294D61;">
+    <div class="service-card" style="border-inline-start: 4px solid #294D61;">
         <div class="service-icon" style="background: #294D61;">
             <i class="fas fa-search"></i>
         </div>
@@ -63,7 +63,7 @@
     </div>
 
     <!-- IP Registration -->
-    <div class="service-card" style="border-left: 4px solid #0C7075;">
+    <div class="service-card" style="border-inline-start: 4px solid #0C7075;">
         <div class="service-icon" style="background: #0C7075;">
             <i class="fas fa-file-contract"></i>
         </div>
@@ -82,7 +82,7 @@
     </div>
 
     <!-- Copyright Registration -->
-    <div class="service-card" style="border-left: 4px solid #0F969C;">
+    <div class="service-card" style="border-inline-start: 4px solid #0F969C;">
         <div class="service-icon" style="background: #0F969C;">
             <i class="fas fa-copyright"></i>
         </div>
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Prototype Development -->
-    <div class="service-card" style="border-left: 4px solid #294D61;">
+    <div class="service-card" style="border-inline-start: 4px solid #294D61;">
         <div class="service-icon" style="background: #294D61;">
             <i class="fas fa-cube"></i>
         </div>
@@ -119,8 +119,46 @@
         </div>
     </div>
 
+    <!-- 3D Printing -->
+    <div class="service-card" style="border-inline-start: 4px solid #0C7075;">
+        <div class="service-icon" style="background: #0C7075;">
+            <i class="fas fa-print"></i>
+        </div>
+        <div class="service-content">
+            <h3>{{ __('portal.services.index.printing_title') }}</h3>
+            <p>{{ __('portal.services.index.printing_body') }}</p>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.printing_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.printing_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.printing_f3') }}</li>
+            </ul>
+            <a href="{{ route('threed.create', ['type' => 'printing']) }}" class="btn btn-primary btn-block">
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.printing_cta') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- 3D Design -->
+    <div class="service-card" style="border-inline-start: 4px solid #0F969C;">
+        <div class="service-icon" style="background: #0F969C;">
+            <i class="fas fa-pen-ruler"></i>
+        </div>
+        <div class="service-content">
+            <h3>{{ __('portal.services.index.design_title') }}</h3>
+            <p>{{ __('portal.services.index.design_body') }}</p>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.design_f1') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.design_f2') }}</li>
+                <li><i class="fas fa-check"></i> {{ __('portal.services.index.design_f3') }}</li>
+            </ul>
+            <a href="{{ route('threed.create', ['type' => 'design']) }}" class="btn btn-primary btn-block">
+                <i class="fas fa-arrow-right"></i> {{ __('portal.services.index.design_cta') }}
+            </a>
+        </div>
+    </div>
+
     <!-- Portal Improvement Idea -->
-    <div class="service-card" style="border-left: 4px solid #294D61;">
+    <div class="service-card" style="border-inline-start: 4px solid #294D61;">
         <div class="service-icon" style="background: #294D61;">
             <i class="fas fa-rocket"></i>
         </div>
@@ -232,7 +270,7 @@
 
 .service-features i {
     color: var(--success-color);
-    margin-right: var(--space-xs);
+    margin-inline-end: var(--space-xs);
 }
 
 .btn-block {

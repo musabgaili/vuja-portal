@@ -119,6 +119,17 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
     });
 
     // ============================================
+    // 3D LAB SERVICE (printing + design)
+    // ============================================
+    Route::prefix('3d')->name('threed.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Services\ThreeDRequestController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Services\ThreeDRequestController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Services\ThreeDRequestController::class, 'store'])->name('store');
+        Route::get('/files/{file}/download', [\App\Http\Controllers\Services\ThreeDRequestController::class, 'downloadFile'])->name('files.download');
+        Route::get('/{threed}', [\App\Http\Controllers\Services\ThreeDRequestController::class, 'show'])->name('show');
+    });
+
+    // ============================================
     // IP REGISTRATION SERVICE
     // ============================================
     Route::prefix('ip')->name('ip.')->group(function () {

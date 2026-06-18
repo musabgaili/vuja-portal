@@ -35,9 +35,28 @@ class ScopePlannerController extends Controller
     // ===================================================================
 
     /** The brief form for a new scope document. */
-    public function create()
+    public function create(Request $request)
     {
         abort_unless(Auth::user()->isInternal(), 403);
+
+        // Option-1 unify: the quick planner (index) hands its inputs over so the
+        // employee fills once and continues into the document builder. The brief
+        // is seeded from the quick requirements + drafted scope + budget.
+        $projectType = trim((string) $request->query('project_type', ''));
+        $requirements = trim((string) $request->query('requirements', ''));
+        $scope = trim((string) $request->query('scope', ''));
+        $budget = trim((string) $request->query('budget', ''));
+
+        $briefParts = array_filter([
+            $requirements !== '' ? $requirements : null,
+            $scope !== '' ? $scope : null,
+            $budget !== '' ? __('portal.scope_planner.budget_line', ['budget' => $budget]) : null,
+        ]);
+
+        $prefill = [
+            'subject' => $projectType,
+            'brief' => implode("\n\n", $briefParts),
+        ];
 
         return view('scope-planner.create', [
             'categories' => self::CATEGORIES,
@@ -47,6 +66,7 @@ class ScopePlannerController extends Controller
             'clients' => User::where('role', 'client')->orderBy('name')->get(),
             'companies' => Company::orderBy('name')->get(),
             'opportunities' => Opportunity::whereIn('stage', PipelineStage::keys())->orderBy('name')->get(),
+            'prefill' => $prefill,
         ]);
     }
 

@@ -5,7 +5,10 @@ return [
     'company_name' => 'Vuja De Innovation',
     'brand_color'  => '#1B565E',                 // sampled from the letterhead
     'footer'       => 'Vuja De innovations Est. CR: 2251504740 — Address: Riyadh - Airport Road',
-    'letterhead'   => 'scope/letterhead.png',    // storage/app/public -> asset('storage/scope/letterhead.png')
+    // Letterhead path is relative to public/ so it is git-tracked and ships with
+    // the repo (no storage:link / storage/app/public dependency). Used as both a
+    // URL via asset() (online viewer) and a file via public_path() (mPDF watermark).
+    'letterhead'   => 'images/scope-letterhead.png',
     'mirror_rtl_letterhead' => false,            // true once a mirrored letterhead-ar.png is supplied
 
     // Page geometry (US Letter) + measured safe area (mm)

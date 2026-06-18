@@ -159,6 +159,10 @@
                         <i class="fas fa-cube"></i>
                         {{ __('portal.nav.prototypes') }}
                     </a>
+                    <a href="{{ route('threed.manager.index') }}" class="nav-item {{ request()->routeIs('threed.manager.*') ? 'active' : '' }}">
+                        <i class="fas fa-cubes"></i>
+                        {{ __('portal.nav.threed') }}
+                    </a>
                 </div>
 
                 <!-- Projects -->
@@ -338,7 +342,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @endif
-                
+
                 @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show">
                     @foreach($errors->all() as $error)

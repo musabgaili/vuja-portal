@@ -7,6 +7,8 @@ use App\Models\Quote;
 use App\Services\Scope\Render\DocxRenderer;
 use App\Services\Scope\Render\PdfRenderer;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response as SfResponse;
 
 /**
  * Renders the scope/quotation document for the online viewer (the "see before
@@ -28,7 +30,7 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $renderer->download($this->renderHtml($quote, ['pdf' => true]), $this->filename($quote));
+        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, ['pdf' => true]), $this->filename($quote)));
     }
 
     /** PDF streamed inline (view in the browser before downloading). */
@@ -36,7 +38,7 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $renderer->stream($this->renderHtml($quote, ['pdf' => true]), $this->filename($quote));
+        return $this->safeExport($quote, fn () => $renderer->stream($this->renderHtml($quote, ['pdf' => true]), $this->filename($quote)));
     }
 
     /** DOCX download (branded equivalent). */
@@ -44,7 +46,7 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $renderer->download($quote, $this->filename($quote, 'docx'));
+        return $this->safeExport($quote, fn () => $renderer->download($quote, $this->filename($quote, 'docx')));
     }
 
     /** Company technical offer (technical sections only, no commercial tables). */
@@ -53,7 +55,30 @@ class DocumentController extends Controller
         $this->guard($quote);
         abort_unless($quote->customer_category === 'company', 404);
 
-        return $renderer->download($this->renderHtml($quote, ['technical' => true, 'pdf' => true]), $this->filename($quote, 'pdf', '-technical'));
+        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, ['technical' => true, 'pdf' => true]), $this->filename($quote, 'pdf', '-technical')));
+    }
+
+    /**
+     * Run an export closure, turning any failure (e.g. the PDF/DOCX library not
+     * installed on the server, or a render error) into a logged, friendly redirect
+     * back to the editor instead of a raw 500. The online viewer always works, so
+     * the user is never fully blocked.
+     */
+    private function safeExport(Quote $quote, \Closure $fn): SfResponse
+    {
+        try {
+            return $fn();
+        } catch (\Throwable $e) {
+            Log::error('Scope document export failed', [
+                'quote_id' => $quote->id,
+                'quote_number' => $quote->quote_number,
+                'error' => $e->getMessage(),
+                'at' => $e->getFile().':'.$e->getLine(),
+            ]);
+
+            return redirect()->route('scope-planner.show', $quote)
+                ->with('error', __('portal.scope_planner.export_failed'));
+        }
     }
 
     /** Render the tier document to HTML in the quote's OWN language (not the UI locale). */

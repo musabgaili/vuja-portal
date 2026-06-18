@@ -28,6 +28,11 @@
                     <label class="form-label">{{ __('portal.scope_ai.budget') }}</label>
                     <input type="text" name="budget" class="form-control mb-3" value="{{ $result['budget'] ?? old('budget') }}" placeholder="$10,000">
                     <button type="submit" class="btn btn-primary w-100"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_ai.draft') }}</button>
+                    <hr class="my-3">
+                    <button type="button" class="btn btn-outline-primary w-100" onclick="goToDocBuilder()">
+                        <i class="fas fa-file-signature"></i> {{ __('portal.scope_ai.build_document') }}
+                    </button>
+                    <small class="text-muted d-block mt-1">{{ __('portal.scope_ai.build_document_hint') }}</small>
                 </div>
             </div>
         </div>
@@ -174,4 +179,21 @@
     </div>
 </div>
 @endif
+
+@push('scripts')
+<script>
+// Option-1 bridge: carry the quick-planner inputs into the full document wizard
+// so the employee fills once and continues, instead of starting over.
+function goToDocBuilder() {
+    var form = document.querySelector('form[action="{{ route('scope-planner.plan') }}"]');
+    var get = function (n) { var el = form && form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
+    var params = new URLSearchParams();
+    ['project_type', 'requirements', 'budget', 'scope'].forEach(function (k) {
+        var v = get(k); if (v) params.append(k, v);
+    });
+    var qs = params.toString();
+    window.location.href = @json(route('scope-planner.create')) + (qs ? ('?' + qs) : '');
+}
+</script>
+@endpush
 @endsection
