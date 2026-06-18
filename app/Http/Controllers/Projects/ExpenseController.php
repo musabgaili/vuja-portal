@@ -21,8 +21,10 @@ class ExpenseController extends Controller
 
         $expenses = $project->expenses()->with('loggedBy')->latest()->paginate(15);
         $totalExpenses = $project->expenses()->sum('amount');
+        $committed = $project->committedSpend();
+        $spendRequests = $project->spendRequests()->with('requester')->latest()->limit(25)->get();
 
-        return view('projects.manager.expenses', compact('project', 'expenses', 'totalExpenses'));
+        return view('projects.manager.expenses', compact('project', 'expenses', 'totalExpenses', 'committed', 'spendRequests'));
     }
 
     public function store(Request $request, Project $project)

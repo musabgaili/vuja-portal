@@ -11,11 +11,15 @@
 <div class="card mb-4">
     <div class="card-header">
         <h3>{{ __('portal.projects_manager.expenses.heading') }}</h3>
+        @php $cur = config('scope.currency', 'SAR'); @endphp
         <div>
-            <span class="badge bg-primary">{{ __('portal.projects_manager.expenses.budget') }}: ${{ number_format($project->budget ?? 0, 2) }}</span>
-            <span class="badge bg-warning">{{ __('portal.projects_manager.expenses.spent') }}: ${{ number_format($totalExpenses, 2) }}</span>
+            <span class="badge bg-primary">{{ __('portal.projects_manager.expenses.budget') }}: {{ number_format($project->budget ?? 0, 2) }} {{ $cur }}</span>
+            <span class="badge bg-warning">{{ __('portal.projects_manager.expenses.spent') }}: {{ number_format($totalExpenses, 2) }} {{ $cur }}</span>
+            @if(($committed ?? 0) > 0)
+            <span class="badge bg-info" title="{{ __('portal.projects_manager.expenses.committed_hint') }}">{{ __('portal.projects_manager.expenses.committed') }}: {{ number_format($committed, 2) }} {{ $cur }}</span>
+            @endif
             <span class="badge bg-{{ $project->isOverBudget() ? 'danger' : 'success' }}">
-                {{ __('portal.projects_manager.expenses.remaining') }}: ${{ number_format($project->getBudgetRemaining(), 2) }}
+                {{ __('portal.projects_manager.expenses.remaining') }}: {{ number_format($project->getBudgetRemaining(), 2) }} {{ $cur }}
             </span>
         </div>
     </div>
@@ -47,7 +51,7 @@
                         @endif
                     </td>
                     <td>{{ $expense->category ?? '—' }}</td>
-                    <td><strong>${{ number_format($expense->amount, 2) }}</strong></td>
+                    <td><strong>{{ number_format($expense->amount, 2) }} {{ $cur }}</strong></td>
                     <td>{{ $expense->loggedBy->name }}</td>
                     <td>
                         @if($expense->receipt_file)
@@ -67,6 +71,46 @@
         {{ $expenses->links('pagination::bootstrap-5') }}
         @else
         <p class="text-muted text-center py-4">{{ __('portal.projects_manager.expenses.empty') }}</p>
+        @endif
+    </div>
+</div>
+
+{{-- Employee/PM spend requests against this project --}}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3>{{ __('portal.projects_manager.expenses.requests_heading') }}</h3>
+        <a href="{{ route('spend.approvals') }}" class="btn btn-sm btn-light"><i class="fas fa-inbox"></i> {{ __('portal.spend.approvals') }}</a>
+    </div>
+    <div class="card-content p-0" style="overflow-x:auto;">
+        @if($spendRequests->count())
+        <table class="table mb-0">
+            <thead><tr>
+                <th>{{ __('portal.spend.col_title') }}</th>
+                <th>{{ __('portal.spend.col_kind') }}</th>
+                <th class="text-end">{{ __('portal.spend.col_amount') }}</th>
+                <th>{{ __('portal.spend.requested_by') }}</th>
+                <th>{{ __('portal.spend.col_status') }}</th>
+            </tr></thead>
+            <tbody>
+            @foreach($spendRequests as $r)
+                <tr>
+                    <td><strong>{{ $r->title }}</strong>
+                        @if($r->isPurchase() && $r->product_url)<a href="{{ $r->product_url }}" target="_blank" rel="noopener" class="text-muted ms-1" title="{{ __('portal.spend.buy_link') }}"><i class="fas fa-link"></i></a>@endif
+                        @if($r->receipt_file)<a href="{{ route('spend.receipt', $r) }}" class="text-muted ms-1" title="{{ __('portal.spend.receipt') }}"><i class="fas fa-paperclip"></i></a>@endif
+                    </td>
+                    <td><span class="badge bg-{{ $r->isPurchase() ? 'primary' : 'secondary' }}">{{ __('portal.spend.type.'.$r->type) }}</span></td>
+                    <td class="text-end">{{ number_format($r->effectiveAmount(), 2) }} {{ $r->currency }}</td>
+                    <td>{{ $r->requester->name ?? '—' }}</td>
+                    <td>
+                        <span class="badge bg-{{ $r->statusColor() }}">{{ $r->statusLabel() }}</span>
+                        @if($r->isCommitted())<span class="badge bg-info" title="{{ __('portal.projects_manager.expenses.committed_hint') }}">{{ __('portal.projects_manager.expenses.committed') }}</span>@endif
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+        @else
+        <p class="text-muted text-center py-3 mb-0">{{ __('portal.projects_manager.expenses.no_requests') }}</p>
         @endif
     </div>
 </div>
