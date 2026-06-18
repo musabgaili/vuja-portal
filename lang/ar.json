@@ -1956,6 +1956,7 @@
     "portal.projects_manager.expenses.committed_hint": "مشتريات معتمدة لم تُشترَ بعد — محجوزة على الميزانية.",
     "portal.projects_manager.expenses.requests_heading": "طلبات المصروفات",
     "portal.projects_manager.expenses.no_requests": "لا توجد طلبات مصروفات لهذا المشروع بعد.",
+    "portal.projects_manager.expenses.linked_to_spend": "نشأ هذا المصروف من طلب مصروف — أدِرْه من وحدة المصروفات حتى يبقى الطلب والميزانية متوافقَين.",
     "portal.spend.requested_by": "مقدّم الطلب",
     "portal.projects_manager.expenses.title": "مصروفات المشروع",
     "portal.projects_manager.index.all": "الكل",

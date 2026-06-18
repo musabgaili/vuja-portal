@@ -65,6 +65,13 @@ class ExpenseController extends Controller
 
         $this->authorize('manageExpenses', $expense->project);
 
+        // Expenses created from a spend request must be managed through the spend
+        // module, otherwise deleting here would null the request's ledger link and
+        // drop `spent` while the request still reads as settled.
+        if (\App\Models\SpendRequest::where('project_expense_id', $expense->id)->exists()) {
+            return back()->withErrors(['expense' => __('portal.projects_manager.expenses.linked_to_spend')]);
+        }
+
         $project = $expense->project;
         $expense->delete();
 

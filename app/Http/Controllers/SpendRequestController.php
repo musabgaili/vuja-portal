@@ -54,7 +54,7 @@ class SpendRequestController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
             'category' => 'nullable|string|max:100',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0|max:9999999999.99',
             'product_url' => 'nullable|url|max:1000',
             'quantity' => 'nullable|integer|min:1|max:100000',
             'receipt_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
@@ -148,7 +148,7 @@ class SpendRequestController extends Controller
         abort_unless($this->canFulfil($user, $spendRequest) && $spendRequest->isPurchase() && $spendRequest->isApproved(), 403);
 
         $validated = $request->validate([
-            'actual_amount' => 'required|numeric|min:0',
+            'actual_amount' => 'required|numeric|min:0|max:9999999999.99',
             'actual_receipt_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
@@ -213,6 +213,7 @@ class SpendRequestController extends Controller
     {
         return SpendRequest::with(['requester', 'project'])
             ->where('status', 'pending')
+            ->where('requester_id', '!=', $user->id) // never your own (no self-approval)
             ->get()
             ->filter(fn (SpendRequest $r) => $r->isApprovableBy($user))
             ->values();
@@ -251,6 +252,13 @@ class SpendRequestController extends Controller
 
     private function canFulfil(User $user, SpendRequest $r): bool
     {
+        // Segregation of duties: the originator may not settle their own request
+        // (which records the disbursed amount) — except a lone manager who has no
+        // peer and legitimately self-records (Option A).
+        if ($r->requester_id === $user->id) {
+            return $user->isManager() && ! $this->otherManagerExists($user);
+        }
+
         return $user->isManager()
             || $r->reviewed_by === $user->id
             || ($r->isProject() && (int) optional($r->project)->project_manager_id === (int) $user->id);

@@ -1956,6 +1956,7 @@
     "portal.projects_manager.expenses.committed_hint": "Approved purchases not yet bought — reserved against the budget.",
     "portal.projects_manager.expenses.requests_heading": "Spend requests",
     "portal.projects_manager.expenses.no_requests": "No spend requests for this project yet.",
+    "portal.projects_manager.expenses.linked_to_spend": "This expense came from a spend request — manage it from the Spend module so the request and budget stay in sync.",
     "portal.spend.requested_by": "Requested by",
     "portal.projects_manager.expenses.title": "Project Expenses",
     "portal.projects_manager.index.all": "All",
