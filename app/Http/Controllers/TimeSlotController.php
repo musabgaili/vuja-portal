@@ -31,7 +31,26 @@ class TimeSlotController extends Controller
 
         $slots = $this->timeSlotService->getUserTimeSlots($user);
 
-        return view('time-slots.my-slots', compact('slots'));
+        // All of the user's slots as calendar events (the list above is paginated;
+        // the calendar needs the full set, coloured by status).
+        $events = \App\Models\TimeSlot::where('user_id', $user->id)->with('meeting.client')->get()->map(function ($s) {
+            $day = $s->date->format('Y-m-d');
+
+            return [
+                'id' => $s->id,
+                'title' => $s->meeting?->client?->name ?: __('portal.time_slots.status.'.$s->status),
+                'start' => $day.'T'.\Illuminate\Support\Carbon::parse($s->start_time)->format('H:i:s'),
+                'end' => $day.'T'.\Illuminate\Support\Carbon::parse($s->end_time)->format('H:i:s'),
+                'color' => $s->status === 'booked' ? '#0C7075' : ($s->status === 'blocked' ? '#ef4444' : '#10b981'),
+                'extendedProps' => [
+                    'status' => __('portal.time_slots.status.'.$s->status),
+                    'bookedBy' => $s->meeting?->client?->name,
+                    'meeting' => $s->meeting?->title,
+                ],
+            ];
+        })->values();
+
+        return view('time-slots.my-slots', compact('slots', 'events'));
     }
 
     /**

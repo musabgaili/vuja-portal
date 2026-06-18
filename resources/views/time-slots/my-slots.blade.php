@@ -69,6 +69,14 @@
     color: #cbd5e1;
     margin-bottom: 1rem;
 }
+.view-toggle .btn.active {
+    background: var(--primary-color, #0C7075) !important;
+    color: #fff !important;
+    border-color: var(--primary-color, #0C7075) !important;
+}
+#fc { background: #fff; }
+.fc .fc-button-primary { background: var(--primary-color, #0C7075); border-color: var(--primary-color, #0C7075); }
+.fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:hover { background: var(--primary-dark, #094f53); border-color: var(--primary-dark, #094f53); }
 </style>
 
 <div class="slots-header">
@@ -77,12 +85,19 @@
             <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700;"><i class="fas fa-calendar-alt"></i> {{ __('portal.time_slots.my_slots.title') }}</h1>
             <p style="margin: 0.5rem 0 0 0; opacity: 0.95;">{{ __('portal.time_slots.my_slots.subtitle') }}</p>
         </div>
-        <a href="{{ route('time-slots.create') }}" class="btn btn-light btn-lg">
-            <i class="fas fa-plus"></i> {{ __('portal.time_slots.my_slots.add_availability') }}
-        </a>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="btn-group view-toggle" role="group" aria-label="{{ __('portal.time_slots.my_slots.view_toggle') }}">
+                <button type="button" id="btnList" class="btn btn-light active" onclick="spView('list')"><i class="fas fa-list"></i> {{ __('portal.time_slots.my_slots.view_list') }}</button>
+                <button type="button" id="btnCal" class="btn btn-light" onclick="spView('calendar')"><i class="fas fa-calendar-days"></i> {{ __('portal.time_slots.my_slots.view_calendar') }}</button>
+            </div>
+            <a href="{{ route('time-slots.create') }}" class="btn btn-light btn-lg">
+                <i class="fas fa-plus"></i> {{ __('portal.time_slots.my_slots.add_availability') }}
+            </a>
+        </div>
     </div>
 </div>
 
+<div id="slotsList">
 @if($slots->count() > 0)
 <div class="table-slots">
     <table class="table mb-0">
@@ -160,10 +175,59 @@
     </a>
 </div>
 @endif
+</div>{{-- /#slotsList --}}
+
+<div id="slotsCalendar" style="display:none;">
+    <div class="table-slots" style="padding:1.25rem;">
+        <div id="fc"></div>
+        <div class="d-flex gap-3 mt-3 flex-wrap" style="font-size:.8rem;color:#475569;">
+            <span><i class="fas fa-square" style="color:#10b981;"></i> {{ __('portal.time_slots.status.available') }}</span>
+            <span><i class="fas fa-square" style="color:#0C7075;"></i> {{ __('portal.time_slots.status.booked') }}</span>
+            <span><i class="fas fa-square" style="color:#ef4444;"></i> {{ __('portal.time_slots.status.blocked') }}</span>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales-all.global.min.js"></script>
 <script>
 function toggleBlock(id){fetch(`/internal/time-slots/${id}/toggle-block`,{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+
+var __slotCal = null;
+function ensureSlotCalendar() {
+    if (__slotCal || typeof FullCalendar === 'undefined') return;
+    __slotCal = new FullCalendar.Calendar(document.getElementById('fc'), {
+        initialView: 'dayGridMonth',
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' },
+        locale: @json(app()->getLocale()),
+        direction: @json(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'),
+        height: 'auto',
+        nowIndicator: true,
+        events: @json($events),
+        eventClick: function (info) {
+            var p = info.event.extendedProps, msg = info.event.title;
+            if (p.meeting) msg += ' — ' + p.meeting;
+            if (p.bookedBy) msg += ' (' + p.bookedBy + ')';
+            window.alert(msg);
+        }
+    });
+    __slotCal.render();
+}
+function spView(v) {
+    var isCal = v === 'calendar';
+    document.getElementById('slotsList').style.display = isCal ? 'none' : '';
+    document.getElementById('slotsCalendar').style.display = isCal ? '' : 'none';
+    document.getElementById('btnList').classList.toggle('active', !isCal);
+    document.getElementById('btnCal').classList.toggle('active', isCal);
+    try { localStorage.setItem('vd-slots-view', v); } catch (e) {}
+    if (isCal) { ensureSlotCalendar(); if (__slotCal) setTimeout(function () { __slotCal.updateSize(); }, 30); }
+}
+document.addEventListener('DOMContentLoaded', function () {
+    var saved = 'list';
+    try { saved = localStorage.getItem('vd-slots-view') || 'list'; } catch (e) {}
+    spView(saved);
+});
 </script>
 @endpush
