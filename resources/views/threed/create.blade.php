@@ -24,11 +24,11 @@
             <div class="form-group">
                 <label class="form-label">{{ __('portal.threed.field.type') }} *</label>
                 <div class="btn-group w-100" role="group">
-                    <button type="button" class="btn td-type-btn" data-type="printing" onclick="setThreedType('printing')">
-                        <i class="fas fa-print"></i> {{ __('portal.threed.type.printing') }}
+                    <button type="button" class="btn td-type-btn" data-type="printing" aria-pressed="false" onclick="setThreedType('printing')">
+                        <i class="fas fa-check td-check"></i> <i class="fas fa-print"></i> {{ __('portal.threed.type.printing') }}
                     </button>
-                    <button type="button" class="btn td-type-btn" data-type="design" onclick="setThreedType('design')">
-                        <i class="fas fa-pen-ruler"></i> {{ __('portal.threed.type.design') }}
+                    <button type="button" class="btn td-type-btn" data-type="design" aria-pressed="false" onclick="setThreedType('design')">
+                        <i class="fas fa-check td-check"></i> <i class="fas fa-pen-ruler"></i> {{ __('portal.threed.type.design') }}
                     </button>
                 </div>
                 <small class="text-muted d-block mt-1" id="td-type-hint"></small>
@@ -166,6 +166,8 @@
 <style>
 .td-type-btn { border: 1px solid var(--border-color, #cbd5e1); background: transparent; color: var(--text-color, #334155); }
 .td-type-btn.active { background: var(--primary-color, #0C7075); color: #fff; border-color: var(--primary-color, #0C7075); }
+.td-type-btn .td-check { display: none; }
+.td-type-btn.active .td-check { display: inline-block; }
 .td-fields { display: none; }
 .td-fields.active { display: block; }
 </style>
@@ -182,7 +184,11 @@ var TD_FILES = {
 };
 function setThreedType(t) {
     document.getElementById('threed_type').value = t;
-    document.querySelectorAll('.td-type-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.type === t); });
+    document.querySelectorAll('.td-type-btn').forEach(function (b) {
+        var on = b.dataset.type === t;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
     document.querySelector('.td-printing').classList.toggle('active', t === 'printing');
     document.querySelector('.td-design').classList.toggle('active', t === 'design');
     document.getElementById('td-type-hint').textContent = TD_HINTS[t] || '';

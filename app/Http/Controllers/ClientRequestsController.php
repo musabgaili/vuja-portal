@@ -20,10 +20,6 @@ class ClientRequestsController extends Controller
     {
         $user = Auth::user();
 
-        // if (!$user->isClient()) {
-        //     abort(403);
-        // }
-
         // Get filter parameters
         $statusFilter = $request->get('status');
         $typeFilter = $request->get('type');
@@ -32,7 +28,7 @@ class ClientRequestsController extends Controller
         $allRequests = collect();
 
         // Get Ideas
-        $ideasQuery = IdeaRequest::where('user_id', $user->id);
+        $ideasQuery = IdeaRequest::where('user_id', $user->id)->with('assignedTo');
         if ($statusFilter) {
             $ideasQuery->where('status', $statusFilter);
         }
@@ -40,7 +36,7 @@ class ClientRequestsController extends Controller
             $allRequests->push([
                 'id' => $idea->id,
                 'type' => 'idea',
-                'type_label' => 'Idea Generation',
+                'type_label' => __('portal.client.requests.type_idea'),
                 'type_icon' => 'lightbulb',
                 'type_color' => '#0F969C',
                 'title' => $idea->tr('title'),
@@ -58,7 +54,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get Consultations
-        $consultationsQuery = ConsultationRequest::where('user_id', $user->id);
+        $consultationsQuery = ConsultationRequest::where('user_id', $user->id)->with('assignedTo');
         if ($statusFilter) {
             $consultationsQuery->where('status', $statusFilter);
         }
@@ -66,7 +62,7 @@ class ClientRequestsController extends Controller
             $allRequests->push([
                 'id' => $consultation->id,
                 'type' => 'consultation',
-                'type_label' => 'Consultation',
+                'type_label' => __('portal.client.requests.type_consultation'),
                 'type_icon' => 'comments',
                 'type_color' => '#0C7075',
                 'title' => $consultation->tr('title'),
@@ -85,7 +81,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get Research
-        $researchQuery = ResearchRequest::where('user_id', $user->id);
+        $researchQuery = ResearchRequest::where('user_id', $user->id)->with('assignedTo');
         if ($statusFilter) {
             $researchQuery->where('status', $statusFilter);
         }
@@ -93,7 +89,7 @@ class ClientRequestsController extends Controller
             $allRequests->push([
                 'id' => $research->id,
                 'type' => 'research',
-                'type_label' => 'Research & IP',
+                'type_label' => __('portal.client.requests.type_research'),
                 'type_icon' => 'search',
                 'type_color' => '#294D61',
                 'title' => $research->tr('title'),
@@ -112,7 +108,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get IP Registrations
-        $ipQuery = IpRegistration::where('user_id', $user->id);
+        $ipQuery = IpRegistration::where('user_id', $user->id)->with('assignedTo');
         if ($statusFilter) {
             $ipQuery->where('status', $statusFilter);
         }
@@ -120,7 +116,7 @@ class ClientRequestsController extends Controller
             $allRequests->push([
                 'id' => $ip->id,
                 'type' => 'ip',
-                'type_label' => 'IP Registration',
+                'type_label' => __('portal.client.requests.type_ip'),
                 'type_icon' => 'file-contract',
                 'type_color' => '#2C3F43',
                 'title' => $ip->tr('title'),
@@ -140,7 +136,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get Copyrights
-        $copyrightQuery = CopyrightRegistration::where('user_id', $user->id);
+        $copyrightQuery = CopyrightRegistration::where('user_id', $user->id)->with('assignedTo');
         if ($statusFilter) {
             $copyrightQuery->where('status', $statusFilter);
         }
@@ -148,7 +144,7 @@ class ClientRequestsController extends Controller
             $allRequests->push([
                 'id' => $copyright->id,
                 'type' => 'copyright',
-                'type_label' => 'Copyright Registration',
+                'type_label' => __('portal.client.requests.type_copyright'),
                 'type_icon' => 'copyright',
                 'type_color' => '#072E33',
                 'title' => $copyright->tr('title'),
@@ -168,7 +164,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get 3D Lab requests (printing + design)
-        $threeDQuery = ThreeDRequest::where('user_id', $user->id);
+        $threeDQuery = ThreeDRequest::where('user_id', $user->id)->with('assignedTo');
         if ($statusFilter) {
             $threeDQuery->where('status', $statusFilter);
         }

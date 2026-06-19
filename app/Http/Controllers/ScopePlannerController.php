@@ -275,7 +275,7 @@ class ScopePlannerController extends Controller
         $stock = StockItem::whereIn('id', $request->input('stock_items', []))->get();
 
         if ($items->isEmpty() && $stock->isEmpty()) {
-            return back()->withErrors(['items' => 'Select at least one inventory or stock item before saving a quote.'])->withInput();
+            return back()->withErrors(['items' => __('portal.scope_planner.select_item_first')])->withInput();
         }
 
         $opp = ! empty($validated['opportunity_id']) ? Opportunity::find($validated['opportunity_id']) : null;
@@ -322,7 +322,7 @@ class ScopePlannerController extends Controller
             return $quote;
         });
 
-        return redirect()->route('quotes.show', $quote)->with('success', 'Quote saved from the AI Scope Planner.');
+        return redirect()->route('quotes.show', $quote)->with('success', __('portal.scope_planner.quote_saved'));
     }
 
     public function index()

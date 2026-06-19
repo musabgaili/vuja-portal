@@ -42,7 +42,9 @@ return new class extends Migration
             $t->text('manager_notes')->nullable();
             $t->timestamps();
             $t->index('status');
-            $t->index(['user_id', 'type']);
+            $t->index(['user_id', 'type']);       // client index() — own requests
+            $t->index(['assigned_to', 'created_at']); // employee inbox + latest() ordering
+            $t->index(['type', 'created_at']);        // manager/employee type filter + ordering
         });
 
         Schema::create('three_d_request_files', function (Blueprint $t) {

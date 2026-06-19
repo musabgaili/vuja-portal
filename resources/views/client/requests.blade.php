@@ -149,6 +149,9 @@
                 <option value="approved">{{ __('portal.client.requests.status_approved') }}</option>
                 <option value="in_progress">{{ __('portal.client.requests.status_in_progress') }}</option>
                 <option value="completed">{{ __('portal.client.requests.status_completed') }}</option>
+                <option value="assigned">{{ __('portal.client.requests.status_assigned') }}</option>
+                <option value="rejected">{{ __('portal.client.requests.status_rejected') }}</option>
+                <option value="cancelled">{{ __('portal.client.requests.status_cancelled') }}</option>
             </select>
         </div>
     </div>
@@ -156,7 +159,7 @@
         @if($allRequests->count() > 0)
             <div class="requests-list">
                 @foreach($allRequests as $req)
-                <div class="request-card mb-3" style="border-left: 4px solid {{ $req['type_color'] }};">
+                <div class="request-card mb-3" style="border-inline-start: 4px solid {{ $req['type_color'] }};">
                     <div class="request-header">
                         <div class="d-flex align-center">
                             <div class="request-type-icon" style="background: {{ $req['type_color'] }};">
@@ -285,7 +288,7 @@
     justify-content: center;
     color: white;
     font-size: var(--font-size-lg);
-    margin-right: var(--space-md);
+    margin-inline-end: var(--space-md);
     flex-shrink: 0;
 }
 
@@ -388,5 +391,4 @@ function filterByStatus(status) {
 }
 </script>
 @endpush
-{{-- @endsection --}}
 

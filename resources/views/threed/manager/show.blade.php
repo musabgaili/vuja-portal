@@ -50,7 +50,7 @@
 
                 <h6>{{ __('portal.threed.field.files') }}</h6>
                 @forelse($threed->files as $f)
-                    <a href="{{ route('threed.manager.files.download', $f) }}" class="d-inline-flex align-items-center gap-2 me-2 mb-2 badge bg-light text-dark border" style="text-decoration:none;">
+                    <a href="{{ route('threed.manager.files.download', $f) }}" class="d-inline-flex align-items-center gap-2 me-2 mb-2 badge bg-body-secondary text-body border" style="text-decoration:none;">
                         <i class="fas fa-download"></i> {{ $f->original_name }} <small class="text-muted">({{ $f->size_label }})</small>
                     </a>
                 @empty

@@ -88,7 +88,11 @@ class DocumentController extends Controller
         app()->setLocale($quote->language ?: $previous);
 
         try {
-            return view($this->tierView($quote), $this->viewData($quote) + $extra)->render();
+            // $extra MUST win over the defaults: the array `+` operator keeps the
+            // LEFT operand on key collisions, so caller flags (e.g. technicalPdf's
+            // 'technical' => true) have to be the left side or they are silently
+            // discarded — which previously made the technical offer leak pricing.
+            return view($this->tierView($quote), $extra + $this->viewData($quote))->render();
         } finally {
             app()->setLocale($previous);
         }
@@ -98,7 +102,7 @@ class DocumentController extends Controller
     {
         $quote->loadMissing(['items', 'scopes', 'milestones', 'client', 'creator']);
 
-        return ['quote' => $quote, 'audience' => 'client', 'technical' => false];
+        return ['quote' => $quote, 'technical' => false];
     }
 
     private function tierView(Quote $quote): string
