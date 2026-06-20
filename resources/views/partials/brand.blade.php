@@ -1,9 +1,14 @@
 @php
-    $hasDark = file_exists(public_path('images/vd-logo-dark.png'));
+    // Prefer the trimmed logo (transparent padding cropped) so it fills the
+    // sidebar header frame instead of floating small inside baked-in whitespace.
+    $logo = file_exists(public_path('images/vd-logo-dark-trimmed.png'))
+        ? 'images/vd-logo-dark-trimmed.png'
+        : 'images/vd-logo-dark.png';
+    $hasDark = file_exists(public_path($logo));
 @endphp
 @if($hasDark)
     {{-- Dark logo used in both light and dark mode (per brand direction) --}}
-    <img src="{{ asset('images/vd-logo-dark.png') }}" alt="Vujà Dé" class="brand-logo">
+    <img src="{{ asset($logo) }}" alt="Vujà Dé" class="brand-logo">
 @else
     {{-- Fallback brand mark until the PNG logos are uploaded to public/images/ --}}
     <span class="brand-fallback">
