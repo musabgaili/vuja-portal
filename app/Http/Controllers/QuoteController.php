@@ -158,10 +158,16 @@ class QuoteController extends Controller
 
     public function destroy(Quote $quote)
     {
-        abort_unless(Auth::user()->isInternal(), 403);
+        $user = Auth::user();
+        abort_unless($user && $user->isInternal(), 403);
+        // Only the creator or a manager may delete, and never an accepted
+        // (contractually committed) quote.
+        abort_unless($user->isManager() || $quote->created_by === $user->id, 403);
+        abort_if($quote->isAccepted(), 403);
+
         $quote->delete();
 
-        return redirect()->route('quotes.index')->with('success', 'Quote deleted.');
+        return redirect()->route('quotes.index')->with('success', __('portal.quote.deleted'));
     }
 
     // ---- Client portal ----

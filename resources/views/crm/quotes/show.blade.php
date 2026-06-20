@@ -74,12 +74,16 @@
             @else
                 {{-- Step 1: creator submits a draft (or a sent-back quote) for approval --}}
                 @if($quote->isEditable())
+                    <a href="{{ route('scope-planner.show', ['quote' => $quote, 'step' => 'document']) }}" class="btn btn-outline-primary w-100 mb-2"><i class="fas fa-pen-to-square"></i> {{ __('portal.quote.edit_in_planner') }}</a>
                     <form method="POST" action="{{ route('quotes.submit', $quote) }}" class="mb-2">@csrf
                         <button class="btn btn-primary w-100"><i class="fas fa-paper-plane"></i> {{ __('portal.quote.submit_for_approval') }}</button>
                     </form>
                     @if($quote->status === 'changes_requested')
                         <div class="alert alert-warning" style="font-size:.85rem;">{{ __('portal.quote.changes_requested_note') }}</div>
                     @endif
+                    <form method="POST" action="{{ route('quotes.destroy', $quote) }}" class="mb-2" onsubmit="return confirm(@json(__('portal.quote.confirm_delete')))">@csrf @method('DELETE')
+                        <button class="btn btn-outline-danger w-100"><i class="fas fa-trash"></i> {{ __('portal.quote.delete') }}</button>
+                    </form>
                 @endif
 
                 {{-- Step 2: a manager / project manager reviews --}}
@@ -139,6 +143,9 @@
         {{-- Scope / quotation document: view online or export as PDF / Word --}}
         <div class="card mt-3"><div class="card-content">
             <h3 class="card-title mb-2"><i class="fas fa-file-lines"></i> {{ __('portal.quote.document') }}</h3>
+            @unless($quote->isAccepted())
+            <a href="{{ route('scope-planner.show', $quote) }}" class="btn btn-outline-primary btn-sm w-100 mb-2"><i class="fas fa-pen-ruler"></i> {{ __('portal.quote.open_in_planner') }}</a>
+            @endunless
             <a href="{{ route('scope-planner.document', $quote) }}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2"><i class="fas fa-up-right-from-square"></i> {{ __('portal.quote.view_document') }}</a>
             <a href="{{ route('scope-planner.view.pdf', $quote) }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 mb-2"><i class="fas fa-file-pdf"></i> {{ __('portal.quote.view_pdf') }}</a>
             <a href="{{ route('scope-planner.export.pdf', $quote) }}" class="btn btn-primary btn-sm w-100 mb-2"><i class="fas fa-download"></i> {{ __('portal.quote.download_pdf') }}</a>
