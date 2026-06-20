@@ -106,6 +106,16 @@ body { font-family: 'Inter', sans-serif; }
                     @enderror
                 </div>
             </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>{{ __('portal.pricing.description') }}</label>
+                    <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="2" placeholder="{{ __('portal.pricing.description_ph') }}">{{ old('description') }}</textarea>
+                    <small class="text-muted">{{ __('portal.pricing.description_hint') }}</small>
+                    @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
         </div>
         <button type="submit" class="btn btn-success">
             <i class="fas fa-plus"></i> {{ __('portal.pricing.add_rule') }}
@@ -148,7 +158,17 @@ body { font-family: 'Inter', sans-serif; }
                         @endif
                     </td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-warning" onclick="editRule({{ $rule->id }}, '{{ $rule->item }}', {{ $rule->rate }}, '{{ $rule->unit }}', '{{ $rule->level }}', '{{ addslashes($rule->note) }}', {{ $rule->is_active ? 'true' : 'false' }}, '{{ addslashes($rule->name_en) }}', '{{ addslashes($rule->name_ar) }}')">
+                        <button type="button" class="btn btn-sm btn-warning js-edit-rule"
+                            data-id="{{ $rule->id }}"
+                            data-item="{{ $rule->item }}"
+                            data-rate="{{ $rule->rate }}"
+                            data-unit="{{ $rule->unit }}"
+                            data-level="{{ $rule->level }}"
+                            data-note="{{ $rule->note }}"
+                            data-name_en="{{ $rule->name_en }}"
+                            data-name_ar="{{ $rule->name_ar }}"
+                            data-description="{{ $rule->description }}"
+                            data-active="{{ $rule->is_active ? '1' : '0' }}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" action="{{ route('pricing.destroy', $rule) }}" class="js-delete-rule" style="display: inline;" data-rule-item="{{ $rule->item }}">
@@ -229,6 +249,11 @@ body { font-family: 'Inter', sans-serif; }
                         <textarea name="note" id="edit_note" class="form-control" rows="2" required></textarea>
                     </div>
                     <div class="form-group">
+                        <label>{{ __('portal.pricing.description') }}</label>
+                        <textarea name="description" id="edit_description" class="form-control" rows="3"></textarea>
+                        <small class="text-muted">{{ __('portal.pricing.description_hint') }}</small>
+                    </div>
+                    <div class="form-group">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="edit_is_active" name="is_active" value="1">
                             <label class="form-check-label" for="edit_is_active">{{ __('portal.pricing.active_visible_to_employees') }}</label>
@@ -269,18 +294,26 @@ body { font-family: 'Inter', sans-serif; }
 <script>
 let pendingDeleteRuleForm = null;
 
-function editRule(id, item, rate, unit, level, note, isActive, nameEn, nameAr) {
-    document.getElementById('edit_item').value = item;
-    document.getElementById('edit_rate').value = rate;
-    document.getElementById('edit_unit').value = unit;
-    document.getElementById('edit_level').value = level;
-    document.getElementById('edit_note').value = note;
-    document.getElementById('edit_is_active').checked = isActive;
-    document.getElementById('edit_name_en').value = nameEn || '';
-    document.getElementById('edit_name_ar').value = nameAr || '';
-    document.getElementById('editRuleForm').action = `/internal/pricing-rules/${id}`;
+// Prefill the edit modal from the button's data-* attributes. Reading from
+// data-attributes (vs inline positional args) safely carries multi-line text
+// like the description without breaking the inline handler.
+function editRule(btn) {
+    const d = btn.dataset;
+    document.getElementById('edit_item').value = d.item || '';
+    document.getElementById('edit_rate').value = d.rate || '';
+    document.getElementById('edit_unit').value = d.unit || '';
+    document.getElementById('edit_level').value = d.level || '';
+    document.getElementById('edit_note').value = d.note || '';
+    document.getElementById('edit_description').value = d.description || '';
+    document.getElementById('edit_is_active').checked = d.active === '1';
+    document.getElementById('edit_name_en').value = d.name_en || '';
+    document.getElementById('edit_name_ar').value = d.name_ar || '';
+    document.getElementById('editRuleForm').action = `/internal/pricing-rules/${d.id}`;
     new bootstrap.Modal(document.getElementById('editRuleModal')).show();
 }
+document.querySelectorAll('.js-edit-rule').forEach((btn) => {
+    btn.addEventListener('click', function () { editRule(btn); });
+});
 
 document.querySelectorAll('.js-delete-rule').forEach((form) => {
     form.addEventListener('submit', function (event) {

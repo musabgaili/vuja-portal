@@ -37,6 +37,7 @@ class PricingRuleAdapter implements PricingToolContract
             unitRate: (float) $r->rate,
             defaultQty: 1.0,
             level: $r->level,
+            description: $r->description,
         );
     }
 }

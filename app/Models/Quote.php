@@ -145,6 +145,7 @@ class Quote extends Model
         if ($this->items->where('type', 'component')->isNotEmpty() || $componentsTotal > 0) {
             $rows->push((object) [
                 'description' => __('scope.electronic_components'),
+                'details' => null,
                 'unit' => '—',
                 'quantity' => 1,
                 'unit_price' => $componentsTotal,
@@ -158,6 +159,7 @@ class Quote extends Model
             $unit = (float) ($it->unit_price ?: ($it->line_client / max(1, (int) $it->qty)));
             $rows->push((object) [
                 'description' => $it->name,
+                'details' => $it->description,   // optional sub-line (manual or recalled)
                 'unit' => $it->unit ?: '—',
                 'quantity' => (float) $it->qty,
                 'unit_price' => $unit,

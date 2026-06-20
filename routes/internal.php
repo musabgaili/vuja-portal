@@ -336,6 +336,12 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::post('/pricing-rules', [\App\Http\Controllers\PricingToolController::class, 'store'])->name('pricing.store');
         Route::put('/pricing-rules/{rule}', [\App\Http\Controllers\PricingToolController::class, 'update'])->name('pricing.update');
         Route::delete('/pricing-rules/{rule}', [\App\Http\Controllers\PricingToolController::class, 'destroy'])->name('pricing.destroy');
+
+        // SCOPE PLANNER — manager-editable AI prompt templates
+        Route::get('/scope-prompts', [\App\Http\Controllers\ScopePromptController::class, 'edit'])->name('scope-prompts.edit');
+        Route::put('/scope-prompts', [\App\Http\Controllers\ScopePromptController::class, 'update'])->name('scope-prompts.update');
+        Route::post('/scope-prompts/reset', [\App\Http\Controllers\ScopePromptController::class, 'reset'])->name('scope-prompts.reset');
+
         Route::get('/reports/financial', [FinancialReportController::class, 'index'])->name('reports.financial');
 
         // Projects moved to routes/projects.php

@@ -35,7 +35,7 @@
         @foreach($quote->clientVisibleItems() as $i => $row)
           <tr>
             <td class="c">{{ $i + 1 }}</td>
-            <td class="desc">{{ $row->description }}</td>
+            <td class="desc">{{ $row->description }}@if($row->details ?? null)<br><small style="color:#64748b">{{ $row->details }}</small>@endif</td>
             <td class="c">{{ $row->unit ?? __('scope.all') }}</td>
             <td class="c">{{ rtrim(rtrim(number_format($row->quantity,2),'0'),'.') }}</td>
             <td class="money">{{ number_format($row->unit_price,0) }}</td>

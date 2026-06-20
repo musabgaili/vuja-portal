@@ -203,6 +203,12 @@
                         <i class="fas fa-wand-magic-sparkles"></i>
                         {{ __('portal.nav.scope_planner') }}
                     </a>
+                    @if(auth()->user()->isManager())
+                    <a href="{{ route('scope-prompts.edit') }}" class="nav-item {{ request()->routeIs('scope-prompts.*') ? 'active' : '' }}">
+                        <i class="fas fa-robot"></i>
+                        {{ __('portal.nav.ai_prompts') }}
+                    </a>
+                    @endif
                     @if(auth()->user()->isManager() || auth()->user()->isProjectManager())
                     <a href="{{ route('invoices.index') }}" class="nav-item {{ request()->routeIs('invoices.index') || request()->routeIs('invoices.create') || request()->routeIs('invoices.show') ? 'active' : '' }}">
                         <i class="fas fa-file-invoice-dollar"></i>

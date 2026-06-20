@@ -70,8 +70,7 @@ class GeminiScopeService
 
     private function geminiSuggest(string $key, string $brief, string $tier, string $language): array
     {
-        $system = 'You are a senior engineer at Vuja De Innovation. From a project brief, list the electronic/hardware '
-            .'components likely required (as search queries against an inventory catalog). Output ONLY JSON. No prices.';
+        $system = app(\App\Services\Scope\ScopePromptService::class)->render('suggest_system', ['tier' => $tier]);
         $user = "Brief: {$brief}\nTier: {$tier}. Return components as catalog search queries.";
         $schema = [
             'type' => 'object',
@@ -177,24 +176,30 @@ class GeminiScopeService
         $langName = $language === 'ar' ? 'Arabic (Modern Standard Arabic)' : 'English';
         $budget = config('scope.length_budgets.'.$length, '5-8 bullets per section');
 
-        $system = "You are a senior technical proposal writer at Vuja De Innovation (engineering, design, innovation; Riyadh). "
-            ."Write the requested sections for a {$tier} {$langName} Scope-of-Work.\n"
-            ."RULES:\n- Output ONLY JSON valid against the provided schema. No prose outside JSON.\n"
-            ."- Write all human-readable text in {$langName}.\n"
-            ."- NEVER include prices, quantities, totals, taxes, or payment amounts — those are added by the system.\n"
-            ."- Be specific to the brief and the confirmed components; avoid generic filler.\n"
-            ."- Depth: {$length} → {$budget}.\n- Tone: professional, factual, client-facing.";
-
-        $user = "Brief:\n{$req['brief']}\n\n"
-            .'Confirmed components: '.(empty($req['components']) ? '(none)' : implode(', ', (array) $req['components']))."\n"
-            .'Selected services: '.(empty($req['services']) ? '(none)' : implode(', ', (array) $req['services']))."\n"
-            ."Tier: {$tier}. Length: {$length}. Structure: {$structure}.";
-
+        // Company gets an explicit scopes instruction; other tiers none.
+        $companyScopeRule = '';
         if ($tier === 'company') {
-            $user .= $structure === 'multi_scope'
+            $companyScopeRule = $structure === 'multi_scope'
                 ? ' Return MULTIPLE scopes in "scopes".'
                 : ' Return EXACTLY ONE scope in "scopes".';
         }
+
+        $prompts = app(\App\Services\Scope\ScopePromptService::class);
+        $vars = [
+            'tier' => $tier,
+            'lang' => $langName,
+            'length' => $length,
+            'budget' => $budget,
+            'brief' => (string) ($req['brief'] ?? ''),
+            'components' => empty($req['components']) ? '(none)' : implode(', ', (array) $req['components']),
+            'services' => empty($req['services']) ? '(none)' : implode(', ', (array) $req['services']),
+            'structure' => $structure,
+            'sections' => $this->sectionsHint($tier),
+            'company_scope_rule' => $companyScopeRule,
+        ];
+
+        $system = $prompts->render('generate_system', $vars);
+        $user = $prompts->render('generate_user', $vars);
 
         $json = $this->callGeminiJson($key, $system, $user, $this->schemaFor($tier));
 
@@ -203,6 +208,26 @@ class GeminiScopeService
         }
 
         return $json;
+    }
+
+    /**
+     * Human-readable enumeration of the sections the model must fill, injected
+     * into the prompt as {sections}. Built from the canonical config('scope.sections')
+     * map so the prompt, the Step-3 editor and the document blades stay aligned.
+     */
+    private function sectionsHint(string $tier): string
+    {
+        $keys = array_keys((array) config('scope.sections.'.$tier, config('scope.sections.company', [])));
+        $parts = array_map(fn ($k) => $k.' ('.trans('scope.'.$k).')', $keys);
+
+        if ($tier === 'company') {
+            $parts[] = 'scopes (each: title, objective, deliverables, inputs_required, acceptance_criteria, exclusions)';
+            $parts[] = 'timeline';
+        } elseif ($tier === 'entrepreneur') {
+            $parts[] = 'timeline';
+        }
+
+        return implode('; ', $parts);
     }
 
     /** Per-tier response schema (spec §9.2). */
@@ -263,6 +288,8 @@ class GeminiScopeService
                             'phase' => ['type' => 'string'], 'duration' => ['type' => 'string'], 'notes' => ['type' => 'string'],
                         ]],
                     ],
+                    'out_of_scope' => $strArr,
+                    'notes' => $strArr,
                 ],
                 'required' => ['introduction_purpose', 'scopes'],
             ],
@@ -316,6 +343,7 @@ class GeminiScopeService
                 'introduction' => $intro,
                 'proposed_scope' => $scopeBullets,
                 'technical_specs' => $compBullets ?: [$ar ? 'تُحدَّد المواصفات الفنية وفق اختيار المكوّنات المناسبة.' : 'Technical specifications per the appropriate component selection.'],
+                'mechanical_specs' => [$ar ? 'تُحدَّد المواصفات الميكانيكية والتصنيع بعد تثبيت النطاق.' : 'Mechanical specifications & fabrication are detailed once the scope is fixed.'],
                 'operational_logic' => [$ar ? 'يوضَّح سيناريو التشغيل بعد تثبيت النطاق.' : 'The operating scenario is detailed once the scope is fixed.'],
                 'implementation_phases' => [$ar ? 'التحليل والتصميم' : 'Analysis & design', $ar ? 'التنفيذ والاختبار' : 'Implementation & testing', $ar ? 'التسليم والتدريب' : 'Handover & training'],
                 'timeline' => [
@@ -343,6 +371,8 @@ class GeminiScopeService
                 ['phase' => $ar ? 'الانطلاق' : 'Kickoff', 'duration' => $ar ? 'يُحدَّد' : 'TBD', 'notes' => ''],
                 ['phase' => $ar ? 'التسليم' : 'Delivery', 'duration' => $ar ? 'يُحدَّد' : 'TBD', 'notes' => ''],
             ],
+            'out_of_scope' => $outOfScope,
+            'notes' => $notes,
             'source' => 'offline',
         ];
     }

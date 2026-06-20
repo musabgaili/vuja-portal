@@ -50,6 +50,50 @@ return [
         'long'   => '8-12 bullets per section with sub-points',
     ],
 
+    // Canonical document sections per tier (key => string|array). Single source of
+    // truth shared by the Step-3 editor fields and the AI prompt's section list,
+    // so the generated text matches the sections the document renders. The label
+    // for each key is scope.<key> in lang/{en,ar}/scope.php. (Company scopes &
+    // timeline are produced via the response schema, not these flat sections.)
+    'sections' => [
+        'student' => [
+            'needs' => 'string', 'scope_of_work' => 'array', 'out_of_scope' => 'array', 'notes' => 'array',
+        ],
+        'entrepreneur' => [
+            'introduction' => 'string', 'proposed_scope' => 'array', 'technical_specs' => 'array',
+            'mechanical_specs' => 'array', 'operational_logic' => 'array', 'implementation_phases' => 'array',
+            'out_of_scope' => 'array', 'notes' => 'array',
+        ],
+        'company' => [
+            'introduction_purpose' => 'string', 'out_of_scope' => 'array', 'notes' => 'array',
+        ],
+    ],
+
+    // Manager-editable AI prompt templates (defaults). A row in scope_prompt_settings
+    // overrides any of these at runtime; the response schema + JSON validation stay
+    // in code, so an edited prompt can never break structured generation.
+    // Placeholders: {tier} {lang} {length} {budget} {brief} {components} {services}
+    // {structure} {sections} {company_scope_rule}
+    'prompts' => [
+        'generate_system' =>
+            "You are a senior technical proposal writer at Vuja De Innovation (engineering, design, innovation; Riyadh). "
+            ."Write the requested sections for a {tier} {lang} Scope-of-Work.\n"
+            ."RULES:\n- Output ONLY JSON valid against the provided schema. No prose outside JSON.\n"
+            ."- Write all human-readable text in {lang}.\n"
+            ."- NEVER include prices, quantities, totals, taxes, or payment amounts — those are added by the system.\n"
+            ."- Be specific to the brief and the confirmed components; avoid generic filler.\n"
+            ."- Depth: {length} → {budget}.\n- Tone: professional, factual, client-facing.",
+        'generate_user' =>
+            "Brief:\n{brief}\n\n"
+            ."Confirmed components: {components}\n"
+            ."Selected services: {services}\n"
+            ."Tier: {tier}. Length: {length}. Structure: {structure}.\n"
+            ."Fill EVERY one of these sections in the JSON: {sections}.{company_scope_rule}",
+        'suggest_system' =>
+            'You are a senior engineer at Vuja De Innovation. From a project brief, list the electronic/hardware '
+            .'components likely required (as search queries against an inventory catalog). Output ONLY JSON. No prices.',
+    ],
+
     // PDF engine: 'mpdf' (default, pure-PHP) or 'browsershot' (headless Chrome —
     // matches the on-screen preview incl. Arabic, needs Node + Chromium on the server).
     'pdf_engine' => env('SCOPE_PDF_ENGINE', 'mpdf'),

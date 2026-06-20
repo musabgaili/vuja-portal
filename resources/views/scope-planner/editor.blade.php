@@ -9,18 +9,18 @@
 @php
     $step = $step ?? 'items';
     $c = $quote->ai_content ?? [];
-    $flatSections = match ($quote->customer_category) {
-        'student' => ['needs' => 'string', 'scope_of_work' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
-        'entrepreneur' => ['introduction' => 'string', 'proposed_scope' => 'array', 'technical_specs' => 'array', 'mechanical_specs' => 'array', 'operational_logic' => 'array', 'implementation_phases' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
-        default => ['introduction_purpose' => 'string', 'out_of_scope' => 'array', 'notes' => 'array'],
-    };
+    // Canonical Step-3 section set per tier (shared with the AI prompt + document
+    // blades via config so the generated text matches what the document renders).
+    $flatSections = config('scope.sections.'.$quote->customer_category, config('scope.sections.company'));
     $components = $quote->items->where('type', 'component')->values();
     $serviceItems = $quote->items->where('type', 'service')->values();
     $editable = in_array($quote->status, ['draft', 'changes_requested'], true);
     // Pre-built for the row-builder JS (passed via @json as plain variables — the
     // @json directive splits its argument on commas, so the map must live here).
-    $stockJson = $stockItems->map(fn ($s) => ['id' => $s->id, 'label' => $s->name.' — '.$s->category])->values();
-    $svcJson = collect($services)->map(fn ($s) => ['key' => $s->key, 'rate' => $s->unitRate, 'label' => $s->name(app()->getLocale()).' ('.number_format($s->unitRate, 0).')'])->values();
+    // Components carry the tier price so selecting an inventory item auto-fills it;
+    // services carry the rate + the Pricing-Tool description for auto-recall.
+    $stockJson = $stockItems->map(fn ($s) => ['id' => $s->id, 'label' => $s->name.' — '.$s->category, 'price' => (float) $s->priceFor($quote->customer_category)])->values();
+    $svcJson = collect($services)->map(fn ($s) => ['key' => $s->key, 'rate' => $s->unitRate, 'desc' => $s->description, 'label' => $s->name(app()->getLocale()).' ('.number_format($s->unitRate, 0).')'])->values();
 @endphp
 
 @section('content')
@@ -96,23 +96,25 @@
 
                     <h6 class="fw-bold">{{ __('portal.scope_planner.components') }} <small class="text-muted">({{ __('portal.scope_planner.components_hint') }})</small></h6>
                     <table class="table table-sm" id="components-table">
-                        <thead><tr><th>{{ __('portal.scope_planner.item') }}</th><th style="width:90px">{{ __('scope.qty') }}</th><th style="width:40px"></th></tr></thead>
+                        <thead><tr><th>{{ __('portal.scope_planner.item') }}</th><th style="width:80px">{{ __('scope.qty') }}</th><th style="width:120px">{{ __('scope.unit_price') }}</th><th style="width:40px"></th></tr></thead>
                         <tbody>
                         @foreach($components as $i => $it)
                             <tr>
                                 <td>
-                                    <select name="components[{{ $i }}][stock_item_id]" class="form-select form-select-sm mb-1">
+                                    <select name="components[{{ $i }}][stock_item_id]" class="form-select form-select-sm comp-select mb-1" onchange="fillComponentPrice(this)">
                                         <option value="">— {{ __('portal.scope_planner.manual') }} —</option>
-                                        @foreach($stockItems as $s)<option value="{{ $s->id }}" @selected($it->stock_item_id==$s->id)>{{ $s->name }} — {{ $s->category }}</option>@endforeach
+                                        @foreach($stockItems as $s)<option value="{{ $s->id }}" data-price="{{ $s->priceFor($quote->customer_category) }}" @selected($it->stock_item_id==$s->id)>{{ $s->name }} — {{ $s->category }}</option>@endforeach
                                     </select>
                                     <input type="text" name="components[{{ $i }}][name]" value="{{ $it->name }}" class="form-control form-control-sm" placeholder="{{ __('portal.scope_planner.item_name') }}">
                                 </td>
                                 <td><input type="number" min="1" name="components[{{ $i }}][qty]" value="{{ (int) $it->qty }}" class="form-control form-control-sm"></td>
+                                <td><input type="number" step="0.01" min="0" name="components[{{ $i }}][unit_price]" value="{{ rtrim(rtrim(number_format((float) $it->unit_price, 2, '.', ''), '0'), '.') }}" class="form-control form-control-sm" @if($it->source === 'inventory') readonly title="{{ __('portal.scope_planner.price_from_inventory') }}" @endif placeholder="0.00"></td>
                                 <td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
+                    <small class="text-muted d-block mb-1">{{ __('portal.scope_planner.component_price_hint') }}</small>
                     <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addComponentRow()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.add_component') }}</button>
 
                     <h6 class="fw-bold">{{ __('portal.scope_planner.services') }}</h6>
@@ -124,9 +126,10 @@
                                 <td>
                                     <select name="services[{{ $i }}][pricing_rule_id]" class="form-select form-select-sm svc-select mb-1" onchange="fillRate(this)">
                                         <option value="">— {{ __('portal.scope_planner.manual') }} —</option>
-                                        @foreach($services as $svc)<option value="{{ $svc->key }}" data-rate="{{ $svc->unitRate }}" @selected($it->pricing_rule_id==$svc->key)>{{ $svc->name(app()->getLocale()) }} ({{ number_format($svc->unitRate,0) }})</option>@endforeach
+                                        @foreach($services as $svc)<option value="{{ $svc->key }}" data-rate="{{ $svc->unitRate }}" data-desc="{{ $svc->description }}" @selected($it->pricing_rule_id==$svc->key)>{{ $svc->name(app()->getLocale()) }} ({{ number_format($svc->unitRate,0) }})</option>@endforeach
                                     </select>
-                                    <input type="text" name="services[{{ $i }}][name]" value="{{ $it->name }}" class="form-control form-control-sm" placeholder="{{ __('portal.scope_planner.item_name') }}">
+                                    <input type="text" name="services[{{ $i }}][name]" value="{{ $it->name }}" class="form-control form-control-sm mb-1" placeholder="{{ __('portal.scope_planner.item_name') }}">
+                                    <textarea name="services[{{ $i }}][description]" rows="2" class="form-control form-control-sm" placeholder="{{ __('portal.scope_planner.service_description_ph') }}">{{ $it->description }}</textarea>
                                 </td>
                                 <td><input type="number" min="1" name="services[{{ $i }}][qty]" value="{{ (int) $it->qty }}" class="form-control form-control-sm"></td>
                                 <td><input type="number" step="0.01" min="0" name="services[{{ $i }}][unit_price]" value="{{ (float) $it->unit_price }}" class="form-control form-control-sm"></td>
@@ -163,9 +166,8 @@
             </div>
             <div class="card-content">
                 @if(empty($c))
-                    <p class="text-muted">{{ __('portal.scope_planner.generate_hint') }}</p>
-                    <a href="{{ route('scope-planner.show', ['quote' => $quote, 'step' => 'items']) }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> {{ __('portal.scope_planner.back_to_items') }}</a>
-                @else
+                    <p class="text-muted"><i class="fas fa-circle-info"></i> {{ __('portal.scope_planner.fill_or_generate_hint') }}</p>
+                @endif
                 <form method="POST" action="{{ route('scope-planner.update', $quote) }}">
                     @csrf @method('PUT')
                     @foreach($flatSections as $key => $type)
@@ -199,7 +201,6 @@
                     </div>
                     @endif
                 </form>
-                @endif
             </div>
         </div>
         @endif
@@ -274,6 +275,7 @@ const SVCS = @json($svcJson);
 const L_MANUAL = @json('— '.__('portal.scope_planner.manual').' —');
 const L_NAME = @json(__('portal.scope_planner.item_name'));
 
+const L_DESC = @json(__('portal.scope_planner.service_description_ph'));
 function mkSelect(name, items, valueKey, cls) {
     const sel = document.createElement('select');
     sel.name = name; sel.className = 'form-select form-select-sm mb-1' + (cls ? ' ' + cls : '');
@@ -282,6 +284,8 @@ function mkSelect(name, items, valueKey, cls) {
         const o = document.createElement('option');
         o.value = it[valueKey]; o.textContent = it.label;          // textContent = injection-safe
         if (it.rate !== undefined) o.dataset.rate = it.rate;
+        if (it.price !== undefined) o.dataset.price = it.price;
+        if (it.desc !== undefined && it.desc !== null) o.dataset.desc = it.desc;
         sel.appendChild(o);
     });
     return sel;
@@ -291,6 +295,12 @@ function mkInput(name, type, attrs) {
     i.name = name; i.type = type; i.className = 'form-control form-control-sm';
     Object.assign(i, attrs || {});
     return i;
+}
+function mkTextarea(name, placeholder) {
+    const t = document.createElement('textarea');
+    t.name = name; t.rows = 2; t.className = 'form-control form-control-sm';
+    if (placeholder) t.placeholder = placeholder;
+    return t;
 }
 function mkRemoveCell() {
     const td = document.createElement('td');
@@ -302,10 +312,13 @@ function mkRemoveCell() {
 function addComponentRow() {
     const tr = document.createElement('tr');
     const td1 = document.createElement('td');
-    td1.appendChild(mkSelect('components[' + compIdx + '][stock_item_id]', STOCK, 'id'));
+    const sel = mkSelect('components[' + compIdx + '][stock_item_id]', STOCK, 'id', 'comp-select');
+    sel.addEventListener('change', function () { fillComponentPrice(sel); });
+    td1.appendChild(sel);
     td1.appendChild(mkInput('components[' + compIdx + '][name]', 'text', { placeholder: L_NAME }));
     const td2 = document.createElement('td'); td2.appendChild(mkInput('components[' + compIdx + '][qty]', 'number', { min: 1, value: 1 }));
-    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(mkRemoveCell());
+    const td3 = document.createElement('td'); td3.appendChild(mkInput('components[' + compIdx + '][unit_price]', 'number', { step: '0.01', min: 0, value: 0 }));
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(mkRemoveCell());
     document.querySelector('#components-table tbody').appendChild(tr); compIdx++;
 }
 function addServiceRow() {
@@ -315,6 +328,7 @@ function addServiceRow() {
     sel.addEventListener('change', function () { fillRate(sel); });
     td1.appendChild(sel);
     td1.appendChild(mkInput('services[' + svcIdx + '][name]', 'text', { placeholder: L_NAME }));
+    td1.appendChild(mkTextarea('services[' + svcIdx + '][description]', L_DESC));
     const td2 = document.createElement('td'); td2.appendChild(mkInput('services[' + svcIdx + '][qty]', 'number', { min: 1, value: 1 }));
     const td3 = document.createElement('td'); td3.appendChild(mkInput('services[' + svcIdx + '][unit_price]', 'number', { step: '0.01', min: 0, value: 0 }));
     tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(mkRemoveCell());
@@ -322,8 +336,24 @@ function addServiceRow() {
 }
 function fillRate(sel) {
     const opt = sel.options[sel.selectedIndex];
+    const row = sel.closest('tr');
     const rate = opt ? opt.getAttribute('data-rate') : null;
-    if (rate) { const price = sel.closest('tr').querySelector('input[name*="[unit_price]"]'); if (price && (!price.value || price.value === '0')) price.value = rate; }
+    if (rate) { const price = row.querySelector('input[name*="[unit_price]"]'); if (price && (!price.value || price.value === '0')) price.value = rate; }
+    // Auto-recall a pre-defined service's stored description when the box is empty.
+    const desc = opt ? opt.getAttribute('data-desc') : null;
+    if (desc) { const box = row.querySelector('textarea[name*="[description]"]'); if (box && box.value.trim() === '') box.value = desc; }
+}
+function fillComponentPrice(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    const row = sel.closest('tr');
+    const price = row.querySelector('input[name*="[unit_price]"]');
+    if (! price) return;
+    if (sel.value === '') {                 // back to Manual → let the user type a price
+        price.readOnly = false;
+        return;
+    }
+    const p = opt ? opt.getAttribute('data-price') : null;
+    if (p !== null) { price.value = p; price.readOnly = true; }   // inventory → tier price, locked
 }
 // Auto-grow editable section textareas so the full content is visible.
 function autosize(el) { el.style.height = 'auto'; el.style.height = (el.scrollHeight + 4) + 'px'; }

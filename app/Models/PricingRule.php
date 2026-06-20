@@ -17,6 +17,7 @@ class PricingRule extends Model
         'unit',
         'level',
         'note',
+        'description',
         'is_active',
     ];
 

@@ -123,7 +123,9 @@ class ScopePlannerController extends Controller
             'step' => $step,
             'suggestion' => session('scope_suggestion'),
             'services' => app(\App\ScopePlanner\Contracts\PricingToolContract::class)->services(),
-            'stockItems' => StockItem::where('is_active', true)->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'unit']),
+            // Full models (not a column subset) so priceFor() can resolve the tier
+            // price for the manual/inventory component price auto-fill in Step 2.
+            'stockItems' => StockItem::where('is_active', true)->orderBy('category')->orderBy('name')->get(),
             'lengths' => self::LENGTHS,
         ]);
     }
@@ -149,9 +151,11 @@ class ScopePlannerController extends Controller
             'components.*.name' => 'nullable|string|max:200',
             'components.*.qty' => 'nullable|integer|min:1',
             'components.*.internal_cost' => 'nullable|numeric|min:0',
+            'components.*.unit_price' => 'nullable|numeric|min:0',
             'services' => 'array',
             'services.*.pricing_rule_id' => 'nullable|exists:pricing_rules,id',
             'services.*.name' => 'nullable|string|max:200',
+            'services.*.description' => 'nullable|string|max:1000',
             'services.*.qty' => 'nullable|integer|min:1',
             'services.*.unit_price' => 'nullable|numeric|min:0',
             'components_client_total' => 'nullable|numeric|min:0',

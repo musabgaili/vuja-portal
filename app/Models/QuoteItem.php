@@ -9,7 +9,7 @@ class QuoteItem extends Model
 {
     protected $fillable = [
         'quote_id', 'inventory_item_id', 'stock_item_id', 'pricing_rule_id', 'quote_scope_id',
-        'name', 'category', 'type', 'source', 'unit',
+        'name', 'description', 'category', 'type', 'source', 'unit',
         'internal_cost', 'markup_percentage', 'qty', 'unit_price', 'line_internal', 'line_client',
         'is_client_visible', 'sort_order',
     ];

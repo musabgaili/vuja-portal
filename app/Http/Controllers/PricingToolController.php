@@ -69,6 +69,7 @@ class PricingToolController extends Controller
             'unit' => 'required|string|max:50',
             'level' => 'required|string|max:100',
             'note' => 'required|string',
+            'description' => 'nullable|string|max:2000',
         ], [
             'item.unique' => 'A pricing rule with this item, level, and unit already exists.',
         ]);
@@ -107,6 +108,7 @@ class PricingToolController extends Controller
             'unit' => 'required|string|max:50',
             'level' => 'required|string|max:100',
             'note' => 'required|string',
+            'description' => 'nullable|string|max:2000',
             'is_active' => 'boolean',
         ], [
             'item.unique' => 'A pricing rule with this item, level, and unit already exists.',

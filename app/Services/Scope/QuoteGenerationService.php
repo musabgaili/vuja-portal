@@ -82,6 +82,7 @@ class QuoteGenerationService
                 $services[] = [
                     'pricing_rule_id' => $rate->key,
                     'name' => $rate->name($quote->language),
+                    'description' => $rate->description,
                     'unit' => $rate->unit,
                     'unit_rate' => $rate->unitRate,
                     'qty' => max(1, (int) ($s['qty'] ?? 1)),
@@ -106,6 +107,10 @@ class QuoteGenerationService
 
         foreach ($components as $c) {
             $stock = ! empty($c['stock_item_id']) ? StockItem::find($c['stock_item_id']) : null;
+            // A MANUAL component (not in inventory) carries an employee-entered price;
+            // an inventory component is priced by PricingService at the tier price, so
+            // its stored unit_price is irrelevant and left at 0.
+            $manualPrice = isset($c['unit_price']) ? (float) $c['unit_price'] : 0.0;
             $quote->items()->create([
                 'type' => 'component',
                 'source' => $stock ? 'inventory' : 'manual',
@@ -114,8 +119,8 @@ class QuoteGenerationService
                 'category' => $c['category'] ?? ($stock->category ?? 'Electronics'),
                 'unit' => $c['unit'] ?? ($stock->unit ?? null),
                 'qty' => max(1, (int) ($c['qty'] ?? 1)),
-                'internal_cost' => $stock ? (float) $stock->purchase_price : (float) ($c['internal_cost'] ?? 0),
-                'unit_price' => 0,              // priced by PricingService at the tier price
+                'internal_cost' => $stock ? (float) $stock->purchase_price : $manualPrice,
+                'unit_price' => $stock ? 0 : $manualPrice,
                 'is_client_visible' => false,   // rolled up into one client line
                 'sort_order' => $sort++,
             ]);
@@ -123,11 +128,16 @@ class QuoteGenerationService
 
         foreach ($services as $s) {
             $rate = ! empty($s['pricing_rule_id']) ? $this->pricing->rateFor($s['pricing_rule_id']) : null;
+            // Store exactly what was submitted: the editor pre-fills a pre-defined
+            // service's description (fillRate) and the suggestion payload carries it,
+            // so a blank box here is a deliberate choice to show no sub-line — honor it.
+            $description = trim((string) ($s['description'] ?? '')) ?: null;
             $quote->items()->create([
                 'type' => 'service',
                 'source' => $rate ? 'pricing_tool' : 'manual',
                 'pricing_rule_id' => $rate ? (int) $rate->key : null,
                 'name' => $rate ? $rate->name($quote->language) : (trim((string) ($s['name'] ?? '')) ?: 'Service'),
+                'description' => $description,
                 'category' => 'Service',
                 'unit' => $s['unit'] ?? ($rate->unit ?? null),
                 'qty' => max(1, (int) ($s['qty'] ?? 1)),

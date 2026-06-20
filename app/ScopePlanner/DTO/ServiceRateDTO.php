@@ -13,6 +13,7 @@ final class ServiceRateDTO
         public readonly float $unitRate,
         public readonly float $defaultQty = 1.0,
         public readonly ?string $level = null,
+        public readonly ?string $description = null,
     ) {}
 
     /** Localised display name for the BoQ. */
