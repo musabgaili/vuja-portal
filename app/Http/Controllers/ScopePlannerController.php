@@ -131,7 +131,7 @@ class ScopePlannerController extends Controller
     /** Re-suggest items from the brief (AI call 1, on demand). */
     public function suggest(Quote $quote)
     {
-        $this->authorizeQuote($quote);
+        $this->authorizeEditable($quote);
 
         return redirect()->route('scope-planner.show', $quote)
             ->with('scope_suggestion', $this->generator->suggestItems($quote))
@@ -141,7 +141,7 @@ class ScopePlannerController extends Controller
     /** Persist the employee-confirmed components + services, then reprice. */
     public function saveItems(Request $request, Quote $quote)
     {
-        $this->authorizeQuote($quote);
+        $this->authorizeEditable($quote);
 
         $data = $request->validate([
             'components' => 'array',
@@ -173,7 +173,7 @@ class ScopePlannerController extends Controller
     /** Generate the document section prose (AI call 2), then reprice. */
     public function generate(Quote $quote)
     {
-        $this->authorizeQuote($quote);
+        $this->authorizeEditable($quote);
 
         if ($quote->items()->count() === 0) {
             return back()->withErrors(['items' => __('portal.scope_planner.confirm_items_first')]);
@@ -187,7 +187,7 @@ class ScopePlannerController extends Controller
     /** Edit section text + the components override, then reprice. */
     public function update(Request $request, Quote $quote)
     {
-        $this->authorizeQuote($quote);
+        $this->authorizeEditable($quote);
 
         $data = $request->validate([
             'sections' => 'array',
@@ -244,7 +244,7 @@ class ScopePlannerController extends Controller
     /** Regenerate a single section (replaces only that key in ai_content). */
     public function regenerateSection(Request $request, Quote $quote)
     {
-        $this->authorizeQuote($quote);
+        $this->authorizeEditable($quote);
         $section = (string) $request->validate(['section' => 'required|string|max:60'])['section'];
 
         $value = $this->gemini->regenerateSection([
@@ -269,7 +269,7 @@ class ScopePlannerController extends Controller
     /** Lock the document for export (status → approved/pending per role). */
     public function finalize(Quote $quote)
     {
-        $this->authorizeQuote($quote);
+        $this->authorizeEditable($quote);
 
         $quote->update(['status' => Auth::user()->isManager() ? 'approved' : 'pending_approval']);
 
@@ -284,6 +284,15 @@ class ScopePlannerController extends Controller
         // An already client-accepted quote is contractually committed — don't reopen.
         abort_if($quote->status === 'accepted', 403);
 
+        // Reverting an approved or already-sent quote discards a manager's approval
+        // (and pulls a sent quote from the client's view), so restrict that to
+        // managers/PMs; a plain creator may only reopen pre-approval states.
+        $user = Auth::user();
+        abort_if(
+            in_array($quote->status, ['approved', 'sent'], true) && ! ($user->isManager() || $user->isProjectManager()),
+            403,
+        );
+
         $quote->update(['status' => 'draft']);
 
         return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])
@@ -296,6 +305,18 @@ class ScopePlannerController extends Controller
         $user = Auth::user();
         abort_unless($user && $user->isInternal(), 403);
         abort_unless($user->isManager() || $user->isProjectManager() || $quote->created_by === $user->id, 403);
+    }
+
+    /**
+     * Authorize AND require the quote to be editable (draft / changes_requested).
+     * The "locked" UI is not enough — these mutating endpoints must reject a direct
+     * POST against a submitted/approved/sent/accepted quote, or an accepted contract
+     * could be silently re-priced and re-itemized.
+     */
+    private function authorizeEditable(Quote $quote): void
+    {
+        $this->authorizeQuote($quote);
+        abort_unless($quote->isEditable(), 403);
     }
 
     /** Persist the current scope + selected inventory/stock as a Quote (CRM bridge). */

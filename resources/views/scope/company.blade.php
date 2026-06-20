@@ -83,6 +83,18 @@
     </div>
   @endunless
 
+  @if(!empty($c['out_of_scope']))
+    <div class="section"><h2>@lang('scope.out_of_scope')</h2>
+      <ul class="points">@foreach($c['out_of_scope'] as $line)<li>{{ $line }}</li>@endforeach</ul>
+    </div>
+  @endif
+
+  @if(!empty($c['notes']))
+    <div class="section"><h2>@lang('scope.notes')</h2>
+      <div class="note-block"><ul>@foreach($c['notes'] as $line)<li>{{ $line }}</li>@endforeach</ul></div>
+    </div>
+  @endif
+
   {{-- ===== General terms ===== --}}
   <div class="pagebreak"></div>
   <div class="section">

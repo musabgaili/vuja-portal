@@ -10,13 +10,17 @@
     $step = $step ?? 'items';
     $c = $quote->ai_content ?? [];
     $flatSections = match ($quote->customer_category) {
-        'student' => ['subject' => 'string', 'needs' => 'string', 'scope_of_work' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
+        'student' => ['needs' => 'string', 'scope_of_work' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
         'entrepreneur' => ['introduction' => 'string', 'proposed_scope' => 'array', 'technical_specs' => 'array', 'mechanical_specs' => 'array', 'operational_logic' => 'array', 'implementation_phases' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
         default => ['introduction_purpose' => 'string', 'out_of_scope' => 'array', 'notes' => 'array'],
     };
     $components = $quote->items->where('type', 'component')->values();
     $serviceItems = $quote->items->where('type', 'service')->values();
     $editable = in_array($quote->status, ['draft', 'changes_requested'], true);
+    // Pre-built for the row-builder JS (passed via @json as plain variables — the
+    // @json directive splits its argument on commas, so the map must live here).
+    $stockJson = $stockItems->map(fn ($s) => ['id' => $s->id, 'label' => $s->name.' — '.$s->category])->values();
+    $svcJson = collect($services)->map(fn ($s) => ['key' => $s->key, 'rate' => $s->unitRate, 'label' => $s->name(app()->getLocale()).' ('.number_format($s->unitRate, 0).')'])->values();
 @endphp
 
 @section('content')
@@ -263,29 +267,58 @@
 <script>
 let compIdx = {{ $components->count() }};
 let svcIdx = {{ $serviceItems->count() }};
-const stockOptions = `@foreach($stockItems as $s)<option value="{{ $s->id }}">{{ $s->name }} — {{ $s->category }}</option>@endforeach`;
-const svcOptions = `@foreach($services as $svc)<option value="{{ $svc->key }}" data-rate="{{ $svc->unitRate }}">{{ $svc->name(app()->getLocale()) }} ({{ number_format($svc->unitRate,0) }})</option>@endforeach`;
+// JSON-encoded catalog data + DOM construction — never string-interpolate
+// catalog names into HTML/JS (names may contain backticks, dollar-brace, or markup).
+const STOCK = @json($stockJson);
+const SVCS = @json($svcJson);
 const L_MANUAL = @json('— '.__('portal.scope_planner.manual').' —');
 const L_NAME = @json(__('portal.scope_planner.item_name'));
 
+function mkSelect(name, items, valueKey, cls) {
+    const sel = document.createElement('select');
+    sel.name = name; sel.className = 'form-select form-select-sm mb-1' + (cls ? ' ' + cls : '');
+    const o0 = document.createElement('option'); o0.value = ''; o0.textContent = L_MANUAL; sel.appendChild(o0);
+    items.forEach(function (it) {
+        const o = document.createElement('option');
+        o.value = it[valueKey]; o.textContent = it.label;          // textContent = injection-safe
+        if (it.rate !== undefined) o.dataset.rate = it.rate;
+        sel.appendChild(o);
+    });
+    return sel;
+}
+function mkInput(name, type, attrs) {
+    const i = document.createElement('input');
+    i.name = name; i.type = type; i.className = 'form-control form-control-sm';
+    Object.assign(i, attrs || {});
+    return i;
+}
+function mkRemoveCell() {
+    const td = document.createElement('td');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn btn-sm btn-link text-danger'; b.textContent = '×';
+    b.addEventListener('click', function () { b.closest('tr').remove(); });
+    td.appendChild(b); return td;
+}
 function addComponentRow() {
-    const tbody = document.querySelector('#components-table tbody');
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td><select name="components[${compIdx}][stock_item_id]" class="form-select form-select-sm mb-1"><option value="">${L_MANUAL}</option>${stockOptions}</select>`
-        + `<input type="text" name="components[${compIdx}][name]" value="" class="form-control form-control-sm" placeholder="${L_NAME}"></td>`
-        + `<td><input type="number" min="1" name="components[${compIdx}][qty]" value="1" class="form-control form-control-sm"></td>`
-        + `<td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>`;
-    tbody.appendChild(tr); compIdx++;
+    const td1 = document.createElement('td');
+    td1.appendChild(mkSelect('components[' + compIdx + '][stock_item_id]', STOCK, 'id'));
+    td1.appendChild(mkInput('components[' + compIdx + '][name]', 'text', { placeholder: L_NAME }));
+    const td2 = document.createElement('td'); td2.appendChild(mkInput('components[' + compIdx + '][qty]', 'number', { min: 1, value: 1 }));
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(mkRemoveCell());
+    document.querySelector('#components-table tbody').appendChild(tr); compIdx++;
 }
 function addServiceRow() {
-    const tbody = document.querySelector('#services-table tbody');
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td><select name="services[${svcIdx}][pricing_rule_id]" class="form-select form-select-sm svc-select mb-1" onchange="fillRate(this)"><option value="">${L_MANUAL}</option>${svcOptions}</select>`
-        + `<input type="text" name="services[${svcIdx}][name]" value="" class="form-control form-control-sm" placeholder="${L_NAME}"></td>`
-        + `<td><input type="number" min="1" name="services[${svcIdx}][qty]" value="1" class="form-control form-control-sm"></td>`
-        + `<td><input type="number" step="0.01" min="0" name="services[${svcIdx}][unit_price]" value="0" class="form-control form-control-sm"></td>`
-        + `<td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>`;
-    tbody.appendChild(tr); svcIdx++;
+    const td1 = document.createElement('td');
+    const sel = mkSelect('services[' + svcIdx + '][pricing_rule_id]', SVCS, 'key', 'svc-select');
+    sel.addEventListener('change', function () { fillRate(sel); });
+    td1.appendChild(sel);
+    td1.appendChild(mkInput('services[' + svcIdx + '][name]', 'text', { placeholder: L_NAME }));
+    const td2 = document.createElement('td'); td2.appendChild(mkInput('services[' + svcIdx + '][qty]', 'number', { min: 1, value: 1 }));
+    const td3 = document.createElement('td'); td3.appendChild(mkInput('services[' + svcIdx + '][unit_price]', 'number', { step: '0.01', min: 0, value: 0 }));
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(mkRemoveCell());
+    document.querySelector('#services-table tbody').appendChild(tr); svcIdx++;
 }
 function fillRate(sel) {
     const opt = sel.options[sel.selectedIndex];
