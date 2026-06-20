@@ -254,6 +254,31 @@ class WeeklyPlannerController extends Controller
             }
         }
 
+        // Presence is mandatory on submit: every working day with non-leave hours
+        // needs a location from the list. A fully on-leave day (sick/vacation) is
+        // exempt — you're not at a lab when you're on leave.
+        if ($submitting) {
+            $leaveKeys = (array) config('planner.leave_activities', []);
+            $missing = [];
+            foreach ($days as $day) {
+                $workHours = 0;
+                foreach ($lines as $l) {
+                    $isLeave = $l['kind'] === 'activity' && in_array($l['activity'], $leaveKeys, true);
+                    if (! $isLeave) {
+                        $workHours += (int) ($l['hours'][$day] ?? 0);
+                    }
+                }
+                if ($workHours > 0 && empty($locations[$day])) {
+                    $missing[] = __('portal.planner.day_short.'.$day);
+                }
+            }
+            if ($missing) {
+                return back()
+                    ->withErrors(['locations' => __('portal.planner.location_required', ['days' => implode(', ', $missing)])])
+                    ->withInput();
+            }
+        }
+
         $wasSubmitted = in_array($plan->status, ['pending', 'approved'], true);
         $selfApprove = $user->isManager();
 
@@ -467,16 +492,31 @@ class WeeklyPlannerController extends Controller
      */
     private function weekOverview($plans, array $days, array $locations): array
     {
+        $leaveKeys = (array) config('planner.leave_activities', []);
         $rows = [];
         foreach ($plans as $plan) {
             $perDay = [];
             foreach ($days as $day) {
                 $hours = 0;
+                $leaveHours = 0;
+                $leaveKey = null;
                 foreach ($plan->lines as $line) {
-                    $hours += (int) (($line->hours[$day] ?? 0));
+                    $h = (int) (($line->hours[$day] ?? 0));
+                    $hours += $h;
+                    if ($h > 0 && $line->kind === 'activity' && in_array($line->activity, $leaveKeys, true)) {
+                        $leaveHours += $h;
+                        $leaveKey = $leaveKey ?: $line->activity;
+                    }
                 }
                 $locKey = $plan->locations[$day] ?? null;
                 $win = $plan->availability[$day] ?? null;
+                // A leave-dominated day shows the leave reason instead of a work location.
+                $isLeaveDay = $hours > 0 && $leaveHours >= ($hours / 2);
+                $leaveLabel = $leaveKey
+                    ? (\Illuminate\Support\Facades\Lang::has('portal.planner.cat.'.$leaveKey)
+                        ? __('portal.planner.cat.'.$leaveKey)
+                        : config('planner.activities.'.$leaveKey, $leaveKey))
+                    : null;
                 $perDay[$day] = [
                     'loc' => $locKey
                         ? (\Illuminate\Support\Facades\Lang::has('portal.planner.location.'.$locKey)
@@ -485,6 +525,7 @@ class WeeklyPlannerController extends Controller
                         : null,
                     'hours' => $hours,
                     'window' => ($win && ($win['start'] ?? null) && ($win['end'] ?? null)) ? ($win['start'].'–'.$win['end']) : null,
+                    'leave' => $isLeaveDay ? $leaveLabel : null,
                 ];
             }
             $rows[] = [

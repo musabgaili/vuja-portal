@@ -36,7 +36,8 @@
                                 <form method="POST" action="{{ route('weekly-planner.approve', $p) }}" class="d-inline">@csrf
                                     <button class="btn btn-primary btn-sm"><i class="fas fa-check"></i></button>
                                 </form>
-                                <form method="POST" action="{{ route('weekly-planner.reject', $p) }}" class="d-inline">@csrf
+                                <form method="POST" action="{{ route('weekly-planner.reject', $p) }}" class="d-inline" onsubmit="return askRejectReason(this)">@csrf
+                                    <input type="hidden" name="review_notes">
                                     <button class="btn btn-outline-primary btn-sm" title="{{ __('portal.planner.send_back') }}"><i class="fas fa-rotate-left"></i></button>
                                 </form>
                             </td>
@@ -93,4 +94,14 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+function askRejectReason(form) {
+    var note = window.prompt(@json(__('portal.planner.reject_prompt')));
+    if (note === null) return false;                       // cancelled
+    form.querySelector('input[name="review_notes"]').value = note;
+    return true;
+}
+</script>
+@endpush
 @endsection

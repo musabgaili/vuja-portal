@@ -2,9 +2,12 @@
 @section('title', __('portal.planner.team_presence'))
 
 @section('content')
-<div class="page-hero">
-    <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.presence_subtitle') }} {{ $weekStart->translatedFormat('D, M j, Y') }}</p>
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</h1>
+        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.presence_subtitle') }} {{ $weekStart->translatedFormat('D, M j, Y') }}</p>
+    </div>
+    <a href="{{ route('internal.dashboard') }}" class="btn btn-light"><i class="fas fa-arrow-left"></i> {{ __('portal.planner.back') }}</a>
 </div>
 
 {{-- High-level: everyone's place of work + hours per day --}}
