@@ -136,8 +136,13 @@
                     </thead>
                     <tbody>
                         @foreach($activities as $key => $label)
-                            <tr>
-                                <td>{{ __('portal.planner.activity.'.$key) }}</td>
+                            <tr @if($key === 'presale_meetings') style="background:rgba(12,112,117,.04);" @endif>
+                                <td>
+                                    {{ __('portal.planner.activity.'.$key) }}
+                                    @if($key === 'presale_meetings')
+                                        <span class="badge bg-primary ms-1" style="font-size:.65rem;">{{ __('portal.planner.presale_min_hint', ['min' => (int) config('planner.min_presale_meeting_hours', 5)]) }}</span>
+                                    @endif
+                                </td>
                                 @foreach($days as $day)
                                     <td class="text-center">
                                         <input type="number" min="0" max="{{ $maxHoursPerDay }}" name="hours[activity][{{ $key }}][{{ $day }}]"

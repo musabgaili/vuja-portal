@@ -235,6 +235,25 @@ class WeeklyPlannerController extends Controller
                 ->withInput();
         }
 
+        // Must-have: at least N hours on "Pre-sale Meetings" — unless the week is
+        // mostly leave (vacation/unpaid/sick), which is exempt so PTO isn't blocked.
+        $minPresale = (int) config('planner.min_presale_meeting_hours', 0);
+        if ($submitting && $minPresale > 0) {
+            $sumActivity = fn (array $keys) => array_sum(array_map(
+                fn ($l) => ($l['kind'] === 'activity' && in_array($l['activity'], $keys, true)) ? array_sum($l['hours']) : 0,
+                $lines,
+            ));
+            $presaleHours = $sumActivity(['presale_meetings']);
+            $leaveHours = $sumActivity((array) config('planner.leave_activities', []));
+            $leaveDominated = $total > 0 && $leaveHours >= ($total / 2);
+
+            if ($presaleHours < $minPresale && ! $leaveDominated) {
+                return back()
+                    ->withErrors(['presale_meetings' => __('portal.planner.presale_min_error', ['min' => $minPresale, 'have' => (int) $presaleHours])])
+                    ->withInput();
+            }
+        }
+
         $wasSubmitted = in_array($plan->status, ['pending', 'approved'], true);
         $selfApprove = $user->isManager();
 

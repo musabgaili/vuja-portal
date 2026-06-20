@@ -54,8 +54,21 @@ class ActualsService
                 ->where(fn ($q) => $q->where('project_manager_id', $user->id)->orWhere('account_manager_id', $user->id))
                 ->count(),
 
+            'presale_meeting_hours' => $this->presaleMeetingHours($user, $start, $end),
+
             default => 0.0,
         };
+    }
+
+    /** Hours logged against the "Pre-sale Meetings" planner activity this month. */
+    private function presaleMeetingHours(User $user, Carbon $start, Carbon $end): float
+    {
+        return (float) \App\Models\WeeklyPlanLine::query()
+            ->where('kind', 'activity')
+            ->where('activity', 'presale_meetings')
+            ->whereHas('plan', fn ($q) => $q->where('user_id', $user->id)->whereBetween('week_start', [$start, $end]))
+            ->get()
+            ->sum(fn ($line) => array_sum($line->hours ?? []));
     }
 
     /**
