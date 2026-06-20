@@ -59,4 +59,14 @@ return [
     'terms_change' => 'Any addition or modification to the scope is handled via a written Change Request signed by both parties, and may affect price or timeline.',
     'terms_confidentiality' => 'Both parties shall keep all non-public information exchanged confidential and not disclose it to third parties without prior written consent.',
     'terms_validity' => 'This proposal is valid for :days days from the date of issue; afterwards prices and timelines may be revised at Vuja De\'s discretion.',
+
+    // Default milestone triggers (resolved in the quote's language; editable per quote)
+    'mtrigger' => [
+        'on_order_advance' => 'On order confirmation (advance)',
+        'on_delivery' => 'On delivery / completion',
+        'on_prototype_review' => 'On prototype / milestone review',
+        'on_final_acceptance' => 'On final delivery & acceptance',
+        'on_contract_signature' => 'On contract signature (advance)',
+        'on_mid_milestone' => 'On mid-project milestone',
+    ],
 ];

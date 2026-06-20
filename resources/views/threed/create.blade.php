@@ -7,9 +7,14 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-cubes"></i> {{ __('portal.threed.create.heading') }}</h3>
-        <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> {{ __('portal.threed.back') }}
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('threed.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-list"></i> {{ __('portal.threed.my_title') }}
+            </a>
+            <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> {{ __('portal.threed.back') }}
+            </a>
+        </div>
     </div>
     <div class="card-content">
         @if($errors->any())

@@ -68,7 +68,7 @@
       <h3>@lang('scope.payment_schedule')</h3>
       <table class="tbl"><thead><tr><th>@lang('scope.milestone')</th><th class="desc">@lang('scope.trigger')</th><th>%</th><th>@lang('scope.amount') ({{ $cur }})</th></tr></thead><tbody>
         @foreach($quote->milestones as $m)
-          <tr><td class="c">{{ $m->code }}</td><td class="desc">{{ $m->trigger }}</td><td class="c">{{ rtrim(rtrim(number_format($m->percentage,2),'0'),'.') }}%</td><td class="money">{{ number_format($m->amount,0) }}</td></tr>
+          <tr><td class="c">{{ $m->code }}</td><td class="desc">{{ $m->triggerLabel() }}</td><td class="c">{{ rtrim(rtrim(number_format($m->percentage,2),'0'),'.') }}%</td><td class="money">{{ number_format($m->amount,0) }}</td></tr>
         @endforeach
       </tbody></table>
 

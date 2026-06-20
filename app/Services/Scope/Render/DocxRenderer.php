@@ -171,7 +171,7 @@ class DocxRenderer
         foreach ($quote->milestones as $m) {
             $t->addRow();
             $t->addCell(1500)->addText($m->code);
-            $t->addCell(6000)->addText((string) $m->trigger);
+            $t->addCell(6000)->addText($m->triggerLabel());
             $t->addCell(1200)->addText(rtrim(rtrim(number_format($m->percentage, 2), '0'), '.').'%');
             $t->addCell(2000)->addText(number_format($m->amount, 0));
         }

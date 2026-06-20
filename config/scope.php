@@ -24,20 +24,22 @@ return [
     'number_format' => 'Q{seq4}',
 
     // Default milestone templates per tier (editable per quote). Amounts derive from grand_total.
+    // Triggers are translation keys (scope.mtrigger.*) resolved in the quote's
+    // language at render time; employee-edited free text renders verbatim.
     'milestones' => [
         'student' => [
-            ['code' => 'M1', 'percentage' => 50, 'trigger' => 'On order confirmation (advance)'],
-            ['code' => 'M2', 'percentage' => 50, 'trigger' => 'On delivery / completion'],
+            ['code' => 'M1', 'percentage' => 50, 'trigger' => 'scope.mtrigger.on_order_advance'],
+            ['code' => 'M2', 'percentage' => 50, 'trigger' => 'scope.mtrigger.on_delivery'],
         ],
         'entrepreneur' => [
-            ['code' => 'M1', 'percentage' => 50, 'trigger' => 'On order confirmation (advance)'],
-            ['code' => 'M2', 'percentage' => 30, 'trigger' => 'On prototype / milestone review'],
-            ['code' => 'M3', 'percentage' => 20, 'trigger' => 'On final delivery & acceptance'],
+            ['code' => 'M1', 'percentage' => 50, 'trigger' => 'scope.mtrigger.on_order_advance'],
+            ['code' => 'M2', 'percentage' => 30, 'trigger' => 'scope.mtrigger.on_prototype_review'],
+            ['code' => 'M3', 'percentage' => 20, 'trigger' => 'scope.mtrigger.on_final_acceptance'],
         ],
         'company' => [
-            ['code' => 'M1', 'percentage' => 40, 'trigger' => 'On contract signature (advance)'],
-            ['code' => 'M2', 'percentage' => 30, 'trigger' => 'On mid-project milestone'],
-            ['code' => 'M3', 'percentage' => 30, 'trigger' => 'On final delivery & acceptance'],
+            ['code' => 'M1', 'percentage' => 40, 'trigger' => 'scope.mtrigger.on_contract_signature'],
+            ['code' => 'M2', 'percentage' => 30, 'trigger' => 'scope.mtrigger.on_mid_milestone'],
+            ['code' => 'M3', 'percentage' => 30, 'trigger' => 'scope.mtrigger.on_final_acceptance'],
         ],
     ],
 

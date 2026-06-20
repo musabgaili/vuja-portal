@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Lang;
 
 /**
  * A payment-schedule milestone (M1/M2/M3). `amount` is computed by PricingService
@@ -24,5 +25,17 @@ class QuoteMilestone extends Model
     public function quote(): BelongsTo
     {
         return $this->belongsTo(Quote::class);
+    }
+
+    /**
+     * The human-readable trigger in the CURRENT locale. Default triggers are
+     * stored as translation keys (scope.mtrigger.*) and resolved here; any
+     * employee-edited free text is not a key and renders verbatim.
+     */
+    public function triggerLabel(): string
+    {
+        $trigger = (string) $this->trigger;
+
+        return $trigger !== '' && Lang::has($trigger) ? __($trigger) : $trigger;
     }
 }

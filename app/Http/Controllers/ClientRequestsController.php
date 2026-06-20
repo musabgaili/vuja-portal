@@ -21,6 +21,7 @@ class ClientRequestsController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        abort_unless($user && $user->isClient(), 403);
 
         // Get filter parameters
         $statusFilter = $request->get('status');
