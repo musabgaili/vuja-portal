@@ -35,7 +35,7 @@ class GeminiScopeService
             try {
                 return $this->callGemini($key, $projectType, $requirements, $budget);
             } catch (\Throwable $e) {
-                Log::warning('Gemini scope draft failed, using offline draft: '.$e->getMessage());
+                Log::warning('Gemini scope draft failed, using offline draft: '.$this->geminiError($e));
             }
         }
 
@@ -61,7 +61,7 @@ class GeminiScopeService
             try {
                 return $this->geminiSuggest($key, $brief, $tier, $language);
             } catch (\Throwable $e) {
-                Log::warning('Gemini suggest failed, using offline match: '.$e->getMessage());
+                Log::warning('Gemini suggest failed, using offline match: '.$this->geminiError($e));
             }
         }
 
@@ -155,7 +155,7 @@ class GeminiScopeService
             try {
                 return $this->geminiGenerate($key, $req);
             } catch (\Throwable $e) {
-                Log::warning('Gemini generate failed, using offline draft: '.$e->getMessage());
+                Log::warning('Gemini generate failed, using offline draft: '.$this->geminiError($e));
             }
         }
 
@@ -361,6 +361,18 @@ class GeminiScopeService
     // ===================================================================
     // Gemini transport
     // ===================================================================
+
+    /** Extract a useful message from a failed Gemini call — includes the API
+     *  response body (which names a bad/retired model or invalid key) instead of
+     *  the truncated default exception text. */
+    private function geminiError(\Throwable $e): string
+    {
+        if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response) {
+            return 'HTTP '.$e->response->status().' '.Str::limit($e->response->body(), 500);
+        }
+
+        return $e->getMessage();
+    }
 
     /** Structured-output Gemini call: returns the decoded JSON object. */
     private function callGeminiJson(string $key, string $system, string $user, array $schema): array
