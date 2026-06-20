@@ -41,36 +41,45 @@ class MpdfRenderer implements PdfRenderer
             @mkdir($tmp, 0775, true);
         }
 
-        $safe = config('scope.safe_area_mm', ['top' => 40, 'side' => 18, 'bottom' => 24]);
         $format = strtolower((string) config('scope.page_size', 'letter')) === 'a4' ? 'A4' : 'Letter';
+        $brand = (string) config('scope.brand_color', '#1B565E');
 
+        // NOTE: we deliberately do NOT use a full-page letterhead watermark here —
+        // mPDF's SetWatermarkImage with this letterhead breaks/clips the body text
+        // layout (especially RTL). Instead we render a clean branded header band +
+        // footer (mPDF's intended mechanism); the body content stays intact. The
+        // exact full-bleed letterhead is the Browsershot engine's job
+        // (SCOPE_PDF_ENGINE=browsershot), which renders the same HTML as the preview.
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => $format,
-            'margin_top' => (float) ($safe['top'] ?? 40),
-            'margin_left' => (float) ($safe['side'] ?? 18),
-            'margin_right' => (float) ($safe['side'] ?? 18),
-            'margin_bottom' => (float) ($safe['bottom'] ?? 24),
-            'margin_header' => 0,
-            'margin_footer' => 10,
+            'margin_top' => 32,
+            'margin_left' => 16,
+            'margin_right' => 16,
+            'margin_bottom' => 22,
+            'margin_header' => 8,
+            'margin_footer' => 9,
             'tempDir' => $tmp,
             'autoScriptToLang' => true,
             'autoLangToFont' => true,
         ]);
         $mpdf->showImageErrors = false;
 
-        // Full-page letterhead behind every page ('F' fills the page, 'P' centres it).
-        // Path is relative to public/ (git-tracked) so it ships with the repo.
-        $letterhead = public_path(config('scope.letterhead', 'images/scope-letterhead.png'));
-        if (is_file($letterhead)) {
-            $mpdf->showWatermarkImage = true;
-            $mpdf->watermarkImageAlpha = 1;
-            $mpdf->SetWatermarkImage($letterhead, 1, 'F', 'P');
+        // Branded header band (teal + white logo) repeated on every page.
+        $logo = public_path('images/vd-logo-dark-trimmed.png');
+        if (! is_file($logo)) {
+            $logo = public_path('images/vd-logo-dark.png');
         }
+        $logoTag = is_file($logo) ? '<img src="'.$logo.'" style="height:30px;">' : '<span style="color:#fff;font-weight:700;font-size:16px;">'.e(config('scope.company_name', 'Vuja De Innovation')).'</span>';
+        $mpdf->SetHTMLHeader(
+            '<table width="100%" style="border:0;"><tr>'
+            .'<td style="background:'.$brand.';padding:7px 14px;border-radius:0 0 12px 0;width:42%;">'.$logoTag.'</td>'
+            .'<td style="border:0;"></td></tr></table>'
+        );
 
         $footer = (string) config('scope.footer', '');
         if ($footer !== '') {
-            $mpdf->SetHTMLFooter('<div style="text-align:center;font-size:8.5px;color:#5a6a6c;">'.e($footer).'</div>');
+            $mpdf->SetHTMLFooter('<div style="border-top:1px solid '.$brand.';padding-top:4px;text-align:center;font-size:8px;color:#5a6a6c;">'.e($footer).'</div>');
         }
 
         $mpdf->WriteHTML($html);
