@@ -172,6 +172,10 @@
                         <i class="fas fa-folder"></i>
                         {{ __('portal.nav.all_projects') }}
                     </a>
+                    <a href="{{ route('projects.proposals.index') }}" class="nav-item {{ request()->routeIs('projects.proposals.*','projects.propose.*') ? 'active' : '' }}">
+                        <i class="fas fa-lightbulb"></i>
+                        {{ __('portal.nav.proposals') }}
+                    </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('projects.create') }}" class="nav-item">
                         <i class="fas fa-plus"></i>

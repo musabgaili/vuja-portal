@@ -231,6 +231,44 @@
     <small style="opacity: 0.8;">{{ $project->completion_percentage }}% {{ __('portal.projects_manager.show.complete') }}</small>
 </div>
 
+{{-- Proposal banner: pending review (reviewers get approve/reject), or the outcome the proposer sees --}}
+@if($project->isProposed())
+<div class="section-card" style="border-left:5px solid #f59e0b;">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+            <h4 style="margin:0;"><i class="fas fa-lightbulb text-warning"></i> {{ __('portal.projects_propose.banner_pending_title') }}</h4>
+            <p class="text-muted mb-1">{{ __('portal.projects_propose.banner_pending_body') }}</p>
+            @if($project->proposedBy)
+                <small class="text-muted">{{ __('portal.projects_propose.proposed_by') }}: <strong>{{ $project->proposedBy->name }}</strong> · {{ $project->created_at?->translatedFormat('M j, Y') }}</small>
+            @endif
+            @if($project->proposal_notes)
+                <div class="mt-2" style="background:var(--bg-tertiary,#f8fafc);padding:.6rem .8rem;border-radius:8px;font-size:.9rem;"><i class="fas fa-quote-left text-muted"></i> {{ $project->proposal_notes }}</div>
+            @endif
+        </div>
+        @if($project->canUserReviewProposal($user))
+        <div class="d-flex gap-2">
+            <form method="POST" action="{{ route('projects.proposal.approve', $project) }}" onsubmit="return confirm(@js(__('portal.projects_propose.approve_confirm')))">@csrf
+                <button class="btn btn-primary"><i class="fas fa-check"></i> {{ __('portal.projects_propose.approve_start') }}</button>
+            </form>
+            <form method="POST" action="{{ route('projects.proposal.reject', $project) }}" onsubmit="return askRejectReason(this)">@csrf
+                <input type="hidden" name="review_notes">
+                <button class="btn btn-outline-danger"><i class="fas fa-xmark"></i> {{ __('portal.projects_propose.reject') }}</button>
+            </form>
+        </div>
+        @endif
+    </div>
+</div>
+@elseif($project->proposal_reviewed_at && $project->proposal_review_notes)
+<div class="section-card" style="border-left:5px solid {{ $project->isCancelled() ? '#ef4444' : '#10b981' }};">
+    <h4 style="margin:0 0 .25rem;">
+        <i class="fas fa-clipboard-check"></i>
+        {{ $project->isCancelled() ? __('portal.projects_propose.outcome_rejected') : __('portal.projects_propose.outcome_approved') }}
+    </h4>
+    <small class="text-muted">{{ __('portal.projects_propose.col_reviewer') }}: {{ $project->proposalReviewedBy?->name ?? '—' }} · {{ $project->proposal_reviewed_at->translatedFormat('M j, Y') }}</small>
+    <div class="mt-2" style="background:var(--bg-tertiary,#f8fafc);padding:.6rem .8rem;border-radius:8px;font-size:.9rem;">{{ $project->proposal_review_notes }}</div>
+</div>
+@endif
+
 <!-- Action Buttons -->
 <div class="mb-3" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
     @if($canEdit)
@@ -846,6 +884,15 @@
 @endsection
 @push('scripts')
 <script>
+// Proposal reject: capture a required comment the proposer will see.
+function askRejectReason(form) {
+    var note = window.prompt(@js(__('portal.projects_propose.reject_prompt')));
+    if (note === null) return false;
+    if (note.trim() === '') { alert(@js(__('portal.projects_propose.reject_required'))); return false; }
+    form.querySelector('input[name="review_notes"]').value = note;
+    return true;
+}
+
 function switchTab(tab) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));

@@ -64,6 +64,13 @@ Route::middleware(['auth'])->group(function () {
         // Project Management
         Route::get('/', [ProjectController::class, 'managerIndex'])->name('manager.index');
         Route::get('/kanban', [ProjectController::class, 'kanban'])->name('kanban');
+
+        // Project Proposals (any internal staff propose; manager/PM review & approve)
+        Route::get('/propose', [ProjectController::class, 'proposeCreate'])->name('propose.create');
+        Route::post('/propose', [ProjectController::class, 'proposeStore'])->name('propose.store');
+        Route::get('/proposals', [ProjectController::class, 'proposalsIndex'])->name('proposals.index');
+        Route::post('/{project}/proposal/approve', [ProjectController::class, 'approveProposal'])->name('proposal.approve');
+        Route::post('/{project}/proposal/reject', [ProjectController::class, 'rejectProposal'])->name('proposal.reject');
         Route::get('/show/{project}', [ProjectController::class, 'managerShow'])->name('manager.show');
         Route::put('/update/{project}', [ProjectController::class, 'update'])->name('update');
         Route::post('/{project}/close', [ProjectController::class, 'close'])->name('close');

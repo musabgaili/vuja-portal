@@ -163,7 +163,7 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:planning,quoted,awarded,in_progress,paused,completed,lost,cancelled',
+            'status' => 'required|in:proposed,planning,quoted,awarded,in_progress,paused,completed,lost,cancelled',
         ]);
 
         $project->update(['status' => $validated['status']]);
@@ -225,6 +225,172 @@ class ProjectController extends Controller
             ->with('success', 'Project created successfully!');
     }
 
+    // ============================================
+    // PROJECT PROPOSALS (employee proposes → manager/PM approves to start)
+    // ============================================
+
+    /**
+     * Show the "propose a project" form. Any internal staff member may propose.
+     */
+    public function proposeCreate()
+    {
+        $user = Auth::user();
+
+        if (! $user->isInternal()) {
+            abort(403);
+        }
+
+        // Client is optional on a proposal (the idea may pre-date a signed client).
+        $clients = User::where('type', 'client')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        return view('projects.manager.propose', compact('clients'));
+    }
+
+    /**
+     * Persist a proposed project. It starts in the "proposed" status, owned by
+     * the proposer (added to the team so they can track it), and waits for a
+     * manager / project manager to approve it.
+     */
+    public function proposeStore(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user->isInternal()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'scope' => 'nullable|string',
+            'proposal_notes' => 'nullable|string',
+            'client_id' => 'nullable|exists:users,id',
+            'budget' => 'nullable|numeric|min:0',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        $project = Project::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'scope' => $validated['scope'] ?? null,
+            'proposal_notes' => $validated['proposal_notes'] ?? null,
+            'client_id' => $validated['client_id'] ?? null,
+            'budget' => $validated['budget'] ?? null,
+            'start_date' => $validated['start_date'] ?? null,
+            'end_date' => $validated['end_date'] ?? null,
+            'status' => 'proposed',
+            'proposed_by' => $user->id,
+        ]);
+
+        // Track the proposer on the team so it surfaces in their project list
+        // (employees only see projects they belong to) and they can view it.
+        \App\Models\ProjectPerson::firstOrCreate(
+            ['project_id' => $project->id, 'user_id' => $user->id],
+            ['role' => 'employee', 'can_edit' => false],
+        );
+
+        // Link the client (if chosen) so the relationship is consistent with
+        // the normal create path.
+        if (! empty($validated['client_id'])) {
+            \App\Models\ProjectPerson::firstOrCreate(
+                ['project_id' => $project->id, 'user_id' => $validated['client_id']],
+                ['role' => 'client', 'can_edit' => false],
+            );
+        }
+
+        return redirect()->route('projects.proposals.index')
+            ->with('success', __('portal.projects_propose.submitted'));
+    }
+
+    /**
+     * The proposals review queue. Reviewers (manager / project manager) see all
+     * pending proposals; an employee sees the proposals they submitted.
+     */
+    public function proposalsIndex()
+    {
+        $user = Auth::user();
+
+        if (! $user->isInternal()) {
+            abort(403);
+        }
+
+        $isReviewer = $user->isManager() || $user->isProjectManager();
+
+        $query = Project::where('status', 'proposed')
+            ->with(['proposedBy', 'client'])
+            ->latest();
+
+        if (! $isReviewer) {
+            $query->where('proposed_by', $user->id);
+        }
+
+        $proposals = $query->get();
+
+        // Recently reviewed proposals (approved/rejected) for context.
+        $reviewedQuery = Project::whereNotNull('proposal_reviewed_at')
+            ->with(['proposedBy', 'proposalReviewedBy', 'client'])
+            ->latest('proposal_reviewed_at')
+            ->limit(15);
+
+        if (! $isReviewer) {
+            $reviewedQuery->where('proposed_by', $user->id);
+        }
+
+        $reviewed = $reviewedQuery->get();
+
+        return view('projects.manager.proposals', compact('proposals', 'reviewed', 'isReviewer'));
+    }
+
+    /**
+     * Approve a proposal → the project starts (moves into the planning pipeline).
+     */
+    public function approveProposal(Request $request, Project $project)
+    {
+        $user = Auth::user();
+
+        abort_unless($project->canUserReviewProposal($user), 403, __('portal.projects_propose.review_forbidden'));
+        abort_unless($project->isProposed(), 422, __('portal.projects_propose.not_pending'));
+
+        $project->update([
+            'status' => 'planning',
+            'proposal_reviewed_by' => $user->id,
+            'proposal_reviewed_at' => now(),
+            'proposal_review_notes' => $request->input('review_notes'),
+        ]);
+
+        return redirect()->route('projects.manager.show', $project)
+            ->with('success', __('portal.projects_propose.approved'));
+    }
+
+    /**
+     * Reject a proposal with a required comment the proposer will see.
+     */
+    public function rejectProposal(Request $request, Project $project)
+    {
+        $user = Auth::user();
+
+        abort_unless($project->canUserReviewProposal($user), 403, __('portal.projects_propose.review_forbidden'));
+        abort_unless($project->isProposed(), 422, __('portal.projects_propose.not_pending'));
+
+        $validated = $request->validate([
+            'review_notes' => 'required|string|max:2000',
+        ]);
+
+        $project->update([
+            'status' => 'cancelled',
+            'proposal_reviewed_by' => $user->id,
+            'proposal_reviewed_at' => now(),
+            'proposal_review_notes' => $validated['review_notes'],
+        ]);
+
+        return redirect()->route('projects.proposals.index')
+            ->with('success', __('portal.projects_propose.rejected'));
+    }
+
     public function managerShow(Project $project)
     {
         $user = Auth::user();
@@ -279,7 +445,7 @@ class ProjectController extends Controller
             'description' => 'required|string',
             'client_id' => 'nullable|exists:users,id',
             'scope' => 'nullable|string',
-            'status' => 'required|in:planning,quoted,awarded,in_progress,paused,completed,lost,cancelled',
+            'status' => 'required|in:proposed,planning,quoted,awarded,in_progress,paused,completed,lost,cancelled',
             'budget' => 'nullable|numeric|min:0',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',

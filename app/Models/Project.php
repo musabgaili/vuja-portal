@@ -62,6 +62,8 @@ class Project extends Model
         'start_date', 'end_date', 'actual_end_date',
         'project_manager_id', 'account_manager_id', 'team_members',
         'quoted_by', 'quote_file', 'quoted_at',
+        'proposed_by', 'proposal_notes',
+        'proposal_reviewed_by', 'proposal_reviewed_at', 'proposal_review_notes',
     ];
 
     protected $casts = [
@@ -71,6 +73,7 @@ class Project extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'actual_end_date' => 'date',
+        'proposal_reviewed_at' => 'datetime',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -94,6 +97,18 @@ class Project extends Model
     public function quotedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'quoted_by');
+    }
+
+    /** The internal staff member who proposed this project (proposal flow). */
+    public function proposedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'proposed_by');
+    }
+
+    /** The manager / project manager who reviewed the proposal. */
+    public function proposalReviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'proposal_reviewed_by');
     }
 
     public function accountManager(): BelongsTo
@@ -190,6 +205,16 @@ class Project extends Model
 
         // Client can view their own projects
         if ($this->client_id === $user->id) {
+            return true;
+        }
+
+        // Proposal reviewers (global project managers; managers are already
+        // covered above) can open a pending proposal to review it, and whoever
+        // reviewed it keeps access to the outcome afterward.
+        if ($this->isProposed() && $this->canUserReviewProposal($user)) {
+            return true;
+        }
+        if ($this->proposal_reviewed_by === $user->id) {
             return true;
         }
 
@@ -375,6 +400,20 @@ class Project extends Model
     }
 
     // Status helpers
+    public function isProposed(): bool
+    {
+        return $this->status === 'proposed';
+    }
+
+    /**
+     * Whether the given user may review (approve/reject) project proposals.
+     * Managers and global project managers can; regular employees cannot.
+     */
+    public function canUserReviewProposal(User $user): bool
+    {
+        return $user->isManager() || $user->isProjectManager();
+    }
+
     public function isPlanning(): bool
     {
         return $this->status === 'planning';
@@ -429,6 +468,7 @@ class Project extends Model
     public function getStatusBadgeColor(): string
     {
         return match ($this->status) {
+            'proposed' => 'warning',
             'planning' => 'info',
             'quoted' => 'primary',
             'awarded' => 'success',
@@ -447,6 +487,7 @@ class Project extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
+            'proposed' => __('portal.projects.status.proposed'),
             'planning' => __('portal.projects.status.planning'),
             'quoted' => __('portal.projects.status.quoted'),
             'awarded' => __('portal.projects.status.awarded'),

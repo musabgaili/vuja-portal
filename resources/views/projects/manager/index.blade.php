@@ -29,6 +29,8 @@
         <div class="d-flex gap-2 mt-3 mt-md-0">
             <a href="{{ route('projects.manager.index') }}" class="btn btn-light">{{ __('portal.projects_manager.index.table_view') }}</a>
             <a href="{{ route('projects.kanban') }}" class="btn btn-outline-light">{{ __('portal.projects_manager.index.kanban') }}</a>
+            <a href="{{ route('projects.proposals.index') }}" class="btn btn-outline-light"><i class="fas fa-lightbulb"></i> {{ __('portal.nav.proposals') }}</a>
+            <a href="{{ route('projects.propose.create') }}" class="btn btn-light"><i class="fas fa-paper-plane"></i> {{ __('portal.projects_propose.new') }}</a>
             @if(auth()->user()->isManager())
             <a href="{{ route('imports.form', 'projects') }}" class="btn btn-light"><i class="fas fa-file-excel"></i> {{ __('portal.import.import') }}</a>
             <a href="{{ route('imports.form', 'project-tasks') }}" class="btn btn-light"><i class="fas fa-list-check"></i> {{ __('portal.import.import_tasks') }}</a>
@@ -49,6 +51,7 @@
                 <label class="form-label fw-bold">{{ __('portal.projects_manager.index.status') }}</label>
                 <select name="status" class="form-control">
                     <option value="">{{ __('portal.projects_manager.index.all') }}</option>
+                    <option value="proposed" {{ request('status')=='proposed'?'selected':'' }}>{{ __('portal.projects.status.proposed') }}</option>
                     <option value="planning" {{ request('status')=='planning'?'selected':'' }}>{{ __('portal.projects_manager.status.planning') }}</option>
                     <option value="quoted" {{ request('status')=='quoted'?'selected':'' }}>{{ __('portal.projects_manager.status.quoted') }}</option>
                     <option value="awarded" {{ request('status')=='awarded'?'selected':'' }}>{{ __('portal.projects_manager.status.awarded') }}</option>
