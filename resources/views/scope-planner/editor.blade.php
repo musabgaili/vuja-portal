@@ -7,14 +7,16 @@
 @endsection
 
 @php
+    $step = $step ?? 'items';
     $c = $quote->ai_content ?? [];
     $flatSections = match ($quote->customer_category) {
         'student' => ['subject' => 'string', 'needs' => 'string', 'scope_of_work' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
         'entrepreneur' => ['introduction' => 'string', 'proposed_scope' => 'array', 'technical_specs' => 'array', 'mechanical_specs' => 'array', 'operational_logic' => 'array', 'implementation_phases' => 'array', 'out_of_scope' => 'array', 'notes' => 'array'],
-        default => ['introduction_purpose' => 'string'],
+        default => ['introduction_purpose' => 'string', 'out_of_scope' => 'array', 'notes' => 'array'],
     };
     $components = $quote->items->where('type', 'component')->values();
     $serviceItems = $quote->items->where('type', 'service')->values();
+    $editable = in_array($quote->status, ['draft', 'changes_requested'], true);
 @endphp
 
 @section('content')
@@ -38,50 +40,73 @@
     </div>
 </div>
 
+{{-- 3-step progress --}}
+<div class="scope-steps mb-3">
+    <a href="{{ route('scope-planner.create') }}" class="scope-step done">
+        <span class="n">1</span> {{ __('portal.scope_planner.step_brief') }}
+    </a>
+    <a href="{{ route('scope-planner.show', ['quote' => $quote, 'step' => 'items']) }}" class="scope-step {{ $step === 'items' ? 'active' : 'done' }}">
+        <span class="n">2</span> {{ __('portal.scope_planner.step_items') }}
+    </a>
+    <a href="{{ route('scope-planner.show', ['quote' => $quote, 'step' => 'document']) }}" class="scope-step {{ $step === 'document' ? 'active' : (empty($c) ? '' : 'done') }}">
+        <span class="n">3</span> {{ __('portal.scope_planner.step_document') }}
+    </a>
+</div>
+
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
-@if($suggestion && ($suggestion['source'] ?? '') )
-<div class="alert alert-info" data-persist>
-    <strong><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_planner.ai_suggestion') }}</strong>
-    ({{ $suggestion['source'] }})
-    — {{ __('portal.scope_planner.ai_suggestion_hint') }}
+@unless($editable)
+<div class="alert alert-warning d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span><i class="fas fa-lock"></i> {{ __('portal.scope_planner.locked_notice') }}</span>
+    @if($quote->status !== 'accepted')
+    <form method="POST" action="{{ route('scope-planner.reopen', $quote) }}" class="m-0">@csrf
+        <button class="btn btn-sm btn-warning"><i class="fas fa-unlock"></i> {{ __('portal.scope_planner.reopen') }}</button>
+    </form>
+    @endif
 </div>
-@endif
+@endunless
 
 <div class="row g-3">
-    {{-- LEFT: build the quote --}}
+    {{-- LEFT: the active step --}}
     <div class="col-lg-7">
-        {{-- Items --}}
+        @if($step === 'items')
+        {{-- ============ STEP 2 · ITEMS ============ --}}
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span class="card-title"><i class="fas fa-list"></i> {{ __('portal.scope_planner.items') }}</span>
+                @if($editable)
                 <form method="POST" action="{{ route('scope-planner.suggest', $quote) }}" class="m-0">@csrf
                     <button class="btn btn-sm btn-outline-primary"><i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_planner.resuggest') }}</button>
                 </form>
+                @endif
             </div>
             <div class="card-content">
-                <form method="POST" action="{{ route('scope-planner.items', $quote) }}">
+                @if($suggestion && ($suggestion['source'] ?? ''))
+                <div class="alert alert-info py-2">
+                    <i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.scope_planner.ai_suggestion') }} ({{ $suggestion['source'] }}) — {{ __('portal.scope_planner.ai_suggestion_hint') }}
+                </div>
+                @endif
+                <form method="POST" action="{{ route('scope-planner.items', $quote) }}" id="items-form">
                     @csrf @method('PUT')
 
                     <h6 class="fw-bold">{{ __('portal.scope_planner.components') }} <small class="text-muted">({{ __('portal.scope_planner.components_hint') }})</small></h6>
                     <table class="table table-sm" id="components-table">
                         <thead><tr><th>{{ __('portal.scope_planner.item') }}</th><th style="width:90px">{{ __('scope.qty') }}</th><th style="width:40px"></th></tr></thead>
                         <tbody>
-                        @forelse($components as $i => $it)
+                        @foreach($components as $i => $it)
                             <tr>
                                 <td>
-                                    <select name="components[{{ $i }}][stock_item_id]" class="form-select form-select-sm">
-                                        <option value="">{{ $it->name }} ({{ __('portal.scope_planner.manual') }})</option>
+                                    <select name="components[{{ $i }}][stock_item_id]" class="form-select form-select-sm mb-1">
+                                        <option value="">— {{ __('portal.scope_planner.manual') }} —</option>
                                         @foreach($stockItems as $s)<option value="{{ $s->id }}" @selected($it->stock_item_id==$s->id)>{{ $s->name }} — {{ $s->category }}</option>@endforeach
                                     </select>
-                                    <input type="hidden" name="components[{{ $i }}][name]" value="{{ $it->name }}">
+                                    <input type="text" name="components[{{ $i }}][name]" value="{{ $it->name }}" class="form-control form-control-sm" placeholder="{{ __('portal.scope_planner.item_name') }}">
                                 </td>
                                 <td><input type="number" min="1" name="components[{{ $i }}][qty]" value="{{ (int) $it->qty }}" class="form-control form-control-sm"></td>
                                 <td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>
                             </tr>
-                        @empty
-                        @endforelse
+                        @endforeach
                         </tbody>
                     </table>
                     <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addComponentRow()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.add_component') }}</button>
@@ -93,11 +118,11 @@
                         @foreach($serviceItems as $i => $it)
                             <tr>
                                 <td>
-                                    <select name="services[{{ $i }}][pricing_rule_id]" class="form-select form-select-sm svc-select" onchange="fillRate(this)">
-                                        <option value="">{{ $it->name }} ({{ __('portal.scope_planner.manual') }})</option>
+                                    <select name="services[{{ $i }}][pricing_rule_id]" class="form-select form-select-sm svc-select mb-1" onchange="fillRate(this)">
+                                        <option value="">— {{ __('portal.scope_planner.manual') }} —</option>
                                         @foreach($services as $svc)<option value="{{ $svc->key }}" data-rate="{{ $svc->unitRate }}" @selected($it->pricing_rule_id==$svc->key)>{{ $svc->name(app()->getLocale()) }} ({{ number_format($svc->unitRate,0) }})</option>@endforeach
                                     </select>
-                                    <input type="hidden" name="services[{{ $i }}][name]" value="{{ $it->name }}">
+                                    <input type="text" name="services[{{ $i }}][name]" value="{{ $it->name }}" class="form-control form-control-sm" placeholder="{{ __('portal.scope_planner.item_name') }}">
                                 </td>
                                 <td><input type="number" min="1" name="services[{{ $i }}][qty]" value="{{ (int) $it->qty }}" class="form-control form-control-sm"></td>
                                 <td><input type="number" step="0.01" min="0" name="services[{{ $i }}][unit_price]" value="{{ (float) $it->unit_price }}" class="form-control form-control-sm"></td>
@@ -114,50 +139,69 @@
                         <small class="text-muted">{{ __('portal.scope_planner.components_override_hint') }}</small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('portal.scope_planner.save_items') }}</button>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" name="continue" value="0" class="btn btn-outline-primary"><i class="fas fa-save"></i> {{ __('portal.scope_planner.save_items') }}</button>
+                        <button type="submit" name="continue" value="1" class="btn btn-primary"><i class="fas fa-arrow-right"></i> {{ __('portal.scope_planner.save_continue') }}</button>
+                    </div>
                 </form>
             </div>
         </div>
-
-        {{-- Generate + edit sections --}}
+        @else
+        {{-- ============ STEP 3 · DOCUMENT ============ --}}
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span class="card-title"><i class="fas fa-pen-fancy"></i> {{ __('portal.scope_planner.document_sections') }}</span>
+                @if($editable)
                 <form method="POST" action="{{ route('scope-planner.generate', $quote) }}" class="m-0">@csrf
                     <button class="btn btn-sm btn-primary"><i class="fas fa-wand-magic-sparkles"></i> {{ empty($c) ? __('portal.scope_planner.generate') : __('portal.scope_planner.regenerate_all') }}</button>
                 </form>
+                @endif
             </div>
             <div class="card-content">
                 @if(empty($c))
                     <p class="text-muted">{{ __('portal.scope_planner.generate_hint') }}</p>
+                    <a href="{{ route('scope-planner.show', ['quote' => $quote, 'step' => 'items']) }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> {{ __('portal.scope_planner.back_to_items') }}</a>
                 @else
                 <form method="POST" action="{{ route('scope-planner.update', $quote) }}">
                     @csrf @method('PUT')
                     @foreach($flatSections as $key => $type)
                         <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <label class="form-label fw-bold mb-0">{{ __('scope.'.$key) }}</label>
-                            </div>
+                            <label class="form-label fw-bold mb-1">{{ __('scope.'.$key) }}</label>
                             @if($type === 'array')<input type="hidden" name="array_sections[]" value="{{ $key }}">@endif
-                            <textarea name="sections[{{ $key }}]" rows="{{ $type === 'array' ? 4 : 2 }}" class="form-control" placeholder="{{ $type === 'array' ? __('portal.scope_planner.one_per_line') : '' }}">{{ $type === 'array' ? implode("\n", (array) ($c[$key] ?? [])) : ($c[$key] ?? '') }}</textarea>
+                            <textarea name="sections[{{ $key }}]" data-autosize rows="{{ $type === 'array' ? 5 : 3 }}" class="form-control" @unless($editable)readonly @endunless placeholder="{{ $type === 'array' ? __('portal.scope_planner.one_per_line') : '' }}">{{ $type === 'array' ? implode("\n", (array) ($c[$key] ?? [])) : ($c[$key] ?? '') }}</textarea>
                         </div>
                     @endforeach
 
+                    {{-- Company: editable per-scope sections --}}
                     @if($quote->customer_category === 'company' && $quote->scopes->isNotEmpty())
-                        <div class="alert alert-light border"><strong>{{ __('portal.scope_planner.scopes') }}:</strong>
-                            {{ $quote->scopes->pluck('title')->implode(' · ') }}
-                            <br><small class="text-muted">{{ __('portal.scope_planner.scopes_hint') }}</small>
+                        <hr>
+                        <h6 class="fw-bold">{{ __('portal.scope_planner.scopes') }}</h6>
+                        @foreach($quote->scopes as $s)
+                        <div class="border rounded p-2 mb-3">
+                            <label class="form-label fw-bold mb-1">{{ __('portal.scope_planner.scope_title') }} #{{ $loop->iteration }}</label>
+                            <input type="text" name="scopes[{{ $s->id }}][title]" value="{{ $s->title }}" class="form-control form-control-sm mb-2" @unless($editable)readonly @endunless>
+                            @foreach(['objective','inputs_required','deliverables','acceptance_criteria','exclusions'] as $f)
+                                <label class="form-label small mb-0">{{ __('scope.'.$f) }} <small class="text-muted">({{ __('portal.scope_planner.one_per_line') }})</small></label>
+                                <textarea name="scopes[{{ $s->id }}][{{ $f }}]" data-autosize rows="3" class="form-control form-control-sm mb-2" @unless($editable)readonly @endunless>{{ implode("\n", (array) (is_array($s->$f) ? $s->$f : array_filter([$s->$f]))) }}</textarea>
+                            @endforeach
                         </div>
+                        @endforeach
                     @endif
 
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('portal.scope_planner.save_sections') }}</button>
+                    @if($editable)
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('portal.scope_planner.save_sections') }}</button>
+                        <a href="{{ route('scope-planner.show', ['quote' => $quote, 'step' => 'items']) }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> {{ __('portal.scope_planner.back_to_items') }}</a>
+                    </div>
+                    @endif
                 </form>
                 @endif
             </div>
         </div>
+        @endif
     </div>
 
-    {{-- RIGHT: totals + preview --}}
+    {{-- RIGHT: totals + preview (both steps) --}}
     <div class="col-lg-5">
         <div class="card mb-3">
             <div class="card-header"><span class="card-title"><i class="fas fa-calculator"></i> {{ __('portal.scope_planner.totals') }}</span></div>
@@ -175,9 +219,20 @@
                     @endforeach
                 </ul>
                 @endif
-                <form method="POST" action="{{ route('scope-planner.finalize', $quote) }}" class="mt-3">@csrf
-                    <button class="btn btn-success w-100"><i class="fas fa-lock"></i> {{ __('portal.scope_planner.finalize') }}</button>
-                </form>
+
+                @if($editable && $step === 'document' && ! empty($c))
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                    <a href="{{ route('quotes.show', $quote) }}" class="btn btn-outline-secondary"><i class="fas fa-floppy-disk"></i> {{ __('portal.scope_planner.save_draft') }}</a>
+                    <form method="POST" action="{{ route('scope-planner.finalize', $quote) }}" class="m-0">@csrf
+                        <button class="btn btn-success" onclick="return confirm(@json(__('portal.scope_planner.finalize_confirm')))"><i class="fas fa-lock"></i> {{ __('portal.scope_planner.finalize') }}</button>
+                    </form>
+                </div>
+                <small class="text-muted d-block mt-1">{{ __('portal.scope_planner.finalize_hint') }}</small>
+                @elseif($step === 'document' && empty($c))
+                {{-- nothing yet --}}
+                @else
+                <a href="{{ route('quotes.show', $quote) }}" class="btn btn-outline-secondary mt-3"><i class="fas fa-floppy-disk"></i> {{ __('portal.scope_planner.save_draft') }}</a>
+                @endif
             </div>
         </div>
 
@@ -192,6 +247,16 @@
         </div>
     </div>
 </div>
+
+<style>
+.scope-steps { display:flex; gap:.5rem; flex-wrap:wrap; }
+.scope-steps .scope-step { flex:1; min-width:120px; display:flex; align-items:center; gap:.5rem; padding:.6rem .9rem; border:1px solid var(--gray-200,#e2e8f0); border-radius:10px; text-decoration:none; color:var(--gray-500,#64748b); font-weight:600; background:var(--bg-secondary,#fff); }
+.scope-steps .scope-step .n { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--gray-200,#e2e8f0); color:var(--gray-600,#475569); font-size:.8rem; }
+.scope-steps .scope-step.active { border-color:var(--primary-color,#0C7075); color:var(--primary-color,#0C7075); }
+.scope-steps .scope-step.active .n { background:var(--primary-color,#0C7075); color:#fff; }
+.scope-steps .scope-step.done { color:var(--text-color,#334155); }
+.scope-steps .scope-step.done .n { background:#10b981; color:#fff; }
+</style>
 @endsection
 
 @push('scripts')
@@ -200,11 +265,14 @@ let compIdx = {{ $components->count() }};
 let svcIdx = {{ $serviceItems->count() }};
 const stockOptions = `@foreach($stockItems as $s)<option value="{{ $s->id }}">{{ $s->name }} — {{ $s->category }}</option>@endforeach`;
 const svcOptions = `@foreach($services as $svc)<option value="{{ $svc->key }}" data-rate="{{ $svc->unitRate }}">{{ $svc->name(app()->getLocale()) }} ({{ number_format($svc->unitRate,0) }})</option>@endforeach`;
+const L_MANUAL = @json('— '.__('portal.scope_planner.manual').' —');
+const L_NAME = @json(__('portal.scope_planner.item_name'));
 
 function addComponentRow() {
     const tbody = document.querySelector('#components-table tbody');
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td><select name="components[${compIdx}][stock_item_id]" class="form-select form-select-sm"><option value="">{{ __('portal.scope_planner.manual') }}</option>${stockOptions}</select></td>`
+    tr.innerHTML = `<td><select name="components[${compIdx}][stock_item_id]" class="form-select form-select-sm mb-1"><option value="">${L_MANUAL}</option>${stockOptions}</select>`
+        + `<input type="text" name="components[${compIdx}][name]" value="" class="form-control form-control-sm" placeholder="${L_NAME}"></td>`
         + `<td><input type="number" min="1" name="components[${compIdx}][qty]" value="1" class="form-control form-control-sm"></td>`
         + `<td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>`;
     tbody.appendChild(tr); compIdx++;
@@ -212,7 +280,8 @@ function addComponentRow() {
 function addServiceRow() {
     const tbody = document.querySelector('#services-table tbody');
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td><select name="services[${svcIdx}][pricing_rule_id]" class="form-select form-select-sm svc-select" onchange="fillRate(this)"><option value="">{{ __('portal.scope_planner.manual') }}</option>${svcOptions}</select></td>`
+    tr.innerHTML = `<td><select name="services[${svcIdx}][pricing_rule_id]" class="form-select form-select-sm svc-select mb-1" onchange="fillRate(this)"><option value="">${L_MANUAL}</option>${svcOptions}</select>`
+        + `<input type="text" name="services[${svcIdx}][name]" value="" class="form-control form-control-sm" placeholder="${L_NAME}"></td>`
         + `<td><input type="number" min="1" name="services[${svcIdx}][qty]" value="1" class="form-control form-control-sm"></td>`
         + `<td><input type="number" step="0.01" min="0" name="services[${svcIdx}][unit_price]" value="0" class="form-control form-control-sm"></td>`
         + `<td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>`;
@@ -223,5 +292,10 @@ function fillRate(sel) {
     const rate = opt ? opt.getAttribute('data-rate') : null;
     if (rate) { const price = sel.closest('tr').querySelector('input[name*="[unit_price]"]'); if (price && (!price.value || price.value === '0')) price.value = rate; }
 }
+// Auto-grow editable section textareas so the full content is visible.
+function autosize(el) { el.style.height = 'auto'; el.style.height = (el.scrollHeight + 4) + 'px'; }
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('textarea[data-autosize]').forEach(function (t) { autosize(t); t.addEventListener('input', function () { autosize(t); }); });
+});
 </script>
 @endpush

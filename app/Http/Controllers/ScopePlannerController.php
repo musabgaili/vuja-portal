@@ -92,22 +92,35 @@ class ScopePlannerController extends Controller
 
         $quote = $this->generator->createDraft($data, Auth::id());
 
-        // Pre-fill the items table with the AI suggestion (employee confirms next).
+        // AI-suggest items AND persist them so Step 2 shows them pre-filled. (They
+        // were previously only flashed as a hint, so the items table came up empty
+        // and the employee had to re-enter everything.)
         $suggestion = $this->generator->suggestItems($quote);
+        if (! empty($suggestion['components']) || ! empty($suggestion['services'])) {
+            $this->generator->saveItems($quote, $suggestion['components'], $suggestion['services']);
+        }
         session()->flash('scope_suggestion', $suggestion);
 
-        return redirect()->route('scope-planner.show', $quote)
+        return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'items'])
             ->with('success', __('portal.scope_planner.draft_created', ['number' => $quote->quote_number]));
     }
 
-    /** The editor / online preview surface. */
-    public function show(Quote $quote)
+    /** The editor / online preview surface — Step 2 (items) or Step 3 (document). */
+    public function show(Request $request, Quote $quote)
     {
         $this->authorizeQuote($quote);
         $quote->load(['items', 'scopes', 'milestones', 'client']);
 
+        // Step 2 = items, Step 3 = document. Default to whichever the quote is up
+        // to: items until sections have been generated, document afterwards.
+        $step = $request->query('step');
+        if (! in_array($step, ['items', 'document'], true)) {
+            $step = empty($quote->ai_content) ? 'items' : 'document';
+        }
+
         return view('scope-planner.editor', [
             'quote' => $quote,
+            'step' => $step,
             'suggestion' => session('scope_suggestion'),
             'services' => app(\App\ScopePlanner\Contracts\PricingToolContract::class)->services(),
             'stockItems' => StockItem::where('is_active', true)->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'unit']),
@@ -152,7 +165,9 @@ class ScopePlannerController extends Controller
             $override !== null ? (float) $override : null,
         );
 
-        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.items_saved'));
+        $step = $request->boolean('continue') ? 'document' : 'items';
+
+        return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => $step])->with('success', __('portal.scope_planner.items_saved'));
     }
 
     /** Generate the document section prose (AI call 2), then reprice. */
@@ -166,7 +181,7 @@ class ScopePlannerController extends Controller
 
         $this->generator->generate($quote);
 
-        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.generated'));
+        return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])->with('success', __('portal.scope_planner.generated'));
     }
 
     /** Edit section text + the components override, then reprice. */
@@ -203,9 +218,27 @@ class ScopePlannerController extends Controller
             'components_client_total' => $data['components_client_total'] ?? $quote->components_client_total,
         ]);
 
+        // Company per-scope edits (title + bullet lists).
+        $toLines = fn ($v) => collect(preg_split('/\r\n|\r|\n/', (string) $v))
+            ->map(fn ($l) => trim($l))->filter()->values()->all();
+        foreach ((array) $request->input('scopes', []) as $scopeId => $fields) {
+            $scope = $quote->scopes()->whereKey($scopeId)->first();
+            if (! $scope) {
+                continue;
+            }
+            $scope->update([
+                'title' => trim((string) ($fields['title'] ?? '')) ?: $scope->title,
+                'objective' => $toLines($fields['objective'] ?? ''),
+                'inputs_required' => $toLines($fields['inputs_required'] ?? ''),
+                'deliverables' => $toLines($fields['deliverables'] ?? ''),
+                'acceptance_criteria' => $toLines($fields['acceptance_criteria'] ?? ''),
+                'exclusions' => $toLines($fields['exclusions'] ?? ''),
+            ]);
+        }
+
         app(\App\Services\Scope\PricingService::class)->price($quote->refresh());
 
-        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.saved'));
+        return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])->with('success', __('portal.scope_planner.saved'));
     }
 
     /** Regenerate a single section (replaces only that key in ai_content). */
@@ -230,7 +263,7 @@ class ScopePlannerController extends Controller
             $quote->update(['ai_content' => $content]);
         }
 
-        return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.section_regenerated'));
+        return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])->with('success', __('portal.scope_planner.section_regenerated'));
     }
 
     /** Lock the document for export (status → approved/pending per role). */
@@ -241,6 +274,20 @@ class ScopePlannerController extends Controller
         $quote->update(['status' => Auth::user()->isManager() ? 'approved' : 'pending_approval']);
 
         return redirect()->route('scope-planner.show', $quote)->with('success', __('portal.scope_planner.finalized'));
+    }
+
+    /** Reopen a submitted/approved/changes-requested quote back to draft for editing. */
+    public function reopen(Quote $quote)
+    {
+        $this->authorizeQuote($quote);
+
+        // An already client-accepted quote is contractually committed — don't reopen.
+        abort_if($quote->status === 'accepted', 403);
+
+        $quote->update(['status' => 'draft']);
+
+        return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])
+            ->with('success', __('portal.scope_planner.reopened'));
     }
 
     /** Internal access guard: internal staff; only the creator or a manager may open a quote. */

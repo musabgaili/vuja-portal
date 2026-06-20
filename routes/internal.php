@@ -105,6 +105,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::put('/scope-planner/{quote}', [\App\Http\Controllers\ScopePlannerController::class, 'update'])->name('scope-planner.update');
     Route::post('/scope-planner/{quote}/regenerate', [\App\Http\Controllers\ScopePlannerController::class, 'regenerateSection'])->name('scope-planner.regenerate');
     Route::post('/scope-planner/{quote}/finalize', [\App\Http\Controllers\ScopePlannerController::class, 'finalize'])->name('scope-planner.finalize');
+    Route::post('/scope-planner/{quote}/reopen', [\App\Http\Controllers\ScopePlannerController::class, 'reopen'])->name('scope-planner.reopen');
 
     // Document render + export.
     Route::get('/scope-planner/{quote}/document', [\App\Http\Controllers\Scope\DocumentController::class, 'document'])->name('scope-planner.document');
