@@ -24,9 +24,12 @@ class ScopePlannerServiceProvider extends ServiceProvider
         $this->app->bind(PricingToolContract::class, PricingRuleAdapter::class);
         $this->app->bind(ScopeAiContract::class, GeminiScopeAdapter::class);
 
-        // PDF engine is swappable via config('scope.pdf_engine'); mPDF ships now.
+        // PDF engine is swappable via config('scope.pdf_engine'):
+        //   browsershot = headless Chrome (matches the preview, needs Node+Chromium),
+        //   mpdf        = pure-PHP fallback (no server deps).
         $this->app->bind(PdfRenderer::class, function () {
             return match (config('scope.pdf_engine', 'mpdf')) {
+                'browsershot' => new \App\Services\Scope\Render\BrowsershotRenderer(),
                 default => new MpdfRenderer(),
             };
         });

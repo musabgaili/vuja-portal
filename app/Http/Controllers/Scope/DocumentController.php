@@ -30,7 +30,7 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, ['pdf' => true]), $this->filename($quote)));
+        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, $this->engineFlags()), $this->filename($quote)));
     }
 
     /** PDF streamed inline (view in the browser before downloading). */
@@ -38,7 +38,7 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $this->safeExport($quote, fn () => $renderer->stream($this->renderHtml($quote, ['pdf' => true]), $this->filename($quote)));
+        return $this->safeExport($quote, fn () => $renderer->stream($this->renderHtml($quote, $this->engineFlags()), $this->filename($quote)));
     }
 
     /** DOCX download (branded equivalent). */
@@ -55,7 +55,18 @@ class DocumentController extends Controller
         $this->guard($quote);
         abort_unless($quote->customer_category === 'company', 404);
 
-        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, ['technical' => true, 'pdf' => true]), $this->filename($quote, 'pdf', '-technical')));
+        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, ['technical' => true] + $this->engineFlags()), $this->filename($quote, 'pdf', '-technical')));
+    }
+
+    /**
+     * HTML-mode flags per PDF engine. mPDF needs the pdf-mode HTML (it supplies
+     * the letterhead watermark + margins). Browsershot is Chrome, so it renders
+     * the SAME HTML as the online preview (pdf=false) — letterhead + RTL come out
+     * exactly as previewed.
+     */
+    private function engineFlags(): array
+    {
+        return config('scope.pdf_engine', 'mpdf') === 'browsershot' ? [] : ['pdf' => true];
     }
 
     /**

@@ -50,6 +50,13 @@ return [
         'long'   => '8-12 bullets per section with sub-points',
     ],
 
-    // PDF engine: 'mpdf' (default, pure-PHP, Arabic-capable), 'browsershot' (needs Node+Chrome), or 'snappy'.
+    // PDF engine: 'mpdf' (default, pure-PHP) or 'browsershot' (headless Chrome —
+    // matches the on-screen preview incl. Arabic, needs Node + Chromium on the server).
     'pdf_engine' => env('SCOPE_PDF_ENGINE', 'mpdf'),
+
+    // Browsershot binary overrides (only needed if not auto-detected on PATH).
+    'node_binary'  => env('BROWSERSHOT_NODE_BINARY'),
+    'npm_binary'   => env('BROWSERSHOT_NPM_BINARY'),
+    'chrome_path'  => env('BROWSERSHOT_CHROME_PATH'),
+    'browsershot_no_sandbox' => (bool) env('BROWSERSHOT_NO_SANDBOX', true),
 ];
