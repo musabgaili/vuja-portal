@@ -156,7 +156,7 @@
         </div>
     </div>
     <div class="card-content">
-        @if($allRequests->count() > 0)
+        @if($allRequests->total() > 0)
             <div class="requests-list">
                 @foreach($allRequests as $req)
                 <div class="request-card mb-3" style="border-inline-start: 4px solid {{ $req['type_color'] }};">
@@ -212,6 +212,11 @@
                 </div>
                 @endforeach
             </div>
+            @if($allRequests->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                {{ $allRequests->links('pagination::bootstrap-5') }}
+            </div>
+            @endif
         @else
             <div class="text-center py-5">
                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>

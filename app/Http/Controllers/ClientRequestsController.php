@@ -9,6 +9,8 @@ use App\Models\IpRegistration;
 use App\Models\ResearchRequest;
 use App\Models\ThreeDRequest;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 
 class ClientRequestsController extends Controller
@@ -24,11 +26,21 @@ class ClientRequestsController extends Controller
         $statusFilter = $request->get('status');
         $typeFilter = $request->get('type');
 
+        // Pagination: we merge six heterogeneous models in PHP, so we bound how
+        // many rows each one hydrates instead of fetching a client's entire
+        // history. Fetching the latest (page * perPage) from each model is enough
+        // to render the requested page correctly once merged + sorted; the hard
+        // cap keeps memory bounded for very deep pages. Summary counts are computed
+        // DB-side (below) so they stay accurate regardless of this window.
+        $perPage = 15;
+        $page = Paginator::resolveCurrentPage();
+        $window = min($page * $perPage, 300);
+
         // Collect all requests from all services
         $allRequests = collect();
 
         // Get Ideas
-        $ideasQuery = IdeaRequest::where('user_id', $user->id)->with('assignedTo');
+        $ideasQuery = IdeaRequest::where('user_id', $user->id)->with('assignedTo')->latest('updated_at')->limit($window);
         if ($statusFilter) {
             $ideasQuery->where('status', $statusFilter);
         }
@@ -54,7 +66,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get Consultations
-        $consultationsQuery = ConsultationRequest::where('user_id', $user->id)->with('assignedTo');
+        $consultationsQuery = ConsultationRequest::where('user_id', $user->id)->with('assignedTo')->latest('updated_at')->limit($window);
         if ($statusFilter) {
             $consultationsQuery->where('status', $statusFilter);
         }
@@ -81,7 +93,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get Research
-        $researchQuery = ResearchRequest::where('user_id', $user->id)->with('assignedTo');
+        $researchQuery = ResearchRequest::where('user_id', $user->id)->with('assignedTo')->latest('updated_at')->limit($window);
         if ($statusFilter) {
             $researchQuery->where('status', $statusFilter);
         }
@@ -108,7 +120,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get IP Registrations
-        $ipQuery = IpRegistration::where('user_id', $user->id)->with('assignedTo');
+        $ipQuery = IpRegistration::where('user_id', $user->id)->with('assignedTo')->latest('updated_at')->limit($window);
         if ($statusFilter) {
             $ipQuery->where('status', $statusFilter);
         }
@@ -136,7 +148,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get Copyrights
-        $copyrightQuery = CopyrightRegistration::where('user_id', $user->id)->with('assignedTo');
+        $copyrightQuery = CopyrightRegistration::where('user_id', $user->id)->with('assignedTo')->latest('updated_at')->limit($window);
         if ($statusFilter) {
             $copyrightQuery->where('status', $statusFilter);
         }
@@ -164,7 +176,7 @@ class ClientRequestsController extends Controller
         }
 
         // Get 3D Lab requests (printing + design)
-        $threeDQuery = ThreeDRequest::where('user_id', $user->id)->with('assignedTo');
+        $threeDQuery = ThreeDRequest::where('user_id', $user->id)->with('assignedTo')->latest('updated_at')->limit($window);
         if ($statusFilter) {
             $threeDQuery->where('status', $statusFilter);
         }
@@ -194,23 +206,77 @@ class ClientRequestsController extends Controller
             $allRequests = $allRequests->where('type', $typeFilter);
         }
 
-        // Sort by most recent
-        $allRequests = $allRequests->sortByDesc('updated_at');
+        // Sort the bounded feed, then page it in-memory. The total comes from the
+        // DB-side summary so the pager spans the client's full history even though
+        // we only hydrated a window of rows above.
+        $sorted = $allRequests->sortByDesc('updated_at')->values();
 
-        // Calculate summary stats
-        $summary = [
-            'total' => $allRequests->count(),
-            'ideas' => $allRequests->where('type', 'idea')->count(),
-            'consultations' => $allRequests->where('type', 'consultation')->count(),
-            'research' => $allRequests->where('type', 'research')->count(),
-            'ip' => $allRequests->where('type', 'ip')->count(),
-            'copyright' => $allRequests->where('type', 'copyright')->count(),
-            'threed' => $allRequests->where('type', 'threed')->count(),
-            'pending' => $allRequests->whereIn('status', ['submitted', 'draft', 'nda_pending'])->count(),
-            'in_progress' => $allRequests->whereIn('status', ['negotiation', 'assigned', 'in_progress', 'meeting_scheduled'])->count(),
-            'completed' => $allRequests->where('status', 'completed')->count(),
-        ];
+        $summary = $this->summaryCounts($user->id, $statusFilter, $typeFilter);
+
+        $allRequests = new LengthAwarePaginator(
+            $sorted->forPage($page, $perPage)->values(),
+            $summary['total'],
+            $perPage,
+            $page,
+            ['path' => Paginator::resolveCurrentPath(), 'query' => $request->query()],
+        );
 
         return view('client.requests', compact('allRequests', 'summary', 'statusFilter', 'typeFilter'));
+    }
+
+    /**
+     * Summary counts computed DB-side so they stay accurate regardless of the
+     * paginated window. Mirrors the index() filter semantics: the status filter
+     * narrows every model, and the type filter restricts which models contribute.
+     * One grouped query per model — no row hydration.
+     */
+    private function summaryCounts(int $userId, ?string $statusFilter, ?string $typeFilter): array
+    {
+        $models = [
+            'idea' => IdeaRequest::class,
+            'consultation' => ConsultationRequest::class,
+            'research' => ResearchRequest::class,
+            'ip' => IpRegistration::class,
+            'copyright' => CopyrightRegistration::class,
+            'threed' => ThreeDRequest::class,
+        ];
+        $typeKey = [
+            'idea' => 'ideas', 'consultation' => 'consultations', 'research' => 'research',
+            'ip' => 'ip', 'copyright' => 'copyright', 'threed' => 'threed',
+        ];
+        $pending = ['submitted', 'draft', 'nda_pending'];
+        $inProgress = ['negotiation', 'assigned', 'in_progress', 'meeting_scheduled'];
+
+        $summary = array_fill_keys(
+            ['total', 'ideas', 'consultations', 'research', 'ip', 'copyright', 'threed', 'pending', 'in_progress', 'completed'],
+            0,
+        );
+
+        foreach ($models as $type => $class) {
+            if ($typeFilter && $typeFilter !== $type) {
+                continue;
+            }
+            $base = $class::where('user_id', $userId);
+            if ($statusFilter) {
+                $base->where('status', $statusFilter);
+            }
+            $byStatus = $base->selectRaw('status, COUNT(*) as c')->groupBy('status')->pluck('c', 'status');
+
+            $count = (int) $byStatus->sum();
+            $summary[$typeKey[$type]] = $count;
+            $summary['total'] += $count;
+
+            foreach ($byStatus as $status => $c) {
+                if (in_array($status, $pending, true)) {
+                    $summary['pending'] += (int) $c;
+                } elseif (in_array($status, $inProgress, true)) {
+                    $summary['in_progress'] += (int) $c;
+                } elseif ($status === 'completed') {
+                    $summary['completed'] += (int) $c;
+                }
+            }
+        }
+
+        return $summary;
     }
 }
