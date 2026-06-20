@@ -53,6 +53,37 @@ class GeminiCheckCommand extends Command
             $this->error('   EXCEPTION: '.$e->getMessage());
         }
 
+        // 1b) Structured JSON output — exactly what item-suggest + section-generate use.
+        $this->newLine();
+        $this->info('1b) Testing structured JSON output (used by suggest + generate) ...');
+        try {
+            $resp = Http::timeout(30)->post(
+                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$key}",
+                [
+                    'contents' => [['parts' => [['text' => 'List two electronic components for an IoT pressure sensor.']]]],
+                    'generationConfig' => [
+                        'response_mime_type' => 'application/json',
+                        'response_schema' => [
+                            'type' => 'object',
+                            'properties' => ['components' => ['type' => 'array', 'items' => ['type' => 'object', 'properties' => ['query' => ['type' => 'string']], 'required' => ['query']]]],
+                            'required' => ['components'],
+                        ],
+                    ],
+                ],
+            );
+            $this->line('   HTTP '.$resp->status());
+            if ($resp->successful()) {
+                $parts = (array) data_get($resp->json(), 'candidates.0.content.parts', []);
+                $text = trim(collect($parts)->pluck('text')->filter()->implode(''));
+                $this->info('   '.(is_array(json_decode($text, true)) ? 'OK - valid JSON returned' : 'WARNING - HTTP 200 but non-JSON output: '.Str::limit($text, 200)));
+            } else {
+                $this->error('   FAILED - structured output rejected (this is why suggest/generate fall back to offline). Body:');
+                $this->line('   '.Str::limit($resp->body(), 700));
+            }
+        } catch (\Throwable $e) {
+            $this->error('   EXCEPTION: '.$e->getMessage());
+        }
+
         // 2) List models this key can call with generateContent.
         $this->newLine();
         $this->info('2) Models available to this key (support generateContent):');

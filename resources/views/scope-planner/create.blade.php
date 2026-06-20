@@ -12,6 +12,20 @@
     <p style="margin:.25rem 0 0;opacity:.9;">{{ __('portal.scope_planner.new_document_sub') }}</p>
 </div>
 
+{{-- 3-step progress (Step 1 active; steps 2 & 3 unlock once the draft is created) --}}
+<div class="scope-steps mb-3">
+    <span class="scope-step active"><span class="n">1</span> {{ __('portal.scope_planner.step_brief') }}</span>
+    <span class="scope-step"><span class="n">2</span> {{ __('portal.scope_planner.step_items') }}</span>
+    <span class="scope-step"><span class="n">3</span> {{ __('portal.scope_planner.step_document') }}</span>
+</div>
+<style>
+.scope-steps { display:flex; gap:.5rem; flex-wrap:wrap; }
+.scope-steps .scope-step { flex:1; min-width:120px; display:flex; align-items:center; gap:.5rem; padding:.6rem .9rem; border:1px solid var(--gray-200,#e2e8f0); border-radius:10px; text-decoration:none; color:var(--gray-500,#64748b); font-weight:600; background:var(--bg-secondary,#fff); }
+.scope-steps .scope-step .n { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--gray-200,#e2e8f0); color:var(--gray-600,#475569); font-size:.8rem; }
+.scope-steps .scope-step.active { border-color:var(--primary-color,#0C7075); color:var(--primary-color,#0C7075); }
+.scope-steps .scope-step.active .n { background:var(--primary-color,#0C7075); color:#fff; }
+</style>
+
 @if($errors->any())<div class="alert alert-danger">@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
 
 @php $prefill = $prefill ?? ['subject' => '', 'brief' => '']; @endphp

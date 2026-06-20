@@ -397,7 +397,10 @@ class ScopePlannerController extends Controller
     {
         abort_unless(Auth::user()->isInternal(), 403);
 
-        return view('scope-planner.index', $this->viewData(null));
+        // The AI Scope Planner IS the 3-step wizard now — open it at Step 1 (Brief)
+        // instead of the old single-page quick planner. Existing drafts are resumed
+        // from the Quotes list ("Open in planner").
+        return redirect()->route('scope-planner.create');
     }
 
     /** Draft a scope with AI and build the internal vs client pricing views. */

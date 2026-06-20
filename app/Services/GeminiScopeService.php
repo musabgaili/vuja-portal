@@ -390,11 +390,16 @@ class GeminiScopeService
             ],
         ])->throw()->json();
 
-        $text = data_get($resp, 'candidates.0.content.parts.0.text', '');
+        // Concatenate ALL text parts: gemini-2.5 can emit a "thinking" part before
+        // the JSON, so parts.0 may be empty. Also strip any ```json fences.
+        $parts = (array) data_get($resp, 'candidates.0.content.parts', []);
+        $text = trim(collect($parts)->pluck('text')->filter()->implode(''));
+        $text = trim(preg_replace('/^```(?:json)?\s*|\s*```$/i', '', $text));
+
         $data = json_decode($text, true);
 
         if (! is_array($data)) {
-            throw new \RuntimeException('Gemini returned non-JSON output.');
+            throw new \RuntimeException('Gemini returned non-JSON output: '.Str::limit($text, 200));
         }
 
         return $data;
