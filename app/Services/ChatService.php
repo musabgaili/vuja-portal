@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\DB;
  */
 class ChatService
 {
-    /** Send a message (+ optional attachments + mentions); bump the channel and mark the author read. */
-    public function send(ChatChannel $channel, User $author, string $body, array $mentionIds = [], ?int $parentId = null, array $files = []): ChatMessage
+    /** Send a message (+ optional attachments); bump the channel and mark the author read. */
+    public function send(ChatChannel $channel, User $author, string $body, ?int $parentId = null, array $files = []): ChatMessage
     {
-        return DB::transaction(function () use ($channel, $author, $body, $mentionIds, $parentId, $files) {
+        return DB::transaction(function () use ($channel, $author, $body, $parentId, $files) {
             // A reply's parent must belong to THIS channel and itself be a root
             // message (one level of threading) — guards a forged cross-channel id.
             $parent = $parentId
@@ -46,7 +46,7 @@ class ChatService
                 }
             }
 
-            $this->syncMentions($message, $mentionIds, $author);
+            $this->syncMentions($message, $this->parseMentions($channel, $body), $author);
 
             $channel->forceFill(['last_message_at' => now()])->save();
             $this->markRead($channel, $author);   // author has implicitly read their own message
@@ -55,13 +55,37 @@ class ChatService
         });
     }
 
-    /** Edit a message body + re-sync mentions (new tags become unread; removed ones drop). */
-    public function edit(ChatMessage $message, string $body, array $mentionIds = []): ChatMessage
+    /** Edit a message body + re-resolve mentions (new tags become unread; removed ones drop). */
+    public function edit(ChatMessage $message, string $body): ChatMessage
     {
         $message->forceFill(['body' => $body, 'edited_at' => now()])->save();
-        $this->syncMentions($message, $mentionIds, $message->author);
+        $this->syncMentions($message, $this->parseMentions($message->channel, $body), $message->author);
 
         return $message;
+    }
+
+    /**
+     * Resolve @mentions from the message body against the channel's members
+     * (server-side = no trusting client ids; an edit re-derives automatically).
+     * Longest names first so "@Ali Hassan" isn't shadowed by "@Ali".
+     */
+    public function parseMentions(ChatChannel $channel, string $body): array
+    {
+        if (! str_contains($body, '@')) {
+            return [];
+        }
+
+        $members = $channel->members()->get(['users.id', 'users.name'])
+            ->sortByDesc(fn ($u) => mb_strlen((string) $u->name));
+
+        $ids = [];
+        foreach ($members as $u) {
+            if ($u->name && str_contains($body, '@'.$u->name)) {
+                $ids[] = $u->id;
+            }
+        }
+
+        return $ids;
     }
 
     public function delete(ChatMessage $message): void

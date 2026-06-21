@@ -48,6 +48,17 @@ class NotificationService
             $items[] = ['icon' => $icon, 'text' => $text, 'url' => $url, 'at' => $ts ?: 0, 'ago' => $ts ? \Carbon\Carbon::createFromTimestamp($ts)->diffForHumans() : ''];
         };
 
+        // Unread chat @mentions → the bell + Mentions inbox.
+        foreach (\App\Models\ChatMessageMention::where('user_id', $user->id)->whereNull('read_at')
+            ->with(['message.author', 'message.channel'])->latest('id')->limit(5)->get() as $mn) {
+            if (! $mn->message || $mn->message->trashed()) {
+                continue;
+            }
+            $push($mn->created_at, 'fa-at',
+                __('portal.notif.chat_mention', ['name' => $mn->message->author?->name ?? '—']),
+                route('chat.show', $mn->message->chat_channel_id));
+        }
+
         foreach (StaffTask::where('assigned_to', $user->id)->latest('updated_at')->limit(5)->get() as $t) {
             $push($t->updated_at, 'fa-list-check', __('portal.notif.staff_task', ['title' => $t->title]), route('staff-tasks.index'));
         }

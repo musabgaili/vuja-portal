@@ -165,6 +165,22 @@
                     </a>
                 </div>
 
+                <!-- Communication -->
+                <div class="nav-section">
+                    <div class="nav-section-title">{{ __('portal.nav.communication') }}</div>
+                    <a href="{{ route('chat.index') }}" class="nav-item {{ request()->routeIs('chat.index','chat.show','chat.messages') ? 'active' : '' }}">
+                        <i class="fas fa-comments"></i>
+                        {{ __('portal.nav.team_chat') }}
+                        <span id="navChatUnread" class="badge rounded-pill bg-danger ms-auto" hidden></span>
+                    </a>
+                    <a href="{{ route('chat.mentions') }}" class="nav-item {{ request()->routeIs('chat.mentions') ? 'active' : '' }}">
+                        <i class="fas fa-at"></i>
+                        {{ __('portal.nav.my_mentions') }}
+                        @php $chatMentions = auth()->user()->unreadChatMentionsCount(); @endphp
+                        <span id="navMentionsUnread" class="badge rounded-pill bg-danger ms-auto" {{ $chatMentions ? '' : 'hidden' }}>{{ $chatMentions > 9 ? '9+' : $chatMentions }}</span>
+                    </a>
+                </div>
+
                 <!-- Projects -->
                 <div class="nav-section">
                     <div class="nav-section-title">{{ __('portal.nav.projects') }}</div>

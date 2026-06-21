@@ -56,6 +56,23 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
+    // TEAM CHAT (internal staff) — channels + DMs, @mentions, threads, reactions.
+    // Literal segments are registered BEFORE the {channel} wildcard so they match.
+    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/mentions', [\App\Http\Controllers\ChatController::class, 'mentions'])->name('chat.mentions');
+    Route::post('/chat/mentions/read-all', [\App\Http\Controllers\ChatController::class, 'readAllMentions'])->name('chat.mentions.read-all');
+    Route::get('/chat/poll', [\App\Http\Controllers\ChatController::class, 'poll'])->name('chat.poll');
+    Route::get('/chat/members', [\App\Http\Controllers\ChatController::class, 'members'])->name('chat.members');
+    Route::post('/chat/channels', [\App\Http\Controllers\ChatController::class, 'storeChannel'])->name('chat.channels.store');
+    Route::post('/chat/dm', [\App\Http\Controllers\ChatController::class, 'startDm'])->name('chat.dm');
+    Route::put('/chat/messages/{message}', [\App\Http\Controllers\ChatController::class, 'updateMessage'])->name('chat.messages.update');
+    Route::delete('/chat/messages/{message}', [\App\Http\Controllers\ChatController::class, 'destroyMessage'])->name('chat.messages.destroy');
+    Route::post('/chat/messages/{message}/react', [\App\Http\Controllers\ChatController::class, 'react'])->name('chat.messages.react');
+    Route::get('/chat/{channel}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chat/{channel}/messages', [\App\Http\Controllers\ChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chat/{channel}/messages', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.messages.store');
+    Route::get('/chat/{channel}/thread/{message}', [\App\Http\Controllers\ChatController::class, 'thread'])->name('chat.thread');
+
     // APPROVAL QUEUE — everything awaiting a manager/PM decision
     Route::get('/approvals', [\App\Http\Controllers\ApprovalController::class, 'index'])->name('approvals.index');
 
