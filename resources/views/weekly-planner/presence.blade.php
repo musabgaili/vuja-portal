@@ -5,9 +5,18 @@
 <div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-2">
     <div>
         <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</h1>
-        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.presence_subtitle') }} {{ $weekStart->translatedFormat('D, M j, Y') }}</p>
+        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.presence_subtitle') }} {{ $weekStart->translatedFormat('D, M j, Y') }}@if($isCurrentWeek) · {{ __('portal.planner.this_week') }}@endif</p>
     </div>
     <a href="{{ route('internal.dashboard') }}" class="btn btn-light"><i class="fas fa-arrow-left"></i> {{ __('portal.planner.back') }}</a>
+</div>
+
+{{-- Week navigation: prev / this week / next (managers + team) --}}
+<div class="d-flex justify-content-center mb-3">
+    <div class="btn-group">
+        <a href="{{ route('weekly-planner.presence', ['week' => $prevWeek]) }}" class="btn btn-outline-primary"><i class="fas fa-chevron-left"></i> {{ __('portal.planner.prev_week') }}</a>
+        <a href="{{ route('weekly-planner.presence', ['week' => $thisWeek]) }}" class="btn {{ $isCurrentWeek ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('portal.planner.this_week') }}</a>
+        <a href="{{ route('weekly-planner.presence', ['week' => $nextWeek]) }}" class="btn btn-outline-primary">{{ __('portal.planner.next_week') }} <i class="fas fa-chevron-right"></i></a>
+    </div>
 </div>
 
 {{-- High-level: everyone's place of work + hours per day --}}

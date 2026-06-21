@@ -353,8 +353,8 @@ class WeeklyPlannerController extends Controller
         $user = Auth::user();
         abort_unless($user->isManager(), 403);
 
-        $weekStart = self::upcomingWeekStart()->toDateString();
-        $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart)->get();
+        $weekStart = $this->resolveWeekStart($request);
+        $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart->toDateString())->get();
 
         $breakdown = [];
         foreach ($plans->whereIn('status', ['pending', 'approved']) as $plan) {
@@ -367,8 +367,7 @@ class WeeklyPlannerController extends Controller
         $days = config('planner.days');
         $locations = config('planner.locations');
 
-        return view('weekly-planner.review', [
-            'weekStart' => Carbon::parse($weekStart),
+        return view('weekly-planner.review', array_merge([
             'plans' => $plans,
             'pending' => $plans->where('status', 'pending'),
             'breakdown' => $breakdown,
@@ -377,7 +376,19 @@ class WeeklyPlannerController extends Controller
             'locations' => $locations,
             // High-level matrix: every employee with a plan, their daily location + hours.
             'overview' => $this->weekOverview($plans, $days, $locations),
-        ]);
+        ], $this->weekNav($weekStart)));
+    }
+
+    /** Week-navigation context (label + prev/this/next) shared by review + presence. */
+    private function weekNav(Carbon $weekStart): array
+    {
+        return [
+            'weekStart' => $weekStart,
+            'prevWeek' => $weekStart->copy()->subWeek()->toDateString(),
+            'nextWeek' => $weekStart->copy()->addWeek()->toDateString(),
+            'thisWeek' => Carbon::today()->startOfWeek(Carbon::SUNDAY)->toDateString(),
+            'isCurrentWeek' => $weekStart->isSameDay(Carbon::today()->startOfWeek(Carbon::SUNDAY)),
+        ];
     }
 
     /** Read-only detail of a single weekly plan (the click-through target). */
@@ -438,16 +449,16 @@ class WeeklyPlannerController extends Controller
      * (high-level), managers also see pending ones. Project managers additionally
      * get a breakdown of who is allocated to the projects/tasks they manage.
      */
-    public function presence()
+    public function presence(Request $request)
     {
         $user = Auth::user();
         abort_unless($user->isInternal(), 403);
 
         $isManager = $user->isManager();
-        $weekStart = self::upcomingWeekStart()->toDateString();
+        $weekStart = $this->resolveWeekStart($request);
 
         $statuses = $isManager ? ['pending', 'approved'] : ['approved'];
-        $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart)
+        $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart->toDateString())
             ->whereIn('status', $statuses)->get();
 
         $days = config('planner.days');
@@ -473,15 +484,14 @@ class WeeklyPlannerController extends Controller
             $managedAllocation = $this->managedAllocation($user, $plans);
         }
 
-        return view('weekly-planner.presence', [
-            'weekStart' => Carbon::parse($weekStart),
+        return view('weekly-planner.presence', array_merge([
             'grid' => $grid,
             'days' => $days,
             'locations' => $locations,
             'overview' => $this->weekOverview($plans, $days, $locations),
             'managedAllocation' => $managedAllocation,
             'canDrillIn' => $isManager || $user->isProjectManager(),
-        ]);
+        ], $this->weekNav($weekStart)));
     }
 
     /**
@@ -534,6 +544,7 @@ class WeeklyPlannerController extends Controller
                 'days' => $perDay,
                 'total' => $plan->totalHours(),
                 'status' => $plan->status,
+                'late' => $plan->isLate(),
             ];
         }
 

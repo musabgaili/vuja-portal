@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Controllers\WeeklyPlannerController;
 use App\Models\Quote;
 use App\Models\User;
 use App\Models\WeeklyPlan;
@@ -22,14 +21,15 @@ class ApprovalService
             ->latest('updated_at')->get();
     }
 
-    /** Timesheets awaiting manager review for the upcoming week. */
+    /** Timesheets awaiting manager review — ALL pending weeks (so late/back-dated
+     *  submissions for the current or a past week also surface, newest week first). */
     public function pendingPlans()
     {
-        $week = WeeklyPlannerController::upcomingWeekStart()->toDateString();
-
         return WeeklyPlan::where('status', 'pending')
-            ->whereDate('week_start', $week)
-            ->with('user')->latest('submitted_at')->get();
+            ->with('user')
+            ->orderByDesc('week_start')
+            ->latest('submitted_at')
+            ->get();
     }
 
     /** Total count relevant to this approver (quotes for all approvers; plans for managers). */

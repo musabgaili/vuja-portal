@@ -2700,6 +2700,7 @@
     "portal.planner.action": "Action",
     "portal.planner.send_back": "Send back",
     "portal.planner.back": "Back",
+    "portal.planner.late": "Late submission",
     "portal.planner.reject_prompt": "Add a note for the employee (what to fix). Leave blank to send back without a note:",
     "portal.planner.location_required": "Pick a work location for every working day with hours: :days.",
     "portal.planner.none_pending": "No timesheets awaiting approval.",

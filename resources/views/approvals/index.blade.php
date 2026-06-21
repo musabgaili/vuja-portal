@@ -64,11 +64,13 @@
             <tbody>
                 @foreach($plans as $p)
                     <tr>
-                        <td><strong>{{ $p->user->name ?? '—' }}</strong></td>
+                        <td><strong>{{ $p->user->name ?? '—' }}</strong>
+                            @if($p->isLate())<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> {{ __('portal.planner.late') }}</span>@endif
+                        </td>
                         <td>{{ $p->week_start->translatedFormat('M j, Y') }}</td>
                         <td class="text-end">{{ $p->totalHours() }}h</td>
                         <td><small class="text-muted">{{ optional($p->submitted_at)->diffForHumans() }}</small></td>
-                        <td class="text-end"><a href="{{ route('weekly-planner.review') }}" class="btn btn-sm btn-primary"><i class="fas fa-gavel"></i> {{ __('portal.approvals.review') }}</a></td>
+                        <td class="text-end"><a href="{{ route('weekly-planner.review', ['week' => $p->week_start->toDateString()]) }}" class="btn btn-sm btn-primary"><i class="fas fa-gavel"></i> {{ __('portal.approvals.review') }}</a></td>
                     </tr>
                 @endforeach
             </tbody>

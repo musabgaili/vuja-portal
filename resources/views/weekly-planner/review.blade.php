@@ -2,15 +2,24 @@
 @section('title', __('portal.planner.review_title'))
 
 @section('content')
-<div class="page-hero">
-    <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-clipboard-check"></i> {{ __('portal.planner.review_title') }}</h1>
-    <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ $weekStart->translatedFormat('D, M j, Y') }}</p>
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 style="margin:0; font-size:1.5rem;"><i class="fas fa-clipboard-check"></i> {{ __('portal.planner.review_title') }}</h1>
+        <p style="margin:.25rem 0 0; opacity:.9;">{{ __('portal.planner.week_of') }} {{ $weekStart->translatedFormat('D, M j, Y') }}@if($isCurrentWeek) · {{ __('portal.planner.this_week') }}@endif</p>
+    </div>
+    <a href="{{ route('internal.dashboard') }}" class="btn btn-light"><i class="fas fa-arrow-left"></i> {{ __('portal.planner.back') }}</a>
 </div>
 
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
-<div class="d-flex justify-content-end mb-3">
-    <a href="{{ route('weekly-planner.presence') }}" class="btn btn-outline-primary"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</a>
+{{-- Week navigation: prev / this week / next --}}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div class="btn-group">
+        <a href="{{ route('weekly-planner.review', ['week' => $prevWeek]) }}" class="btn btn-outline-primary"><i class="fas fa-chevron-left"></i> {{ __('portal.planner.prev_week') }}</a>
+        <a href="{{ route('weekly-planner.review', ['week' => $thisWeek]) }}" class="btn {{ $isCurrentWeek ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('portal.planner.this_week') }}</a>
+        <a href="{{ route('weekly-planner.review', ['week' => $nextWeek]) }}" class="btn btn-outline-primary">{{ __('portal.planner.next_week') }} <i class="fas fa-chevron-right"></i></a>
+    </div>
+    <a href="{{ route('weekly-planner.presence', ['week' => $weekStart->toDateString()]) }}" class="btn btn-outline-primary"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.team_presence') }}</a>
 </div>
 
 @include('weekly-planner._overview', ['overview' => $overview, 'days' => $days, 'canDrillIn' => true])
@@ -25,7 +34,9 @@
                     <tbody>
                     @forelse($pending as $p)
                         <tr>
-                            <td>{{ $p->user->name }}</td>
+                            <td>{{ $p->user->name }}
+                                @if($p->isLate())<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> {{ __('portal.planner.late') }}</span>@endif
+                            </td>
                             <td>
                                 @foreach($p->categoryBreakdown() as $cat => $h)
                                     <span class="badge bg-light text-dark border">{{ $cat }}: {{ $h }}h</span>
@@ -58,7 +69,9 @@
                     <tbody>
                     @forelse($plans as $p)
                         <tr><td>{{ $p->user->name }}</td><td>{{ $p->totalHours() }}h</td>
-                            <td><span class="badge bg-{{ $p->statusColor() }}">{{ __('portal.planner.status.'.$p->status) }}</span></td></tr>
+                            <td><span class="badge bg-{{ $p->statusColor() }}">{{ __('portal.planner.status.'.$p->status) }}</span>
+                                @if($p->isLate())<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> {{ __('portal.planner.late') }}</span>@endif
+                            </td></tr>
                     @empty
                         <tr><td colspan="3" class="text-muted text-center py-3">{{ __('portal.planner.none_submitted') }}</td></tr>
                     @endforelse

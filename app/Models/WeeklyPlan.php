@@ -71,4 +71,18 @@ class WeeklyPlan extends Model
             default => 'secondary',
         };
     }
+
+    /** Submission deadline for this plan's week: Saturday (the day before) at the configured time. */
+    public function deadline(): \Carbon\Carbon
+    {
+        [$h, $m] = explode(':', (string) config('planner.deadline_time', '18:00'));
+
+        return \Carbon\Carbon::parse($this->week_start)->subDay()->setTime((int) $h, (int) $m);
+    }
+
+    /** Whether the timesheet was submitted after its deadline (or its week already started). */
+    public function isLate(): bool
+    {
+        return $this->submitted_at !== null && $this->submitted_at->greaterThan($this->deadline());
+    }
 }

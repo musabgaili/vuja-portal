@@ -21,6 +21,7 @@
                             <strong>{{ $row['name'] }}</strong>
                         @endif
                         <br><span class="badge bg-{{ $row['plan']->statusColor() }}">{{ __('portal.planner.status.'.$row['status']) }}</span>
+                        @if($row['late'] ?? false)<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> {{ __('portal.planner.late') }}</span>@endif
                     </td>
                     @foreach($days as $day)
                         @php $cell = $row['days'][$day]; @endphp
