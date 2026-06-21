@@ -70,7 +70,7 @@ class GeminiScopeService
 
     private function geminiSuggest(string $key, string $brief, string $tier, string $language): array
     {
-        $system = app(\App\Services\Scope\ScopePromptService::class)->render('suggest_system', ['tier' => $tier]);
+        $system = app(\App\Services\Scope\ScopePromptService::class)->render('suggest_system', $tier, ['tier' => $tier]);
         $user = "Brief: {$brief}\nTier: {$tier}. Return components as catalog search queries.";
         $schema = [
             'type' => 'object',
@@ -198,8 +198,8 @@ class GeminiScopeService
             'company_scope_rule' => $companyScopeRule,
         ];
 
-        $system = $prompts->render('generate_system', $vars);
-        $user = $prompts->render('generate_user', $vars);
+        $system = $prompts->render('generate_system', $tier, $vars);
+        $user = $prompts->render('generate_user', $tier, $vars);
 
         $json = $this->callGeminiJson($key, $system, $user, $this->schemaFor($tier));
 

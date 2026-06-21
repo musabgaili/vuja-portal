@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ScopePromptSetting;
 use App\Services\Scope\ScopePromptService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Manager-editable AI prompt templates for the Scope Planner. Lets a manager
- * tune the generate/suggest prompts; the response schema + JSON validation stay
+ * Manager-editable AI prompt templates for the Scope Planner, tuned PER TIER
+ * (student / entrepreneur / company). The response schema + JSON validation stay
  * in code, so an edited prompt can never break structured generation.
  */
 class ScopePromptController extends Controller
@@ -20,18 +19,22 @@ class ScopePromptController extends Controller
     {
         abort_unless(Auth::user()?->isManager(), 403);
 
+        // templates[tier][type] = ['current' => ..., 'default' => ..., 'custom' => bool]
         $templates = [];
-        foreach (ScopePromptService::KEYS as $key) {
-            $templates[$key] = [
-                'current' => $this->prompts->template($key),
-                'default' => $this->prompts->default($key),
-                'custom' => $this->prompts->isCustom($key),
-            ];
+        foreach (ScopePromptService::TIERS as $tier) {
+            foreach (ScopePromptService::TYPES as $type) {
+                $templates[$tier][$type] = [
+                    'current' => $this->prompts->template($type, $tier),
+                    'default' => $this->prompts->default($type),
+                    'custom' => $this->prompts->isCustom($type, $tier),
+                ];
+            }
         }
 
         return view('scope-planner.prompts', [
             'templates' => $templates,
-            'keys' => ScopePromptService::KEYS,
+            'tiers' => ScopePromptService::TIERS,
+            'types' => ScopePromptService::TYPES,
         ]);
     }
 
@@ -39,34 +42,37 @@ class ScopePromptController extends Controller
     {
         abort_unless(Auth::user()?->isManager(), 403);
 
-        $data = $request->validate([
+        $request->validate([
             'prompts' => 'array',
-            'prompts.*' => 'nullable|string|max:20000',
+            'prompts.*' => 'array',
+            'prompts.*.*' => 'nullable|string|max:20000',
         ]);
 
-        foreach (ScopePromptService::KEYS as $key) {
-            if (! array_key_exists($key, $data['prompts'] ?? [])) {
-                continue;
+        $posted = (array) $request->input('prompts', []);
+        foreach (ScopePromptService::TIERS as $tier) {
+            foreach (ScopePromptService::TYPES as $type) {
+                if (! array_key_exists($type, $posted[$tier] ?? [])) {
+                    continue;
+                }
+                // Blank → clears the override and reverts to the default.
+                $this->prompts->save($type, $tier, $posted[$tier][$type] ?? null, Auth::id());
             }
-            ScopePromptSetting::updateOrCreate(
-                ['key' => $key],
-                ['content' => (string) ($data['prompts'][$key] ?? ''), 'updated_by' => Auth::id()],
-            );
         }
 
         return back()->with('success', __('portal.scope_prompts.saved'));
     }
 
-    /** Drop the override for one key so it reverts to the shipped default. */
+    /** Drop the override for one (tier, type) so it reverts to the shipped default. */
     public function reset(Request $request)
     {
         abort_unless(Auth::user()?->isManager(), 403);
 
-        $key = $request->validate([
-            'key' => 'required|in:'.implode(',', ScopePromptService::KEYS),
-        ])['key'];
+        $data = $request->validate([
+            'tier' => 'required|in:'.implode(',', ScopePromptService::TIERS),
+            'type' => 'required|in:'.implode(',', ScopePromptService::TYPES),
+        ]);
 
-        ScopePromptSetting::where('key', $key)->delete();
+        $this->prompts->reset($data['type'], $data['tier']);
 
         return back()->with('success', __('portal.scope_prompts.reset_done'));
     }

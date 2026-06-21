@@ -27,29 +27,46 @@
     <i class="fas fa-circle-info"></i> {{ __('portal.scope_prompts.note') }}
 </div>
 
+{{-- Jump-to-tier tabs --}}
+<ul class="nav nav-pills mb-3" role="tablist">
+    @foreach($tiers as $i => $tier)
+    <li class="nav-item">
+        <button class="nav-link {{ $i === 0 ? 'active' : '' }}" data-bs-toggle="pill" data-bs-target="#tier-{{ $tier }}" type="button">
+            {{ __('portal.scope_planner.tier_'.$tier) }}
+        </button>
+    </li>
+    @endforeach
+</ul>
+
 <form method="POST" action="{{ route('scope-prompts.update') }}">
     @csrf @method('PUT')
-    @foreach($keys as $key)
-        @php $t = $templates[$key]; @endphp
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span class="card-title">
-                    <i class="fas fa-pen"></i> {{ __('portal.scope_prompts.key.'.$key) }}
-                    @if($t['custom'])<span class="badge bg-warning text-dark">{{ __('portal.scope_prompts.custom') }}</span>
-                    @else<span class="badge bg-secondary">{{ __('portal.scope_prompts.default') }}</span>@endif
-                </span>
-            </div>
-            <div class="card-content">
-                <div class="mb-2">
-                    <small class="text-muted">{{ __('portal.scope_prompts.placeholders') }}:</small>
-                    @foreach($placeholders[$key] ?? [] as $ph)
-                        <code class="me-1">&#123;{{ $ph }}&#125;</code>
-                    @endforeach
+    <div class="tab-content">
+    @foreach($tiers as $i => $tier)
+        <div class="tab-pane fade {{ $i === 0 ? 'show active' : '' }}" id="tier-{{ $tier }}" role="tabpanel">
+            @foreach($types as $type)
+                @php $t = $templates[$tier][$type]; @endphp
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <span class="card-title">
+                            <i class="fas fa-pen"></i> {{ __('portal.scope_prompts.key.'.$type) }}
+                            @if($t['custom'])<span class="badge bg-warning text-dark">{{ __('portal.scope_prompts.custom') }}</span>
+                            @else<span class="badge bg-secondary">{{ __('portal.scope_prompts.default') }}</span>@endif
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <div class="mb-2">
+                            <small class="text-muted">{{ __('portal.scope_prompts.placeholders') }}:</small>
+                            @foreach($placeholders[$type] ?? [] as $ph)
+                                <code class="me-1">&#123;{{ $ph }}&#125;</code>
+                            @endforeach
+                        </div>
+                        <textarea name="prompts[{{ $tier }}][{{ $type }}]" rows="8" class="form-control" style="font-family:monospace;font-size:.85rem;">{{ $t['current'] }}</textarea>
+                    </div>
                 </div>
-                <textarea name="prompts[{{ $key }}]" rows="8" class="form-control" style="font-family:monospace;font-size:.85rem;">{{ $t['current'] }}</textarea>
-            </div>
+            @endforeach
         </div>
     @endforeach
+    </div>
 
     <div class="d-flex gap-2 flex-wrap mb-4">
         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('portal.scope_prompts.save') }}</button>
@@ -57,22 +74,28 @@
     </div>
 </form>
 
-{{-- Reset-to-default per template (separate forms so each can revert independently) --}}
+{{-- Reset a single (tier, type) back to the shipped default --}}
 <div class="card">
     <div class="card-header"><span class="card-title">{{ __('portal.scope_prompts.reset_title') }}</span></div>
     <div class="card-content">
         <p class="text-muted">{{ __('portal.scope_prompts.reset_help') }}</p>
-        <div class="d-flex gap-2 flex-wrap">
-            @foreach($keys as $key)
-            <form method="POST" action="{{ route('scope-prompts.reset') }}" onsubmit="return confirm(@js(__('portal.scope_prompts.reset_confirm')))" class="m-0">
-                @csrf
-                <input type="hidden" name="key" value="{{ $key }}">
-                <button class="btn btn-sm btn-outline-danger" @disabled(! $templates[$key]['custom'])>
-                    <i class="fas fa-rotate-left"></i> {{ __('portal.scope_prompts.key.'.$key) }}
-                </button>
-            </form>
-            @endforeach
+        @foreach($tiers as $tier)
+        <div class="mb-2">
+            <strong class="d-block mb-1">{{ __('portal.scope_planner.tier_'.$tier) }}</strong>
+            <div class="d-flex gap-2 flex-wrap">
+                @foreach($types as $type)
+                <form method="POST" action="{{ route('scope-prompts.reset') }}" onsubmit="return confirm(@js(__('portal.scope_prompts.reset_confirm')))" class="m-0">
+                    @csrf
+                    <input type="hidden" name="tier" value="{{ $tier }}">
+                    <input type="hidden" name="type" value="{{ $type }}">
+                    <button class="btn btn-sm btn-outline-danger" @disabled(! $templates[$tier][$type]['custom'])>
+                        <i class="fas fa-rotate-left"></i> {{ __('portal.scope_prompts.key.'.$type) }}
+                    </button>
+                </form>
+                @endforeach
+            </div>
         </div>
+        @endforeach
     </div>
 </div>
 @endsection
