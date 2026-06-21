@@ -49,14 +49,29 @@ class NotificationService
         };
 
         // Unread chat @mentions → the bell + Mentions inbox.
+        $mentionedChannels = [];
         foreach (\App\Models\ChatMessageMention::where('user_id', $user->id)->whereNull('read_at')
             ->with(['message.author', 'message.channel'])->latest('id')->limit(5)->get() as $mn) {
             if (! $mn->message || $mn->message->trashed()) {
                 continue;
             }
+            $mentionedChannels[$mn->message->chat_channel_id] = true;
             $push($mn->created_at, 'fa-at',
                 __('portal.notif.chat_mention', ['name' => $mn->message->author?->name ?? '—']),
                 route('chat.show', $mn->message->chat_channel_id));
+        }
+
+        // Unread chat conversations (DMs + channels) → the bell. So a plain direct
+        // message (no @mention) still notifies the recipient. Skip channels already
+        // surfaced as a mention above to avoid a duplicate bell entry.
+        foreach (app(ChatService::class)->unreadConversations($user) as $conv) {
+            if (isset($mentionedChannels[$conv['channel_id']])) {
+                continue;
+            }
+            $icon = $conv['is_dm'] ? 'fa-comment-dots' : 'fa-hashtag';
+            $push($conv['at'], $icon,
+                __('portal.notif.chat_message', ['name' => $conv['title'], 'count' => $conv['count']]),
+                route('chat.show', $conv['channel_id']));
         }
 
         foreach (StaffTask::where('assigned_to', $user->id)->latest('updated_at')->limit(5)->get() as $t) {

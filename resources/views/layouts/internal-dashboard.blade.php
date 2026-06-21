@@ -166,18 +166,25 @@
                 </div>
 
                 <!-- Communication -->
+                @php
+                    // Cheap server-rendered seed (the JS poller refreshes it live on the
+                    // chat page); cached briefly so every internal page doesn't re-scan.
+                    $chatCounts = \Illuminate\Support\Facades\Cache::remember(
+                        'chat_nav_counts:'.auth()->id(), 15,
+                        fn () => app(\App\Services\ChatService::class)->unreadCounts(auth()->user())
+                    );
+                @endphp
                 <div class="nav-section">
                     <div class="nav-section-title">{{ __('portal.nav.communication') }}</div>
                     <a href="{{ route('chat.index') }}" class="nav-item {{ request()->routeIs('chat.index','chat.show','chat.messages') ? 'active' : '' }}">
                         <i class="fas fa-comments"></i>
                         {{ __('portal.nav.team_chat') }}
-                        <span id="navChatUnread" class="badge rounded-pill bg-danger ms-auto" hidden></span>
+                        <span id="navChatUnread" class="badge rounded-pill bg-danger ms-auto" {{ $chatCounts['total'] ? '' : 'hidden' }}>{{ $chatCounts['total'] > 9 ? '9+' : $chatCounts['total'] }}</span>
                     </a>
                     <a href="{{ route('chat.mentions') }}" class="nav-item {{ request()->routeIs('chat.mentions') ? 'active' : '' }}">
                         <i class="fas fa-at"></i>
                         {{ __('portal.nav.my_mentions') }}
-                        @php $chatMentions = auth()->user()->unreadChatMentionsCount(); @endphp
-                        <span id="navMentionsUnread" class="badge rounded-pill bg-danger ms-auto" {{ $chatMentions ? '' : 'hidden' }}>{{ $chatMentions > 9 ? '9+' : $chatMentions }}</span>
+                        <span id="navMentionsUnread" class="badge rounded-pill bg-danger ms-auto" {{ $chatCounts['mentions'] ? '' : 'hidden' }}>{{ $chatCounts['mentions'] > 9 ? '9+' : $chatCounts['mentions'] }}</span>
                     </a>
                 </div>
 

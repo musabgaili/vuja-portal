@@ -258,4 +258,65 @@ class ChatService
             'mentions' => $user->unreadChatMentionsCount(),
         ];
     }
+
+    /**
+     * Read-receipt state for a channel from the viewer's perspective: each OTHER
+     * member's last_read_message_id + the total member count. The "Seen" indicator
+     * on the viewer's own messages is derived from this.
+     *
+     * @return array{reads: array<int,int>, memberCount: int}
+     */
+    public function readState(ChatChannel $channel, int $viewerId): array
+    {
+        $members = $channel->members()->get(['users.id']);
+        $reads = [];
+        foreach ($members as $m) {
+            if ($m->id !== $viewerId) {
+                $reads[$m->id] = (int) ($m->pivot->last_read_message_id ?? 0);
+            }
+        }
+
+        return ['reads' => $reads, 'memberCount' => $members->count()];
+    }
+
+    /**
+     * Conversations (DMs + channels) with unread messages for a user — feeds the
+     * notification bell. Each entry: channel_id, count, latest time, display title.
+     */
+    public function unreadConversations(User $user): array
+    {
+        $rows = DB::table('chat_messages as m')
+            ->join('chat_channel_user as p', 'p.chat_channel_id', '=', 'm.chat_channel_id')
+            ->where('p.user_id', $user->id)
+            ->whereNull('m.parent_id')
+            ->whereNull('m.deleted_at')
+            ->where('m.user_id', '!=', $user->id)
+            ->whereColumn('m.id', '>', DB::raw('COALESCE(p.last_read_message_id, 0)'))
+            ->groupBy('m.chat_channel_id')
+            ->selectRaw('m.chat_channel_id as cid, COUNT(*) as c, MAX(m.created_at) as at')
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $channels = ChatChannel::whereIn('id', $rows->pluck('cid'))->with('members:id,name')->get()->keyBy('id');
+
+        $out = [];
+        foreach ($rows as $r) {
+            $channel = $channels->get($r->cid);
+            if (! $channel) {
+                continue;
+            }
+            $out[] = [
+                'channel_id' => (int) $r->cid,
+                'count' => (int) $r->c,
+                'at' => $r->at,
+                'title' => $channel->displayName($user),
+                'is_dm' => $channel->isDm(),
+            ];
+        }
+
+        return $out;
+    }
 }

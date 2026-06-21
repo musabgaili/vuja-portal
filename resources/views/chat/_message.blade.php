@@ -59,5 +59,18 @@
             </form>
             @endif
         </div>
+        @if($isMine && ! $m->isReply() && ($memberCount ?? 0) > 1)
+            @php
+                $seenBy = collect($reads ?? [])->filter(fn ($lr) => (int) $lr >= $m->id)->count();
+                $otherCount = ($memberCount ?? 1) - 1;
+            @endphp
+            <div class="chat-seen" data-mid="{{ $m->id }}">
+                @if(($memberCount ?? 0) === 2)
+                    @if($seenBy >= 1)<i class="fas fa-check-double"></i> {{ __('portal.chat.seen') }}@else<i class="fas fa-check"></i> {{ __('portal.chat.sent') }}@endif
+                @else
+                    @if($seenBy > 0)<i class="fas fa-check-double"></i> {{ __('portal.chat.seen_by') }} {{ $seenBy }}/{{ $otherCount }}@else<i class="fas fa-check"></i> {{ __('portal.chat.sent') }}@endif
+                @endif
+            </div>
+        @endif
     </div>
 </div>

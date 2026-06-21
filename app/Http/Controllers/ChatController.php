@@ -67,8 +67,9 @@ class ChatController extends Controller
         $this->chat->markRead($channel, $user);
 
         $allUsers = $this->internalUsers();
+        $readState = $this->chat->readState($channel, $user->id);   // for "Seen" receipts
 
-        return view('chat.index', compact('channels', 'channel', 'messages', 'members', 'allUsers'));
+        return view('chat.index', compact('channels', 'channel', 'messages', 'members', 'allUsers', 'readState'));
     }
 
     /** My Mentions inbox — every message that tagged me, unread first. */
@@ -159,7 +160,8 @@ class ChatController extends Controller
         );
 
         if ($request->ajax()) {
-            return response()->json(['ok' => true, 'id' => $message->id, 'html' => $this->renderMessage($message)]);
+            $rs = $this->chat->readState($channel, Auth::id());
+            return response()->json(['ok' => true, 'id' => $message->id, 'html' => $this->renderMessage($message, $rs)]);
         }
 
         return redirect()->route('chat.show', $channel);
@@ -176,7 +178,8 @@ class ChatController extends Controller
         $this->chat->edit($message, $data['body']);
 
         if ($request->ajax()) {
-            return response()->json(['ok' => true, 'html' => $this->renderMessage($message->fresh($this->messageEagerLoads()))]);
+            $rs = $this->chat->readState($message->channel, Auth::id());
+            return response()->json(['ok' => true, 'html' => $this->renderMessage($message->fresh($this->messageEagerLoads()), $rs)]);
         }
 
         return redirect()->route('chat.show', $message->chat_channel_id);
@@ -215,7 +218,8 @@ class ChatController extends Controller
         $this->chat->toggleReaction($message, Auth::user(), $data['emoji']);
 
         if ($request->ajax()) {
-            return response()->json(['ok' => true, 'html' => $this->renderMessage($message->fresh($this->messageEagerLoads()))]);
+            $rs = $this->chat->readState($channel, Auth::id());
+            return response()->json(['ok' => true, 'html' => $this->renderMessage($message->fresh($this->messageEagerLoads()), $rs)]);
         }
 
         return back();
@@ -246,15 +250,22 @@ class ChatController extends Controller
                 ->limit(100)->get();
         }
 
-        // Passive polling only advances the read pointer — it must NOT clear
-        // @mentions (those clear when the user actively opens the channel).
-        $this->chat->advanceRead($channel, Auth::user());
+        // Only advance the read pointer when the tab is actually focused, so a
+        // "Seen" receipt reflects genuine viewing — not just an open background tab.
+        // (Mentions still only clear on an active open via show(), never here.)
+        if ($request->boolean('focus')) {
+            $this->chat->advanceRead($channel, Auth::user());
+        }
+
+        $rs = $this->chat->readState($channel, Auth::id());
 
         return response()->json([
-            'messages' => $new->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m)])->values(),
-            'updated' => $updated->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m)])->values(),
+            'messages' => $new->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m, $rs)])->values(),
+            'updated' => $updated->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m, $rs)])->values(),
             'last_id' => (int) ($new->max('id') ?: $after),
             'since' => now()->timestamp,
+            'reads' => $rs['reads'],
+            'member_count' => $rs['memberCount'],
         ]);
     }
 
@@ -271,9 +282,10 @@ class ChatController extends Controller
             $query->where('id', '<', $before);
         }
         $older = $query->limit(self::PAGE_SIZE)->get()->reverse()->values();
+        $rs = $this->chat->readState($channel, Auth::id());
 
         return response()->json([
-            'messages' => $older->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m)])->values(),
+            'messages' => $older->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m, $rs)])->values(),
             'first_id' => (int) ($older->min('id') ?: $before),
             'has_more' => $older->count() === self::PAGE_SIZE,
         ]);
@@ -362,7 +374,7 @@ class ChatController extends Controller
         ];
     }
 
-    private function renderMessage(ChatMessage $message): string
+    private function renderMessage(ChatMessage $message, array $readState = []): string
     {
         if (! isset($message->replies_count)) {
             $message->loadCount('replies');
@@ -371,6 +383,8 @@ class ChatController extends Controller
         return view('chat._message', [
             'm' => $message,
             'emojis' => self::EMOJIS,
+            'reads' => $readState['reads'] ?? [],
+            'memberCount' => $readState['memberCount'] ?? 0,
         ])->render();
     }
 }

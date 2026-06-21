@@ -70,7 +70,7 @@
                     <i class="fas fa-arrow-up"></i> {{ __('portal.chat.load_earlier') }}
                 </button>
                 @forelse($messages as $m)
-                    @include('chat._message', ['m' => $m, 'emojis' => \App\Http\Controllers\ChatController::EMOJIS])
+                    @include('chat._message', ['m' => $m, 'emojis' => \App\Http\Controllers\ChatController::EMOJIS, 'reads' => $readState['reads'] ?? [], 'memberCount' => $readState['memberCount'] ?? 0])
                 @empty
                     <div class="chat-empty-stream" id="chatEmptyStream">{{ __('portal.chat.no_messages') }}</div>
                 @endforelse
@@ -205,6 +205,8 @@
 .chat-att-file{display:inline-flex;align-items:center;gap:.4rem;background:var(--gray-100,#f1f5f9);padding:.35rem .6rem;border-radius:8px;font-size:.85rem;text-decoration:none;color:var(--text-color,#334155);}
 .chat-msg-foot{display:flex;align-items:center;gap:.35rem;margin-top:.3rem;opacity:.55;transition:opacity .15s;flex-wrap:wrap;}
 .chat-msg-foot button,.chat-del-btn{background:none;border:1px solid var(--gray-200,#e2e8f0);border-radius:999px;font-size:.78rem;padding:.05rem .5rem;color:var(--gray-600,#475569);cursor:pointer;}
+.chat-seen{font-size:.7rem;color:var(--gray-500,#94a3b8);margin-top:.15rem;}
+.chat-seen .fa-check-double{color:var(--primary-color,#0C7075);}
 .chat-react.on{background:rgba(12,112,117,.14);border-color:var(--primary-color,#0C7075);color:var(--primary-color,#0C7075);}
 .chat-del-form{display:inline;}
 .chat-react-add{position:relative;cursor:pointer;color:var(--gray-500,#94a3b8);padding:.05rem .3rem;}
@@ -248,6 +250,27 @@
     const msgBase = wrap.dataset.msgBase;
     const stream = document.getElementById('chatStream');
     const headers = { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' };
+    const L_SEEN = @js(__('portal.chat.seen'));
+    const L_SENT = @js(__('portal.chat.sent'));
+    const L_SEEN_BY = @js(__('portal.chat.seen_by'));
+
+    // Live-update the "Seen / Seen by N" receipts on my own messages from the poll's reads map.
+    function updateSeen(reads, memberCount) {
+        if (!stream || !memberCount || memberCount < 2) return;
+        const vals = Object.values(reads || {});
+        const others = memberCount - 1;
+        const dbl = '<i class="fas fa-check-double"></i> ';
+        const one = '<i class="fas fa-check"></i> ';
+        stream.querySelectorAll('.chat-seen').forEach(el => {
+            const mid = parseInt(el.dataset.mid || '0', 10);
+            const seenBy = vals.filter(v => parseInt(v, 10) >= mid).length;
+            if (memberCount === 2) {
+                el.innerHTML = seenBy >= 1 ? (dbl + L_SEEN) : (one + L_SENT);
+            } else {
+                el.innerHTML = seenBy > 0 ? (dbl + L_SEEN_BY + ' ' + seenBy + '/' + others) : (one + L_SENT);
+            }
+        });
+    }
 
     function nearBottom() { return stream && (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 120); }
     function toBottom() { if (stream) stream.scrollTop = stream.scrollHeight; }
@@ -460,7 +483,8 @@
     async function pollMessages() {
         if (!stream) return;
         try {
-            const res = await fetch(stream.dataset.messagesUrl + '?after=' + stream.dataset.last + '&since=' + (stream.dataset.since || 0), { headers });
+            const focus = document.hasFocus() ? 1 : 0;
+            const res = await fetch(stream.dataset.messagesUrl + '?after=' + stream.dataset.last + '&since=' + (stream.dataset.since || 0) + '&focus=' + focus, { headers });
             const d = await res.json();
             const stick = nearBottom();
             if (d.messages && d.messages.length) {
@@ -470,6 +494,7 @@
             if (d.updated && d.updated.length) {
                 d.updated.forEach(m => { const ex = document.getElementById('msg-' + m.id); if (ex) replaceMessage(ex, m.html); });
             }
+            if (d.reads !== undefined) updateSeen(d.reads, d.member_count);
             if (d.since) stream.dataset.since = d.since;
             if (d.messages && d.messages.length && stick) toBottom();
         } catch (e) {}
