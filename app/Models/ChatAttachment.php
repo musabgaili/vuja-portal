@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ChatAttachment extends Model
@@ -16,9 +15,10 @@ class ChatAttachment extends Model
         return $this->belongsTo(ChatMessage::class, 'chat_message_id');
     }
 
+    /** Membership-gated download route (files live on the private disk). */
     public function url(): string
     {
-        return Storage::disk($this->disk ?: 'public')->url($this->path);
+        return route('chat.attachments.show', $this);
     }
 
     public function isImage(): bool

@@ -511,6 +511,8 @@
     "portal.chat.channel_created": "Channel created.",
     "portal.chat.dm_pick_someone": "Pick at least one teammate.",
     "portal.chat.mentions_cleared": "All mentions marked as read.",
+    "portal.chat.load_earlier": "Load earlier messages",
+    "portal.chat.action_failed": "Action failed — please try again.",
     "portal.nav.new_project": "New Project",
     "portal.nav.scope_changes": "Scope Changes",
     "portal.nav.quote_system": "Quote System",

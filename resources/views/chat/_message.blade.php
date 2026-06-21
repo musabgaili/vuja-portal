@@ -6,7 +6,8 @@
     // Safe body: escape first, then highlight the exact mentioned users, linkify
     // URLs, and preserve line breaks. Never echo the raw body unescaped.
     $body = e($m->body);
-    foreach ($m->mentions as $mention) {
+    // Longest names first so "@Ali" doesn't break the span inside "@Ali Hassan".
+    foreach ($m->mentions->sortByDesc(fn ($x) => mb_strlen((string) ($x->user?->name ?? ''))) as $mention) {
         $nm = $mention->user?->name;
         if ($nm) {
             $body = str_replace('@'.e($nm), '<span class="chat-mention">@'.e($nm).'</span>', $body);
@@ -49,7 +50,7 @@
             </span>
             @unless($m->isReply())
                 <button type="button" class="chat-reply-btn" data-id="{{ $m->id }}"><i class="far fa-comment"></i>
-                    @if(($m->replies_count ?? 0) > 0){{ $m->replies_count }}@else{{ __('portal.chat.reply') }}@endif</button>
+                    <span class="rc" data-count="{{ $m->replies_count ?? 0 }}">@if(($m->replies_count ?? 0) > 0){{ $m->replies_count }}@else{{ __('portal.chat.reply') }}@endif</span></button>
             @endunless
             @if($isMine)<button type="button" class="chat-edit-btn" data-id="{{ $m->id }}" title="{{ __('portal.chat.edit') }}"><i class="fas fa-pen"></i></button>@endif
             @if($canDelete)

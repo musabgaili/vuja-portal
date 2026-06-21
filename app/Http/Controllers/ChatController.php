@@ -16,6 +16,9 @@ class ChatController extends Controller
     /** Allowed reaction emojis. */
     public const EMOJIS = ['👍', '✅', '🎉', '❤️', '👀', '🙏', '🔥', '😄'];
 
+    /** How many root messages per page (initial load + "load earlier"). */
+    public const PAGE_SIZE = 50;
+
     public function __construct(private ChatService $chat) {}
 
     // ===================================================================
@@ -48,10 +51,15 @@ class ChatController extends Controller
 
         $channels = ChatChannel::forUser($user)->with('members:id,name')->get();
 
-        $messages = $channel->rootMessages()
+        // Load only the most recent page; older messages load on demand (chat.older).
+        $messages = $channel->messages()->whereNull('parent_id')
             ->with($this->messageEagerLoads())
             ->withCount('replies')
-            ->get();
+            ->orderByDesc('id')
+            ->limit(self::PAGE_SIZE)
+            ->get()
+            ->reverse()
+            ->values();
 
         // Members of THIS channel power the @-mention autocomplete (mentionable = members only).
         $members = $channel->members()->select('users.id', 'users.name')->orderBy('name')->get();
@@ -69,13 +77,14 @@ class ChatController extends Controller
         $user = Auth::user();
 
         $mentions = ChatMessageMention::where('user_id', $user->id)
-            ->with(['message' => fn ($q) => $q->withTrashed()->with(['author:id,name', 'channel.members:id,name'])])
+            // Exclude mentions on (soft-)deleted messages in SQL, so the 100-row
+            // cap counts only actionable rows.
+            ->whereHas('message')
+            ->with(['message.author:id,name', 'message.channel.members:id,name'])
             ->orderByRaw('read_at IS NULL DESC')
             ->latest('id')
             ->limit(100)
-            ->get()
-            // A mention whose message was deleted is no longer actionable.
-            ->filter(fn ($m) => $m->message && ! $m->message->trashed());
+            ->get();
 
         return view('chat.mentions', compact('mentions'));
     }
@@ -175,8 +184,15 @@ class ChatController extends Controller
 
     public function destroyMessage(Request $request, ChatMessage $message)
     {
-        // The author or a manager may delete a message.
-        abort_unless($message->user_id === Auth::id() || Auth::user()->isManager(), 403);
+        $user = Auth::user();
+        $channel = $message->channel;
+
+        // The author may always delete their own message. A manager may delete
+        // others' messages ONLY in a channel they belong to — and never inside a
+        // DM (private 1:1/group conversations are not manager-moderated).
+        $isAuthor = $message->user_id === $user->id;
+        $managerModerates = $user->isManager() && ! $channel->isDm() && $channel->hasMember($user);
+        abort_unless($isAuthor || $managerModerates, 403);
 
         $this->chat->delete($message);
 
@@ -209,25 +225,67 @@ class ChatController extends Controller
     // JSON helpers (polling + pickers)
     // ===================================================================
 
-    /** New root messages since ?after=id, rendered for append. */
+    /** Forward poll: NEW root messages (id>after) + EXISTING roots changed since ?since (edits/reactions/reply-count). */
     public function messages(Request $request, ChatChannel $channel)
     {
         $this->authorize('view', $channel);
 
         $after = (int) $request->query('after', 0);
-        $new = $channel->rootMessages()
-            ->where('id', '>', $after)
-            ->with($this->messageEagerLoads())
-            ->withCount('replies')
-            ->get();
+        $since = (int) $request->query('since', 0);
 
-        // Opening/looking at the channel counts as reading it.
-        $this->chat->markRead($channel, Auth::user());
+        $new = $channel->messages()->whereNull('parent_id')->where('id', '>', $after)
+            ->with($this->messageEagerLoads())->withCount('replies')
+            ->orderBy('id')->limit(100)->get();
+
+        $updated = collect();
+        if ($since > 0) {
+            $updated = $channel->messages()->whereNull('parent_id')
+                ->where('id', '<=', $after)
+                ->where('updated_at', '>', \Illuminate\Support\Carbon::createFromTimestamp($since))
+                ->with($this->messageEagerLoads())->withCount('replies')
+                ->limit(100)->get();
+        }
+
+        // Passive polling only advances the read pointer — it must NOT clear
+        // @mentions (those clear when the user actively opens the channel).
+        $this->chat->advanceRead($channel, Auth::user());
 
         return response()->json([
             'messages' => $new->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m)])->values(),
+            'updated' => $updated->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m)])->values(),
             'last_id' => (int) ($new->max('id') ?: $after),
+            'since' => now()->timestamp,
         ]);
+    }
+
+    /** Older root messages before ?before=id (the "load earlier" control). */
+    public function older(Request $request, ChatChannel $channel)
+    {
+        $this->authorize('view', $channel);
+
+        $before = (int) $request->query('before', 0);
+        $query = $channel->messages()->whereNull('parent_id')
+            ->with($this->messageEagerLoads())->withCount('replies')
+            ->orderByDesc('id');
+        if ($before > 0) {
+            $query->where('id', '<', $before);
+        }
+        $older = $query->limit(self::PAGE_SIZE)->get()->reverse()->values();
+
+        return response()->json([
+            'messages' => $older->map(fn ($m) => ['id' => $m->id, 'html' => $this->renderMessage($m)])->values(),
+            'first_id' => (int) ($older->min('id') ?: $before),
+            'has_more' => $older->count() === self::PAGE_SIZE,
+        ]);
+    }
+
+    /** Stream a chat attachment through the membership gate (files live on the private disk). */
+    public function downloadAttachment(\App\Models\ChatAttachment $attachment)
+    {
+        $this->authorize('view', $attachment->message->channel);
+
+        return \Illuminate\Support\Facades\Storage::disk($attachment->disk ?: 'private')
+            ->download($attachment->path, $attachment->original_name);
     }
 
     /** Replies under one root message (thread pane). */

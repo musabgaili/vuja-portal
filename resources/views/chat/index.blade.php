@@ -6,6 +6,7 @@
     $textChannels = $channels->where('type', 'channel');
     $dmChannels = $channels->where('type', 'dm');
     $lastId = $messages->max('id') ?? 0;
+    $firstId = $messages->min('id') ?? 0;
 @endphp
 
 @section('content')
@@ -60,8 +61,14 @@
             <div id="chatStream" class="chat-stream"
                  data-channel="{{ $channel->id }}"
                  data-messages-url="{{ route('chat.messages', $channel) }}"
+                 data-older-url="{{ route('chat.older', $channel) }}"
                  data-thread-base="{{ url('internal/chat/'.$channel->id.'/thread') }}"
-                 data-last="{{ $lastId }}">
+                 data-last="{{ $lastId }}"
+                 data-first="{{ $firstId }}"
+                 data-since="{{ now()->timestamp }}">
+                <button type="button" id="chatLoadEarlier" class="btn btn-sm btn-light chat-load-earlier" {{ $messages->count() < \App\Http\Controllers\ChatController::PAGE_SIZE ? 'hidden' : '' }}>
+                    <i class="fas fa-arrow-up"></i> {{ __('portal.chat.load_earlier') }}
+                </button>
                 @forelse($messages as $m)
                     @include('chat._message', ['m' => $m, 'emojis' => \App\Http\Controllers\ChatController::EMOJIS])
                 @empty
@@ -183,6 +190,7 @@
 .chat-head-meta{margin-inline-start:auto;font-size:.8rem;color:var(--gray-500,#94a3b8);}
 .chat-stream{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.25rem;}
 .chat-empty-stream{margin:auto;color:var(--gray-500,#94a3b8);}
+.chat-load-earlier{display:block;margin:0 auto .5rem;}
 .chat-msg{display:flex;gap:.65rem;padding:.4rem .25rem;border-radius:8px;}
 .chat-msg:hover{background:var(--gray-50,#f8fafc);}
 .chat-msg:hover .chat-msg-foot{opacity:1;}
@@ -323,7 +331,6 @@
             appendMessage(data.html);
             stream.dataset.last = data.id;
             body.value = ''; autosize(body); fileBox.innerHTML = ''; if (fileInput) fileInput.value = '';
-            const empty = document.getElementById('chatEmptyStream'); if (empty) empty.remove();
             toBottom();
         } catch (err) { composer.submit(); }   // fall back to full POST
     });
@@ -334,6 +341,7 @@
         const node = tmp.firstElementChild; if (!node) return;
         if (document.getElementById(node.id)) return;   // de-dupe (poll may race)
         stream.appendChild(node);
+        const empty = document.getElementById('chatEmptyStream'); if (empty) empty.remove();
     }
 
     // ---- Reactions / edit / delete (delegated) ----
@@ -342,8 +350,11 @@
         if (react && stream) {
             const msg = react.closest('.chat-msg'); if (!msg) return;
             const fd = new FormData(); fd.append('emoji', react.dataset.emoji);
-            const res = await fetch(msgBase + '/' + msg.dataset.id + '/react', { method: 'POST', headers, body: fd });
-            if (res.ok) { const d = await res.json(); replaceMessage(msg, d.html); }
+            try {
+                const res = await fetch(msgBase + '/' + msg.dataset.id + '/react', { method: 'POST', headers, body: fd });
+                if (!res.ok) throw 0;
+                const d = await res.json(); replaceMessage(msg, d.html);
+            } catch (err) {}
             return;
         }
         const editBtn = e.target.closest('.chat-edit-btn');
@@ -356,8 +367,11 @@
         if (!form) return;
         e.preventDefault();
         if (!confirm(@js(__('portal.chat.delete_confirm')))) return;
-        const res = await fetch(form.action, { method: 'POST', headers, body: new FormData(form) });
-        if (res.ok) { const m = form.closest('.chat-msg'); if (m) m.remove(); }
+        try {
+            const res = await fetch(form.action, { method: 'POST', headers, body: new FormData(form) });
+            if (!res.ok) throw 0;
+            const m = form.closest('.chat-msg'); if (m) m.remove();
+        } catch (err) { form.submit(); }   // fall back to full POST
     });
 
     function replaceMessage(node, html) {
@@ -378,8 +392,11 @@
         area.querySelector('.chat-edit-save').addEventListener('click', async () => {
             const val = area.querySelector('textarea').value.trim(); if (!val) return;
             const fd = new FormData(); fd.append('_method', 'PUT'); fd.append('body', val);
-            const res = await fetch(msgBase + '/' + msg.dataset.id, { method: 'POST', headers, body: fd });
-            if (res.ok) { const d = await res.json(); replaceMessage(msg, d.html); }
+            try {
+                const res = await fetch(msgBase + '/' + msg.dataset.id, { method: 'POST', headers, body: fd });
+                if (!res.ok) throw 0;
+                const d = await res.json(); replaceMessage(msg, d.html);
+            } catch (err) { alert(@js(__('portal.chat.action_failed'))); }
         });
     }
 
@@ -412,23 +429,49 @@
             const d = await res.json();
             const t = document.createElement('div'); t.innerHTML = d.html; threadBody.appendChild(t.firstElementChild);
             ta.value = '';
-            // bump the reply button label on the root message in the main stream
-            const rootBtn = stream.querySelector('#msg-' + threadParent.value + ' .chat-reply-btn span');
+            // bump the reply count on the root message in the main stream
+            const rc = stream.querySelector('#msg-' + threadParent.value + ' .chat-reply-btn .rc');
+            if (rc) { const n = parseInt(rc.dataset.count || '0', 10) + 1; rc.dataset.count = n; rc.textContent = n; }
         }
+    });
+
+    // ---- Load earlier (older messages) ----
+    const loadEarlierBtn = document.getElementById('chatLoadEarlier');
+    if (loadEarlierBtn) loadEarlierBtn.addEventListener('click', async function () {
+        loadEarlierBtn.disabled = true;
+        try {
+            const res = await fetch(stream.dataset.olderUrl + '?before=' + stream.dataset.first, { headers });
+            const d = await res.json();
+            const prevH = stream.scrollHeight;
+            const frag = document.createDocumentFragment();
+            d.messages.forEach(m => {
+                if (document.getElementById('msg-' + m.id)) return;
+                const tmp = document.createElement('div'); tmp.innerHTML = m.html.trim();
+                if (tmp.firstElementChild) frag.appendChild(tmp.firstElementChild);
+            });
+            loadEarlierBtn.after(frag);
+            if (d.first_id) stream.dataset.first = d.first_id;
+            stream.scrollTop = stream.scrollTop + (stream.scrollHeight - prevH);   // keep view anchored
+            if (!d.has_more) loadEarlierBtn.hidden = true;
+        } catch (e) {} finally { loadEarlierBtn.disabled = false; }
     });
 
     // ---- Polling ----
     async function pollMessages() {
         if (!stream) return;
         try {
-            const res = await fetch(stream.dataset.messagesUrl + '?after=' + stream.dataset.last, { headers });
+            const res = await fetch(stream.dataset.messagesUrl + '?after=' + stream.dataset.last + '&since=' + (stream.dataset.since || 0), { headers });
             const d = await res.json();
+            const stick = nearBottom();
             if (d.messages && d.messages.length) {
-                const stick = nearBottom();
                 d.messages.forEach(m => appendMessage(m.html));
                 stream.dataset.last = d.last_id;
-                if (stick) toBottom();
             }
+            if (d.updated && d.updated.length) {
+                d.updated.forEach(m => { const ex = document.getElementById('msg-' + m.id); if (ex) replaceMessage(ex, m.html); });
+            }
+            if (d.since) stream.dataset.since = d.since;
+            if (d.messages && d.messages.length && stick) toBottom();
         } catch (e) {}
     }
     async function pollBadges() {

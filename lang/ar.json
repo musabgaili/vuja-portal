@@ -511,6 +511,8 @@
     "portal.chat.channel_created": "تم إنشاء القناة.",
     "portal.chat.dm_pick_someone": "اختر زميلاً واحداً على الأقل.",
     "portal.chat.mentions_cleared": "تم تعليم جميع الإشارات كمقروءة.",
+    "portal.chat.load_earlier": "تحميل الرسائل الأقدم",
+    "portal.chat.action_failed": "فشل الإجراء — يرجى المحاولة مرة أخرى.",
     "portal.nav.new_project": "مشروع جديد",
     "portal.nav.scope_changes": "تغييرات النطاق",
     "portal.nav.quote_system": "نظام التسعير",

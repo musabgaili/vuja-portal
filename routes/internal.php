@@ -63,14 +63,16 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/chat/mentions/read-all', [\App\Http\Controllers\ChatController::class, 'readAllMentions'])->name('chat.mentions.read-all');
     Route::get('/chat/poll', [\App\Http\Controllers\ChatController::class, 'poll'])->name('chat.poll');
     Route::get('/chat/members', [\App\Http\Controllers\ChatController::class, 'members'])->name('chat.members');
-    Route::post('/chat/channels', [\App\Http\Controllers\ChatController::class, 'storeChannel'])->name('chat.channels.store');
-    Route::post('/chat/dm', [\App\Http\Controllers\ChatController::class, 'startDm'])->name('chat.dm');
-    Route::put('/chat/messages/{message}', [\App\Http\Controllers\ChatController::class, 'updateMessage'])->name('chat.messages.update');
-    Route::delete('/chat/messages/{message}', [\App\Http\Controllers\ChatController::class, 'destroyMessage'])->name('chat.messages.destroy');
-    Route::post('/chat/messages/{message}/react', [\App\Http\Controllers\ChatController::class, 'react'])->name('chat.messages.react');
+    Route::get('/chat/attachments/{attachment}', [\App\Http\Controllers\ChatController::class, 'downloadAttachment'])->name('chat.attachments.show');
+    Route::post('/chat/channels', [\App\Http\Controllers\ChatController::class, 'storeChannel'])->middleware('throttle:30,1')->name('chat.channels.store');
+    Route::post('/chat/dm', [\App\Http\Controllers\ChatController::class, 'startDm'])->middleware('throttle:60,1')->name('chat.dm');
+    Route::put('/chat/messages/{message}', [\App\Http\Controllers\ChatController::class, 'updateMessage'])->middleware('throttle:60,1')->name('chat.messages.update');
+    Route::delete('/chat/messages/{message}', [\App\Http\Controllers\ChatController::class, 'destroyMessage'])->middleware('throttle:60,1')->name('chat.messages.destroy');
+    Route::post('/chat/messages/{message}/react', [\App\Http\Controllers\ChatController::class, 'react'])->middleware('throttle:120,1')->name('chat.messages.react');
     Route::get('/chat/{channel}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
     Route::get('/chat/{channel}/messages', [\App\Http\Controllers\ChatController::class, 'messages'])->name('chat.messages');
-    Route::post('/chat/{channel}/messages', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('chat.messages.store');
+    Route::get('/chat/{channel}/older', [\App\Http\Controllers\ChatController::class, 'older'])->name('chat.older');
+    Route::post('/chat/{channel}/messages', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->middleware('throttle:90,1')->name('chat.messages.store');
     Route::get('/chat/{channel}/thread/{message}', [\App\Http\Controllers\ChatController::class, 'thread'])->name('chat.thread');
 
     // APPROVAL QUEUE — everything awaiting a manager/PM decision
