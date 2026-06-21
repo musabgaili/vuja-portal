@@ -223,6 +223,20 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $project->projectPeople()->where('user_id', $this->id)->exists();
     }
 
+    /** Internal chat channels & DMs this user belongs to. */
+    public function chatChannels(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(ChatChannel::class, 'chat_channel_user')
+            ->withPivot(['role', 'last_read_message_id', 'muted', 'joined_at'])
+            ->withTimestamps();
+    }
+
+    /** Unread @mention count (bell badge + Mentions inbox). */
+    public function unreadChatMentionsCount(): int
+    {
+        return ChatMessageMention::where('user_id', $this->id)->whereNull('read_at')->count();
+    }
+
     /**
      * Check if user is internal (employee, manager, or project manager).
      */
