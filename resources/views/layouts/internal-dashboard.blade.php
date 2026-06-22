@@ -203,11 +203,13 @@
                         <i class="fas fa-lightbulb"></i>
                         {{ __('portal.nav.proposals') }}
                     </a>
-                    @if(auth()->user()->isManager())
+                    @if(auth()->user()->canManageProjects())
                     <a href="{{ route('projects.create') }}" class="nav-item">
                         <i class="fas fa-plus"></i>
                         {{ __('portal.nav.new_project') }}
                     </a>
+                    @endif
+                    @if(auth()->user()->isManager())
                     <a href="{{ route('projects.scope-changes.index') }}" class="nav-item">
                         <i class="fas fa-edit"></i>
                         {{ __('portal.nav.scope_changes') }}

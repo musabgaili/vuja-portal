@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'is_internal' => \App\Http\Middleware\IsInternal::class,
             'is_manager' => \App\Http\Middleware\IsManager::class,
+            'can_manage_projects' => \App\Http\Middleware\CanManageProjects::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

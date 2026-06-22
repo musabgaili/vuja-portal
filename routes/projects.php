@@ -120,11 +120,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/requests/{projectRequest}/respond', [\App\Http\Controllers\Projects\RequestController::class, 'respond'])->name('requests.respond');
 
         // ============================================
-        // MANAGER-ONLY PROJECT ROUTES
+        // MANAGER + PROJECT-MANAGER: direct project creation
         // ============================================
-        Route::middleware(['is_manager'])->group(function () {
+        Route::middleware(['can_manage_projects'])->group(function () {
             Route::get('/create', [ProjectController::class, 'create'])->name('create');
             Route::post('/', [ProjectController::class, 'store'])->name('store');
+        });
+
+        // ============================================
+        // MANAGER-ONLY PROJECT ROUTES (destructive)
+        // ============================================
+        Route::middleware(['is_manager'])->group(function () {
             Route::delete('/destroy/{project}', [ProjectController::class, 'destroy'])->name('destroy');
         });
     });

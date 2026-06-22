@@ -136,7 +136,7 @@
             <a href="{{ route('projects.kanban') }}" class="btn btn-light">
                 <i class="fas fa-th"></i> {{ __('portal.projects_manager.index.kanban') }}
             </a>
-            @if(auth()->user()->isManager())
+            @if(auth()->user()->canManageProjects())
             <a href="{{ route('projects.create') }}" class="btn btn-warning">
                 <i class="fas fa-plus"></i> {{ __('portal.projects_manager.kanban.new_project') }}
             </a>

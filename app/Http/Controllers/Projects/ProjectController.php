@@ -179,8 +179,8 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isManager()) {
-            abort(403, 'Only managers can create projects.');
+        if (! $user->canManageProjects()) {
+            abort(403, 'Only managers and project managers can create projects.');
         }
 
         $clients = User::where('type', 'client')

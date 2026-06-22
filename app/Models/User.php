@@ -205,6 +205,17 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * May this user create/run projects directly? Managers and project managers
+     * both can (a PM can already approve a proposal into a live project, so they
+     * may also create one outright). Excludes bulk import + delete, which stay
+     * manager-only.
+     */
+    public function canManageProjects(): bool
+    {
+        return $this->isManager() || $this->isProjectManager();
+    }
+
+    /**
      * Whether this user may use client-facing project routes (aligned with non-internal dashboard users).
      */
     public function canUseClientProjectPortal(): bool
