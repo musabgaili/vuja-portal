@@ -14,6 +14,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Hard refusal on production: these are DEMO accounts with the shared
+        // password "12345678" and must never exist on a live host, even via a
+        // direct `db:seed --class=UserSeeder` invocation.
+        if (app()->environment('production')) {
+            $this->command?->warn('UserSeeder skipped: demo login accounts are not seeded in production.');
+
+            return;
+        }
+
         // Create test users with different roles
 
         // Client User

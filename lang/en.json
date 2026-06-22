@@ -535,6 +535,7 @@
     "portal.active_projects": "Active Projects",
     "portal.active_projects_desc": "Track your ongoing projects and their progress",
     "portal.app.toggle_nav": "Toggle navigation",
+    "portal.auth.account_inactive": "Your account is not active. Please contact an administrator.",
     "portal.auth.already_have_account": "Already have an account?",
     "portal.auth.back_to_login": "Back to Login",
     "portal.auth.confirm_new_password": "Confirm New Password",

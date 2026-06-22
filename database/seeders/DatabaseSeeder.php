@@ -18,23 +18,29 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        // Catalog / config seeders — idempotent (firstOrCreate) and safe to run on
+        // every environment incl. production.
         $this->call([
             RolePermissionSeeder::class,
-            UserSeeder::class,
             ServiceRequestTypeSeeder::class,
             PricingRuleSeeder::class,
             InventoryItemSeeder::class,
-            // Engagement Points + Performance Targets + Capacity catalogs (all
-            // idempotent firstOrCreate). TeamMembersSeeder reads existing users,
-            // so it runs after UserSeeder.
             EngagementPointsSeeder::class,
             TargetMetricsSeeder::class,
             ActivityCategoriesSeeder::class,
-            TeamMembersSeeder::class,
         ]);
 
+        // Demo LOGIN accounts + demo team roster + demo project data are NEVER
+        // seeded in production: they ship the shared, well-known password
+        // "12345678" (manager@vujade.com etc.) and would be a remote admin
+        // backdoor. Real prod accounts come from registration / team invites.
+        // (UserSeeder must precede TeamMembersSeeder / DemoDataSeeder.)
         if (! app()->environment('production')) {
-            $this->call(DemoDataSeeder::class);
+            $this->call([
+                UserSeeder::class,
+                TeamMembersSeeder::class,
+                DemoDataSeeder::class,
+            ]);
         }
     }
 }

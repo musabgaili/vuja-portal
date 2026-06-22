@@ -32,14 +32,20 @@ class ApprovalService
             ->get();
     }
 
-    /** Total count relevant to this approver (quotes for all approvers; plans for managers). */
+    /**
+     * Total count relevant to this approver (quotes for all approvers; plans for
+     * managers). Runs cheap COUNT(*) queries — NOT the eager-loaded list builders —
+     * and caches briefly, since this renders in the sidebar on every internal page.
+     */
     public function count(User $user): int
     {
-        $n = $this->pendingQuotes()->count();
-        if ($user->isManager()) {
-            $n += $this->pendingPlans()->count();
-        }
+        return \Illuminate\Support\Facades\Cache::remember('approvals_count:'.$user->id, 30, function () use ($user) {
+            $n = Quote::where('status', 'pending_approval')->count();
+            if ($user->isManager()) {
+                $n += WeeklyPlan::where('status', 'pending')->count();
+            }
 
-        return $n;
+            return $n;
+        });
     }
 }

@@ -41,6 +41,14 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
+        // Never seed demo accounts/data on production, even via a direct
+        // `db:seed --class=DemoDataSeeder` invocation (shared "12345678" password).
+        if (app()->environment('production')) {
+            $this->command?->warn('DemoDataSeeder skipped on production.');
+
+            return;
+        }
+
         $manager = User::where('email', 'manager@vujade.com')->first();
         $pm = User::where('email', 'pm@vujade.com')->first();
         $employee = User::where('email', 'employee@vujade.com')->first();

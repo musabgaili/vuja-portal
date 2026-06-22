@@ -22,19 +22,28 @@ class SocialAuthService
             ->first();
 
         if ($user) {
+            $this->assertActive($user);
+
             return $user;
         }
 
-        // Check if user exists with same email
+        // Link to an existing local account by email ONLY when the provider
+        // asserts the email is verified AND the local account is already
+        // email-verified — otherwise this is an account-takeover vector (a provider
+        // returning an attacker-controlled, unverified email could hijack the match).
         $user = User::where('email', $socialUser->getEmail())->first();
 
         if ($user) {
-            // Update existing user with social provider info
+            $providerVerified = (bool) data_get((array) ($socialUser->user ?? []), 'email_verified', false);
+            if (! $providerVerified || $user->email_verified_at === null) {
+                throw new \RuntimeException('Cannot link this social account to an existing account automatically.');
+            }
+            $this->assertActive($user);
+
+            // Do NOT change status here (never silently un-suspend).
             $user->update([
                 'provider' => $provider,
                 'provider_id' => $socialUser->getId(),
-                'status' => UserStatus::ACTIVE,
-                'email_verified_at' => now(),
             ]);
 
             return $user;
@@ -42,6 +51,14 @@ class SocialAuthService
 
         // Create new user
         return $this->createUserFromSocial($socialUser, $provider);
+    }
+
+    /** Reject suspended/inactive accounts on the social path too. */
+    private function assertActive(User $user): void
+    {
+        if ($user->status !== UserStatus::ACTIVE) {
+            throw new \RuntimeException('This account is not active.');
+        }
     }
 
     /**

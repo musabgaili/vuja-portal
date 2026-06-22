@@ -535,6 +535,7 @@
     "portal.active_projects": "المشاريع النشطة",
     "portal.active_projects_desc": "تتبع مشاريعك الجارية وتقدمها",
     "portal.app.toggle_nav": "تبديل القائمة",
+    "portal.auth.account_inactive": "حسابك غير نشط. يرجى التواصل مع المسؤول.",
     "portal.auth.already_have_account": "لديك حساب بالفعل؟",
     "portal.auth.back_to_login": "العودة لتسجيل الدخول",
     "portal.auth.confirm_new_password": "تأكيد كلمة المرور الجديدة",

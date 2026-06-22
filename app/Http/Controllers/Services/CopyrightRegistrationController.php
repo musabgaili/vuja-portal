@@ -23,7 +23,8 @@ class CopyrightRegistrationController extends Controller
             'title' => 'required|string|max:255',
             'work_description' => 'required|string',
             'work_type' => 'required|string',
-            'files.*' => 'nullable|file|max:20480',
+            'files' => 'nullable|array|max:10',
+            'files.*' => 'nullable|file|max:20480|mimes:pdf,doc,docx,png,jpg,jpeg,gif,webp,zip,txt,mp3,wav,mp4,mov',
         ]);
 
         $files = [];

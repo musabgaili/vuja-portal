@@ -23,7 +23,8 @@ class IpRegistrationController extends Controller
             'title' => 'required|string|max:255',
             'ip_description' => 'required|string',
             'ip_type' => 'required|string',
-            'documents.*' => 'nullable|file|max:10240',
+            'documents' => 'nullable|array|max:10',
+            'documents.*' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,png,jpg,jpeg,gif,webp,zip,txt,csv',
         ]);
 
         $documents = [];

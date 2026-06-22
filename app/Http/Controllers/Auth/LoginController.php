@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -26,6 +28,24 @@ class LoginController extends Controller
         return Auth::user()?->isInternal()
             ? route('internal.dashboard')
             : route('client.dashboard');
+    }
+
+    /**
+     * Reject suspended/inactive accounts at login — credential match alone is not
+     * enough; a suspended user must not regain access. Runs right after a
+     * successful attempt, before the session is used.
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->status !== UserStatus::ACTIVE) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors(['email' => __('portal.auth.account_inactive')]);
+        }
+
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
