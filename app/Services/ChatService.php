@@ -235,6 +235,43 @@ class ChatService
         return $channel;
     }
 
+    /**
+     * Add internal users to a team channel. Skips DMs, non-internal users, and
+     * anyone already a member. Returns the ids actually added.
+     */
+    public function addMembers(ChatChannel $channel, array $userIds): array
+    {
+        if ($channel->isDm()) {
+            return [];
+        }
+
+        $existing = $channel->members()->pluck('users.id')->all();
+        $toAdd = User::where('type', 'internal')
+            ->whereIn('id', collect($userIds)->map(fn ($i) => (int) $i)->unique()->all() ?: [0])
+            ->whereNotIn('id', $existing ?: [0])
+            ->pluck('id');
+
+        if ($toAdd->isNotEmpty()) {
+            $channel->members()->attach(
+                $toAdd->mapWithKeys(fn ($id) => [$id => ['role' => 'member', 'joined_at' => now()]])->all()
+            );
+        }
+
+        return $toAdd->all();
+    }
+
+    /** Remove a member from a team channel (never a DM; never the channel creator). */
+    public function removeMember(ChatChannel $channel, int $userId): bool
+    {
+        if ($channel->isDm() || $userId === (int) $channel->created_by) {
+            return false;
+        }
+
+        $channel->members()->detach($userId);
+
+        return true;
+    }
+
     /** Find (or create) the DM channel whose participants are EXACTLY {author} ∪ {others}. */
     public function resolveDirectChannel(User $author, array $otherUserIds): ChatChannel
     {

@@ -78,6 +78,8 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/chat/{channel}/older', [\App\Http\Controllers\ChatController::class, 'older'])->name('chat.older');
     Route::post('/chat/{channel}/messages', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->middleware('throttle:90,1')->name('chat.messages.store');
     Route::get('/chat/{channel}/thread/{message}', [\App\Http\Controllers\ChatController::class, 'thread'])->name('chat.thread');
+    Route::post('/chat/{channel}/members', [\App\Http\Controllers\ChatController::class, 'addMembers'])->middleware('throttle:30,1')->name('chat.members.add');
+    Route::delete('/chat/{channel}/members/{member}', [\App\Http\Controllers\ChatController::class, 'removeMember'])->middleware('throttle:30,1')->name('chat.members.remove');
 
     // APPROVAL QUEUE — everything awaiting a manager/PM decision
     Route::get('/approvals', [\App\Http\Controllers\ApprovalController::class, 'index'])->name('approvals.index');

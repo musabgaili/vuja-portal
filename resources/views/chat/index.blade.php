@@ -55,7 +55,13 @@
                     <strong>{{ $channel->isDm() ? '' : '# ' }}{{ $channel->displayName($me) }}</strong>
                     @if($channel->description)<div class="chat-head-desc">{{ $channel->description }}</div>@endif
                 </div>
+                @if($channel->isDm())
                 <span class="chat-head-meta">{{ $channel->members->count() }} {{ __('portal.chat.members') }}</span>
+                @else
+                <button type="button" class="btn btn-sm btn-light chat-head-meta" data-bs-toggle="modal" data-bs-target="#manageMembersModal" title="{{ __('portal.chat.manage_members') }}">
+                    <i class="fas fa-users"></i> {{ $channel->members->count() }} {{ __('portal.chat.members') }}
+                </button>
+                @endif
             </header>
 
             <div id="chatStream" class="chat-stream"
@@ -170,6 +176,55 @@
     </form>
   </div></div>
 </div>
+
+@if($channel && ! $channel->isDm())
+<div class="modal fade" id="manageMembersModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title"><i class="fas fa-users"></i> {{ __('portal.chat.manage_members') }}</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <h6 style="font-size:.9rem;">{{ __('portal.chat.current_members') }}</h6>
+      <ul class="list-unstyled" style="max-height:240px;overflow-y:auto;margin-bottom:0;">
+        @foreach($members as $m)
+        <li class="d-flex justify-content-between align-items-center py-1 border-bottom">
+          <span>{{ $m->name }}@if($m->id === $channel->created_by) <small class="text-muted">({{ __('portal.chat.owner') }})</small>@endif</span>
+          @can('manageMembers', $channel)
+            @if($m->id !== $channel->created_by)
+            <form method="POST" action="{{ route('chat.members.remove', [$channel, $m]) }}" onsubmit="return confirm('{{ __('portal.chat.confirm_remove') }}');" class="m-0">
+              @csrf @method('DELETE')
+              <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('portal.chat.remove') }}"><i class="fas fa-user-minus"></i></button>
+            </form>
+            @endif
+          @endcan
+        </li>
+        @endforeach
+      </ul>
+
+      @can('manageMembers', $channel)
+        @php $addable = $allUsers->whereNotIn('id', $members->pluck('id')); @endphp
+        @if($addable->isNotEmpty())
+        <hr>
+        <form method="POST" action="{{ route('chat.members.add', $channel) }}">
+          @csrf
+          <h6 style="font-size:.9rem;">{{ __('portal.chat.add_members') }}</h6>
+          <div class="chat-member-pick">
+            @foreach($addable as $u)
+            <label class="chat-member-opt"><input type="checkbox" name="members[]" value="{{ $u->id }}"> {{ $u->name }}</label>
+            @endforeach
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm mt-2"><i class="fas fa-user-plus"></i> {{ __('portal.chat.add_selected') }}</button>
+        </form>
+        @else
+        <hr>
+        <p class="text-muted" style="font-size:.85rem;margin-bottom:0;">{{ __('portal.chat.all_added') }}</p>
+        @endif
+      @endcan
+    </div>
+  </div></div>
+</div>
+@endif
 @endsection
 
 @push('styles')

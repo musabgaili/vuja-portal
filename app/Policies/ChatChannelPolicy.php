@@ -18,4 +18,21 @@ class ChatChannelPolicy
     {
         return $this->view($user, $channel);
     }
+
+    /**
+     * Add/remove members on a team channel (never a DM): the channel creator, a
+     * channel admin, or a global manager who belongs to the channel.
+     */
+    public function manageMembers(User $user, ChatChannel $channel): bool
+    {
+        if ($channel->isDm() || ! $this->view($user, $channel)) {
+            return false;
+        }
+
+        if ($channel->created_by === $user->id || $user->isManager()) {
+            return true;
+        }
+
+        return $channel->members()->whereKey($user->id)->first()?->pivot->role === 'admin';
+    }
 }

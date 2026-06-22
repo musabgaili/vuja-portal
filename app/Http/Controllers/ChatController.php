@@ -136,6 +136,44 @@ class ChatController extends Controller
         return redirect()->route('chat.show', $channel);
     }
 
+    /** Add members to a team channel (creator / admin / manager). */
+    public function addMembers(Request $request, ChatChannel $channel)
+    {
+        $this->authorize('manageMembers', $channel);
+
+        $data = $request->validate([
+            'members' => 'required|array|min:1',
+            'members.*' => ['integer', Rule::exists('users', 'id')->where('type', 'internal')],
+        ]);
+
+        $added = $this->chat->addMembers($channel, $data['members']);
+
+        return redirect()->route('chat.show', $channel)
+            ->with('success', __('portal.chat.members_added', ['count' => count($added)]));
+    }
+
+    /** Remove a member from a team channel; a member may also remove themselves (leave). */
+    public function removeMember(ChatChannel $channel, User $member)
+    {
+        $isSelf = $member->id === Auth::id();
+
+        if ($isSelf) {
+            abort_unless(! $channel->isDm() && $channel->hasMember(Auth::user()), 403);
+        } else {
+            $this->authorize('manageMembers', $channel);
+        }
+
+        if (! $this->chat->removeMember($channel, $member->id)) {
+            return back()->withErrors(['member' => __('portal.chat.cannot_remove')]);
+        }
+
+        if ($isSelf) {
+            return redirect()->route('chat.index')->with('success', __('portal.chat.left_channel'));
+        }
+
+        return redirect()->route('chat.show', $channel)->with('success', __('portal.chat.member_removed'));
+    }
+
     // ===================================================================
     // Messages
     // ===================================================================
