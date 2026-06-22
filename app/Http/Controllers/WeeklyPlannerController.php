@@ -19,10 +19,16 @@ class WeeklyPlannerController extends Controller
     {
     }
 
-    /** The Sunday that starts the upcoming planned week (the default week). */
+    /** The Sunday that starts the upcoming planned week (the default for the planner). */
     public static function upcomingWeekStart(): Carbon
     {
         return Carbon::today()->next(Carbon::SUNDAY);
+    }
+
+    /** The Sunday that starts the CURRENT week (the default for review + presence). */
+    public static function currentWeekStart(): Carbon
+    {
+        return Carbon::today()->startOfWeek(Carbon::SUNDAY);
     }
 
     /** Saturday 18:00 the day before the planned week (the "Saturday protocol"). */
@@ -33,8 +39,11 @@ class WeeklyPlannerController extends Controller
         return $weekStart->copy()->subDay()->setTime((int) $h, (int) $m);
     }
 
-    /** Resolve the week being planned from the ?week= param, snapped to its Sunday. */
-    private function resolveWeekStart(Request $request): Carbon
+    /**
+     * Resolve the week from the ?week= param, snapped to its Sunday. When the param
+     * is absent, fall back to $default if given, otherwise the upcoming week.
+     */
+    private function resolveWeekStart(Request $request, ?Carbon $default = null): Carbon
     {
         $week = $request->input('week');
         if ($week) {
@@ -47,7 +56,7 @@ class WeeklyPlannerController extends Controller
             }
         }
 
-        return self::upcomingWeekStart();
+        return $default ?? self::upcomingWeekStart();
     }
 
     /**
@@ -353,7 +362,7 @@ class WeeklyPlannerController extends Controller
         $user = Auth::user();
         abort_unless($user->isManager(), 403);
 
-        $weekStart = $this->resolveWeekStart($request);
+        $weekStart = $this->resolveWeekStart($request, self::currentWeekStart());
         $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart->toDateString())->get();
 
         $breakdown = [];
@@ -382,12 +391,14 @@ class WeeklyPlannerController extends Controller
     /** Week-navigation context (label + prev/this/next) shared by review + presence. */
     private function weekNav(Carbon $weekStart): array
     {
+        $thisWeek = self::currentWeekStart();
+
         return [
             'weekStart' => $weekStart,
             'prevWeek' => $weekStart->copy()->subWeek()->toDateString(),
             'nextWeek' => $weekStart->copy()->addWeek()->toDateString(),
-            'thisWeek' => Carbon::today()->startOfWeek(Carbon::SUNDAY)->toDateString(),
-            'isCurrentWeek' => $weekStart->isSameDay(Carbon::today()->startOfWeek(Carbon::SUNDAY)),
+            'thisWeek' => $thisWeek->toDateString(),
+            'isCurrentWeek' => $weekStart->isSameDay($thisWeek),
         ];
     }
 
@@ -472,7 +483,7 @@ class WeeklyPlannerController extends Controller
         abort_unless($user->isInternal(), 403);
 
         $isManager = $user->isManager();
-        $weekStart = $this->resolveWeekStart($request);
+        $weekStart = $this->resolveWeekStart($request, self::currentWeekStart());
 
         $statuses = $isManager ? ['pending', 'approved'] : ['approved'];
         $plans = WeeklyPlan::with(['user', 'lines'])->whereDate('week_start', $weekStart->toDateString())
