@@ -423,6 +423,14 @@ class WeeklyPlannerController extends Controller
         ]);
         $this->engagement->award($weeklyPlan->user, 'weekly_plan_approved', $weeklyPlan, null, 'Weekly plan approved');
 
+        app(\App\Services\Notifier::class)->email(
+            $weeklyPlan->user, 'weekly_plan_reviewed',
+            __('portal.notif_prefs.mail.plan_subject'),
+            __('portal.notif_prefs.mail.plan_approved_heading'),
+            __('portal.notif_prefs.mail.plan_approved_body', ['week' => $weeklyPlan->week_start->translatedFormat('M j, Y')]),
+            route('weekly-planner.index', ['week' => $weeklyPlan->week_start->toDateString()]),
+        );
+
         return back()->with('success', "Approved {$weeklyPlan->user->name}'s plan.");
     }
 
@@ -438,6 +446,15 @@ class WeeklyPlannerController extends Controller
             'reviewed_at' => now(),
             'review_notes' => $validated['review_notes'] ?? null,
         ]);
+
+        $note = $validated['review_notes'] ?? '';
+        app(\App\Services\Notifier::class)->email(
+            $weeklyPlan->user, 'weekly_plan_reviewed',
+            __('portal.notif_prefs.mail.plan_subject'),
+            __('portal.notif_prefs.mail.plan_sentback_heading'),
+            __('portal.notif_prefs.mail.plan_sentback_body', ['week' => $weeklyPlan->week_start->translatedFormat('M j, Y')]).($note !== '' ? "\n\n".$note : ''),
+            route('weekly-planner.index', ['week' => $weeklyPlan->week_start->toDateString()]),
+        );
 
         return back()->with('success', "Sent back {$weeklyPlan->user->name}'s plan for changes.");
     }

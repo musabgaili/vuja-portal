@@ -362,6 +362,14 @@ class ProjectController extends Controller
             'proposal_review_notes' => $request->input('review_notes'),
         ]);
 
+        app(\App\Services\Notifier::class)->email(
+            $project->proposedBy, 'project_proposal_reviewed',
+            __('portal.notif_prefs.mail.proposal_subject'),
+            __('portal.notif_prefs.mail.proposal_approved_heading'),
+            __('portal.notif_prefs.mail.proposal_approved_body', ['title' => $project->title]),
+            route('projects.manager.show', $project),
+        );
+
         return redirect()->route('projects.manager.show', $project)
             ->with('success', __('portal.projects_propose.approved'));
     }
@@ -386,6 +394,14 @@ class ProjectController extends Controller
             'proposal_reviewed_at' => now(),
             'proposal_review_notes' => $validated['review_notes'],
         ]);
+
+        app(\App\Services\Notifier::class)->email(
+            $project->proposedBy, 'project_proposal_reviewed',
+            __('portal.notif_prefs.mail.proposal_subject'),
+            __('portal.notif_prefs.mail.proposal_sentback_heading'),
+            __('portal.notif_prefs.mail.proposal_sentback_body', ['title' => $project->title])."\n\n".$validated['review_notes'],
+            route('projects.manager.show', $project),
+        );
 
         return redirect()->route('projects.proposals.index')
             ->with('success', __('portal.projects_propose.rejected'));

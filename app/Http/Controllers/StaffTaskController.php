@@ -100,7 +100,17 @@ class StaffTaskController extends Controller
 
         // A project task should not also dangle an opportunity and vice versa,
         // but we don't force a link — both stay optional.
-        StaffTask::create($validated);
+        $task = StaffTask::create($validated);
+
+        if ($task->assigned_to !== $user->id) {
+            app(\App\Services\Notifier::class)->email(
+                \App\Models\User::find($task->assigned_to), 'task_assigned',
+                __('portal.notif_prefs.mail.task_subject'),
+                __('portal.notif_prefs.mail.task_heading'),
+                __('portal.notif_prefs.mail.task_body', ['title' => $task->title, 'by' => $user->name]),
+                route('staff-tasks.index'),
+            );
+        }
 
         return redirect()->route('staff-tasks.index')
             ->with('success', __('portal.staff_tasks.created'));

@@ -186,6 +186,10 @@
                         {{ __('portal.nav.my_mentions') }}
                         <span id="navMentionsUnread" class="badge rounded-pill bg-danger ms-auto" {{ $chatCounts['mentions'] ? '' : 'hidden' }}>{{ $chatCounts['mentions'] > 9 ? '9+' : $chatCounts['mentions'] }}</span>
                     </a>
+                    <a href="{{ route('notifications.preferences') }}" class="nav-item {{ request()->routeIs('notifications.preferences*') ? 'active' : '' }}">
+                        <i class="fas fa-envelope-open-text"></i>
+                        {{ __('portal.nav.notification_settings') }}
+                    </a>
                 </div>
 
                 <!-- Projects -->

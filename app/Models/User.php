@@ -35,6 +35,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'provider',
         'provider_id',
         'impact_points',
+        'notification_preferences',
     ];
 
     /**
@@ -60,7 +61,19 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             'role' => UserRole::class,
             'status' => UserStatus::class,
             'impact_points' => 'integer',
+            'notification_preferences' => 'array',
         ];
+    }
+
+    /** Whether this user wants email for a given notification type (default per config). */
+    public function wantsEmail(string $type): bool
+    {
+        $prefs = $this->notification_preferences ?? [];
+        if (array_key_exists($type, $prefs)) {
+            return (bool) $prefs[$type];
+        }
+
+        return (bool) config("notifications.types.$type.default", true);
     }
 
     /**

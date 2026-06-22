@@ -56,6 +56,10 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
+    // Per-user email-notification preferences.
+    Route::get('/notification-settings', [\App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('notifications.preferences');
+    Route::put('/notification-settings', [\App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('notifications.preferences.update');
+
     // TEAM CHAT (internal staff) — channels + DMs, @mentions, threads, reactions.
     // Literal segments are registered BEFORE the {channel} wildcard so they match.
     Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');

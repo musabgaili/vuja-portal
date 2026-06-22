@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Core operations for the internal team chat: sending/editing/deleting messages,
@@ -21,7 +22,9 @@ class ChatService
     /** Send a message (+ optional attachments); bump the channel and mark the author read. */
     public function send(ChatChannel $channel, User $author, string $body, ?int $parentId = null, array $files = []): ChatMessage
     {
-        return DB::transaction(function () use ($channel, $author, $body, $parentId, $files) {
+        $newMentions = [];
+
+        $message = DB::transaction(function () use ($channel, $author, $body, $parentId, $files, &$newMentions) {
             // A reply's parent must belong to THIS channel and itself be a root
             // message (one level of threading) — guards a forged cross-channel id.
             $parent = $parentId
@@ -49,7 +52,7 @@ class ChatService
                 }
             }
 
-            $this->syncMentions($message, $this->parseMentions($channel, $body), $author);
+            $newMentions = $this->syncMentions($message, $this->parseMentions($channel, $body), $author);
 
             // A reply bumps its parent so pollers refresh the parent's reply count.
             $parent?->touch();
@@ -59,13 +62,32 @@ class ChatService
 
             return $message;
         });
+
+        // Email AFTER commit (queued + guarded). Mentions first; DM recipients who
+        // weren't already mentioned get the DM email (default off).
+        $this->emailMentions($message, $author, $newMentions);
+        if ($channel->isDm()) {
+            $recipients = $channel->members()->where('users.id', '!=', $author->id)->get()
+                ->reject(fn ($u) => in_array($u->id, $newMentions, true));
+            app(Notifier::class)->emailMany(
+                $recipients, 'chat_dm',
+                __('portal.notif_prefs.mail.dm_subject', ['name' => $author->name]),
+                __('portal.notif_prefs.mail.dm_heading', ['name' => $author->name]),
+                Str::limit($body, 300),
+                route('chat.show', $channel->id),
+                __('portal.notif_prefs.mail.open_chat'),
+            );
+        }
+
+        return $message;
     }
 
     /** Edit a message body + re-resolve mentions (new tags become unread; removed ones drop). */
     public function edit(ChatMessage $message, string $body): ChatMessage
     {
         $message->forceFill(['body' => $body, 'edited_at' => now()])->save();
-        $this->syncMentions($message, $this->parseMentions($message->channel, $body), $message->author);
+        $new = $this->syncMentions($message, $this->parseMentions($message->channel, $body), $message->author);
+        $this->emailMentions($message, $message->author, $new);
 
         return $message;
     }
@@ -109,7 +131,7 @@ class ChatService
      * Persist the @mentions for a message. Only channel members (minus the author)
      * can be mentioned, so a mention can never notify someone who can't see it.
      */
-    public function syncMentions(ChatMessage $message, array $userIds, ?User $author = null): void
+    public function syncMentions(ChatMessage $message, array $userIds, ?User $author = null): array
     {
         $authorId = $author?->id ?? $message->user_id;
         $memberIds = $message->channel->members()->pluck('users.id')->all();
@@ -123,12 +145,36 @@ class ChatService
         // Drop mentions no longer present (e.g. removed on edit).
         $message->mentions()->whereNotIn('user_id', $valid->all() ?: [0])->delete();
 
+        $newlyMentioned = [];
         foreach ($valid as $id) {
-            ChatMessageMention::firstOrCreate(
+            $row = ChatMessageMention::firstOrCreate(
                 ['chat_message_id' => $message->id, 'user_id' => $id],
                 ['read_at' => null],
             );
+            if ($row->wasRecentlyCreated) {
+                $newlyMentioned[] = $id;   // only email people newly tagged
+            }
         }
+
+        return $newlyMentioned;
+    }
+
+    /** Email the people newly @mentioned in a message (gated by their preference). */
+    private function emailMentions(ChatMessage $message, ?User $author, array $userIds): void
+    {
+        if (empty($userIds)) {
+            return;
+        }
+        $name = $author?->name ?? $message->author?->name ?? '—';
+        $users = User::whereIn('id', $userIds)->get();
+        app(Notifier::class)->emailMany(
+            $users, 'chat_mention',
+            __('portal.notif_prefs.mail.mention_subject', ['name' => $name]),
+            __('portal.notif_prefs.mail.mention_heading', ['name' => $name]),
+            \Illuminate\Support\Str::limit((string) $message->body, 300),
+            route('chat.show', $message->chat_channel_id),
+            __('portal.notif_prefs.mail.open_chat'),
+        );
     }
 
     /** Toggle one emoji reaction for a user on a message. */

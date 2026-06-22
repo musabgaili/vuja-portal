@@ -95,6 +95,13 @@ class QuoteController extends Controller
         }
         $quote->update(['status' => 'approved', 'approved_by' => Auth::id(), 'approved_at' => now()]);
         $this->logComment($quote, 'approval', __('portal.quote.log_approved'));
+        app(\App\Services\Notifier::class)->email(
+            $quote->creator, 'quote_reviewed',
+            __('portal.notif_prefs.mail.quote_subject', ['number' => $quote->quote_number]),
+            __('portal.notif_prefs.mail.quote_approved_heading'),
+            __('portal.notif_prefs.mail.quote_approved_body', ['number' => $quote->quote_number]),
+            route('quotes.show', $quote),
+        );
 
         return back()->with('success', __('portal.quote.approved'));
     }
@@ -105,6 +112,13 @@ class QuoteController extends Controller
         $validated = $request->validate(['comment' => 'required|string|max:2000']);
         $quote->update(['status' => 'rejected', 'reject_reason' => $validated['comment']]);
         $this->logComment($quote, 'rejection', $validated['comment']);
+        app(\App\Services\Notifier::class)->email(
+            $quote->creator, 'quote_reviewed',
+            __('portal.notif_prefs.mail.quote_subject', ['number' => $quote->quote_number]),
+            __('portal.notif_prefs.mail.quote_rejected_heading'),
+            __('portal.notif_prefs.mail.quote_rejected_body', ['number' => $quote->quote_number])."\n\n".$validated['comment'],
+            route('quotes.show', $quote),
+        );
 
         return back()->with('success', __('portal.quote.rejected'));
     }
@@ -116,6 +130,13 @@ class QuoteController extends Controller
         $validated = $request->validate(['comment' => 'required|string|max:2000']);
         $quote->update(['status' => 'changes_requested']);
         $this->logComment($quote, 'changes', $validated['comment']);
+        app(\App\Services\Notifier::class)->email(
+            $quote->creator, 'quote_reviewed',
+            __('portal.notif_prefs.mail.quote_subject', ['number' => $quote->quote_number]),
+            __('portal.notif_prefs.mail.quote_changes_heading'),
+            __('portal.notif_prefs.mail.quote_changes_body', ['number' => $quote->quote_number])."\n\n".$validated['comment'],
+            route('quotes.show', $quote),
+        );
 
         return back()->with('success', __('portal.quote.changes_requested'));
     }
