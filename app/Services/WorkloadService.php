@@ -24,19 +24,32 @@ class WorkloadService
     public function grid()
     {
         $employees = User::where('type', 'internal')->orderBy('name')->get();
+        $ids = $employees->pluck('id')->all();
 
-        $rows = $employees->map(function (User $u) {
-            $projects = Project::where('project_manager_id', $u->id)
-                ->whereIn('status', ProjectHealthService::ACTIVE_STATUSES)->count();
+        // Grouped aggregates computed ONCE (was 7 count queries per employee).
+        $projectCounts = Project::whereIn('project_manager_id', $ids)
+            ->whereIn('status', ProjectHealthService::ACTIVE_STATUSES)
+            ->selectRaw('project_manager_id, COUNT(*) AS c')->groupBy('project_manager_id')
+            ->pluck('c', 'project_manager_id');
 
-            $tasks = ProjectTask::where('assigned_to', $u->id)
-                ->where('status', '!=', 'completed')->count();
+        $taskCounts = ProjectTask::whereIn('assigned_to', $ids)
+            ->where('status', '!=', 'completed')
+            ->selectRaw('assigned_to, COUNT(*) AS c')->groupBy('assigned_to')
+            ->pluck('c', 'assigned_to');
 
-            $requests = 0;
-            foreach ([ConsultationRequest::class, IdeaRequest::class, ResearchRequest::class, IpRegistration::class, CopyrightRegistration::class] as $model) {
-                $requests += $model::where('assigned_to', $u->id)->whereNotIn('status', self::DONE)->count();
+        $requestCounts = [];
+        foreach ([ConsultationRequest::class, IdeaRequest::class, ResearchRequest::class, IpRegistration::class, CopyrightRegistration::class] as $model) {
+            $byUser = $model::whereIn('assigned_to', $ids)->whereNotIn('status', self::DONE)
+                ->selectRaw('assigned_to, COUNT(*) AS c')->groupBy('assigned_to')->pluck('c', 'assigned_to');
+            foreach ($byUser as $uid => $c) {
+                $requestCounts[$uid] = ($requestCounts[$uid] ?? 0) + (int) $c;
             }
+        }
 
+        $rows = $employees->map(function (User $u) use ($projectCounts, $taskCounts, $requestCounts) {
+            $projects = (int) ($projectCounts[$u->id] ?? 0);
+            $tasks = (int) ($taskCounts[$u->id] ?? 0);
+            $requests = (int) ($requestCounts[$u->id] ?? 0);
             $load = $projects * 2 + $tasks + $requests;
 
             return [

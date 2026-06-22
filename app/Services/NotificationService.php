@@ -23,7 +23,8 @@ class NotificationService
     /** Recent items for the bell dropdown, newest first. */
     public function feed(User $user, int $limit = 12): array
     {
-        return Cache::remember('notif_feed:'.$user->id, 30, fn () => $this->build($user, $limit));
+        // ~13 queries to rebuild; the bell is a passive feed, so a longer TTL is fine.
+        return Cache::remember('notif_feed:'.$user->id, 120, fn () => $this->build($user, $limit));
     }
 
     /** How many feed items are newer than the user's last "seen" time. */

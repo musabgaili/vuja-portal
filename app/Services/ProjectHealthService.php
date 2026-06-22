@@ -28,8 +28,11 @@ class ProjectHealthService
         $flags = [];
         $today = Carbon::today();
 
-        // 1) Stale — no update in STALE_DAYS days.
-        $lastComment = $project->comments()->max('created_at');
+        // 1) Stale — no update in STALE_DAYS days. Use the preloaded aggregate
+        // (withMax) from dashboard() when present; otherwise query (standalone use).
+        $lastComment = array_key_exists('comments_max_created_at', $project->getAttributes())
+            ? $project->comments_max_created_at
+            : $project->comments()->max('created_at');
         $lastActivity = collect([$project->updated_at, $lastComment ? Carbon::parse($lastComment) : null])
             ->filter()->max();
         if ($lastActivity && $lastActivity->lt(Carbon::now()->subDays(self::STALE_DAYS))) {
@@ -37,8 +40,10 @@ class ProjectHealthService
                 'label' => __('portal.control_tower.flag.stale', ['days' => round($lastActivity->diffInDays(Carbon::now()))])];
         }
 
-        // 2) Milestones overdue / due within 24h.
-        foreach ($project->milestones()->where('status', '!=', 'completed')->whereNotNull('due_date')->get() as $m) {
+        // 2) Milestones overdue / due within 24h. Filter the eager-loaded
+        // collection in PHP (dashboard() preloads milestones) instead of re-querying.
+        $openMilestones = $project->milestones->filter(fn ($m) => $m->status !== 'completed' && $m->due_date);
+        foreach ($openMilestones as $m) {
             $due = Carbon::parse($m->due_date)->startOfDay();
             if ($due->lt($today)) {
                 $flags[] = ['key' => 'milestone_overdue', 'severity' => 'red',
@@ -61,8 +66,12 @@ class ProjectHealthService
             $flags[] = ['key' => 'past_due', 'severity' => 'red', 'label' => __('portal.control_tower.flag.past_due')];
         }
 
-        // 5) Pending scope change awaiting decision.
-        if (method_exists($project, 'hasPendingScopeChanges') && $project->hasPendingScopeChanges()) {
+        // 5) Pending scope change awaiting decision. Prefer the preloaded
+        // withExists flag; fall back to the relation method standalone.
+        $hasPendingScope = array_key_exists('has_pending_scope', $project->getAttributes())
+            ? (bool) $project->has_pending_scope
+            : (method_exists($project, 'hasPendingScopeChanges') && $project->hasPendingScopeChanges());
+        if ($hasPendingScope) {
             $flags[] = ['key' => 'pending_scope', 'severity' => 'yellow', 'label' => __('portal.control_tower.flag.pending_scope')];
         }
 
@@ -80,6 +89,8 @@ class ProjectHealthService
     {
         return Project::whereIn('status', self::ACTIVE_STATUSES)
             ->with(['client', 'projectManager', 'milestones'])
+            ->withMax('comments', 'created_at')
+            ->withExists(['scopeChanges as has_pending_scope' => fn ($q) => $q->where('status', 'pending')])
             ->get()
             ->map(fn (Project $p) => ['project' => $p] + $this->evaluate($p))
             ->sortBy(fn ($r) => ['red' => 0, 'yellow' => 1, 'green' => 2][$r['health']])

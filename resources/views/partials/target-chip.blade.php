@@ -2,7 +2,13 @@
 @php
     $tgtUser = auth()->user();
     $tgtShow = $tgtUser && $tgtUser->holdsTargets();
-    $tgtOverall = $tgtShow ? app(\App\Services\Targets\ActualsService::class)->overallAttainment($tgtUser, now()->startOfMonth()) : null;
+    // Cache the month-to-date attainment briefly: it ran ~8-12 aggregate queries
+    // on EVERY internal page render. The number barely changes between clicks.
+    $tgtOverall = $tgtShow
+        ? \Illuminate\Support\Facades\Cache::remember(
+            'tgt_overall:'.$tgtUser->id.':'.now()->format('Y-m'), 300,
+            fn () => app(\App\Services\Targets\ActualsService::class)->overallAttainment($tgtUser, now()->startOfMonth()))
+        : null;
 @endphp
 @if($tgtShow)
     @php $tgtRag = $tgtOverall === null ? 'none' : ($tgtOverall >= 100 ? 'green' : ($tgtOverall >= 70 ? 'amber' : 'red')); @endphp
