@@ -65,6 +65,14 @@ Route::get('/r/{code}', function (string $code) {
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
 
+// Client invitation — a signed link (emailed when staff "invite" a new client)
+// lets the client set a password and activate their account. Guest-accessible;
+// authorised by the URL signature.
+Route::get('/invite/{user}/accept', [\App\Http\Controllers\Auth\InviteController::class, 'show'])
+    ->name('invite.accept')->middleware('signed');
+Route::post('/invite/{user}/accept', [\App\Http\Controllers\Auth\InviteController::class, 'store'])
+    ->middleware('signed');
+
 // ============================================
 // AUTHENTICATED ROUTES
 // ============================================

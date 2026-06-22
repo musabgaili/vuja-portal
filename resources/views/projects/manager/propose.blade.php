@@ -46,7 +46,7 @@
 
                     <div class="form-group">
                         <label>{{ __('portal.projects_propose.client') }}</label>
-                        <select name="client_id" class="form-control">
+                        <select name="client_id" id="client_id" class="form-control" onchange="onClientPick()">
                             <option value="">{{ __('portal.projects_propose.client_optional') }}</option>
                             @foreach($clients as $client)
                             <option value="{{ $client->id }}" @selected(old('client_id')==$client->id)>{{ $client->name }} ({{ $client->email }})</option>
@@ -54,6 +54,35 @@
                         </select>
                         <small class="text-muted">{{ __('portal.projects_propose.client_hint') }}</small>
                         @error('client_id')<small class="text-danger">{{ $message }}</small>@enderror
+                    </div>
+
+                    {{-- Unregistered client: capture details, then either record only or invite. --}}
+                    <div class="card" id="newClientCard" style="background:rgba(15,150,156,.06);border:1px dashed #0F969C;margin-bottom:1rem;">
+                        <div class="card-content">
+                            <h5 style="font-size:1rem;margin-bottom:.25rem;"><i class="fas fa-user-plus"></i> {{ __('portal.projects_propose.new_client_heading') }}</h5>
+                            <p class="text-muted" style="font-size:.85rem;">{{ __('portal.projects_propose.new_client_hint') }}</p>
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label>{{ __('portal.quick_client.name') }}</label>
+                                    <input type="text" name="new_client_name" class="form-control" value="{{ old('new_client_name') }}">
+                                    @error('new_client_name')<small class="text-danger">{{ $message }}</small>@enderror
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>{{ __('portal.quick_client.email') }}</label>
+                                    <input type="email" name="new_client_email" class="form-control" value="{{ old('new_client_email') }}">
+                                    @error('new_client_email')<small class="text-danger">{{ $message }}</small>@enderror
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>{{ __('portal.quick_client.phone') }}</label>
+                                    <input type="text" name="new_client_phone" class="form-control" value="{{ old('new_client_phone') }}">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>{{ __('portal.quick_client.company') }}</label>
+                                    <input type="text" name="new_client_company" class="form-control" value="{{ old('new_client_company') }}">
+                                </div>
+                            </div>
+                            <small class="text-muted"><i class="fas fa-circle-info"></i> {{ __('portal.projects_propose.new_client_actions_hint') }}</small>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -84,9 +113,12 @@
                         <i class="fas fa-circle-info"></i> {{ __('portal.projects_propose.review_note') }}
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> {{ __('portal.projects_propose.submit') }}
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" name="action" value="record" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> {{ __('portal.projects_propose.submit_record') }}
+                        </button>
+                        <button type="submit" name="action" value="invite" class="btn btn-success" id="inviteBtn">
+                            <i class="fas fa-envelope"></i> {{ __('portal.projects_propose.submit_invite') }}
                         </button>
                         <a href="{{ route('projects.proposals.index') }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i> {{ __('portal.team.cancel') }}
@@ -97,4 +129,19 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+// When an existing client is picked from the list, the "new client" section and
+// the Invite button no longer apply — dim them so the choice is unambiguous.
+function onClientPick() {
+    var picked = !!document.getElementById('client_id').value;
+    var card = document.getElementById('newClientCard');
+    var inviteBtn = document.getElementById('inviteBtn');
+    if (card) { card.style.opacity = picked ? '.5' : '1'; }
+    card.querySelectorAll('input').forEach(function (el) { el.disabled = picked; });
+    if (inviteBtn) { inviteBtn.disabled = picked; }
+}
+document.addEventListener('DOMContentLoaded', onClientPick);
+</script>
+@endpush
 @endsection

@@ -446,6 +446,56 @@
 
         window.setTimeout(() => toastEl.remove(), 4000);
     };
+
+    // Prevent accidental double-submits. The instant a form is submitted we lock
+    // its submit button (with a spinner) so an impatient user can't fire the same
+    // POST many times before the redirect lands. AJAX forms that call
+    // preventDefault(), and forms marked [data-no-submit-guard], are left alone.
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!(form instanceof HTMLFormElement) || form.hasAttribute('data-no-submit-guard')) {
+            return;
+        }
+        var btn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (!btn || btn.hasAttribute('data-no-submit-guard')) {
+            return;
+        }
+        // Defer so any AJAX handler's preventDefault() is already visible; if the
+        // native submit was cancelled we must NOT lock the button.
+        window.setTimeout(function () {
+            if (e.defaultPrevented || btn.disabled) {
+                return;
+            }
+            if (btn.dataset.origHtml === undefined && btn.tagName === 'BUTTON') {
+                btn.dataset.origHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' + btn.innerHTML;
+            }
+            btn.disabled = true;
+            // Safety net: re-enable if navigation never happened (e.g. the request
+            // failed silently or we stayed on the page).
+            window.setTimeout(function () {
+                btn.disabled = false;
+                if (btn.dataset.origHtml !== undefined) {
+                    btn.innerHTML = btn.dataset.origHtml;
+                    delete btn.dataset.origHtml;
+                }
+            }, 15000);
+        }, 0);
+    });
+
+    // Restore any locked buttons when returning to a cached page (back button).
+    window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) {
+            return;
+        }
+        document.querySelectorAll('button[type="submit"][disabled]').forEach(function (btn) {
+            btn.disabled = false;
+            if (btn.dataset.origHtml !== undefined) {
+                btn.innerHTML = btn.dataset.origHtml;
+                delete btn.dataset.origHtml;
+            }
+        });
+    });
     </script>
     <x-toast />
     @include('partials.flash-autodismiss')

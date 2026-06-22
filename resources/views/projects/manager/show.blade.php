@@ -194,6 +194,11 @@
                     <i class="fas fa-user"></i>
                     <span>{{ $project->client->name }}</span>
                 </div>
+                @elseif($project->prospect_name)
+                <div class="project-meta-item">
+                    <i class="fas fa-user-clock"></i>
+                    <span>{{ $project->prospect_name }} <small style="opacity:.8;">({{ __('portal.projects_propose.prospect_badge') }})</small></span>
+                </div>
                 @else
                 <div class="project-meta-item">
                     <i class="fas fa-user"></i>

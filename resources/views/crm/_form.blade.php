@@ -60,12 +60,17 @@
     </div>
     <div class="col-md-4">
         <label class="form-label">{{ __('portal.crm.client') }}</label>
-        <select name="client_id" class="form-select">
-            <option value="">—</option>
-            @foreach($clients as $u)
-                <option value="{{ $u->id }}" @selected((int) old('client_id', $opp?->client_id) === $u->id)>{{ $u->name }}</option>
-            @endforeach
-        </select>
+        <div class="d-flex gap-2 align-items-start">
+            <select name="client_id" id="client_id" class="form-select">
+                <option value="">—</option>
+                @foreach($clients as $u)
+                    <option value="{{ $u->id }}" @selected((int) old('client_id', $opp?->client_id) === $u->id)>{{ $u->name }}</option>
+                @endforeach
+            </select>
+            <button type="button" class="btn btn-outline-primary text-nowrap" onclick="quickAddClient('client_id')" title="{{ __('portal.quick_client.add') }}">
+                <i class="fas fa-user-plus"></i>
+            </button>
+        </div>
     </div>
     <div class="col-md-6">
         <label class="form-label">{{ __('portal.crm.company') }} <small class="text-muted">({{ __('portal.crm.from_book') }})</small></label>

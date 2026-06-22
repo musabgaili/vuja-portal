@@ -103,6 +103,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::resource('companies', \App\Http\Controllers\CompanyController::class);
     Route::resource('contacts', \App\Http\Controllers\ContactController::class)->except('show');
 
+    // Inline "add a new client" used by the project / proposal / opportunity forms.
+    Route::post('/clients/quick', [\App\Http\Controllers\ClientQuickController::class, 'store'])->name('clients.quick-store');
+
     // CRM reporting — sales analytics (manager)
     Route::get('/crm-reports', [\App\Http\Controllers\CrmReportController::class, 'index'])->name('crm-reports.index');
 

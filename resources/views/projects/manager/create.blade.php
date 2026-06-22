@@ -19,12 +19,17 @@
                     
                     <div class="form-group">
                         <label>{{ __('portal.projects_manager.create.client') }} *</label>
-                        <select name="client_id" class="form-control" required>
-                            <option value="">{{ __('portal.projects_manager.create.select_client') }}</option>
-                            @foreach($clients as $client)
-                            <option value="{{ $client->id }}">{{ $client->name }} ({{ $client->email }})</option>
-                            @endforeach
-                        </select>
+                        <div class="d-flex gap-2 align-items-start">
+                            <select name="client_id" id="client_id" class="form-control" required>
+                                <option value="">{{ __('portal.projects_manager.create.select_client') }}</option>
+                                @foreach($clients as $client)
+                                <option value="{{ $client->id }}" @selected(old('client_id')==$client->id)>{{ $client->name }} ({{ $client->email }})</option>
+                                @endforeach
+                            </select>
+                            <button type="button" class="btn btn-outline-primary text-nowrap" onclick="quickAddClient('client_id')">
+                                <i class="fas fa-user-plus"></i> {{ __('portal.quick_client.add') }}
+                            </button>
+                        </div>
                         @error('client_id')<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
 
@@ -116,4 +121,5 @@
         </div>
     </div>
 </div>
+@include('partials.quick-add-client')
 @endsection

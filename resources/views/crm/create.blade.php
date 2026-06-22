@@ -16,4 +16,5 @@
         </form>
     </div>
 </div>
+@include('partials.quick-add-client')
 @endsection

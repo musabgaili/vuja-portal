@@ -159,7 +159,7 @@ class OpportunityController extends Controller
     {
         return [
             'owners' => User::where('type', 'internal')->orderBy('name')->get(),
-            'clients' => User::where('role', 'client')->orderBy('name')->get(),
+            'clients' => User::where('type', 'client')->where('status', 'active')->orderBy('name')->get(),
             'companies' => Company::orderBy('name')->get(),
             'contacts' => Contact::orderBy('name')->get(),
             'sources' => config('crm.sources'),

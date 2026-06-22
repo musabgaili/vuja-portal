@@ -64,6 +64,7 @@ class Project extends Model
         'quoted_by', 'quote_file', 'quoted_at',
         'proposed_by', 'proposal_notes',
         'proposal_reviewed_by', 'proposal_reviewed_at', 'proposal_review_notes',
+        'prospect_name', 'prospect_email', 'prospect_phone', 'prospect_company',
     ];
 
     protected $casts = [
@@ -87,6 +88,15 @@ class Project extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
+    }
+
+    /**
+     * Display name for the project's client: the registered account if one is
+     * linked, otherwise the free-text prospect captured on a proposal.
+     */
+    public function clientDisplayName(): ?string
+    {
+        return $this->client?->name ?? $this->prospect_name;
     }
 
     public function projectManager(): BelongsTo

@@ -271,39 +271,120 @@ class ProjectController extends Controller
             'budget' => 'nullable|numeric|min:0',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            // Unregistered client captured inline (recorded as prospect, or invited).
+            'new_client_name' => 'nullable|string|max:160',
+            'new_client_email' => 'nullable|email|max:255',
+            'new_client_phone' => 'nullable|string|max:40',
+            'new_client_company' => 'nullable|string|max:160',
         ]);
 
-        $project = Project::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'scope' => $validated['scope'] ?? null,
-            'proposal_notes' => $validated['proposal_notes'] ?? null,
-            'client_id' => $validated['client_id'] ?? null,
-            'budget' => $validated['budget'] ?? null,
-            'start_date' => $validated['start_date'] ?? null,
-            'end_date' => $validated['end_date'] ?? null,
-            'status' => 'proposed',
-            'proposed_by' => $user->id,
-        ]);
+        $action = $request->input('action') === 'invite' ? 'invite' : 'record';
+        $hasNewClient = empty($validated['client_id']) && ! empty($validated['new_client_name']);
 
-        // Track the proposer on the team so it surfaces in their project list
-        // (employees only see projects they belong to) and they can view it.
-        \App\Models\ProjectPerson::firstOrCreate(
-            ['project_id' => $project->id, 'user_id' => $user->id],
-            ['role' => 'employee', 'can_edit' => false],
-        );
-
-        // Link the client (if chosen) so the relationship is consistent with
-        // the normal create path.
-        if (! empty($validated['client_id'])) {
-            \App\Models\ProjectPerson::firstOrCreate(
-                ['project_id' => $project->id, 'user_id' => $validated['client_id']],
-                ['role' => 'client', 'can_edit' => false],
-            );
+        // Inviting needs an email to send to.
+        if ($action === 'invite' && $hasNewClient && empty($validated['new_client_email'])) {
+            return back()->withInput()->withErrors(['new_client_email' => __('portal.projects_propose.invite_needs_email')]);
         }
 
-        return redirect()->route('projects.proposals.index')
-            ->with('success', __('portal.projects_propose.submitted'));
+        $provisioning = app(\App\Services\Clients\ClientProvisioningService::class);
+        $title = $validated['title'];
+
+        // The whole create is serialized per (proposer, title) and collapses a
+        // repeat of the same still-pending proposal (a double-submit) into the
+        // original row. Returns the outcome used to pick the flash message.
+        $create = function () use ($validated, $user, $title, $action, $hasNewClient, $provisioning): string {
+            $recent = Project::where('proposed_by', $user->id)
+                ->where('status', 'proposed')
+                ->where('title', $title)
+                ->where('created_at', '>=', now()->subMinutes(10))
+                ->exists();
+
+            if ($recent) {
+                return 'duplicate'; // identical proposal just filed — no-op.
+            }
+
+            $clientId = $validated['client_id'] ?? null;
+            $prospect = ['name' => null, 'email' => null, 'phone' => null, 'company' => null];
+            $invited = false;
+
+            if ($hasNewClient) {
+                if ($action === 'invite') {
+                    // Create (or reuse) the client account and email an activation
+                    // invite. Throws ClientEmailTakenException for staff emails.
+                    $result = $provisioning->findOrCreateClient([
+                        'name' => $validated['new_client_name'],
+                        'email' => $validated['new_client_email'],
+                        'phone' => $validated['new_client_phone'] ?? null,
+                        'company' => $validated['new_client_company'] ?? null,
+                    ], $user->id);
+                    $clientId = $result['user']->id;
+                    $invited = $provisioning->sendInvitation($result['user'], $user);
+                } else {
+                    // Record only — keep the client's details as free text.
+                    $prospect = [
+                        'name' => $validated['new_client_name'],
+                        'email' => $validated['new_client_email'] ?? null,
+                        'phone' => $validated['new_client_phone'] ?? null,
+                        'company' => $validated['new_client_company'] ?? null,
+                    ];
+                }
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $user, $clientId, $prospect) {
+                $project = Project::create([
+                    'title' => $validated['title'],
+                    'description' => $validated['description'],
+                    'scope' => $validated['scope'] ?? null,
+                    'proposal_notes' => $validated['proposal_notes'] ?? null,
+                    'client_id' => $clientId,
+                    'prospect_name' => $prospect['name'],
+                    'prospect_email' => $prospect['email'],
+                    'prospect_phone' => $prospect['phone'],
+                    'prospect_company' => $prospect['company'],
+                    'budget' => $validated['budget'] ?? null,
+                    'start_date' => $validated['start_date'] ?? null,
+                    'end_date' => $validated['end_date'] ?? null,
+                    'status' => 'proposed',
+                    'proposed_by' => $user->id,
+                ]);
+
+                // Track the proposer on the team so it surfaces in their project
+                // list (employees only see projects they belong to).
+                \App\Models\ProjectPerson::firstOrCreate(
+                    ['project_id' => $project->id, 'user_id' => $user->id],
+                    ['role' => 'employee', 'can_edit' => false],
+                );
+
+                if ($clientId) {
+                    \App\Models\ProjectPerson::firstOrCreate(
+                        ['project_id' => $project->id, 'user_id' => $clientId],
+                        ['role' => 'client', 'can_edit' => false],
+                    );
+                }
+            });
+
+            return $invited ? 'invited' : 'recorded';
+        };
+
+        $lockKey = 'propose:'.$user->id.':'.md5(mb_strtolower(trim($title)));
+
+        try {
+            try {
+                $outcome = \Illuminate\Support\Facades\Cache::lock($lockKey, 10)->block(5, $create);
+            } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+                // Couldn't grab the lock in time — proceed without it (the dedupe
+                // check inside still guards against an obvious duplicate).
+                $outcome = $create();
+            }
+        } catch (\App\Exceptions\ClientEmailTakenException $e) {
+            return back()->withInput()->withErrors(['new_client_email' => __('portal.quick_client.email_taken')]);
+        }
+
+        $message = $outcome === 'invited'
+            ? __('portal.projects_propose.submitted_invited')
+            : __('portal.projects_propose.submitted');
+
+        return redirect()->route('projects.proposals.index')->with('success', $message);
     }
 
     /**

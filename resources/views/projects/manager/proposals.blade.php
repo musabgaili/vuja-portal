@@ -43,7 +43,12 @@
                         @endif
                     </td>
                     <td>{{ $p->proposedBy?->name ?? '—' }}<br><small class="text-muted">{{ $p->created_at?->translatedFormat('M j, Y') }}</small></td>
-                    <td>{{ $p->client?->name ?? __('portal.projects_propose.no_client') }}</td>
+                    <td>
+                        {{ $p->clientDisplayName() ?? __('portal.projects_propose.no_client') }}
+                        @if(! $p->client_id && $p->prospect_name)
+                        <br><small class="text-muted"><i class="fas fa-user-clock"></i> {{ __('portal.projects_propose.prospect_badge') }}</small>
+                        @endif
+                    </td>
                     <td>{{ $p->budget ? number_format($p->budget, 2).' '.config('scope.currency','SAR') : '—' }}</td>
                     <td class="text-end">
                         <a href="{{ route('projects.manager.show', $p) }}" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>
