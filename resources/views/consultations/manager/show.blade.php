@@ -70,6 +70,8 @@
         </div>
     </div>
 </div>
+@include('partials.service-work-panel', ['model' => $consultation, 'type' => 'consultation'])
+
 <div class="modal fade" id="assignModal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>{{ __('portal.consultations.manager.show.assign_employee') }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form method="POST" action="{{ route('consultations.assign', $consultation) }}">@csrf<div class="modal-body"><select name="assigned_to" class="form-control" required><option value="">{{ __('portal.consultations.manager.show.select_employee') }}</option>@foreach($employees as $emp)<option value="{{ $emp->id }}">{{ $emp->name }}</option>@endforeach</select></div><div class="modal-footer"><button type="submit" class="btn btn-primary">{{ __('portal.consultations.manager.show.assign') }}</button></div></form></div></div></div>
 <div class="modal fade" id="meetingModal">
     <div class="modal-dialog modal-lg">

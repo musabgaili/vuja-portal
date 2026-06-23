@@ -77,6 +77,8 @@
     </div>
 </div>
 
+@include('partials.service-work-panel', ['model' => $prototype, 'type' => 'prototype'])
+
 @if($prototype->status === 'completed')
 @php $convertedProject = $prototype->convertedProject(); @endphp
 <div class="card mt-3"><div class="card-content d-flex justify-content-between align-items-center flex-wrap gap-2">

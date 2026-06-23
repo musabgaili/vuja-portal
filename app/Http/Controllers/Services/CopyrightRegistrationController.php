@@ -139,6 +139,9 @@ class CopyrightRegistrationController extends Controller
     public function updateStatus(Request $request, CopyrightRegistration $copyright)
     {
         $this->authorize('manage', $copyright);
+        // Same scope as the work panel: only the assignee, a manager, or a PM may record the outcome.
+        $user = Auth::user();
+        abort_unless((int) $copyright->assigned_to === (int) $user->id || $user->isManager() || $user->isProjectManager(), 403);
 
         $validated = $request->validate([
             'status' => 'required|in:filing,registered,completed',
@@ -147,8 +150,11 @@ class CopyrightRegistrationController extends Controller
 
         $updateData = ['status' => $validated['status']];
 
-        if ($validated['status'] === 'registered' && isset($validated['registration_number'])) {
+        // Persist the number whenever it is provided; only stamp registered_at on the registered status.
+        if (! empty($validated['copyright_number'])) {
             $updateData['copyright_number'] = $validated['copyright_number'];
+        }
+        if ($validated['status'] === 'registered') {
             $updateData['registered_at'] = now();
         }
 

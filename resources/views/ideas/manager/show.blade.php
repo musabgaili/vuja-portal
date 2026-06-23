@@ -140,6 +140,8 @@
             </div>
         </div>
     </div>
+    @include('partials.service-work-panel', ['model' => $idea, 'type' => 'idea'])
+
     <div class="modal fade" id="quoteModal">
         <div class="modal-dialog">
             <div class="modal-content">

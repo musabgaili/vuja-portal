@@ -108,6 +108,8 @@
         </div>
     </div>
 </div>
+
+@include('partials.client-deliverables', ['model' => $consultation])
 @endsection
 
 @push('styles')

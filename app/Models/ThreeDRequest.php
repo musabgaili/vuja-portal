@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasAutoTranslations;
 use App\Models\Concerns\HasServiceProject;
+use App\Models\Concerns\HasServiceWorkPanel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +24,7 @@ class ThreeDRequest extends Model
 
     protected array $translatable = ['title', 'description'];
 
-    use HasFactory, HasServiceProject, HasUuidRouteKey, LogsActivity;
+    use HasFactory, HasServiceProject, HasServiceWorkPanel, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'uuid', 'user_id', 'type', 'title', 'description',

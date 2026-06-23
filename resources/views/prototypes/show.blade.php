@@ -42,4 +42,6 @@
         <div class="mt-3"><a href="{{ route('prototypes.index') }}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> {{ __('portal.prototypes.back_to_list') }}</a></div>
     </div>
 </div>
+
+@include('partials.client-deliverables', ['model' => $prototype])
 @endsection

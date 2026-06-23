@@ -12,6 +12,7 @@ use App\Http\Controllers\Services\CopyrightRegistrationController;
 use App\Http\Controllers\Services\IdeaRequestController;
 use App\Http\Controllers\Services\IpRegistrationController;
 use App\Http\Controllers\Services\ResearchRequestController;
+use App\Http\Controllers\Services\ServiceWorkController;
 use App\Http\Controllers\StepFormFieldController;
 use App\Http\Controllers\StepperServiceRequestController;
 use Illuminate\Support\Facades\Route;
@@ -229,6 +230,13 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/ideas/{idea}/assign', [IdeaRequestController::class, 'assign'])->name('ideas.assign');
     Route::post('/ideas/{idea}/close', [IdeaRequestController::class, 'close'])->name('ideas.close');
     Route::post('/ideas/{idea}/convert-to-project', [IdeaRequestController::class, 'convertToProject'])->name('ideas.convert-to-project');
+
+    // SERVICE WORK PANEL — assignee/manager/PM progress, internal notes, deliverables
+    // (shared across prototype, 3D, IP, copyright, research, consultation, idea).
+    Route::post('/service-work/{type}/{id}/status', [ServiceWorkController::class, 'updateStatus'])->name('service-work.status')->middleware('throttle:60,1');
+    Route::post('/service-work/{type}/{id}/note', [ServiceWorkController::class, 'addNote'])->name('service-work.note')->middleware('throttle:60,1');
+    Route::post('/service-work/{type}/{id}/deliverable', [ServiceWorkController::class, 'addDeliverable'])->name('service-work.deliverable')->middleware('throttle:30,1');
+    Route::delete('/service-work/items/{item}', [ServiceWorkController::class, 'deleteItem'])->name('service-work.delete-item')->middleware('throttle:30,1');
 
     // PROTOTYPES - Manager/Employee Routes
     Route::get('/prototypes/manager', [\App\Http\Controllers\Services\PrototypeRequestController::class, 'managerIndex'])->name('prototypes.manager.index');

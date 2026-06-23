@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Models\Concerns\HasServiceProject;
+use App\Models\Concerns\HasServiceWorkPanel;
 
 class IdeaRequest extends Model
 {
@@ -18,7 +19,7 @@ class IdeaRequest extends Model
 
     protected array $translatable = ['title', 'description'];
 
-    use HasFactory, HasServiceProject, HasUuidRouteKey, LogsActivity;
+    use HasFactory, HasServiceProject, HasServiceWorkPanel, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'user_id',

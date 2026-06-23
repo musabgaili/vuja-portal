@@ -142,6 +142,9 @@ class ResearchRequestController extends Controller
     public function complete(Request $request, ResearchRequest $research)
     {
         $this->authorize('manage', $research);
+        // Same scope as the work panel: only the assignee, a manager, or a PM may submit findings.
+        $user = Auth::user();
+        abort_unless((int) $research->assigned_to === (int) $user->id || $user->isManager() || $user->isProjectManager(), 403);
 
         $validated = $request->validate([
             'research_findings' => 'required|string',

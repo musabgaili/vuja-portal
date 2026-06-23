@@ -139,6 +139,9 @@ class IpRegistrationController extends Controller
     public function updateStatus(Request $request, IpRegistration $ip)
     {
         $this->authorize('manage', $ip);
+        // Same scope as the work panel: only the assignee, a manager, or a PM may record the outcome.
+        $user = Auth::user();
+        abort_unless((int) $ip->assigned_to === (int) $user->id || $user->isManager() || $user->isProjectManager(), 403);
 
         $validated = $request->validate([
             'status' => 'required|in:documentation,filing,registered,completed',
@@ -147,8 +150,11 @@ class IpRegistrationController extends Controller
 
         $updateData = ['status' => $validated['status']];
 
-        if ($validated['status'] === 'registered' && isset($validated['registration_number'])) {
+        // Persist the number whenever it is provided; only stamp registered_at on the registered status.
+        if (! empty($validated['registration_number'])) {
             $updateData['registration_number'] = $validated['registration_number'];
+        }
+        if ($validated['status'] === 'registered') {
             $updateData['registered_at'] = now();
         }
 

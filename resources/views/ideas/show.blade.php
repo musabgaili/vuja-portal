@@ -254,6 +254,8 @@
         </div>
     </div>
 </div>
+
+@include('partials.client-deliverables', ['model' => $idea])
 @endsection
 
 @push('styles')

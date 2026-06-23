@@ -42,5 +42,7 @@
         </div>
     </div>
 </div>
+
+@include('partials.client-deliverables', ['model' => $ip])
 @endsection
 

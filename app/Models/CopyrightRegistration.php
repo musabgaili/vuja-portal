@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Models\Concerns\HasServiceProject;
+use App\Models\Concerns\HasServiceWorkPanel;
 
 class CopyrightRegistration extends Model
 {
@@ -17,7 +18,7 @@ class CopyrightRegistration extends Model
 
     protected array $translatable = ['title', 'work_description'];
 
-    use HasFactory, HasServiceProject, HasUuidRouteKey, LogsActivity;
+    use HasFactory, HasServiceProject, HasServiceWorkPanel, HasUuidRouteKey, LogsActivity;
 
     protected $fillable = [
         'user_id',

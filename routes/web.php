@@ -100,6 +100,13 @@ Route::middleware(['auth'])->group(function () {
     // Service Request Routes (Legacy - can be removed later)
     Route::resource('service-requests', ServiceRequestController::class);
 
+    // Service-work deliverable download — reachable by internal staff and by the
+    // client owner when the deliverable was shared. Authorization is enforced in
+    // the controller (assignee/manager/PM, or client owner for client-visible files).
+    Route::get('/service-work/items/{item}/download', [\App\Http\Controllers\Services\ServiceWorkController::class, 'download'])
+        ->middleware('throttle:60,1')
+        ->name('service-work.download');
+
     // Internal Improvement Ideas — any authenticated user (client, employee or
     // PM) can suggest portal improvements. Managers review & approve them in the
     // internal area (see routes/internal.php). Views are role-aware.

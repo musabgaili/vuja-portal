@@ -81,4 +81,6 @@
         </div>
     </div>
 </div>
+
+@include('partials.client-deliverables', ['model' => $research])
 @endsection
