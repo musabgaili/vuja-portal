@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChatChannel;
+use App\Models\ChatChannelJoinRequest;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageMention;
 use App\Models\User;
@@ -69,7 +70,12 @@ class ChatController extends Controller
         $allUsers = $this->internalUsers();
         $readState = $this->chat->readState($channel, $user->id);   // for "Seen" receipts
 
-        return view('chat.index', compact('channels', 'channel', 'messages', 'members', 'allUsers', 'readState'));
+        // Pending join requests (for the manage-members modal + header badge).
+        $pendingRequests = $channel->isDm()
+            ? collect()
+            : $channel->pendingJoinRequests()->with('user:id,name')->get();
+
+        return view('chat.index', compact('channels', 'channel', 'messages', 'members', 'allUsers', 'readState', 'pendingRequests'));
     }
 
     /** My Mentions inbox — every message that tagged me, unread first. */
@@ -172,6 +178,56 @@ class ChatController extends Controller
         }
 
         return redirect()->route('chat.show', $channel)->with('success', __('portal.chat.member_removed'));
+    }
+
+    /** Directory of channels the user can discover but hasn't joined. */
+    public function browse()
+    {
+        $user = Auth::user();
+
+        $channels = ChatChannel::discoverableFor($user)->withCount('members')->get();
+
+        $pending = ChatChannelJoinRequest::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->pluck('chat_channel_id')
+            ->all();
+
+        return view('chat.browse', compact('channels', 'pending'));
+    }
+
+    /** Ask to join a public channel. */
+    public function requestJoin(ChatChannel $channel)
+    {
+        $this->authorize('requestToJoin', $channel);
+
+        $created = $this->chat->requestToJoin($channel, Auth::user());
+
+        return redirect()->route('chat.browse')->with(
+            'success',
+            $created ? __('portal.chat.join_requested') : __('portal.chat.join_already_requested')
+        );
+    }
+
+    /** Approve a pending join request (channel admin / creator / manager). */
+    public function approveJoin(ChatChannel $channel, ChatChannelJoinRequest $joinRequest)
+    {
+        $this->authorize('manageMembers', $channel);
+        abort_unless($joinRequest->chat_channel_id === $channel->id, 404);
+
+        $this->chat->approveJoinRequest($joinRequest, Auth::user());
+
+        return redirect()->route('chat.show', $channel)->with('success', __('portal.chat.join_approved'));
+    }
+
+    /** Decline a pending join request. */
+    public function declineJoin(ChatChannel $channel, ChatChannelJoinRequest $joinRequest)
+    {
+        $this->authorize('manageMembers', $channel);
+        abort_unless($joinRequest->chat_channel_id === $channel->id, 404);
+
+        $this->chat->declineJoinRequest($joinRequest, Auth::user());
+
+        return redirect()->route('chat.show', $channel)->with('success', __('portal.chat.join_declined'));
     }
 
     // ===================================================================

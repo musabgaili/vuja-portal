@@ -20,6 +20,7 @@
         <div class="chat-side-head">
             <span><i class="fas fa-comments"></i> {{ __('portal.chat.title') }}</span>
             <div class="d-flex gap-1">
+                <a href="{{ route('chat.browse') }}" class="btn btn-sm btn-light" title="{{ __('portal.chat.browse') }}"><i class="fas fa-compass"></i></a>
                 <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#newDmModal" title="{{ __('portal.chat.new_dm') }}"><i class="fas fa-user-plus"></i></button>
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newChannelModal" title="{{ __('portal.chat.new_channel') }}"><i class="fas fa-plus"></i></button>
             </div>
@@ -60,6 +61,11 @@
                 @else
                 <button type="button" class="btn btn-sm btn-light chat-head-meta" data-bs-toggle="modal" data-bs-target="#manageMembersModal" title="{{ __('portal.chat.manage_members') }}">
                     <i class="fas fa-users"></i> {{ $channel->members->count() }} {{ __('portal.chat.members') }}
+                    @can('manageMembers', $channel)
+                        @if(($pendingRequests ?? collect())->isNotEmpty())
+                        <span class="badge bg-warning text-dark">{{ $pendingRequests->count() }}</span>
+                        @endif
+                    @endcan
                 </button>
                 @endif
             </header>
@@ -203,6 +209,28 @@
       </ul>
 
       @can('manageMembers', $channel)
+        @if(($pendingRequests ?? collect())->isNotEmpty())
+        <hr>
+        <h6 style="font-size:.9rem;"><i class="fas fa-user-clock"></i> {{ __('portal.chat.pending_requests') }}</h6>
+        <ul class="list-unstyled" style="margin-bottom:0;">
+          @foreach($pendingRequests as $req)
+          <li class="d-flex justify-content-between align-items-center py-1 border-bottom">
+            <span>{{ $req->user?->name }}</span>
+            <span class="d-flex gap-1">
+              <form method="POST" action="{{ route('chat.join.approve', [$channel, $req]) }}" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-outline-success" title="{{ __('portal.chat.approve') }}"><i class="fas fa-check"></i></button>
+              </form>
+              <form method="POST" action="{{ route('chat.join.decline', [$channel, $req]) }}" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ __('portal.chat.decline') }}"><i class="fas fa-times"></i></button>
+              </form>
+            </span>
+          </li>
+          @endforeach
+        </ul>
+        @endif
+
         @php $addable = $allUsers->whereNotIn('id', $members->pluck('id')); @endphp
         @if($addable->isNotEmpty())
         <hr>

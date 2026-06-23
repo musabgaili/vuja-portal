@@ -67,6 +67,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::post('/chat/mentions/read-all', [\App\Http\Controllers\ChatController::class, 'readAllMentions'])->name('chat.mentions.read-all');
     Route::get('/chat/poll', [\App\Http\Controllers\ChatController::class, 'poll'])->name('chat.poll');
     Route::get('/chat/members', [\App\Http\Controllers\ChatController::class, 'members'])->name('chat.members');
+    Route::get('/chat/browse', [\App\Http\Controllers\ChatController::class, 'browse'])->name('chat.browse');
     Route::get('/chat/attachments/{attachment}', [\App\Http\Controllers\ChatController::class, 'downloadAttachment'])->name('chat.attachments.show');
     Route::post('/chat/channels', [\App\Http\Controllers\ChatController::class, 'storeChannel'])->middleware('throttle:30,1')->name('chat.channels.store');
     Route::post('/chat/dm', [\App\Http\Controllers\ChatController::class, 'startDm'])->middleware('throttle:60,1')->name('chat.dm');
@@ -80,6 +81,9 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/chat/{channel}/thread/{message}', [\App\Http\Controllers\ChatController::class, 'thread'])->name('chat.thread');
     Route::post('/chat/{channel}/members', [\App\Http\Controllers\ChatController::class, 'addMembers'])->middleware('throttle:30,1')->name('chat.members.add');
     Route::delete('/chat/{channel}/members/{member}', [\App\Http\Controllers\ChatController::class, 'removeMember'])->middleware('throttle:30,1')->name('chat.members.remove');
+    Route::post('/chat/{channel}/join', [\App\Http\Controllers\ChatController::class, 'requestJoin'])->middleware('throttle:20,1')->name('chat.join.request');
+    Route::post('/chat/{channel}/join-requests/{joinRequest}/approve', [\App\Http\Controllers\ChatController::class, 'approveJoin'])->middleware('throttle:60,1')->name('chat.join.approve');
+    Route::post('/chat/{channel}/join-requests/{joinRequest}/decline', [\App\Http\Controllers\ChatController::class, 'declineJoin'])->middleware('throttle:60,1')->name('chat.join.decline');
 
     // APPROVAL QUEUE — everything awaiting a manager/PM decision
     Route::get('/approvals', [\App\Http\Controllers\ApprovalController::class, 'index'])->name('approvals.index');

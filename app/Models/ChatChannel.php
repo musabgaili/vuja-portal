@@ -47,9 +47,36 @@ class ChatChannel extends Model
             ->withTimestamps();
     }
 
+    public function joinRequests(): HasMany
+    {
+        return $this->hasMany(ChatChannelJoinRequest::class);
+    }
+
+    public function pendingJoinRequests(): HasMany
+    {
+        return $this->joinRequests()->where('status', 'pending');
+    }
+
     public function isDm(): bool
     {
         return $this->type === 'dm';
+    }
+
+    public function isPublic(): bool
+    {
+        return ! $this->isDm() && ! $this->is_private;
+    }
+
+    /**
+     * Public team channels the user can DISCOVER but hasn't joined. Managers also
+     * see private channels here (they may open any team channel for oversight).
+     */
+    public function scopeDiscoverableFor(Builder $query, User $user): Builder
+    {
+        return $query->where('type', 'channel')
+            ->when(! $user->isManager(), fn ($q) => $q->where('is_private', false))
+            ->whereDoesntHave('members', fn ($q) => $q->whereKey($user->id))
+            ->orderBy('name');
     }
 
     /** Channels the user is a member of, most-recently-active first. */

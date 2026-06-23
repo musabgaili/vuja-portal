@@ -7,10 +7,30 @@ use App\Models\User;
 
 class ChatChannelPolicy
 {
-    /** Only an internal member of the channel may view it. */
+    /**
+     * Members may view their channel. Managers may additionally open ANY team
+     * channel (not DMs) for oversight, even ones they weren't added to.
+     */
     public function view(User $user, ChatChannel $channel): bool
     {
-        return $user->isInternal() && $channel->hasMember($user);
+        if (! $user->isInternal()) {
+            return false;
+        }
+
+        if ($channel->hasMember($user)) {
+            return true;
+        }
+
+        return $user->isManager() && ! $channel->isDm();
+    }
+
+    /** An internal non-member may ask to join a PUBLIC team channel. */
+    public function requestToJoin(User $user, ChatChannel $channel): bool
+    {
+        return $user->isInternal()
+            && ! $channel->isDm()
+            && ! $channel->is_private
+            && ! $channel->hasMember($user);
     }
 
     /** Posting (messages, reactions, read receipts) requires membership. */

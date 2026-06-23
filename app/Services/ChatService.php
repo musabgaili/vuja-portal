@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ChatChannel;
+use App\Models\ChatChannelJoinRequest;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageMention;
 use App\Models\User;
@@ -270,6 +271,48 @@ class ChatService
         $channel->members()->detach($userId);
 
         return true;
+    }
+
+    /**
+     * Record (or revive) a pending request to join a channel. Returns true when a
+     * new pending request was created; false if one is already pending or moot.
+     */
+    public function requestToJoin(ChatChannel $channel, User $user): bool
+    {
+        if ($channel->isDm() || $channel->hasMember($user)) {
+            return false;
+        }
+
+        $request = ChatChannelJoinRequest::firstOrNew([
+            'chat_channel_id' => $channel->id,
+            'user_id' => $user->id,
+        ]);
+
+        if ($request->exists && $request->status === 'pending') {
+            return false;
+        }
+
+        // Allow re-requesting after a previous decline.
+        $request->fill(['status' => 'pending', 'decided_by' => null, 'decided_at' => null])->save();
+
+        return true;
+    }
+
+    /** Approve a join request: add the requester as a member and settle the row. */
+    public function approveJoinRequest(ChatChannelJoinRequest $request, User $decider): void
+    {
+        $channel = $request->channel;
+        if ($channel && ! $channel->isDm() && ! $channel->members()->whereKey($request->user_id)->exists()) {
+            $channel->members()->attach($request->user_id, ['role' => 'member', 'joined_at' => now()]);
+        }
+
+        $request->update(['status' => 'approved', 'decided_by' => $decider->id, 'decided_at' => now()]);
+    }
+
+    /** Decline a join request without adding the requester. */
+    public function declineJoinRequest(ChatChannelJoinRequest $request, User $decider): void
+    {
+        $request->update(['status' => 'declined', 'decided_by' => $decider->id, 'decided_at' => now()]);
     }
 
     /** Find (or create) the DM channel whose participants are EXACTLY {author} ∪ {others}. */
