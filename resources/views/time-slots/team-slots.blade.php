@@ -30,9 +30,14 @@
                             <span class="badge bg-secondary mt-1">{{ __('portal.time_slots.team_slots.no_available') }}</span>
                         @endif
                     </div>
-                    <button class="btn btn-sm btn-primary" onclick="addSlots({{ $member->id }}, @js($member->name))">
-                        <i class="fas fa-plus"></i> {{ __('portal.time_slots.team_slots.add_slots') }}
-                    </button>
+                    <div class="d-flex flex-column gap-1">
+                        <a href="{{ route('meetings.internal.book', ['member' => $member->id]) }}" class="btn btn-sm btn-success text-nowrap">
+                            <i class="fas fa-calendar-check"></i> {{ __('portal.meetings.book') }}
+                        </a>
+                        <button class="btn btn-sm btn-primary text-nowrap" onclick="addSlots({{ $member->id }}, @js($member->name))">
+                            <i class="fas fa-plus"></i> {{ __('portal.time_slots.team_slots.add_slots') }}
+                        </button>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -89,6 +94,11 @@
                         @endif
                     </td>
                     <td>
+                        @if($slot->status === 'available' && !$slot->isBooked() && !$slot->isPast())
+                        <a href="{{ route('meetings.internal.book', ['member' => $slot->user_id]) }}" class="btn btn-sm btn-success" title="{{ __('portal.meetings.book') }}">
+                            <i class="fas fa-calendar-check"></i>
+                        </a>
+                        @endif
                         @if(!$slot->isBooked() && !$slot->isPast())
                         <button class="btn btn-sm btn-warning" onclick="toggleBlock({{ $slot->id }})">
                             <i class="fas fa-{{ $slot->isBlocked() ? 'unlock' : 'lock' }}"></i>

@@ -207,9 +207,14 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::delete('/time-slots/{timeSlot}', [\App\Http\Controllers\TimeSlotController::class, 'destroy'])->name('time-slots.destroy');
     Route::post('/time-slots/{timeSlot}/toggle-block', [\App\Http\Controllers\TimeSlotController::class, 'toggleBlock'])->name('time-slots.toggle-block');
     Route::get('/time-slots/available/{employeeId}', [\App\Http\Controllers\TimeSlotController::class, 'getAvailableSlots'])->name('time-slots.available');
+    // Add availability for a colleague (managers + project managers).
+    Route::post('/team-time-slots/add', [\App\Http\Controllers\TimeSlotController::class, 'storeForEmployee'])->name('time-slots.store-for-employee');
 
     // MEETINGS
     Route::get('/my-meetings', [\App\Http\Controllers\MeetingController::class, 'myMeetings'])->name('meetings.internal.my-meetings');
+    // Book a meeting in a colleague's available slot (all internal users).
+    Route::get('/meetings/book', [\App\Http\Controllers\MeetingController::class, 'bookInternal'])->name('meetings.internal.book');
+    Route::post('/meetings/book/{timeSlot}', [\App\Http\Controllers\MeetingController::class, 'storeInternal'])->middleware('throttle:30,1')->name('meetings.internal.store');
     Route::post('/meetings/{meeting}/confirm', [\App\Http\Controllers\MeetingController::class, 'confirm'])->name('meetings.confirm');
     Route::post('/meetings/{meeting}/complete', [\App\Http\Controllers\MeetingController::class, 'complete'])->name('meetings.complete');
 
@@ -361,7 +366,6 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
 
         // Team Time Slots Overview (Manager Only)
         Route::get('/team-time-slots', [\App\Http\Controllers\TimeSlotController::class, 'teamSlots'])->name('time-slots.team-slots');
-        Route::post('/team-time-slots/add', [\App\Http\Controllers\TimeSlotController::class, 'storeForEmployee'])->name('time-slots.store-for-employee');
 
         // PRICING ADMIN
         Route::get('/pricing-admin', [\App\Http\Controllers\PricingToolController::class, 'admin'])->name('pricing.admin');

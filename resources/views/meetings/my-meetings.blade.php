@@ -16,6 +16,10 @@
         <a href="{{ route('meetings.available-slots') }}" class="btn btn-primary btn-sm">
             <i class="fas fa-plus"></i> {{ __('portal.meetings.book_new_meeting') }}
         </a>
+        @else
+        <a href="{{ route('meetings.internal.book') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> {{ __('portal.meetings.book_new_meeting') }}
+        </a>
         @endif
     </div>
     <div class="card-content">
@@ -24,11 +28,7 @@
             <thead>
                 <tr>
                     <th>{{ __('portal.manager_legacy.col_title') }}</th>
-                    @if(auth()->user()->isClient())
                     <th>{{ __('portal.meetings.with') }}</th>
-                    @else
-                    <th>{{ __('portal.manager_legacy.col_client') }}</th>
-                    @endif
                     <th>{{ __('portal.meetings.date_time') }}</th>
                     <th>{{ __('portal.meetings.duration') }}</th>
                     <th>{{ __('portal.manager_legacy.col_status') }}</th>
@@ -45,16 +45,15 @@
                         @endif
                     </td>
                     <td>
-                        @if(auth()->user()->isClient())
-                        <strong>{{ $meeting->teamMember->name }}</strong>
-                        <br><small class="text-muted">{{ $meeting->teamMember->email }}</small>
-                        @else
-                        <strong>{{ $meeting->client->name }}</strong>
-                        <br><small class="text-muted">{{ $meeting->client->email }}</small>
-                        @if($meeting->client->phone)
-                        <br><small class="text-muted"><i class="fas fa-phone"></i> {{ $meeting->client->phone }}</small>
-                        @endif
-                        @endif
+                        @php
+                            $meUser = auth()->user();
+                            $other = $meUser->isClient()
+                                ? $meeting->teamMember
+                                : ($meeting->team_member_id === $meUser->id ? $meeting->client : $meeting->teamMember);
+                        @endphp
+                        <strong>{{ $other?->name ?? '—' }}</strong>
+                        @if($other?->email)<br><small class="text-muted">{{ $other->email }}</small>@endif
+                        @if($other?->phone)<br><small class="text-muted"><i class="fas fa-phone"></i> {{ $other->phone }}</small>@endif
                     </td>
                     <td>
                         {{ $meeting->scheduled_at->translatedFormat('M d, Y') }}
@@ -72,7 +71,7 @@
                         @endif
                     </td>
                     <td>
-                        @if(auth()->user()->isInternal() && $meeting->isScheduled())
+                        @if($meeting->team_member_id === auth()->id() && $meeting->isScheduled())
                         <button class="btn btn-sm btn-success" onclick="confirmMeeting(@js($meeting->getRouteKey()))">
                             <i class="fas fa-check"></i> {{ __('portal.meetings.confirm') }}
                         </button>

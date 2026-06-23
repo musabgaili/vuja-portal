@@ -85,8 +85,8 @@ class TimeSlotController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isManager()) {
-            abort(403, 'You need manager role to add availability for others.');
+        if (! ($user->isManager() || $user->isProjectManager())) {
+            abort(403, 'Only managers and project managers can add availability for others.');
         }
 
         $validated = $request->validate([

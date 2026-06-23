@@ -62,8 +62,12 @@ class MeetingService
                 ->latest('scheduled_at')
                 ->paginate(15);
         } else {
-            return Meeting::where('team_member_id', $user->id)
-                ->with(['client', 'timeSlot'])
+            // Internal users see meetings booked WITH them (their slot) and ones
+            // they booked with a colleague (they are the organiser/client).
+            return Meeting::where(function ($q) use ($user) {
+                $q->where('team_member_id', $user->id)->orWhere('client_id', $user->id);
+            })
+                ->with(['client', 'teamMember', 'timeSlot'])
                 ->latest('scheduled_at')
                 ->paginate(15);
         }

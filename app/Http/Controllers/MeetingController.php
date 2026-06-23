@@ -316,6 +316,78 @@ class MeetingController extends Controller
     }
 
     /**
+     * INTERNAL booking: choose a colleague and book a meeting in one of their
+     * available slots. Managers / project managers can also add a slot inline.
+     */
+    public function bookInternal(Request $request)
+    {
+        $user = Auth::user();
+        abort_unless($user->isInternal(), 403);
+
+        $colleagues = User::where('type', 'internal')
+            ->where('id', '!=', $user->id)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $selected = null;
+        $slots = collect();
+        if ($memberId = $request->query('member')) {
+            $selected = $colleagues->firstWhere('id', (int) $memberId);
+            if ($selected) {
+                $slots = $this->timeSlotService->getAvailableSlotsForBooking($selected->id);
+            }
+        }
+
+        $canCreateSlots = $user->isManager() || $user->isProjectManager();
+
+        return view('meetings.book-internal', compact('colleagues', 'selected', 'slots', 'canCreateSlots'));
+    }
+
+    /**
+     * INTERNAL booking: book the chosen colleague's available slot for the
+     * current user. The booker is the meeting's organiser; the slot owner is the
+     * team member it's with.
+     */
+    public function storeInternal(Request $request, TimeSlot $timeSlot)
+    {
+        $user = Auth::user();
+        abort_unless($user->isInternal(), 403);
+
+        // The slot must belong to a different internal colleague.
+        $owner = User::where('type', 'internal')->find($timeSlot->user_id);
+        if (! $owner || $owner->id === $user->id) {
+            return back()->withErrors(['error' => __('portal.meetings.cannot_book_own')]);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration_minutes' => 'nullable|integer|in:30,60,90,120',
+        ]);
+
+        try {
+            $meeting = $this->meetingService->bookMeeting($user, $timeSlot, $validated);
+            $meeting->load(['client', 'teamMember']);
+
+            // Tell the colleague whose slot was booked.
+            if ($meeting->teamMember?->email) {
+                Mail::to($meeting->teamMember->email)->send(new MeetingBooked($meeting));
+            }
+
+            return redirect()->route('meetings.internal.my-meetings')
+                ->with('success', __('portal.meetings.booked_internal', ['name' => $owner->name]));
+        } catch (\Exception $e) {
+            Log::error('Internal meeting booking failed.', [
+                'user_id' => $user->id,
+                'time_slot_id' => $timeSlot->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors(['error' => __('portal.meetings.book_failed')]);
+        }
+    }
+
+    /**
      * Show all meetings for current user (BOTH SIDES)
      */
     public function myMeetings()

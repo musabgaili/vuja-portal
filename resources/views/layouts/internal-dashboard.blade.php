@@ -269,6 +269,10 @@
                         <i class="fas fa-video"></i>
                         {{ __('portal.nav.my_meetings') }}
                     </a>
+                    <a href="{{ route('meetings.internal.book') }}" class="nav-item">
+                        <i class="fas fa-calendar-plus"></i>
+                        {{ __('portal.nav.book_meeting') }}
+                    </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('time-slots.team-slots') }}" class="nav-item">
                         <i class="fas fa-users-cog"></i>
