@@ -1461,6 +1461,8 @@
     "portal.meetings.booked_summary": ":booked booked, :invited invited.",
     "portal.meetings.past_time": "That time is in the past.",
     "portal.meetings.no_attendees": "Pick at least one attendee.",
+    "portal.meetings.conflict": "That time clashes with another meeting on the calendar.",
+    "portal.meetings.not_yet_held": "This meeting hasn't started yet, so it can't be marked attended.",
     "portal.meetings.invitations_title": "Meeting invitations",
     "portal.meetings.pending_invitations": "Awaiting your response",
     "portal.meetings.from_organizer": "From :name",

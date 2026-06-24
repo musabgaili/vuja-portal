@@ -49,8 +49,6 @@ class InternalMeetingService
         $canForce = $organizer->isManager() || $organizer->isProjectManager();
 
         return DB::transaction(function () use ($organizer, $attendeeIds, $date, $start, $end, $duration, $scheduledAt, $data, $canForce) {
-            $primaryId = (int) $attendeeIds->first();
-
             // 1) Decide + reserve each attendee's slot BEFORE the meeting exists, so
             //    the host's own meeting can't register as a conflict against itself.
             $decisions = [];
@@ -62,6 +60,7 @@ class InternalMeetingService
                 }
                 $isSelf = $uid === $organizer->id;
 
+                // a) The time falls inside one of their open slots (and they're free).
                 if ($slot = $this->coveringSlot($uid, $date, $start, $end)) {
                     $slot->update(['status' => 'booked']);
                     $decisions[$uid] = ['name' => $user->name, 'outcome' => 'booked', 'slot_id' => $slot->id];
@@ -71,13 +70,16 @@ class InternalMeetingService
 
                 $hasSlots = $this->hasAnyAvailableSlot($uid);
 
-                if ($isSelf || ($canForce && ! $hasSlots)) {
+                // b) Force-book (organiser self, or manager/PM booking a slotless
+                //    colleague) — but never on top of an existing clashing meeting.
+                if (($isSelf || ($canForce && ! $hasSlots)) && ! $this->userHasConflict($uid, $date, $start, $end)) {
                     $newSlot = $this->createBookedSlot($uid, $date, $start, $end);
                     $decisions[$uid] = ['name' => $user->name, 'outcome' => $isSelf ? 'booked' : 'force_booked', 'slot_id' => $newSlot->id];
 
                     continue;
                 }
 
+                // c) Otherwise send a recommendation the colleague must accept.
                 $decisions[$uid] = ['name' => $user->name, 'outcome' => 'invited', 'slot_id' => null];
             }
 
@@ -85,11 +87,19 @@ class InternalMeetingService
                 throw new \RuntimeException(__('portal.meetings.no_attendees'));
             }
 
+            // The primary host is the first CONFIRMED attendee, so a meeting is never
+            // created with a host who hasn't accepted; fall back to the first id.
+            $primaryId = collect($decisions)->search(fn ($d) => $d['outcome'] !== 'invited');
+            if ($primaryId === false) {
+                $primaryId = array_key_first($decisions);
+            }
+            $primaryId = (int) $primaryId;
+
             // 2) Create the meeting, adopting the primary host's slot if confirmed.
             $meeting = Meeting::create([
                 'time_slot_id' => $decisions[$primaryId]['slot_id'] ?? null,
                 'client_id' => $organizer->id,        // organiser / booker
-                'team_member_id' => $primaryId,        // primary host (first attendee)
+                'team_member_id' => $primaryId,        // primary host (first confirmed attendee)
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
                 'scheduled_at' => $scheduledAt,
@@ -120,12 +130,21 @@ class InternalMeetingService
         }
 
         $meeting = $attendee->meeting;
+        if (! $meeting || $meeting->status === 'cancelled' || $meeting->scheduled_at?->isPast()) {
+            throw new \RuntimeException(__('portal.meetings.past_time'));
+        }
+
         $date = $meeting->scheduled_at->format('Y-m-d');
         $start = $meeting->scheduled_at->format('H:i:s');
         $end = $meeting->scheduled_at->copy()->addMinutes($meeting->duration_minutes)->format('H:i:s');
 
         DB::transaction(function () use ($attendee, $meeting, $date, $start, $end) {
-            // Ignore this very meeting when checking for conflicts.
+            // Refuse if the user now has another meeting clashing with this time
+            // (ignoring this very meeting).
+            if ($this->userHasConflict($attendee->user_id, $date, $start, $end, $meeting->id)) {
+                throw new \RuntimeException(__('portal.meetings.conflict'));
+            }
+
             $slot = $this->coveringSlot($attendee->user_id, $date, $start, $end, $meeting->id)
                 ?? $this->createBookedSlot($attendee->user_id, $date, $start, $end);
 
@@ -216,19 +235,34 @@ class InternalMeetingService
             ->exists();
     }
 
-    /** Create (or reuse) a slot at the exact window and mark it booked. */
+    /**
+     * Create a booked slot at the window, or consume an existing slot that already
+     * starts at this time. Never rewrites an existing slot's end_time — that would
+     * silently shrink/extend a colleague's real availability (the table's unique
+     * key is user_id+date+start_time).
+     */
     private function createBookedSlot(int $userId, string $date, string $start, string $end): TimeSlot
     {
-        $slot = TimeSlot::firstOrNew([
+        $slot = TimeSlot::where('user_id', $userId)
+            ->whereDate('date', $date)
+            ->where('start_time', $start)
+            ->first();
+
+        if ($slot) {
+            if ($slot->status !== 'booked') {
+                $slot->update(['status' => 'booked']);
+            }
+
+            return $slot;
+        }
+
+        return TimeSlot::create([
             'user_id' => $userId,
             'date' => $date,
             'start_time' => $start,
+            'end_time' => $end,
+            'status' => 'booked',
         ]);
-        $slot->end_time = $end;
-        $slot->status = 'booked';
-        $slot->save();
-
-        return $slot;
     }
 
     private function upsertAttendee(Meeting $meeting, int $userId, string $status, ?int $slotId): void

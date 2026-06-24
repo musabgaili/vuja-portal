@@ -99,8 +99,17 @@ class ActualsService
             ->where('status', 'completed')
             ->whereBetween('completed_at', [$start, $end])
             ->where(function ($q) use ($user) {
-                $q->where('team_member_id', $user->id)
-                    ->orWhereHas('acceptedAttendees', fn ($a) => $a->where('user_id', $user->id));
+                // Accepted attendee, OR primary host of a meeting that has no
+                // attendee rows (legacy/client) or whose own host row is accepted —
+                // mirrors Meeting::attendeeUserIds() so credit and metric agree.
+                $q->whereHas('acceptedAttendees', fn ($a) => $a->where('user_id', $user->id))
+                    ->orWhere(function ($h) use ($user) {
+                        $h->where('team_member_id', $user->id)
+                            ->where(function ($x) use ($user) {
+                                $x->whereDoesntHave('attendees')
+                                    ->orWhereHas('attendees', fn ($a) => $a->where('user_id', $user->id)->where('status', 'accepted'));
+                            });
+                    });
             })
             ->count();
     }

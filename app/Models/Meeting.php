@@ -76,12 +76,20 @@ class Meeting extends Model
     }
 
     /**
-     * Distinct internal user ids who attended this meeting — the primary host
-     * plus every accepted attendee. Used to credit "meeting attended" points.
+     * Distinct internal user ids who attended this meeting — every accepted
+     * attendee, plus the primary host when they have actually accepted (or for a
+     * legacy/client meeting with no attendee rows). Used to credit "meeting
+     * attended" points, so a host who never confirmed is not credited.
      */
     public function attendeeUserIds(): array
     {
-        return collect([$this->team_member_id])
+        $hasRows = $this->attendees()->exists();
+        $hostCounts = ! $hasRows || $this->attendees()
+            ->where('user_id', $this->team_member_id)
+            ->where('status', 'accepted')
+            ->exists();
+
+        return collect($hostCounts ? [$this->team_member_id] : [])
             ->merge($this->acceptedAttendees()->pluck('user_id'))
             ->filter()
             ->unique()

@@ -29,13 +29,24 @@ trait HasServiceWorkPanel
      * `service_completed_at` and award the assignee target-gated impact points
      * (only beyond their monthly "services completed" target — see TargetPointsGate).
      */
+    /**
+     * Statuses that count as "this service request is delivered". Override per
+     * model — e.g. IP/copyright registrations finish at 'registered'.
+     */
+    public function serviceCompletionStatuses(): array
+    {
+        return ['completed'];
+    }
+
     public static function bootHasServiceWorkPanel(): void
     {
         static::updated(function ($model) {
             if (! $model->wasChanged('status')) {
                 return;
             }
-            if ($model->status !== 'completed' || $model->getOriginal('status') === 'completed') {
+            $terminal = $model->serviceCompletionStatuses();
+            // Fire once: now terminal, but wasn't terminal before this change.
+            if (! in_array($model->status, $terminal, true) || in_array($model->getOriginal('status'), $terminal, true)) {
                 return;
             }
             if (! $model->assigned_to) {

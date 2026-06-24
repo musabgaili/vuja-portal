@@ -93,6 +93,12 @@ class CopyrightRegistration extends Model
         return $this->status === 'completed';
     }
 
+    /** A copyright registration is delivered once it is registered (or later completed). */
+    public function serviceCompletionStatuses(): array
+    {
+        return ['registered', 'completed'];
+    }
+
     public function isCancelled(): bool
     {
         return $this->status === 'cancelled';

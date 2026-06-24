@@ -397,7 +397,8 @@ class MeetingController extends Controller
             'start_time' => 'required|date_format:H:i',
             'duration_minutes' => 'required|integer|in:30,60,90,120',
             'attendee_ids' => 'required|array|min:1',
-            'attendee_ids.*' => 'integer|distinct|exists:users,id',
+            // Internal staff only — never let a forged request invite a client.
+            'attendee_ids.*' => ['integer', 'distinct', \Illuminate\Validation\Rule::exists('users', 'id')->where('type', 'internal')],
             'include_self' => 'nullable|boolean',
         ]);
 
@@ -409,10 +410,13 @@ class MeetingController extends Controller
 
         try {
             $outcome = $service->book($user, $validated);
+        } catch (\RuntimeException $e) {
+            // App-thrown, already-translated, safe-to-show messages (past time, etc.).
+            return back()->withInput()->withErrors(['error' => $e->getMessage() ?: __('portal.meetings.book_failed')]);
         } catch (\Throwable $e) {
             Log::error('Internal meeting booking failed.', ['user_id' => $user->id, 'exception' => $e->getMessage()]);
 
-            return back()->withInput()->withErrors(['error' => $e->getMessage() ?: __('portal.meetings.book_failed')]);
+            return back()->withInput()->withErrors(['error' => __('portal.meetings.book_failed')]);
         }
 
         $this->notifyAttendees($outcome['meeting'], $outcome['results'], $user);
@@ -497,7 +501,13 @@ class MeetingController extends Controller
     {
         $this->authorizeInvitation($attendee);
 
-        $service->accept($attendee);
+        try {
+            $service->accept($attendee);
+        } catch (\RuntimeException $e) {
+            // e.g. the meeting time has passed, or the user now has a clashing meeting.
+            return back()->withErrors(['error' => $e->getMessage() ?: __('portal.meetings.book_failed')]);
+        }
+
         Cache::forget('notif_feed:'.$attendee->user_id);
         Cache::forget('mtg_inv:'.$attendee->user_id);
 
@@ -576,14 +586,21 @@ class MeetingController extends Controller
             403
         );
 
+        // A meeting can only be "attended" once it has actually started — this also
+        // blocks book-then-instantly-complete points farming.
+        if ($meeting->scheduled_at && $meeting->scheduled_at->isFuture()) {
+            return back()->withErrors(['error' => __('portal.meetings.not_yet_held')]);
+        }
+
         if ($meeting->status !== 'completed') {
             $meeting->update(['status' => 'completed', 'completed_at' => now()]);
 
-            // Credit every internal person who attended (primary host + accepted
+            // Credit every INTERNAL person who attended (primary host + accepted
             // attendees) with target-gated "meeting attended" points.
             $gate = app(\App\Services\Targets\TargetPointsGate::class);
             foreach ($meeting->attendeeUserIds() as $uid) {
-                if ($staff = \App\Models\User::find($uid)) {
+                $staff = \App\Models\User::find($uid);
+                if ($staff && $staff->isInternal()) {
                     $gate->awardIfEarned($staff, 'meeting_attended', $meeting, 'Meeting attended');
                 }
             }
@@ -601,7 +618,17 @@ class MeetingController extends Controller
 
         $this->authorize('update', $meeting);
 
+        // Every attendee (incl. still-pending invitees) + the primary host has a
+        // stale bell/badge once this meeting goes away — refresh them.
+        $affected = $meeting->attendees()->pluck('user_id')
+            ->push($meeting->team_member_id)->filter()->unique();
+
         $this->meetingService->cancelMeeting($meeting);
+
+        foreach ($affected as $uid) {
+            Cache::forget('notif_feed:'.$uid);
+            Cache::forget('mtg_inv:'.$uid);
+        }
 
         return back()->with('success', 'Meeting cancelled.');
     }

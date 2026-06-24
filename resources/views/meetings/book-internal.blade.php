@@ -111,6 +111,7 @@
                             @foreach($groups as $specKey => $members)
                                 <div class="text-uppercase text-muted mt-1" style="font-size:.7rem;letter-spacing:.04em;">{{ $specLabel($specKey) }}</div>
                                 @foreach($members as $member)
+                                    @continue($member->id === $user->id)
                                     @php $cnt = (int) ($upcomingCounts[$member->id] ?? 0); @endphp
                                     <label class="d-flex align-items-center gap-2 py-1" style="font-size:.85rem;cursor:pointer;">
                                         <input type="checkbox" name="attendee_ids[]" value="{{ $member->id }}" class="att-check" data-user="{{ $member->id }}"
