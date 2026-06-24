@@ -62,12 +62,14 @@ class MeetingService
                 ->latest('scheduled_at')
                 ->paginate(15);
         } else {
-            // Internal users see meetings booked WITH them (their slot) and ones
-            // they booked with a colleague (they are the organiser/client).
+            // Internal users see meetings they host (their slot), ones they organised
+            // (booker), and ones they were invited to as an attendee.
             return Meeting::where(function ($q) use ($user) {
-                $q->where('team_member_id', $user->id)->orWhere('client_id', $user->id);
+                $q->where('team_member_id', $user->id)
+                    ->orWhere('client_id', $user->id)
+                    ->orWhereHas('attendees', fn ($a) => $a->where('user_id', $user->id));
             })
-                ->with(['client', 'teamMember', 'timeSlot'])
+                ->with(['client', 'teamMember', 'timeSlot', 'attendees.user'])
                 ->latest('scheduled_at')
                 ->paginate(15);
         }
@@ -95,8 +97,16 @@ class MeetingService
             'cancelled_at' => now(),
         ]);
 
-        // Free up the time slot
-        $meeting->timeSlot->update(['status' => 'available']);
+        // Free the primary slot (a proposed multi-attendee meeting may have none yet)
+        // and each attendee's reserved slot.
+        if ($meeting->timeSlot) {
+            $meeting->timeSlot->update(['status' => 'available']);
+        }
+        foreach ($meeting->attendees()->whereNotNull('time_slot_id')->with('timeSlot')->get() as $a) {
+            if ($a->timeSlot && (! $a->timeSlot->meeting || $a->timeSlot->meeting->id === $meeting->id)) {
+                $a->timeSlot->update(['status' => 'available']);
+            }
+        }
     }
 
     /**

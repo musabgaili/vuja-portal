@@ -46,18 +46,63 @@ class ActualsService
 
             'projects_won' => (float) $this->projectsWon($user, $start, $end),
 
-            'meetings_attended' => (float) \App\Models\Meeting::where('team_member_id', $user->id)
-                ->where('status', 'completed')->whereBetween('completed_at', [$start, $end])->count(),
+            'meetings_attended' => (float) $this->meetingsAttended($user, $start, $end),
 
             'projects_closed' => (float) Project::where('status', 'completed')
                 ->whereBetween('actual_end_date', [$start, $end])
                 ->where(fn ($q) => $q->where('project_manager_id', $user->id)->orWhere('account_manager_id', $user->id))
                 ->count(),
 
+            'services_completed' => (float) $this->servicesCompleted($user, $start, $end),
+
             'presale_meeting_hours' => $this->presaleMeetingHours($user, $start, $end),
 
             default => 0.0,
         };
+    }
+
+    /**
+     * Service requests this person delivered this month, across every assignable
+     * service type. Counted from the `service_completed_at` stamp the work-panel
+     * trait writes the first time a request reaches its terminal "completed" state.
+     */
+    private function servicesCompleted(User $user, Carbon $start, Carbon $end): int
+    {
+        $models = [
+            \App\Models\IdeaRequest::class,
+            \App\Models\ConsultationRequest::class,
+            \App\Models\ResearchRequest::class,
+            \App\Models\IpRegistration::class,
+            \App\Models\CopyrightRegistration::class,
+            \App\Models\ThreeDRequest::class,
+            \App\Models\PrototypeRequest::class,
+        ];
+
+        $total = 0;
+        foreach ($models as $model) {
+            $total += $model::where('assigned_to', $user->id)
+                ->whereNotNull('service_completed_at')
+                ->whereBetween('service_completed_at', [$start, $end])
+                ->count();
+        }
+
+        return $total;
+    }
+
+    /**
+     * Completed meetings this month the user attended — as the primary host OR as
+     * an accepted attendee of a multi-attendee meeting. Deduped by meeting.
+     */
+    private function meetingsAttended(User $user, Carbon $start, Carbon $end): int
+    {
+        return (int) \App\Models\Meeting::query()
+            ->where('status', 'completed')
+            ->whereBetween('completed_at', [$start, $end])
+            ->where(function ($q) use ($user) {
+                $q->where('team_member_id', $user->id)
+                    ->orWhereHas('acceptedAttendees', fn ($a) => $a->where('user_id', $user->id));
+            })
+            ->count();
     }
 
     /** Hours logged against the "Pre-sale Meetings" planner activity this month. */

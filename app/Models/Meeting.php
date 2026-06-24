@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Meeting extends Model
@@ -54,6 +55,38 @@ class Meeting extends Model
     public function bookable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /** All invited internal colleagues (beyond the organiser). */
+    public function attendees(): HasMany
+    {
+        return $this->hasMany(MeetingAttendee::class);
+    }
+
+    /** Attendees who have confirmed. */
+    public function acceptedAttendees(): HasMany
+    {
+        return $this->attendees()->where('status', 'accepted');
+    }
+
+    /** Attendees still to respond to their invitation. */
+    public function pendingAttendees(): HasMany
+    {
+        return $this->attendees()->where('status', 'invited');
+    }
+
+    /**
+     * Distinct internal user ids who attended this meeting — the primary host
+     * plus every accepted attendee. Used to credit "meeting attended" points.
+     */
+    public function attendeeUserIds(): array
+    {
+        return collect([$this->team_member_id])
+            ->merge($this->acceptedAttendees()->pluck('user_id'))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 
     public function isScheduled(): bool

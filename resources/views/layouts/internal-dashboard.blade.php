@@ -273,6 +273,12 @@
                         <i class="fas fa-calendar-plus"></i>
                         {{ __('portal.nav.book_meeting') }}
                     </a>
+                    @php($pendingInvites = \Illuminate\Support\Facades\Cache::remember('mtg_inv:'.auth()->id(), 60, fn () => \App\Models\MeetingAttendee::where('user_id', auth()->id())->where('status', 'invited')->whereHas('meeting', fn ($q) => $q->where('status', '!=', 'cancelled')->where('scheduled_at', '>', now()))->count()))
+                    <a href="{{ route('meetings.invitations') }}" class="nav-item">
+                        <i class="fas fa-calendar-check"></i>
+                        {{ __('portal.nav.meeting_invitations') }}
+                        @if($pendingInvites > 0)<span class="badge bg-danger ms-auto">{{ $pendingInvites }}</span>@endif
+                    </a>
                     @if(auth()->user()->isManager())
                     <a href="{{ route('time-slots.team-slots') }}" class="nav-item">
                         <i class="fas fa-users-cog"></i>

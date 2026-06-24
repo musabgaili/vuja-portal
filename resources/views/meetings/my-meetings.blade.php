@@ -43,6 +43,15 @@
                         @if($meeting->description)
                         <br><small class="text-muted">{{ Str::limit($meeting->description, 50) }}</small>
                         @endif
+                        @if(!auth()->user()->isClient() && $meeting->attendees->count())
+                        <div class="mt-1 d-flex flex-wrap gap-1">
+                            @foreach($meeting->attendees as $att)
+                            <span class="badge bg-{{ $att->isAccepted() ? 'success' : ($att->isDeclined() ? 'secondary' : 'warning text-dark') }}" style="font-weight:500;">
+                                {{ $att->user?->name ?? '—' }} · {{ __('portal.meetings.attendee_status.'.$att->status) }}
+                            </span>
+                            @endforeach
+                        </div>
+                        @endif
                     </td>
                     <td>
                         @php
@@ -75,6 +84,13 @@
                         <button class="btn btn-sm btn-success" onclick="confirmMeeting(@js($meeting->getRouteKey()))">
                             <i class="fas fa-check"></i> {{ __('portal.meetings.confirm') }}
                         </button>
+                        @endif
+                        @php $canComplete = ! auth()->user()->isClient() && ! $meeting->isCompleted() && ! $meeting->isCancelled() && ((int) $meeting->team_member_id === auth()->id() || (int) $meeting->client_id === auth()->id() || auth()->user()->isManager() || auth()->user()->isProjectManager()); @endphp
+                        @if($canComplete)
+                        <form method="POST" action="{{ route('meetings.complete', $meeting) }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-check-double"></i> {{ __('portal.meetings.mark_attended') }}</button>
+                        </form>
                         @endif
                         @if(!$meeting->isCompleted() && !$meeting->isCancelled())
                         <form method="POST" action="{{ route('meetings.cancel', $meeting) }}" style="display:inline;" onsubmit="return confirm('{{ __('portal.meetings.confirm_cancel') }}')">

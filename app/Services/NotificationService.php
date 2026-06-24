@@ -146,6 +146,19 @@ class NotificationService
             }
         }
 
+        // Meeting invitations awaiting this user's accept/decline.
+        if ($user->isInternal()) {
+            foreach (\App\Models\MeetingAttendee::with('meeting.client')->where('user_id', $user->id)
+                ->where('status', 'invited')->latest()->limit(5)->get() as $inv) {
+                if (! $inv->meeting || $inv->meeting->status === 'cancelled' || ! $inv->meeting->scheduled_at?->isFuture()) {
+                    continue;
+                }
+                $push($inv->created_at, 'fa-calendar-plus',
+                    __('portal.notif.meeting_invite', ['name' => $inv->meeting->client?->name ?? '—', 'title' => $inv->meeting->title]),
+                    route('meetings.invitations'));
+            }
+        }
+
         usort($items, fn ($a, $b) => $b['at'] <=> $a['at']);
 
         return array_slice($items, 0, $limit);

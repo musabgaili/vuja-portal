@@ -19,7 +19,52 @@ trait HasServiceWorkPanel
     /** Eloquent calls this automatically when the trait is used (boot-time). */
     public function initializeHasServiceWorkPanel(): void
     {
-        $this->mergeFillable(['worker_status']);
+        $this->mergeFillable(['worker_status', 'service_completed_at']);
+        $this->mergeCasts(['service_completed_at' => 'datetime']);
+    }
+
+    /**
+     * Eloquent calls this automatically (boot-time). The first time a service
+     * request transitions into its terminal "completed" state we stamp
+     * `service_completed_at` and award the assignee target-gated impact points
+     * (only beyond their monthly "services completed" target — see TargetPointsGate).
+     */
+    public static function bootHasServiceWorkPanel(): void
+    {
+        static::updated(function ($model) {
+            if (! $model->wasChanged('status')) {
+                return;
+            }
+            if ($model->status !== 'completed' || $model->getOriginal('status') === 'completed') {
+                return;
+            }
+            if (! $model->assigned_to) {
+                return;
+            }
+
+            // Stamp the completion time once (quietly — don't re-fire this hook).
+            if (! $model->service_completed_at) {
+                $model->service_completed_at = now();
+                $model->saveQuietly();
+            }
+
+            $assignee = \App\Models\User::find($model->assigned_to);
+            if (! $assignee) {
+                return;
+            }
+
+            // Idempotency: never award twice for the same service request.
+            $already = \App\Models\EngagementLog::where('subject_type', $model->getMorphClass())
+                ->where('subject_id', $model->getKey())
+                ->where('action', 'service_completed')
+                ->exists();
+            if ($already) {
+                return;
+            }
+
+            app(\App\Services\Targets\TargetPointsGate::class)
+                ->awardIfEarned($assignee, 'service_completed', $model, 'Service completed: '.($model->title ?? ('#'.$model->getKey())));
+        });
     }
 
     public function workItems(): MorphMany

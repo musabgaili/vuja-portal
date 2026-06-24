@@ -213,9 +213,13 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
 
     // MEETINGS
     Route::get('/my-meetings', [\App\Http\Controllers\MeetingController::class, 'myMeetings'])->name('meetings.internal.my-meetings');
-    // Book a meeting in a colleague's available slot (all internal users).
+    // Team-availability board + multi-attendee booking (all internal users).
     Route::get('/meetings/book', [\App\Http\Controllers\MeetingController::class, 'bookInternal'])->name('meetings.internal.book');
-    Route::post('/meetings/book/{timeSlot}', [\App\Http\Controllers\MeetingController::class, 'storeInternal'])->middleware('throttle:30,1')->name('meetings.internal.store');
+    Route::post('/meetings/book', [\App\Http\Controllers\MeetingController::class, 'storeInternal'])->middleware('throttle:30,1')->name('meetings.internal.store');
+    // Meeting invitations the current user must accept/decline.
+    Route::get('/meetings/invitations', [\App\Http\Controllers\MeetingController::class, 'invitations'])->name('meetings.invitations');
+    Route::post('/meetings/invitations/{attendee}/accept', [\App\Http\Controllers\MeetingController::class, 'acceptInvitation'])->middleware('throttle:60,1')->name('meetings.invitation.accept');
+    Route::post('/meetings/invitations/{attendee}/decline', [\App\Http\Controllers\MeetingController::class, 'declineInvitation'])->middleware('throttle:60,1')->name('meetings.invitation.decline');
     Route::post('/meetings/{meeting}/confirm', [\App\Http\Controllers\MeetingController::class, 'confirm'])->name('meetings.confirm');
     Route::post('/meetings/{meeting}/complete', [\App\Http\Controllers\MeetingController::class, 'complete'])->name('meetings.complete');
 

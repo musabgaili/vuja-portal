@@ -44,6 +44,7 @@ return [
         'project_won'      => 120,  // a quote/opportunity/project won (beyond the wins target)
         'meeting_attended' => 15,   // a completed client meeting (beyond the meetings target)
         'project_closed'   => 80,   // a project completed (beyond the closed target)
+        'service_completed' => 50,  // a service request delivered (beyond the services target)
     ],
 
     // Editor metadata: groups each action under a category and gives it a label
@@ -81,6 +82,7 @@ return [
         'project_won'      => ['category' => 'targets', 'label' => 'Project won (beyond target)'],
         'meeting_attended' => ['category' => 'targets', 'label' => 'Meeting attended (beyond target)'],
         'project_closed'   => ['category' => 'targets', 'label' => 'Project closed (beyond target)'],
+        'service_completed' => ['category' => 'targets', 'label' => 'Service completed (beyond target)'],
     ],
 
     // Levels: name, inclusive point range, unlocked perk.

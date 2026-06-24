@@ -42,5 +42,10 @@ return [
             'default' => true,
             'audience' => 'internal',
         ],
+        'meeting_invitation' => [
+            'label' => 'portal.notif_prefs.type.meeting_invitation',
+            'default' => true,
+            'audience' => 'internal',
+        ],
     ],
 ];
