@@ -167,6 +167,13 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/spend/create', [\App\Http\Controllers\SpendRequestController::class, 'create'])->name('spend.create');
     Route::post('/spend', [\App\Http\Controllers\SpendRequestController::class, 'store'])->name('spend.store');
     Route::get('/spend/approvals', [\App\Http\Controllers\SpendRequestController::class, 'approvals'])->name('spend.approvals');
+    // Manager/PM hub: all requests, all statuses, filterable + totals.
+    Route::get('/spend/manage', [\App\Http\Controllers\SpendRequestController::class, 'manage'])->name('spend.manage');
+    Route::get('/spend/file/{file}', [\App\Http\Controllers\SpendRequestController::class, 'fileDownload'])->middleware('throttle:60,1')->name('spend.file');
+    // Single-request detail + edit (literal paths above must precede these wildcards).
+    Route::get('/spend/{spendRequest}', [\App\Http\Controllers\SpendRequestController::class, 'show'])->name('spend.show');
+    Route::get('/spend/{spendRequest}/edit', [\App\Http\Controllers\SpendRequestController::class, 'edit'])->name('spend.edit');
+    Route::put('/spend/{spendRequest}', [\App\Http\Controllers\SpendRequestController::class, 'update'])->name('spend.update');
     Route::post('/spend/{spendRequest}/approve', [\App\Http\Controllers\SpendRequestController::class, 'approve'])->name('spend.approve');
     Route::post('/spend/{spendRequest}/reject', [\App\Http\Controllers\SpendRequestController::class, 'reject'])->name('spend.reject');
     Route::post('/spend/{spendRequest}/purchase', [\App\Http\Controllers\SpendRequestController::class, 'purchase'])->name('spend.purchase');

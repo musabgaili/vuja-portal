@@ -35,7 +35,11 @@
         <tbody>
         @forelse($requests as $r)
             <tr>
-                <td><strong>{{ $r->title }}</strong>@if($r->product_url)<a href="{{ $r->product_url }}" target="_blank" rel="noopener" class="ms-1 text-muted" title="{{ __('portal.spend.buy_link') }}"><i class="fas fa-link"></i></a>@endif</td>
+                <td>
+                    <a href="{{ route('spend.show', $r) }}" class="fw-bold text-decoration-none">{{ $r->title }}</a>
+                    @if($r->links())<i class="fas fa-link text-muted ms-1" title="{{ __('portal.spend.has_links') }}"></i>@endif
+                    <span class="text-muted small d-block">{{ trans_choice('portal.spend.items_count', $r->items->count(), ['count' => $r->items->count()]) }}</span>
+                </td>
                 <td>
                     <span class="badge bg-{{ $r->isPurchase() ? 'primary' : 'secondary' }}">{{ __('portal.spend.type.'.$r->type) }}</span>
                     <span class="badge bg-light text-dark">{{ __('portal.spend.scope.'.$r->scope) }}</span>
@@ -45,7 +49,8 @@
                 <td><span class="badge bg-{{ $r->statusColor() }}">{{ $r->statusLabel() }}</span>@if($r->self_recorded)<span class="badge bg-secondary ms-1" title="{{ __('portal.spend.self_recorded_hint') }}"><i class="fas fa-user-shield"></i></span>@endif</td>
                 <td><span class="text-muted small">{{ $r->created_at->translatedFormat('M j, Y') }}</span></td>
                 <td class="text-end">
-                    @if($r->receipt_file)<a href="{{ route('spend.receipt', $r) }}" class="text-muted me-2" title="{{ __('portal.spend.receipt') }}"><i class="fas fa-paperclip"></i></a>@endif
+                    @if($r->receipts->isNotEmpty())<a href="{{ route('spend.show', $r) }}" class="text-muted me-2" title="{{ __('portal.spend.receipt') }}"><i class="fas fa-paperclip"></i></a>@endif
+                    <a href="{{ route('spend.show', $r) }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></a>
                     @if($r->isPending())
                         <form method="POST" action="{{ route('spend.destroy', $r) }}" class="d-inline" onsubmit="return confirm('{{ __('portal.spend.delete_confirm') }}')">@csrf @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>

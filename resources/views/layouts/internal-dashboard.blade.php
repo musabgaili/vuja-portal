@@ -85,10 +85,16 @@
                         <i class="fas fa-list-check"></i>
                         {{ auth()->user()->isManager() ? __('portal.nav.staff_tasks') : __('portal.nav.my_tasks') }}
                     </a>
-                    <a href="{{ route('spend.index') }}" class="nav-item {{ request()->routeIs('spend.*') ? 'active' : '' }}">
+                    <a href="{{ route('spend.index') }}" class="nav-item {{ request()->routeIs('spend.index') || request()->routeIs('spend.create') || request()->routeIs('spend.show') || request()->routeIs('spend.edit') ? 'active' : '' }}">
                         <i class="fas fa-receipt"></i>
                         {{ __('portal.nav.spend') }}
                     </a>
+                    @if(auth()->user()->isManager() || auth()->user()->isProjectManager())
+                    <a href="{{ route('spend.manage') }}" class="nav-item {{ request()->routeIs('spend.manage') ? 'active' : '' }}">
+                        <i class="fas fa-folder-open"></i>
+                        {{ __('portal.nav.spend_manage') }}
+                    </a>
+                    @endif
                     @if(auth()->user()->isManager())
                     <a href="{{ route('weekly-planner.review') }}" class="nav-item {{ request()->routeIs('weekly-planner.review') || request()->routeIs('weekly-planner.presence') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-check"></i>

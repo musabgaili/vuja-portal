@@ -37,8 +37,8 @@
                     </div>
                     @if($r->description)<div class="small mt-1">{{ $r->description }}</div>@endif
                     <div class="mt-1">
-                        @if($r->isPurchase() && $r->product_url)<a href="{{ $r->product_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary"><i class="fas fa-link"></i> {{ __('portal.spend.buy_link') }} (×{{ $r->quantity }})</a>@endif
-                        @if($r->receipt_file)<a href="{{ route('spend.receipt', $r) }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-paperclip"></i> {{ __('portal.spend.receipt') }}</a>@endif
+                        <a href="{{ route('spend.show', $r) }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i> {{ __('portal.spend.view_details') }}</a>
+                        <span class="text-muted small ms-1">{{ trans_choice('portal.spend.items_count', $r->items->count(), ['count' => $r->items->count()]) }}@if($r->links()) · <i class="fas fa-link"></i> {{ count($r->links()) }}@endif</span>
                     </div>
                 </div>
                 <div class="text-end"><div style="font-size:1.3rem;font-weight:800;color:var(--primary-color);">{{ number_format((float) $r->amount, 2) }} {{ $r->currency }}</div></div>
@@ -68,14 +68,14 @@
                     <strong>{{ $r->title }}</strong>
                     <span class="badge bg-{{ $r->isPurchase() ? 'primary' : 'secondary' }}">{{ __('portal.spend.type.'.$r->type) }}</span>
                     <div class="text-muted small mt-1"><i class="fas fa-user"></i> {{ $r->requester->name }} · {{ $r->isProject() ? ($r->project->title ?? '—') : ($r->category ?: __('portal.spend.general')) }}</div>
-                    @if($r->isPurchase() && $r->product_url)<a href="{{ $r->product_url }}" target="_blank" rel="noopener" class="small"><i class="fas fa-link"></i> {{ __('portal.spend.buy_link') }} (×{{ $r->quantity }})</a>@endif
+                    <a href="{{ route('spend.show', $r) }}" class="small"><i class="fas fa-eye"></i> {{ __('portal.spend.view_details') }}</a>
                 </div>
                 <div class="text-end"><div style="font-weight:700;">{{ number_format((float) $r->amount, 2) }} {{ $r->currency }}</div><small class="text-muted">{{ $r->isPurchase() ? __('portal.spend.estimated') : __('portal.spend.paid') }}</small></div>
             </div>
             @if($r->isPurchase())
                 <form method="POST" action="{{ route('spend.purchase', $r) }}" enctype="multipart/form-data" class="row g-1 mt-2 align-items-end">@csrf
                     <div class="col-md-4"><label class="form-label small mb-0">{{ __('portal.spend.actual_cost') }} ({{ $r->currency }})</label><input type="number" step="0.01" min="0" name="actual_amount" class="form-control form-control-sm" value="{{ $r->amount }}" required></div>
-                    <div class="col-md-5"><label class="form-label small mb-0">{{ __('portal.spend.actual_receipt') }}</label><input type="file" name="actual_receipt_file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png"></div>
+                    <div class="col-md-5"><label class="form-label small mb-0">{{ __('portal.spend.actual_receipt') }}</label><input type="file" name="actual_receipts[]" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png" multiple></div>
                     <div class="col-md-3"><button class="btn btn-sm btn-primary w-100"><i class="fas fa-cart-shopping"></i> {{ __('portal.spend.mark_purchased') }}</button></div>
                 </form>
             @else

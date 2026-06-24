@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * An employee/PM/manager request to spend money — either a reimbursement (already
@@ -47,6 +48,46 @@ class SpendRequest extends Model
     public function projectExpense(): BelongsTo
     {
         return $this->belongsTo(ProjectExpense::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(SpendRequestItem::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(SpendRequestFile::class);
+    }
+
+    /** Receipts/attachments attached at request time. */
+    public function receipts(): HasMany
+    {
+        return $this->files()->whereIn('kind', ['receipt', 'attachment']);
+    }
+
+    /** Proof-of-purchase files attached at fulfilment time. */
+    public function actualReceipts(): HasMany
+    {
+        return $this->files()->where('kind', 'actual_receipt');
+    }
+
+    /** Sum of the line items (the request's estimated/claimed total). */
+    public function itemsTotal(): float
+    {
+        return round((float) $this->items->sum(fn (SpendRequestItem $i) => $i->lineTotal()), 2);
+    }
+
+    /** All buy links across the line items. */
+    public function links(): array
+    {
+        return $this->items->pluck('product_url')->filter()->values()->all();
+    }
+
+    /** First receipt path (back-compat helper for the ledger). */
+    public function firstReceiptPath(): ?string
+    {
+        return $this->receipts->first()->path ?? $this->receipt_file;
     }
 
     // ---- State helpers ----
