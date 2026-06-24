@@ -103,7 +103,7 @@
         <tbody>
         @forelse($requests as $r)
             <tr style="cursor:pointer;" onclick="window.location='{{ route('spend.show', $r) }}'">
-                <td><strong>{{ $r->title }}</strong></td>
+                <td><a href="{{ route('spend.show', $r) }}" class="fw-bold text-decoration-none">{{ $r->title }}</a></td>
                 <td>{{ $r->requester->name ?? '—' }}</td>
                 <td>
                     <span class="badge bg-{{ $r->isPurchase() ? 'primary' : 'secondary' }}">{{ __('portal.spend.type.'.$r->type) }}</span>

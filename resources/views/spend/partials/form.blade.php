@@ -139,7 +139,9 @@
 
 <script>
 (function () {
-    var idx = {{ count($initial) }};
+    // Seed from the highest existing key+1 (old() rows can be non-contiguous after a
+    // remove-then-bounce), so an added row never collides with a rendered index.
+    var idx = {{ empty($initial) ? 0 : max(array_keys($initial)) + 1 }};
     var box = document.getElementById('sp-items');
     var tpl = document.getElementById('sp-item-tpl').innerHTML;
 

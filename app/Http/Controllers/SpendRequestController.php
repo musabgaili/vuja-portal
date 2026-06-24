@@ -144,8 +144,8 @@ class SpendRequestController extends Controller
     public function show(SpendRequest $spendRequest)
     {
         $user = Auth::user();
-        $spendRequest->load(['items', 'files.uploader', 'requester', 'project', 'reviewer']);
         abort_unless($this->canView($user, $spendRequest), 403);
+        $spendRequest->load(['items', 'files.uploader', 'requester', 'project', 'reviewer']);
 
         return view('spend.show', [
             'spend' => $spendRequest,
@@ -169,8 +169,8 @@ class SpendRequestController extends Controller
             $base->where(fn ($w) => $w->whereIn('project_id', $pmProjectIds)->orWhere('requester_id', $user->id));
         }
 
+        // Apply every filter EXCEPT status first (type/scope/project/requester/q/dates).
         foreach ([
-            'status' => ['pending', 'approved', 'completed', 'rejected'],
             'type' => ['reimbursement', 'purchase'],
             'scope' => ['project', 'general'],
         ] as $field => $allowed) {
@@ -200,14 +200,21 @@ class SpendRequestController extends Controller
             }
         }
 
-        // Totals across the filtered set (before pagination consumes the builder).
+        // The per-status money cards summarise across the non-status filters, so they
+        // stay meaningful even when the table is narrowed to one status.
+        $statusless = clone $base;
         $summary = [
-            'count' => (clone $base)->count(),
-            'pending' => (float) (clone $base)->where('status', 'pending')->sum('amount'),
-            'approved' => (float) (clone $base)->where('status', 'approved')->sum('amount'),
-            'completed' => (float) (clone $base)->where('status', 'completed')->whereNotNull('actual_amount')->sum('actual_amount')
-                + (float) (clone $base)->where('status', 'completed')->whereNull('actual_amount')->sum('amount'),
+            'pending' => (float) (clone $statusless)->where('status', 'pending')->sum('amount'),
+            'approved' => (float) (clone $statusless)->where('status', 'approved')->sum('amount'),
+            'completed' => (float) (clone $statusless)->where('status', 'completed')->whereNotNull('actual_amount')->sum('actual_amount')
+                + (float) (clone $statusless)->where('status', 'completed')->whereNull('actual_amount')->sum('amount'),
         ];
+
+        // The status filter drives the table + the count card only.
+        if (in_array($request->query('status'), ['pending', 'approved', 'completed', 'rejected'], true)) {
+            $base->where('status', $request->query('status'));
+        }
+        $summary['count'] = (clone $base)->count();
 
         return view('spend.manage', [
             'requests' => $base->paginate(25)->withQueryString(),

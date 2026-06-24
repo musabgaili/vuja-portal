@@ -20,15 +20,14 @@ return new class extends Migration
                 // Skip if this request already has line items (idempotent re-run).
                 $hasItems = DB::table('spend_request_items')->where('spend_request_id', $r->id)->exists();
                 if (! $hasItems) {
-                    $qty = max((int) ($r->quantity ?? 1), 1);
-                    $amount = (float) ($r->amount ?? 0);
-                    $unit = $qty > 0 ? round($amount / $qty, 2) : $amount;
-
+                    // The legacy `amount` was always the TOTAL, so a single line of
+                    // quantity 1 at unit = amount reproduces it exactly (qty*unit == amount).
+                    // Storing the old quantity here would round unit and drift the total.
                     DB::table('spend_request_items')->insert([
                         'spend_request_id' => $r->id,
                         'description' => $r->title,
-                        'quantity' => $qty,
-                        'unit_amount' => $unit,
+                        'quantity' => 1,
+                        'unit_amount' => (float) ($r->amount ?? 0),
                         'product_url' => $r->product_url,
                         'sort_order' => 0,
                         'created_at' => $now,
