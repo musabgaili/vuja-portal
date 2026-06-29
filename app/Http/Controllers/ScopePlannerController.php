@@ -188,7 +188,11 @@ class ScopePlannerController extends Controller
         return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])->with('success', __('portal.scope_planner.generated'));
     }
 
-    /** Edit section text + the components override, then reprice. */
+    /**
+     * Targeted editor save (Phase 2A): section text, custom heading/column labels,
+     * the timeline, Company scopes (add/edit/remove), and milestones (structure;
+     * amounts stay computed by PricingService). Money is never authored here.
+     */
     public function update(Request $request, Quote $quote)
     {
         $this->authorizeEditable($quote);
@@ -199,50 +203,176 @@ class ScopePlannerController extends Controller
             'subject' => 'nullable|string|max:200',
             'beneficiary' => 'nullable|string|max:200',
             'components_client_total' => 'nullable|numeric|min:0',
+            'labels' => 'array',
+            'labels.*' => 'nullable|string|max:120',
+            'timeline' => 'array',
+            'timeline.*.period' => 'nullable|string|max:120',
+            'timeline.*.activity' => 'nullable|string|max:500',
+            'scopes' => 'array',
+            'milestones' => 'array',
+            'milestones.*.code' => 'nullable|string|max:20',
+            'milestones.*.trigger' => 'nullable|string|max:200',
+            'milestones.*.percentage' => 'nullable|numeric|min:0|max:100',
+            // Advanced grid editor (Phase 2B): a JSON blob of custom content tables.
+            'custom_tables_json' => 'nullable|string|max:200000',
         ]);
 
+        $toLines = fn ($v) => collect(preg_split('/\r\n|\r|\n/', (string) $v))
+            ->map(fn ($l) => trim($l))->filter()->values()->all();
+
         // Rebuild ai_content from the edited section text: keys flagged in
-        // array_sections become bullet arrays (split on newlines); the rest stay
-        // strings. Untouched keys (timeline, scopes, …) are preserved.
+        // array_sections become bullet arrays; the rest stay strings. Untouched
+        // keys are preserved.
         $content = $quote->ai_content ?? [];
         $arraySections = $data['array_sections'] ?? [];
         foreach (($data['sections'] ?? []) as $key => $val) {
-            if (in_array($key, $arraySections, true)) {
-                $content[$key] = collect(preg_split('/\r\n|\r|\n/', (string) $val))
-                    ->map(fn ($l) => trim($l))->filter()->values()->all();
-            } else {
-                $content[$key] = trim((string) $val);
-            }
+            $content[$key] = in_array($key, $arraySections, true) ? $toLines($val) : trim((string) $val);
         }
+
+        // Timeline rows (period + activity) — keep only the non-empty ones.
+        if ($request->has('timeline')) {
+            $timeline = [];
+            foreach ((array) $request->input('timeline', []) as $row) {
+                $period = trim((string) ($row['period'] ?? ''));
+                $activity = trim((string) ($row['activity'] ?? ''));
+                if ($period !== '' || $activity !== '') {
+                    $timeline[] = ['period' => $period, 'activity' => $activity];
+                }
+            }
+            $content['timeline'] = $timeline;
+        }
+
+        // Custom heading/column labels — store only the non-empty overrides.
+        $labels = collect($data['labels'] ?? [])->map(fn ($v) => trim((string) $v))->filter()->all();
 
         $quote->update([
             'ai_content' => $content,
+            'doc_labels' => $labels ?: null,
             'subject' => $data['subject'] ?? $quote->subject,
             'beneficiary' => $data['beneficiary'] ?? $quote->beneficiary,
             'components_client_total' => $data['components_client_total'] ?? $quote->components_client_total,
         ]);
 
-        // Company per-scope edits (title + bullet lists).
-        $toLines = fn ($v) => collect(preg_split('/\r\n|\r|\n/', (string) $v))
-            ->map(fn ($l) => trim($l))->filter()->values()->all();
-        foreach ((array) $request->input('scopes', []) as $scopeId => $fields) {
-            $scope = $quote->scopes()->whereKey($scopeId)->first();
-            if (! $scope) {
-                continue;
+        if ($quote->customer_category === 'company' && $request->has('scopes')) {
+            $this->syncScopeEdits($quote, (array) $request->input('scopes', []), $toLines);
+        }
+
+        // Milestones: rebuild the schedule structure from the form; PricingService
+        // computes the amounts (last absorbs rounding). Empty → reseeds from config.
+        if ($request->has('milestones')) {
+            $quote->milestones()->delete();
+            $i = 0;
+            foreach ((array) $request->input('milestones', []) as $row) {
+                $code = trim((string) ($row['code'] ?? ''));
+                $trigger = trim((string) ($row['trigger'] ?? ''));
+                $pct = $row['percentage'] ?? '';
+                if ($code === '' && $trigger === '' && $pct === '') {
+                    continue;
+                }
+                $quote->milestones()->create([
+                    'code' => $code ?: 'M'.($i + 1),
+                    'trigger' => $trigger ?: null,
+                    'percentage' => (float) ($pct ?: 0),
+                    'amount' => 0,
+                    'sort_order' => $i++,
+                ]);
             }
-            $scope->update([
-                'title' => trim((string) ($fields['title'] ?? '')) ?: $scope->title,
-                'objective' => $toLines($fields['objective'] ?? ''),
-                'inputs_required' => $toLines($fields['inputs_required'] ?? ''),
-                'deliverables' => $toLines($fields['deliverables'] ?? ''),
-                'acceptance_criteria' => $toLines($fields['acceptance_criteria'] ?? ''),
-                'exclusions' => $toLines($fields['exclusions'] ?? ''),
-            ]);
+        }
+
+        // Advanced custom grids (Phase 2B): a JSON map of table-slug → grid. The
+        // editor submits it as a hidden field; absent field = leave as-is, empty
+        // string = clear all custom grids back to the structured defaults.
+        if ($request->has('custom_tables_json')) {
+            $raw = trim((string) $request->input('custom_tables_json'));
+            $decoded = $raw !== '' ? json_decode($raw, true) : [];
+            $clean = is_array($decoded) ? $this->sanitizeCustomTables($decoded) : [];
+            $quote->update(['custom_tables' => $clean ?: null]);
         }
 
         app(\App\Services\Scope\PricingService::class)->price($quote->refresh());
 
         return redirect()->route('scope-planner.show', ['quote' => $quote, 'step' => 'document'])->with('success', __('portal.scope_planner.saved'));
+    }
+
+    /**
+     * Validate + clamp the advanced grid payload. Text is escaped on render, so
+     * this is about structure + sane limits (no runaway grids), never trust.
+     *
+     * @return array<string,array{columns:array,rows:array}>
+     */
+    private function sanitizeCustomTables(array $tables): array
+    {
+        $aligns = ['start', 'center', 'end'];
+        $out = [];
+
+        foreach ($tables as $slug => $tbl) {
+            $slug = preg_replace('/[^a-z0-9_]/i', '', (string) $slug);
+            if ($slug === '' || ! is_array($tbl)) {
+                continue;
+            }
+
+            $cols = [];
+            foreach (array_slice((array) ($tbl['columns'] ?? []), 0, 20) as $col) {
+                $cols[] = [
+                    'label' => mb_substr(trim((string) ($col['label'] ?? '')), 0, 120),
+                    'align' => in_array($col['align'] ?? '', $aligns, true) ? $col['align'] : 'start',
+                ];
+            }
+            if (! $cols) {
+                continue;
+            }
+
+            $rows = [];
+            foreach (array_slice((array) ($tbl['rows'] ?? []), 0, 200) as $row) {
+                $cells = [];
+                foreach (array_slice((array) $row, 0, 20) as $cell) {
+                    $cells[] = [
+                        'text' => mb_substr((string) ($cell['text'] ?? ''), 0, 2000),
+                        'colspan' => max(1, min(20, (int) ($cell['colspan'] ?? 1))),
+                        'rowspan' => max(1, min(200, (int) ($cell['rowspan'] ?? 1))),
+                        'align' => in_array($cell['align'] ?? '', $aligns, true) ? $cell['align'] : 'start',
+                        'merged' => ! empty($cell['merged']),
+                    ];
+                }
+                $rows[] = $cells;
+            }
+
+            $out[$slug] = ['columns' => $cols, 'rows' => $rows];
+        }
+
+        return $out;
+    }
+
+    /** Create / update / delete Company scope rows from the editor repeater. */
+    private function syncScopeEdits(Quote $quote, array $scopes, \Closure $toLines): void
+    {
+        $keepIds = [];
+        $order = 0;
+        foreach ($scopes as $key => $fields) {
+            $title = trim((string) ($fields['title'] ?? ''));
+            $payload = [
+                'sort_order' => $order++,
+                'title' => $title ?: ('Scope '.$order),
+                'objective' => $toLines($fields['objective'] ?? ''),
+                'inputs_required' => $toLines($fields['inputs_required'] ?? ''),
+                'deliverables' => $toLines($fields['deliverables'] ?? ''),
+                'acceptance_criteria' => $toLines($fields['acceptance_criteria'] ?? ''),
+                'exclusions' => $toLines($fields['exclusions'] ?? ''),
+            ];
+
+            if (is_numeric($key) && ($scope = $quote->scopes()->whereKey($key)->first())) {
+                $scope->update($payload);
+                $keepIds[] = $scope->id;
+            } else {
+                // A brand-new row (key like "new_0") — skip if completely empty.
+                if ($title === '' && empty($payload['deliverables']) && empty($payload['objective'])) {
+                    continue;
+                }
+                $keepIds[] = $quote->scopes()->create($payload + ['type' => 'commercial', 'price' => 0])->id;
+            }
+        }
+
+        $quote->scopes()->whereNotIn('id', $keepIds ?: [0])->delete();
     }
 
     /** Regenerate a single section (replaces only that key in ai_content). */

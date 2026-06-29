@@ -35,6 +35,9 @@ class DocxRenderer
     {
         $quote->loadMissing(['items', 'scopes', 'milestones', 'client']);
         $rtl = $quote->language === 'ar';
+        // Label helper: honour the employee's per-quote heading/column renames
+        // (doc_labels) so the DOCX matches the PDF/online document.
+        $L = fn (string $k, array $r = []) => $quote->label($k, __($k, $r));
         $cur = config('scope.currency', 'SAR');
         $brand = ltrim((string) config('scope.brand_color', '#1B565E'), '#');
 
@@ -81,7 +84,7 @@ class DocxRenderer
             if (empty($c[$key])) {
                 continue;
             }
-            $section->addText(__('scope.'.$key), $h2, ['spaceBefore' => 200, 'spaceAfter' => 80]);
+            $section->addText($L('scope.'.$key), $h2, ['spaceBefore' => 200, 'spaceAfter' => 80]);
             if (is_array($c[$key])) {
                 foreach ($c[$key] as $line) {
                     $section->addListItem((string) $line, 0, $run, null, $para);
@@ -99,7 +102,7 @@ class DocxRenderer
                 if (empty($val)) {
                     continue;
                 }
-                $section->addText(__('scope.'.$f), ['bold' => true, 'rtl' => $rtl], ['spaceBefore' => 80]);
+                $section->addText($L('scope.'.$f), ['bold' => true, 'rtl' => $rtl], ['spaceBefore' => 80]);
                 foreach ((array) $val as $line) {
                     $section->addListItem((string) $line, 0, $run, null, $para);
                 }
@@ -107,12 +110,12 @@ class DocxRenderer
         }
 
         // Pricing (BoQ)
-        $section->addText(__('scope.pricing'), $h2, ['spaceBefore' => 240, 'spaceAfter' => 80]);
+        $section->addText($L('scope.pricing'), $h2, ['spaceBefore' => 240, 'spaceAfter' => 80]);
         $this->boqTable($section, $quote, $cur, $brand);
 
         // Milestones
         if ($quote->milestones->isNotEmpty()) {
-            $section->addText(__('scope.payment_schedule'), $h2, ['spaceBefore' => 200, 'spaceAfter' => 80]);
+            $section->addText($L('scope.payment_schedule'), $h2, ['spaceBefore' => 200, 'spaceAfter' => 80]);
             $this->milestoneTable($section, $quote, $cur, $brand);
         }
 
@@ -141,7 +144,8 @@ class DocxRenderer
     {
         $t = $section->addTable(['borderSize' => 6, 'borderColor' => 'd3dedd', 'cellMargin' => 60, 'width' => 100 * 50, 'unit' => 'pct']);
         $t->addRow();
-        foreach ([__('scope.item_no'), __('scope.description'), __('scope.qty'), __('scope.unit_price').' ('.$cur.')', __('scope.total').' ('.$cur.')'] as $head) {
+        $L = fn (string $k) => $quote->label($k, __($k));
+        foreach ([$L('scope.item_no'), $L('scope.description'), $L('scope.qty'), $L('scope.unit_price').' ('.$cur.')', $L('scope.total').' ('.$cur.')'] as $head) {
             $t->addCell(null, ['bgColor' => $brand])->addText($head, ['bold' => true, 'color' => 'FFFFFF']);
         }
         foreach ($quote->clientVisibleItems() as $i => $row) {
@@ -159,7 +163,7 @@ class DocxRenderer
         ] as $r) {
             $t->addRow();
             $cell = $t->addCell(8600, ['gridSpan' => 4, 'bgColor' => 'eaf2f2']);
-            $cell->addText(__($r[0], $r[2] ?? []), ['bold' => true, 'color' => $brand]);
+            $cell->addText($quote->label($r[0], __($r[0], $r[2] ?? [])), ['bold' => true, 'color' => $brand]);
             $t->addCell(1700, ['bgColor' => 'eaf2f2'])->addText(number_format($r[1], 0), ['bold' => true]);
         }
     }
@@ -168,7 +172,8 @@ class DocxRenderer
     {
         $t = $section->addTable(['borderSize' => 6, 'borderColor' => 'd3dedd', 'cellMargin' => 60, 'width' => 100 * 50, 'unit' => 'pct']);
         $t->addRow();
-        foreach ([__('scope.milestone'), __('scope.trigger'), '%', __('scope.amount').' ('.$cur.')'] as $head) {
+        $L = fn (string $k) => $quote->label($k, __($k));
+        foreach ([$L('scope.milestone'), $L('scope.trigger'), '%', $L('scope.amount').' ('.$cur.')'] as $head) {
             $t->addCell(null, ['bgColor' => $brand])->addText($head, ['bold' => true, 'color' => 'FFFFFF']);
         }
         foreach ($quote->milestones as $m) {

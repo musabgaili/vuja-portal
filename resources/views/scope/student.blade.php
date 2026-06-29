@@ -2,6 +2,7 @@
 @extends('scope.document')
 @php($c = $quote->ai_content ?? [])
 @php($cur = $quote->language === 'ar' ? 'ر.س' : 'SAR')
+@php($L = fn ($k) => $quote->label($k, __($k)))
 
 @section('body')
   <table class="meta">
@@ -13,23 +14,23 @@
   </table>
 
   <div class="section">
-    <h2>@lang('scope.scope_of_work')</h2>
+    <h2>{{ $L('scope.scope_of_work') }}</h2>
     <ul class="points">
       @foreach(($c['scope_of_work'] ?? []) as $line)<li>{{ $line }}</li>@endforeach
     </ul>
   </div>
 
   <div class="section">
-    <h2>@lang('scope.pricing')</h2>
+    <h2>{{ $L('scope.pricing') }}</h2>
     <p class="lead">@lang('scope.pricing_intro')</p>
     <table class="tbl">
       <thead><tr>
         <th style="width:6%">@lang('scope.item_no')</th>
-        <th class="desc">@lang('scope.description')</th>
-        <th style="width:10%">@lang('scope.unit')</th>
-        <th style="width:10%">@lang('scope.qty')</th>
-        <th style="width:14%">@lang('scope.unit_price') ({{ $cur }})</th>
-        <th style="width:14%">@lang('scope.total') ({{ $cur }})</th>
+        <th class="desc">{{ $L('scope.description') }}</th>
+        <th style="width:10%">{{ $L('scope.unit') }}</th>
+        <th style="width:10%">{{ $L('scope.qty') }}</th>
+        <th style="width:14%">{{ $L('scope.unit_price') }} ({{ $cur }})</th>
+        <th style="width:14%">{{ $L('scope.total') }} ({{ $cur }})</th>
       </tr></thead>
       <tbody>
         @foreach($quote->clientVisibleItems() as $i => $row)
@@ -51,14 +52,14 @@
   </div>
 
   <div class="section">
-    <h2>@lang('scope.out_of_scope')</h2>
+    <h2>{{ $L('scope.out_of_scope') }}</h2>
     <ul class="points">
       @foreach(($c['out_of_scope'] ?? []) as $line)<li>{{ $line }}</li>@endforeach
     </ul>
   </div>
 
   <div class="section">
-    <h2>@lang('scope.notes')</h2>
+    <h2>{{ $L('scope.notes') }}</h2>
     <div class="note-block"><ul>
       @foreach(($c['notes'] ?? []) as $line)<li>{{ $line }}</li>@endforeach
     </ul></div>

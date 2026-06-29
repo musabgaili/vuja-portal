@@ -21,6 +21,13 @@
     // services carry the rate + the Pricing-Tool description for auto-recall.
     $stockJson = $stockItems->map(fn ($s) => ['id' => $s->id, 'label' => $s->name.' — '.$s->category, 'price' => (float) $s->priceFor($quote->customer_category)])->values();
     $svcJson = collect($services)->map(fn ($s) => ['key' => $s->key, 'rate' => $s->unitRate, 'desc' => $s->description, 'label' => $s->name(app()->getLocale()).' ('.number_format($s->unitRate, 0).')'])->values();
+    // Curated per-tier set of renamable headings + table column headers for the
+    // targeted "rename labels" editor (stored in doc_labels). Each is a scope.* key.
+    $labelKeys = match ($quote->customer_category) {
+        'company' => ['scope.introduction_purpose', 'scope.pricing_structure', 'scope.scope', 'scope.type', 'scope.value', 'scope.objective', 'scope.inputs_required', 'scope.deliverables', 'scope.acceptance_criteria', 'scope.exclusions', 'scope.commercial_proposal', 'scope.price_summary', 'scope.payment_schedule', 'scope.milestone', 'scope.trigger', 'scope.amount', 'scope.indicative_timeline', 'scope.period', 'scope.activity', 'scope.out_of_scope', 'scope.notes', 'scope.general_terms'],
+        'student' => ['scope.scope_of_work', 'scope.pricing', 'scope.description', 'scope.unit', 'scope.qty', 'scope.unit_price', 'scope.total', 'scope.out_of_scope', 'scope.notes'],
+        default => ['scope.introduction', 'scope.proposed_scope', 'scope.technical_specs', 'scope.mechanical_specs', 'scope.operational_logic', 'scope.implementation_phases', 'scope.pricing', 'scope.payment_schedule', 'scope.out_of_scope', 'scope.notes'],
+    };
 @endphp
 
 @section('content')
@@ -178,20 +185,99 @@
                         </div>
                     @endforeach
 
-                    {{-- Company: editable per-scope sections --}}
-                    @if($quote->customer_category === 'company' && $quote->scopes->isNotEmpty())
+                    {{-- Company: editable per-scope sections (add / remove) --}}
+                    @if($quote->customer_category === 'company')
                         <hr>
-                        <h6 class="fw-bold">{{ __('portal.scope_planner.scopes') }}</h6>
-                        @foreach($quote->scopes as $s)
-                        <div class="border rounded p-2 mb-3">
-                            <label class="form-label fw-bold mb-1">{{ __('portal.scope_planner.scope_title') }} #{{ $loop->iteration }}</label>
-                            <input type="text" name="scopes[{{ $s->id }}][title]" value="{{ $s->title }}" class="form-control form-control-sm mb-2" @unless($editable)readonly @endunless>
-                            @foreach(['objective','inputs_required','deliverables','acceptance_criteria','exclusions'] as $f)
-                                <label class="form-label small mb-0">{{ __('scope.'.$f) }} <small class="text-muted">({{ __('portal.scope_planner.one_per_line') }})</small></label>
-                                <textarea name="scopes[{{ $s->id }}][{{ $f }}]" data-autosize rows="3" class="form-control form-control-sm mb-2" @unless($editable)readonly @endunless>{{ implode("\n", (array) (is_array($s->$f) ? $s->$f : array_filter([$s->$f]))) }}</textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold m-0">{{ __('portal.scope_planner.scopes') }}</h6>
+                            @if($editable)<button type="button" class="btn btn-sm btn-outline-secondary" onclick="addScope()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.add_scope') }}</button>@endif
+                        </div>
+                        <div id="scopes-wrap">
+                            @foreach($quote->scopes as $s)
+                                @include('scope-planner._scope_row', ['key' => $s->id, 'scope' => $s, 'editable' => $editable])
                             @endforeach
                         </div>
+                    @endif
+
+                    {{-- Indicative timeline (all tiers) — add / remove rows, or full grid --}}
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <h6 class="fw-bold m-0">{{ $quote->label('scope.indicative_timeline', __('scope.indicative_timeline')) }}
+                            <span id="adv-badge-timeline" class="badge bg-info ms-1" @if(empty($quote->custom_tables['timeline'] ?? null)) style="display:none" @endif>{{ __('portal.scope_planner.adv_custom_badge') }}</span>
+                        </h6>
+                        @if($editable)
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addTimelineRow()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.add_row') }}</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openAdv('timeline')"><i class="fas fa-table-cells"></i> {{ __('portal.scope_planner.advanced_edit') }}</button>
+                        </div>
+                        @endif
+                    </div>
+                    @if(! empty($quote->custom_tables['timeline'] ?? null))
+                        <div class="alert alert-info py-1 px-2 small mb-2"><i class="fas fa-circle-info"></i> {{ __('portal.scope_planner.advanced_edit_hint') }}</div>
+                    @endif
+                    <table class="table table-sm" id="timeline-table"><tbody>
+                        @foreach(($c['timeline'] ?? []) as $i => $row)
+                        <tr>
+                            <td style="width:38%"><input type="text" name="timeline[{{ $i }}][period]" value="{{ $row['period'] ?? ($row['phase'] ?? '') }}" class="form-control form-control-sm" placeholder="{{ __('scope.period') }}" @unless($editable)readonly @endunless></td>
+                            <td><input type="text" name="timeline[{{ $i }}][activity]" value="{{ $row['activity'] ?? ($row['notes'] ?? '') }}" class="form-control form-control-sm" placeholder="{{ __('scope.activity') }}" @unless($editable)readonly @endunless></td>
+                            <td style="width:36px">@if($editable)<button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button>@endif</td>
+                        </tr>
                         @endforeach
+                    </tbody></table>
+
+                    {{-- Payment schedule (milestones) — structure editable; amounts computed --}}
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="fw-bold m-0">{{ $quote->label('scope.payment_schedule', __('scope.payment_schedule')) }}</h6>
+                        @if($editable)<button type="button" class="btn btn-sm btn-outline-secondary" onclick="addMilestoneRow()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.add_row') }}</button>@endif
+                    </div>
+                    <small class="text-muted d-block mb-1">{{ __('portal.scope_planner.milestone_hint') }}</small>
+                    <table class="table table-sm" id="milestones-table">
+                        <thead><tr><th style="width:64px">{{ __('scope.milestone') }}</th><th>{{ __('scope.trigger') }}</th><th style="width:74px">%</th><th style="width:36px"></th></tr></thead>
+                        <tbody>
+                        @foreach($quote->milestones as $i => $m)
+                        <tr>
+                            <td><input type="text" name="milestones[{{ $i }}][code]" value="{{ $m->code }}" class="form-control form-control-sm" @unless($editable)readonly @endunless></td>
+                            <td><input type="text" name="milestones[{{ $i }}][trigger]" value="{{ $m->triggerLabel() }}" class="form-control form-control-sm" @unless($editable)readonly @endunless></td>
+                            <td><input type="number" step="0.01" min="0" max="100" name="milestones[{{ $i }}][percentage]" value="{{ rtrim(rtrim(number_format($m->percentage,2),'0'),'.') }}" class="form-control form-control-sm ms-pct" oninput="sumPct()" @unless($editable)readonly @endunless></td>
+                            <td>@if($editable)<button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove();sumPct()">&times;</button>@endif</td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                    <small class="text-muted">{{ __('portal.scope_planner.pct_sum') }}: <span id="pct-sum">0</span>%</small>
+
+                    {{-- Rename any heading / table column (doc_labels) --}}
+                    <hr>
+                    <details class="mb-3">
+                        <summary class="fw-bold" style="cursor:pointer"><i class="fas fa-tag"></i> {{ __('portal.scope_planner.rename_labels') }}</summary>
+                        <small class="text-muted d-block my-2">{{ __('portal.scope_planner.rename_labels_hint') }}</small>
+                        <div class="row g-2">
+                        @foreach($labelKeys as $lk)
+                            <div class="col-md-6">
+                                <label class="form-label small mb-0">{{ __($lk) }}</label>
+                                <input type="text" name="labels[{{ $lk }}]" value="{{ data_get($quote->doc_labels, $lk, '') }}" placeholder="{{ __($lk) }}" class="form-control form-control-sm" @unless($editable)readonly @endunless>
+                            </div>
+                        @endforeach
+                        </div>
+                    </details>
+
+                    @if($editable)
+                    {{-- Advanced grid editor state (written by the grid modal). --}}
+                    <input type="hidden" name="custom_tables_json" id="custom_tables_json" value="{{ json_encode($quote->custom_tables ?: (object) []) }}">
+                    {{-- Templates for JS-added rows (inert; not submitted) --}}
+                    <template id="scope-tpl">@include('scope-planner._scope_row', ['key' => '__K__', 'scope' => null, 'editable' => true])</template>
+                    <template id="tl-tpl"><tr>
+                        <td style="width:38%"><input type="text" name="timeline[__I__][period]" class="form-control form-control-sm" placeholder="{{ __('scope.period') }}"></td>
+                        <td><input type="text" name="timeline[__I__][activity]" class="form-control form-control-sm" placeholder="{{ __('scope.activity') }}"></td>
+                        <td style="width:36px"><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove()">&times;</button></td>
+                    </tr></template>
+                    <template id="ms-tpl"><tr>
+                        <td><input type="text" name="milestones[__I__][code]" class="form-control form-control-sm" value="M"></td>
+                        <td><input type="text" name="milestones[__I__][trigger]" class="form-control form-control-sm"></td>
+                        <td><input type="number" step="0.01" min="0" max="100" name="milestones[__I__][percentage]" class="form-control form-control-sm ms-pct" value="0" oninput="sumPct()"></td>
+                        <td><button type="button" class="btn btn-sm btn-link text-danger" onclick="this.closest('tr').remove();sumPct()">&times;</button></td>
+                    </tr></template>
                     @endif
 
                     @if($editable)
@@ -252,6 +338,31 @@
         </div>
     </div>
 </div>
+
+@if($editable)
+{{-- Advanced grid editor modal (Phase 2B) --}}
+<div id="advOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1090;padding:24px;overflow:auto;">
+    <div style="max-width:920px;margin:0 auto;background:var(--bg-primary,#fff);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+            <h5 class="m-0"><i class="fas fa-table-cells"></i> {{ __('portal.scope_planner.advanced_edit') }}</h5>
+            <button type="button" class="btn-close" onclick="advClose()" aria-label="{{ __('portal.scope_planner.adv_cancel') }}"></button>
+        </div>
+        <div class="p-3">
+            <p class="text-muted small">{{ __('portal.scope_planner.advanced_edit_hint') }}</p>
+            <div class="d-flex gap-2 mb-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="advAddCol()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.adv_add_col') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="advAddRow()"><i class="fas fa-plus"></i> {{ __('portal.scope_planner.adv_add_row') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-auto" onclick="advResetCur()"><i class="fas fa-rotate-left"></i> {{ __('portal.scope_planner.adv_reset') }}</button>
+            </div>
+            <div style="overflow:auto;"><table class="table table-sm table-bordered align-middle mb-0" id="advGrid"></table></div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 p-3 border-top">
+            <button type="button" class="btn btn-outline-secondary" onclick="advClose()">{{ __('portal.scope_planner.adv_cancel') }}</button>
+            <button type="button" class="btn btn-primary" onclick="advApply()"><i class="fas fa-check"></i> {{ __('portal.scope_planner.adv_save') }}</button>
+        </div>
+    </div>
+</div>
+@endif
 
 <style>
 .scope-steps { display:flex; gap:.5rem; flex-wrap:wrap; }
@@ -360,5 +471,146 @@ function autosize(el) { el.style.height = 'auto'; el.style.height = (el.scrollHe
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('textarea[data-autosize]').forEach(function (t) { autosize(t); t.addEventListener('input', function () { autosize(t); }); });
 });
+
+// ---- Targeted editor: scope / timeline / milestone repeaters ----
+let tlIdx = {{ count($c['timeline'] ?? []) }};
+let msIdx = {{ $quote->milestones->count() }};
+let scNew = 0;
+function addScope() {
+    const t = document.getElementById('scope-tpl'); if (!t) return;
+    const frag = t.content.cloneNode(true);
+    const key = 'new_' + (scNew++);
+    frag.querySelectorAll('[name]').forEach(function (el) { el.name = el.name.split('__K__').join(key); });
+    const wrap = document.getElementById('scopes-wrap'); if (!wrap) return;
+    wrap.appendChild(frag);
+    const node = wrap.lastElementChild;
+    if (node) node.querySelectorAll('textarea[data-autosize]').forEach(function (t) { autosize(t); t.addEventListener('input', function () { autosize(t); }); });
+}
+function addRowFrom(tplId, tbodySel, idx) {
+    const t = document.getElementById(tplId); if (!t) return;
+    const frag = t.content.cloneNode(true);
+    frag.querySelectorAll('[name]').forEach(function (el) { el.name = el.name.split('__I__').join(idx); });
+    const tb = document.querySelector(tbodySel); if (tb) tb.appendChild(frag);
+}
+function addTimelineRow() { addRowFrom('tl-tpl', '#timeline-table tbody', tlIdx++); }
+function addMilestoneRow() { addRowFrom('ms-tpl', '#milestones-table tbody', msIdx++); sumPct(); }
+function sumPct() {
+    let s = 0;
+    document.querySelectorAll('#milestones-table .ms-pct').forEach(function (i) { s += parseFloat(i.value || 0) || 0; });
+    const el = document.getElementById('pct-sum');
+    if (el) { el.textContent = (Math.round(s * 100) / 100); el.style.color = Math.abs(s - 100) < 0.01 ? 'var(--success-color,#198754)' : 'var(--danger-color,#dc3545)'; }
+}
+document.addEventListener('DOMContentLoaded', sumPct);
+
+// ---- Advanced grid editor (Phase 2B): generic table with merge cells ----
+const ADV_DEFAULT_COLS = @json(['timeline' => [$quote->label('scope.period', __('scope.period')), $quote->label('scope.activity', __('scope.activity'))]]);
+const ADV_T = { unmerge: @json(__('portal.scope_planner.adv_unmerge')), mright: @json(__('portal.scope_planner.adv_merge_right')), mdown: @json(__('portal.scope_planner.adv_merge_down')), up: @json(__('portal.scope_planner.adv_move_up')), down: @json(__('portal.scope_planner.adv_move_down')) };
+let advTables = (function () { var el = document.getElementById('custom_tables_json'); if (!el) return {}; try { return JSON.parse(el.value || '{}') || {}; } catch (e) { return {}; } })();
+let advCur = null, advGrid = null;
+
+function advCell(t) { return { text: t || '', colspan: 1, rowspan: 1, align: 'start' }; }
+function advSeed(slug) {
+    const cols = (ADV_DEFAULT_COLS[slug] || ['Column 1', 'Column 2']).map(function (l) { return { label: l, align: 'start' }; });
+    let rows = [];
+    if (slug === 'timeline') {
+        document.querySelectorAll('#timeline-table tbody tr').forEach(function (tr) {
+            const ins = tr.querySelectorAll('input');
+            if (ins.length >= 2) rows.push([advCell(ins[0].value), advCell(ins[1].value)]);
+        });
+    }
+    if (!rows.length) rows = [cols.map(function () { return advCell(''); })];
+    return { columns: cols, rows: rows };
+}
+function advNormalize(g) {
+    const n = g.columns.length;
+    g.rows.forEach(function (row) { while (row.length < n) row.push(advCell('')); if (row.length > n) row.length = n; });
+}
+function advCoverage(g) {
+    const cov = {};
+    g.rows.forEach(function (row, r) { row.forEach(function (cell, c) {
+        const cs = cell.colspan || 1, rs = cell.rowspan || 1;
+        if (cs > 1 || rs > 1) { for (let dr = 0; dr < rs; dr++) for (let dc = 0; dc < cs; dc++) { if (dr || dc) cov[(r + dr) + ',' + (c + dc)] = true; } }
+    }); });
+    return cov;
+}
+function openAdv(slug) {
+    advCur = slug;
+    advGrid = advTables[slug] ? JSON.parse(JSON.stringify(advTables[slug])) : advSeed(slug);
+    advNormalize(advGrid);
+    advRender();
+    document.getElementById('advOverlay').style.display = 'block';
+}
+function advClose() { const o = document.getElementById('advOverlay'); if (o) o.style.display = 'none'; advCur = null; advGrid = null; }
+function advAddCol() { advGrid.columns.push({ label: '', align: 'start' }); advGrid.rows.forEach(function (r) { r.push(advCell('')); }); advRender(); }
+function advDelCol(c) { if (advGrid.columns.length <= 1) return; advGrid.columns.splice(c, 1); advGrid.rows.forEach(function (r) { r.splice(c, 1); r.forEach(function (cell) { cell.colspan = 1; cell.rowspan = 1; }); }); advRender(); }
+function advAddRow() { advGrid.rows.push(advGrid.columns.map(function () { return advCell(''); })); advRender(); }
+function advDelRow(r) { if (advGrid.rows.length <= 1) return; advGrid.rows.splice(r, 1); advGrid.rows.forEach(function (row) { row.forEach(function (cell) { cell.rowspan = 1; }); }); advRender(); }
+function advMoveRow(r, d) { const j = r + d; if (j < 0 || j >= advGrid.rows.length) return; const t = advGrid.rows[r]; advGrid.rows[r] = advGrid.rows[j]; advGrid.rows[j] = t; advRender(); }
+function advMergeRight(r, c) { const cell = advGrid.rows[r][c]; if (c + (cell.colspan || 1) < advGrid.columns.length) { cell.colspan = (cell.colspan || 1) + 1; advRender(); } }
+function advMergeDown(r, c) { const cell = advGrid.rows[r][c]; if (r + (cell.rowspan || 1) < advGrid.rows.length) { cell.rowspan = (cell.rowspan || 1) + 1; advRender(); } }
+function advUnmerge(r, c) { const cell = advGrid.rows[r][c]; cell.colspan = 1; cell.rowspan = 1; advRender(); }
+function advBtn(txt, title, fn) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-sm btn-outline-secondary py-0 px-1'; b.title = title || ''; b.textContent = txt; b.addEventListener('click', fn); return b; }
+function advRender() {
+    const g = advGrid, cov = advCoverage(g), t = document.getElementById('advGrid');
+    if (!t) return;
+    t.innerHTML = '';
+    const thead = document.createElement('thead'); const htr = document.createElement('tr');
+    g.columns.forEach(function (col, c) {
+        const th = document.createElement('th');
+        const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'form-control form-control-sm'; inp.value = col.label || ''; inp.placeholder = '#' + (c + 1);
+        inp.addEventListener('input', function () { g.columns[c].label = inp.value; });
+        const bar = document.createElement('div'); bar.className = 'd-flex gap-1 mt-1';
+        const al = document.createElement('select'); al.className = 'form-select form-select-sm';
+        ['start', 'center', 'end'].forEach(function (a) { const o = document.createElement('option'); o.value = a; o.textContent = a; if (col.align === a) o.selected = true; al.appendChild(o); });
+        al.addEventListener('change', function () { g.columns[c].align = al.value; });
+        bar.appendChild(al); bar.appendChild(advBtn('×', '', function () { advDelCol(c); }));
+        th.appendChild(inp); th.appendChild(bar); htr.appendChild(th);
+    });
+    const corner = document.createElement('th'); corner.style.width = '96px'; htr.appendChild(corner);
+    thead.appendChild(htr); t.appendChild(thead);
+    const tb = document.createElement('tbody');
+    g.rows.forEach(function (row, r) {
+        const tr = document.createElement('tr');
+        row.forEach(function (cell, c) {
+            if (cov[r + ',' + c]) return;
+            const td = document.createElement('td');
+            if ((cell.colspan || 1) > 1) td.colSpan = cell.colspan;
+            if ((cell.rowspan || 1) > 1) td.rowSpan = cell.rowspan;
+            const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'form-control form-control-sm'; inp.value = cell.text || '';
+            inp.addEventListener('input', function () { cell.text = inp.value; });
+            td.appendChild(inp);
+            const bar = document.createElement('div'); bar.className = 'd-flex gap-1 mt-1';
+            if ((cell.colspan || 1) > 1 || (cell.rowspan || 1) > 1) {
+                bar.appendChild(advBtn('⤺', ADV_T.unmerge, function () { advUnmerge(r, c); }));
+            } else {
+                bar.appendChild(advBtn('▶', ADV_T.mright, function () { advMergeRight(r, c); }));
+                bar.appendChild(advBtn('▼', ADV_T.mdown, function () { advMergeDown(r, c); }));
+            }
+            td.appendChild(bar); tr.appendChild(td);
+        });
+        const ctl = document.createElement('td'); const wrap = document.createElement('div'); wrap.className = 'd-flex gap-1';
+        wrap.appendChild(advBtn('▲', ADV_T.up, function () { advMoveRow(r, -1); }));
+        wrap.appendChild(advBtn('▼', ADV_T.down, function () { advMoveRow(r, 1); }));
+        const del = document.createElement('button'); del.type = 'button'; del.className = 'btn btn-sm btn-link text-danger py-0 px-1'; del.textContent = '×'; del.addEventListener('click', function () { advDelRow(r); });
+        wrap.appendChild(del); ctl.appendChild(wrap); tr.appendChild(ctl);
+        tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+}
+function advWrite() { const el = document.getElementById('custom_tables_json'); if (el) el.value = JSON.stringify(advTables); }
+function advApply() {
+    if (!advCur || !advGrid) return advClose();
+    const cov = advCoverage(advGrid);
+    advGrid.rows.forEach(function (row, r) { row.forEach(function (cell, c) { cell.merged = !!cov[r + ',' + c]; }); });
+    advTables[advCur] = advGrid; advWrite();
+    const badge = document.getElementById('adv-badge-' + advCur); if (badge) badge.style.display = '';
+    advClose();
+}
+function advResetCur() {
+    if (advCur && advTables[advCur]) delete advTables[advCur];
+    advWrite();
+    const badge = document.getElementById('adv-badge-' + advCur); if (badge) badge.style.display = 'none';
+    advClose();
+}
 </script>
 @endpush

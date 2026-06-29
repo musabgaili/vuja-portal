@@ -15,7 +15,7 @@ class Quote extends Model
         'accepted_signature', 'accepted_at', 'accepted_ip', 'approved_at', 'reject_reason',
         // Scope Planner upgrade
         'quote_number', 'language', 'length', 'structure', 'subject', 'beneficiary', 'client_ref',
-        'brief', 'ai_content', 'vat_rate', 'components_internal_total', 'components_client_total',
+        'brief', 'ai_content', 'doc_labels', 'custom_tables', 'vat_rate', 'components_internal_total', 'components_client_total',
         'subtotal', 'vat_amount', 'grand_total', 'validity_days',
         'discount_percent', 'discount_cap_sar', 'discount_amount',
         'payment_status', 'paid_at', 'sent_at',
@@ -29,6 +29,8 @@ class Quote extends Model
         'approved_at' => 'datetime',
         // Scope Planner upgrade
         'ai_content' => 'array',
+        'doc_labels' => 'array',
+        'custom_tables' => 'array',
         'vat_rate' => 'decimal:2',
         'components_internal_total' => 'decimal:2',
         'components_client_total' => 'decimal:2',
@@ -42,6 +44,18 @@ class Quote extends Model
         'paid_at' => 'datetime',
         'sent_at' => 'datetime',
     ];
+
+    /**
+     * A document label: the employee's per-quote override (doc_labels) when set,
+     * otherwise the translated default. Lets the targeted editor rename any
+     * heading or table column header without touching the templates.
+     */
+    public function label(string $key, ?string $default = null): string
+    {
+        $custom = $this->doc_labels[$key] ?? null;
+
+        return (is_string($custom) && trim($custom) !== '') ? $custom : (string) ($default ?? __($key));
+    }
 
     /** The invoice/headline amount: VAT-inclusive grand total if priced, else the legacy client total. */
     public function invoiceTotal(): float

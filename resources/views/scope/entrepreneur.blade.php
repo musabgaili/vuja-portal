@@ -2,6 +2,7 @@
 @extends('scope.document')
 @php($c = $quote->ai_content ?? [])
 @php($cur = $quote->language === 'ar' ? 'ر.س' : 'SAR')
+@php($L = fn ($k) => $quote->label($k, __($k)))
 
 @section('body')
   <table class="meta">
@@ -13,7 +14,7 @@
   </table>
 
   @if(!empty($c['introduction']))
-    <div class="section"><h2>@lang('scope.introduction')</h2><p class="para">{{ $c['introduction'] }}</p></div>
+    <div class="section"><h2>{{ $L('scope.introduction') }}</h2><p class="para">{{ $c['introduction'] }}</p></div>
   @endif
 
   @foreach([
@@ -24,30 +25,30 @@
       'implementation_phases' => 'scope.implementation_phases',
   ] as $key => $title)
     @if(!empty($c[$key]))
-      <div class="section"><h2>@lang($title)</h2><ul class="points">
+      <div class="section"><h2>{{ $L($title) }}</h2><ul class="points">
         @foreach($c[$key] as $line)<li>{{ $line }}</li>@endforeach
       </ul></div>
     @endif
   @endforeach
 
   @if(!empty($c['timeline']))
-    <div class="section"><h2>@lang('scope.timeline')</h2>
-      <table class="tbl"><thead><tr><th>@lang('scope.phase')</th><th>@lang('scope.duration')</th><th>@lang('scope.notes')</th></tr></thead><tbody>
+    <div class="section"><h2>{{ $L('scope.timeline') }}</h2>
+      <table class="tbl"><thead><tr><th>@lang('scope.phase')</th><th>@lang('scope.duration')</th><th>{{ $L('scope.notes') }}</th></tr></thead><tbody>
         @foreach($c['timeline'] as $row)
-          <tr><td class="c">{{ $row['phase'] ?? '' }}</td><td class="c">{{ $row['duration'] ?? '' }}</td><td>{{ $row['notes'] ?? '' }}</td></tr>
+          <tr><td class="c">{{ $row['phase'] ?? '' }}</td><td class="c">{{ $row['duration'] ?? '' }}</td><td>{{ $row['notes'] ?? ($row['activity'] ?? '') }}</td></tr>
         @endforeach
       </tbody></table>
     </div>
   @endif
 
   <div class="section">
-    <h2>@lang('scope.pricing')</h2>
+    <h2>{{ $L('scope.pricing') }}</h2>
     <p class="lead">@lang('scope.pricing_intro')</p>
     <table class="tbl">
       <thead><tr>
-        <th style="width:6%">@lang('scope.item_no')</th><th class="desc">@lang('scope.description')</th>
-        <th style="width:10%">@lang('scope.unit')</th><th style="width:10%">@lang('scope.qty')</th>
-        <th style="width:14%">@lang('scope.unit_price') ({{ $cur }})</th><th style="width:14%">@lang('scope.total') ({{ $cur }})</th>
+        <th style="width:6%">@lang('scope.item_no')</th><th class="desc">{{ $L('scope.description') }}</th>
+        <th style="width:10%">{{ $L('scope.unit') }}</th><th style="width:10%">{{ $L('scope.qty') }}</th>
+        <th style="width:14%">{{ $L('scope.unit_price') }} ({{ $cur }})</th><th style="width:14%">{{ $L('scope.total') }} ({{ $cur }})</th>
       </tr></thead>
       <tbody>
         @foreach($quote->clientVisibleItems() as $i => $row)
@@ -64,11 +65,11 @@
     <p class="note">@lang('scope.components_note')</p>
   </div>
 
-  <div class="section"><h2>@lang('scope.out_of_scope')</h2><ul class="points">
+  <div class="section"><h2>{{ $L('scope.out_of_scope') }}</h2><ul class="points">
     @foreach(($c['out_of_scope'] ?? []) as $line)<li>{{ $line }}</li>@endforeach
   </ul></div>
 
-  <div class="section"><h2>@lang('scope.notes')</h2><div class="note-block"><ul>
+  <div class="section"><h2>{{ $L('scope.notes') }}</h2><div class="note-block"><ul>
     @foreach(($c['notes'] ?? []) as $line)<li>{{ $line }}</li>@endforeach
   </ul></div></div>
 @endsection

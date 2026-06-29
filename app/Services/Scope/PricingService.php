@@ -113,36 +113,44 @@ class PricingService
         return $quote->refresh();
     }
 
-    /** Rebuild the milestone schedule from the per-tier template; last absorbs rounding. */
+    /**
+     * Compute milestone AMOUNTS from the grand total (last absorbs the rounding
+     * remainder so they sum exactly). The milestone STRUCTURE — codes, triggers,
+     * percentages, order — is preserved, so employee edits survive every reprice.
+     * The per-tier template only SEEDS the schedule when a quote has none yet.
+     */
     private function buildMilestones(Quote $quote, float $grandTotal): void
     {
-        $tier = $quote->customer_category ?: 'company';
-        $template = array_values(config('scope.milestones.'.$tier, config('scope.milestones.company', [])));
+        $existing = $quote->milestones()->orderBy('sort_order')->get();
 
-        $quote->milestones()->delete();
-        if (empty($template)) {
+        if ($existing->isEmpty()) {
+            $tier = $quote->customer_category ?: 'company';
+            $template = array_values(config('scope.milestones.'.$tier, config('scope.milestones.company', [])));
+            foreach ($template as $i => $m) {
+                $quote->milestones()->create([
+                    'code' => $m['code'],
+                    'trigger' => $m['trigger'] ?? null,
+                    'percentage' => (float) $m['percentage'],
+                    'amount' => 0,
+                    'sort_order' => $i,
+                ]);
+            }
+            $existing = $quote->milestones()->orderBy('sort_order')->get();
+        }
+
+        if ($existing->isEmpty()) {
             return;
         }
 
-        $last = count($template) - 1;
+        $last = $existing->count() - 1;
         $running = 0.0;
-
-        foreach ($template as $i => $m) {
-            $pct = (float) $m['percentage'];
-            if ($i === $last) {
-                $amount = round($grandTotal - $running, 2); // remainder so they sum exactly
-            } else {
-                $amount = round($grandTotal * $pct / 100, 2);
+        foreach ($existing->values() as $i => $m) {
+            $pct = (float) $m->percentage;
+            $amount = $i === $last ? round($grandTotal - $running, 2) : round($grandTotal * $pct / 100, 2);
+            if ($i !== $last) {
                 $running += $amount;
             }
-
-            $quote->milestones()->create([
-                'code' => $m['code'],
-                'trigger' => $m['trigger'] ?? null,
-                'percentage' => $pct,
-                'amount' => $amount,
-                'sort_order' => $i,
-            ]);
+            $m->forceFill(['amount' => $amount])->save();
         }
     }
 
