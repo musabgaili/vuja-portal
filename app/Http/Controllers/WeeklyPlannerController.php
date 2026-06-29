@@ -126,6 +126,9 @@ class WeeklyPlannerController extends Controller
             'cells' => $cells,
             'requiredHours' => $user->plannerRequiredHours(),
             'member' => $user->teamMember,   // drives the "your weekly hours" control
+            'defaults' => $user->planner_defaults,  // reusable per-day schedule, applied client-side
+            'hasDefault' => ! empty($user->planner_defaults['availability'] ?? null)
+                || ! empty($user->planner_defaults['locations'] ?? null),
             'maxHoursPerDay' => (int) config('planner.max_hours_per_day', 24),
             'history' => WeeklyPlan::with('lines')->where('user_id', $user->id)
                 ->orderByDesc('week_start')->limit(8)->get(),
@@ -289,6 +292,44 @@ class WeeklyPlannerController extends Controller
             }
         }
 
+        // Availability must cover the hours you're committing to: you can't log
+        // more work than you've said you're available for. Leave hours are exempt
+        // — you don't hold an availability window on a day off. (The grid total
+        // already equals $required at this point, so we measure against it.)
+        if ($submitting) {
+            $leaveKeys = (array) config('planner.leave_activities', []);
+            $leaveHours = 0;
+            foreach ($lines as $l) {
+                if ($l['kind'] === 'activity' && in_array($l['activity'], $leaveKeys, true)) {
+                    $leaveHours += array_sum($l['hours']);
+                }
+            }
+            $neededHours = max(0, $required - $leaveHours);
+
+            $availMinutes = 0;
+            foreach ($days as $day) {
+                $win = $availability[$day] ?? null;
+                if ($win && ! empty($win['start']) && ! empty($win['end'])) {
+                    $start = Carbon::createFromFormat('H:i', $win['start']);
+                    $end = Carbon::createFromFormat('H:i', $win['end']);
+                    if ($end->greaterThan($start)) {
+                        $availMinutes += $start->diffInMinutes($end);
+                    }
+                }
+            }
+
+            if ($availMinutes < $neededHours * 60) {
+                $haveHours = rtrim(rtrim(number_format($availMinutes / 60, 1), '0'), '.');
+
+                return back()
+                    ->withErrors(['availability' => __('portal.planner.availability_min_error', [
+                        'need' => $neededHours,
+                        'have' => $haveHours,
+                    ])])
+                    ->withInput();
+            }
+        }
+
         $wasSubmitted = in_array($plan->status, ['pending', 'approved'], true);
         $selfApprove = $user->isManager();
 
@@ -342,6 +383,52 @@ class WeeklyPlannerController extends Controller
             : 'Draft saved.';
 
         return redirect()->route('weekly-planner.index', ['week' => $weekStart->toDateString()])->with('success', $msg);
+    }
+
+    /**
+     * Save the employee's reusable default weekly schedule (per-day availability
+     * windows + working location) so they can apply it each week with one click
+     * instead of re-entering the same timing. Posted via fetch from the planner;
+     * applying the default is a pure client-side fill (no round-trip).
+     */
+    public function saveDefaults(Request $request)
+    {
+        $user = Auth::user();
+        abort_unless($user->isInternal(), 403);
+
+        $request->validate([
+            'locations' => 'array',
+            'availability' => 'array',
+        ]);
+
+        $days = config('planner.days');
+        $allowedLocs = array_keys(config('planner.locations'));
+
+        $locations = collect($request->input('locations', []))
+            ->only($days)
+            ->map(fn ($v) => in_array($v, $allowedLocs, true) ? $v : null)
+            ->filter()
+            ->toArray();
+
+        $availability = [];
+        foreach ($days as $day) {
+            $start = $this->cleanTime($request->input("availability.$day.start"));
+            $end = $this->cleanTime($request->input("availability.$day.end"));
+            $window = array_filter(['start' => $start, 'end' => $end]);
+            if ($window) {
+                $availability[$day] = $window;
+            }
+        }
+
+        $user->update([
+            'planner_defaults' => ['locations' => $locations, 'availability' => $availability],
+        ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'message' => __('portal.planner.default_saved')]);
+        }
+
+        return back()->with('success', __('portal.planner.default_saved'));
     }
 
     /** Clamp/normalise a {day => hours} map to the configured days and cap. */

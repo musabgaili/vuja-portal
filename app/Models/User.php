@@ -36,6 +36,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'provider_id',
         'impact_points',
         'notification_preferences',
+        'planner_defaults',
     ];
 
     /**
@@ -62,6 +63,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             'status' => UserStatus::class,
             'impact_points' => 'integer',
             'notification_preferences' => 'array',
+            'planner_defaults' => 'array',
         ];
     }
 

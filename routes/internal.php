@@ -207,6 +207,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // WEEKLY STRATEGIC PLANNER (employees plan; managers review/oversee)
     Route::get('/weekly-planner', [WeeklyPlannerController::class, 'index'])->name('weekly-planner.index');
     Route::post('/weekly-planner', [WeeklyPlannerController::class, 'store'])->name('weekly-planner.store');
+    Route::post('/weekly-planner/default', [WeeklyPlannerController::class, 'saveDefaults'])->name('weekly-planner.default');
     Route::get('/weekly-planner/review', [WeeklyPlannerController::class, 'review'])->name('weekly-planner.review');
     Route::get('/weekly-planner/presence', [WeeklyPlannerController::class, 'presence'])->name('weekly-planner.presence');
     Route::get('/weekly-planner/plan/{weeklyPlan}', [WeeklyPlannerController::class, 'show'])->name('weekly-planner.show');

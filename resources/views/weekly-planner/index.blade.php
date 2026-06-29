@@ -55,9 +55,24 @@
 
     {{-- Working location + availability window per day --}}
     <div class="card mb-3">
-        <div class="card-header"><span class="card-title"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.working_location') }}</span></div>
+        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span class="card-title"><i class="fas fa-map-marker-alt"></i> {{ __('portal.planner.working_location') }}</span>
+            @unless($readonly)
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="applyDefaultBtn" @disabled(! $hasDefault)>
+                        <i class="fas fa-wand-magic-sparkles"></i> {{ __('portal.planner.apply_default') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="saveDefaultBtn">
+                        <i class="fas fa-floppy-disk"></i> {{ __('portal.planner.save_default') }}
+                    </button>
+                </div>
+            @endunless
+        </div>
         <div class="card-content">
-            <p class="text-muted mb-2" style="font-size:.85rem;">{{ __('portal.planner.availability_hint') }}</p>
+            <p class="text-muted mb-2" style="font-size:.85rem;">
+                {{ __('portal.planner.availability_hint') }}
+                @unless($readonly)<br><i class="fas fa-circle-info"></i> {{ __('portal.planner.default_hint') }}@endunless
+            </p>
             <div class="row g-2">
                 @foreach($days as $day)
                     <div class="col">
@@ -65,16 +80,19 @@
                         <select name="locations[{{ $day }}]" class="form-select form-select-sm mb-1" @disabled($readonly)>
                             <option value="">—</option>
                             @foreach($locations as $lk => $ll)
-                                <option value="{{ $lk }}" @selected(($plan->locations[$day] ?? '') === $lk)>{{ $ll }}</option>
+                                <option value="{{ $lk }}" @selected(old('locations.'.$day, $plan->locations[$day] ?? '') === $lk)>{{ $ll }}</option>
                             @endforeach
                         </select>
                         <div class="d-flex gap-1">
-                            <input type="time" name="availability[{{ $day }}][start]" value="{{ $plan->availability[$day]['start'] ?? '' }}" class="form-control form-control-sm" title="{{ __('portal.planner.from') }}" @disabled($readonly)>
-                            <input type="time" name="availability[{{ $day }}][end]" value="{{ $plan->availability[$day]['end'] ?? '' }}" class="form-control form-control-sm" title="{{ __('portal.planner.to') }}" @disabled($readonly)>
+                            <input type="time" name="availability[{{ $day }}][start]" value="{{ old('availability.'.$day.'.start', $plan->availability[$day]['start'] ?? '') }}" class="form-control form-control-sm" title="{{ __('portal.planner.from') }}" @disabled($readonly)>
+                            <input type="time" name="availability[{{ $day }}][end]" value="{{ old('availability.'.$day.'.end', $plan->availability[$day]['end'] ?? '') }}" class="form-control form-control-sm" title="{{ __('portal.planner.to') }}" @disabled($readonly)>
                         </div>
                     </div>
                 @endforeach
             </div>
+            @unless($readonly)
+                <div class="mt-2" style="font-size:.85rem;"><i class="fas fa-hourglass-half"></i> <span id="availSummary" class="fw-semibold"></span></div>
+            @endunless
         </div>
     </div>
 
@@ -257,4 +275,119 @@
         recalc();
     })();
 </script>
+
+@unless($readonly)
+<script>
+    // Default weekly schedule: apply your saved per-day availability + location
+    // with one click, or save the current timing as your reusable default.
+    (function () {
+        var form = document.getElementById('timesheetForm');
+        if (!form) return;
+        var applyBtn = document.getElementById('applyDefaultBtn');
+        var saveBtn = document.getElementById('saveDefaultBtn');
+        var days = @json(array_values($days));
+        var url = "{{ route('weekly-planner.default') }}";
+        var csrf = "{{ csrf_token() }}";
+        var msg = { applied: @json(__('portal.planner.default_applied')), none: @json(__('portal.planner.no_default')) };
+        var defaults = @json($defaults ?: (object) []);
+
+        function field(name) { return form.querySelector('[name="' + name + '"]'); }
+
+        function notify(text) {
+            var t = document.createElement('div');
+            t.className = 'alert alert-success';
+            t.style.cssText = 'position:fixed;bottom:1rem;inset-inline-end:1rem;z-index:1080;box-shadow:var(--shadow-lg);max-width:90vw;';
+            t.textContent = text;
+            document.body.appendChild(t);
+            setTimeout(function () { t.remove(); }, 2600);
+        }
+
+        if (applyBtn) applyBtn.addEventListener('click', function () {
+            var loc = (defaults && defaults.locations) || {};
+            var av = (defaults && defaults.availability) || {};
+            if (!Object.keys(loc).length && !Object.keys(av).length) { notify(msg.none); return; }
+            days.forEach(function (day) {
+                var sel = field('locations[' + day + ']'); if (sel) sel.value = loc[day] || '';
+                var s = field('availability[' + day + '][start]'); if (s) s.value = (av[day] && av[day].start) || '';
+                var e = field('availability[' + day + '][end]'); if (e) e.value = (av[day] && av[day].end) || '';
+            });
+            notify(msg.applied);
+        });
+
+        if (saveBtn) saveBtn.addEventListener('click', function () {
+            var payload = { locations: {}, availability: {} };
+            var body = new URLSearchParams();
+            days.forEach(function (day) {
+                var sel = field('locations[' + day + ']');
+                if (sel && sel.value) { payload.locations[day] = sel.value; body.append('locations[' + day + ']', sel.value); }
+                var s = field('availability[' + day + '][start]');
+                var e = field('availability[' + day + '][end]');
+                var win = {};
+                if (s && s.value) { win.start = s.value; body.append('availability[' + day + '][start]', s.value); }
+                if (e && e.value) { win.end = e.value; body.append('availability[' + day + '][end]', e.value); }
+                if (win.start || win.end) payload.availability[day] = win;
+            });
+            saveBtn.disabled = true;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body.toString()
+            }).then(function (r) { return r.json().catch(function () { return {}; }); })
+              .then(function (res) {
+                  defaults = payload;                 // reuse immediately, no reload
+                  if (applyBtn) applyBtn.disabled = false;
+                  notify((res && res.message) || @json(__('portal.planner.default_saved')));
+              })
+              .catch(function () { notify(@json(__('portal.planner.default_saved'))); })
+              .finally(function () { saveBtn.disabled = false; });
+        });
+
+        // Live availability counter: sum each day's from–to span and compare to
+        // the hours you're committing to (required minus any leave logged in the
+        // grid). Mirrors the submit-time check so you can close the gap first.
+        var required = {{ $requiredHours }};
+        var leaveKeys = @json(array_values((array) config('planner.leave_activities', [])));
+        var summaryEl = document.getElementById('availSummary');
+        var tplGap = @json(__('portal.planner.avail_summary'));
+        var tplOk = @json(__('portal.planner.avail_ok'));
+
+        function toMin(v) { var m = /^(\d{1,2}):(\d{2})$/.exec(v || ''); return m ? (parseInt(m[1], 10) * 60 + parseInt(m[2], 10)) : null; }
+
+        function availMinutes() {
+            var total = 0;
+            days.forEach(function (day) {
+                var s = field('availability[' + day + '][start]');
+                var e = field('availability[' + day + '][end]');
+                var a = s ? toMin(s.value) : null, b = e ? toMin(e.value) : null;
+                if (a !== null && b !== null && b > a) total += (b - a);
+            });
+            return total;
+        }
+        function leaveHours() {
+            var h = 0;
+            leaveKeys.forEach(function (k) {
+                form.querySelectorAll('[name^="hours[activity][' + k + ']"]').forEach(function (i) { h += parseInt(i.value || 0, 10) || 0; });
+            });
+            return h;
+        }
+        function updateAvail() {
+            if (!summaryEl) return;
+            var mins = availMinutes();
+            var have = (Math.round(mins / 6) / 10).toString();   // hours, 1 decimal
+            var need = Math.max(0, required - leaveHours());
+            var ok = mins >= need * 60;
+            summaryEl.textContent = (ok ? tplOk : tplGap).replace(/:have/g, have).replace(/:need/g, need);
+            summaryEl.style.color = ok ? 'var(--success-color, #198754)' : 'var(--danger-color, #dc3545)';
+        }
+        days.forEach(function (day) {
+            ['start', 'end'].forEach(function (k) {
+                var el = field('availability[' + day + '][' + k + ']');
+                if (el) el.addEventListener('input', updateAvail);
+            });
+        });
+        form.querySelectorAll('.ts-hours').forEach(function (i) { i.addEventListener('input', updateAvail); });
+        updateAvail();
+    })();
+</script>
+@endunless
 @endsection
