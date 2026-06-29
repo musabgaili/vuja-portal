@@ -26,7 +26,7 @@
 <div class="card mb-3">
     <div class="card-header"><span class="card-title"><i class="fas fa-location-dot"></i> {{ __('portal.planner.by_location') }}</span></div>
     <div class="card-content p-0" style="overflow-x:auto;">
-        <table class="table mb-0" style="min-width:720px;">
+        <table class="table mb-0" style="min-width:560px;">
             <thead>
                 <tr>
                     <th>{{ __('portal.planner.location') }}</th>

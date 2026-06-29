@@ -155,7 +155,8 @@
     background: var(--bg-tertiary);
     color: var(--gray-600);
     border: 1px solid var(--gray-200);
-    width: 38px; height: 38px;
+    /* 44px is the minimum comfortable touch target (WCAG 2.5.5 / Apple HIG). */
+    width: 44px; height: 44px; flex-shrink: 0;
     border-radius: var(--radius-md);
     display: inline-flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -202,6 +203,13 @@ body {
 
 .main-content {
     flex: 1;
+    /* A flex item defaults to min-width:auto, so any intrinsically-wide child
+       (a data table, a long line) would refuse to shrink and push the whole
+       page wider than the viewport — which is what made mobile browsers zoom
+       OUT (everything tiny, the menu button untappable). min-width:0 lets the
+       column shrink to the viewport and keeps wide tables inside their own
+       horizontal scrollers instead of blowing out the page. */
+    min-width: 0;
     margin-left: 280px;
     min-height: 100vh;
     background: var(--bg-secondary);
@@ -647,22 +655,19 @@ body {
         transform: translateX(-100%);
     }
     
-    .sidebar.open {
+    /* JS toggles .active (see toggleSidebar()); .open was dead. */
+    .sidebar.active {
         transform: translateX(0);
     }
-    
+
     .main-content {
         margin-left: 0;
     }
-    
+
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
-    
-    .content-header {
-        padding: var(--space-lg);
-    }
-    
+
     .content-body {
         padding: var(--space-lg);
     }
@@ -883,15 +888,21 @@ body {
 .mobile-menu-toggle {
     display: none;
     position: fixed;
-    top: 1rem;
-    left: 1rem;
+    top: .75rem;
+    left: .75rem;
     z-index: 1001;
-    width: 40px;
-    height: 40px;
+    /* 46px touch target with a readable icon and a shadow so it stays visible
+       over any content it floats above. */
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
     background: var(--primary-color);
     color: white;
     border: none;
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     cursor: pointer;
     align-items: center;
     justify-content: center;
@@ -1018,7 +1029,7 @@ body {
 
     [dir="rtl"] .mobile-menu-toggle {
         left: auto;
-        right: 1rem;
+        right: .75rem;
     }
 }
 
@@ -1334,3 +1345,30 @@ th.sortable.sort-desc::after { content: '\f0dd'; opacity: .9; }
 [data-bs-theme="dark"] .sidebar { border-color: rgba(255, 255, 255, .12); }
 [data-bs-theme="dark"] .progress,
 [data-bs-theme="dark"] .progress-bar-client { background: rgba(255, 255, 255, .16); }
+
+/* =====================================================================
+   MOBILE UX HARDENING — no horizontal zoom-out + comfortable touch targets
+   ===================================================================== */
+
+/* Never let the PAGE scroll/zoom horizontally. Wide data tables live in their
+   own .table-responsive / overflow-x:auto scrollers, so clipping the page edge
+   only catches stray overflow — it never hides table data. `clip` (preferred
+   over `hidden`) keeps position:sticky working; `hidden` is the old-browser
+   fallback. This is what stops mobile browsers from rendering the whole portal
+   zoomed-out (which made the menu button and links too small to tap). */
+body { overflow-x: hidden; overflow-x: clip; }
+
+@media (max-width: 768px) {
+    /* The floating hamburger sits at the top inline-start corner; pad the
+       header so the page title never hides behind it. padding-inline-start
+       maps to the left in LTR and the right in RTL — same side as the button. */
+    .content-header { padding-inline-start: 3.75rem; }
+
+    /* Roomier spacing so the top-bar controls don't crowd into each other. */
+    .content-header .header-right { gap: .6rem; row-gap: .5rem; }
+
+    /* Bring the remaining top-bar controls up to a 44px touch target. */
+    .notif-bell > .btn { min-width: 44px; min-height: 44px; }
+    .locale-switcher__toggle { min-height: 44px; padding-block: .45rem; }
+    .content-header .user-menu { min-height: 44px; }
+}
