@@ -2924,6 +2924,7 @@
     "portal.planner.next_week": "التالي",
     "portal.planner.deadline": "الموعد النهائي",
     "portal.planner.readonly_note": "هذا الجدول معتمد ومقفل. انتقل إلى أسبوع آخر لإجراء تغييرات.",
+    "portal.planner.hours_drive_total": "ساعاتك الأسبوعية تحدد إجمالي الجدول المطلوب أدناه.",
     "portal.planner.working_location": "مكان العمل",
     "portal.planner.projects_tasks": "المشاريع والمهام",
     "portal.planner.projects_tasks_hint": "سجّل الساعات على المشاريع والمهام المباشرة المسندة إليك.",

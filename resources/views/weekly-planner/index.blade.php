@@ -34,6 +34,22 @@
     <div class="alert alert-info"><i class="fas fa-lock"></i> {{ __('portal.planner.readonly_note') }}</div>
 @endif
 
+@if($member && $member->is_active)
+{{-- Your committed weekly hours — this sets the required timesheet total below --}}
+<div class="card mb-3"><div class="card-content d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <form method="POST" action="{{ route('capacity.hours') }}" class="d-flex align-items-end gap-2 flex-wrap">
+        @csrf @method('PUT')
+        <div>
+            <label class="form-label fw-bold mb-0" style="font-size:.85rem;"><i class="fas fa-business-time"></i> {{ __('targets.cap.my_hours') }}</label>
+            <div class="text-muted" style="font-size:.78rem;">{{ __('targets.cap.min_floor_note', ['hours' => rtrim(rtrim(number_format($member->min_weekly_hours, 1), '0'), '.')]) }}</div>
+        </div>
+        <input type="number" step="0.5" min="{{ rtrim(rtrim(number_format($member->min_weekly_hours, 1), '0'), '.') }}" max="168" name="weekly_capacity_hours" value="{{ rtrim(rtrim(number_format($member->weekly_capacity_hours, 1), '0'), '.') }}" class="form-control form-control-sm" style="width:110px;">
+        <button class="btn btn-sm btn-outline-primary">{{ __('targets.cap.save_hours') }}</button>
+    </form>
+    <small class="text-muted">{{ __('portal.planner.hours_drive_total') }}</small>
+</div></div>
+@endif
+
 <form method="POST" action="{{ route('weekly-planner.store', ['week' => $weekStart->toDateString()]) }}" id="timesheetForm">
     @csrf
 

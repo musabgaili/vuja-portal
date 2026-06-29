@@ -61,12 +61,8 @@
                         <i class="fas fa-bullseye"></i>
                         {{ __('targets.my_title') }}
                     </a>
-                    @if(auth()->user()->teamMember)
-                    <a href="{{ route('capacity.my') }}" class="nav-item {{ request()->routeIs('capacity.my') ? 'active' : '' }}">
-                        <i class="fas fa-gauge-high"></i>
-                        {{ __('targets.cap.my_title') }}
-                    </a>
-                    @endif
+                    {{-- "My Capacity" merged into the Weekly Planner: employees set their hours there;
+                         the capacity analytics live on the manager dashboard, fed from planner submissions. --}}
                     <a href="{{ route('improvement-ideas.index') }}" class="nav-item {{ request()->routeIs('improvement-ideas.index') || request()->routeIs('improvement-ideas.create') || request()->routeIs('improvement-ideas.show') ? 'active' : '' }}">
                         <i class="fas fa-rocket"></i>
                         {{ __('portal.nav.improvement_ideas') }}

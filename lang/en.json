@@ -2925,6 +2925,7 @@
     "portal.planner.next_week": "Next",
     "portal.planner.deadline": "Deadline",
     "portal.planner.readonly_note": "This timesheet is approved and locked. Navigate to another week to make changes.",
+    "portal.planner.hours_drive_total": "Your weekly hours set the required timesheet total below.",
     "portal.planner.working_location": "Working Location",
     "portal.planner.projects_tasks": "Projects & Tasks",
     "portal.planner.projects_tasks_hint": "Log hours against the projects and direct tasks assigned to you.",

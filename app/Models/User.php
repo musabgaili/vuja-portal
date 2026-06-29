@@ -77,6 +77,18 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * Hours this user's weekly plan must total — their committed capacity
+     * (TeamMember.weekly_capacity_hours) when they're an engineer, otherwise the
+     * global default. This is what ties the planner to the capacity floor.
+     */
+    public function plannerRequiredHours(): int
+    {
+        $hours = (int) round((float) optional($this->teamMember)->weekly_capacity_hours);
+
+        return $hours > 0 ? $hours : (int) config('planner.required_hours', 40);
+    }
+
+    /**
      * Send the email-verification notification, but never let a mail-transport
      * failure (e.g. an unverified Resend domain) bubble up — that would 500 the
      * registration request and, with APP_DEBUG on, leak the request body. The

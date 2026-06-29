@@ -58,7 +58,9 @@ class WeeklyPlan extends Model
 
     public function isComplete(): bool
     {
-        return $this->totalHours() === (int) config('planner.required_hours', 40);
+        $required = $this->user?->plannerRequiredHours() ?? (int) config('planner.required_hours', 40);
+
+        return $this->totalHours() === $required;
     }
 
     public function statusColor(): string

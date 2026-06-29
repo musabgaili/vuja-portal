@@ -124,7 +124,8 @@ class WeeklyPlannerController extends Controller
             'projects' => $projects,
             'tasks' => $tasks,
             'cells' => $cells,
-            'requiredHours' => (int) config('planner.required_hours', 40),
+            'requiredHours' => $user->plannerRequiredHours(),
+            'member' => $user->teamMember,   // drives the "your weekly hours" control
             'maxHoursPerDay' => (int) config('planner.max_hours_per_day', 24),
             'history' => WeeklyPlan::with('lines')->where('user_id', $user->id)
                 ->orderByDesc('week_start')->limit(8)->get(),
@@ -236,7 +237,7 @@ class WeeklyPlannerController extends Controller
         }
 
         $submitting = $request->input('action') === 'submit';
-        $required = (int) config('planner.required_hours', 40);
+        $required = $user->plannerRequiredHours();
 
         if ($submitting && $total !== $required) {
             return back()
@@ -312,6 +313,16 @@ class WeeklyPlannerController extends Controller
                 $plan->lines()->create($l);
             }
         });
+
+        // Feed the manager capacity analytics from this plan (single source of
+        // truth). Best-effort — never let a derivation hiccup block submission.
+        if ($submitting && $user->teamMember) {
+            try {
+                app(\App\Services\Targets\PlannerAllocationDeriver::class)->derive($user->teamMember, $plan->load('lines'));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Planner→capacity derive failed for plan '.$plan->id.': '.$e->getMessage());
+            }
+        }
 
         // Reward the first on-time/late submission, once. The existence check
         // makes this idempotent even under a rapid double-submit (no duplicate IP).
