@@ -8,7 +8,10 @@
             <h1 style="margin:0; font-size:1.4rem;"><i class="fas fa-building"></i> {{ $company->name }}</h1>
             <p style="margin:.25rem 0 0; opacity:.9;">{{ $company->industry ?: '' }}</p>
         </div>
-        <a href="{{ route('companies.edit', $company) }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-pen"></i> {{ __('portal.crm.edit') }}</a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ route('companies.index') }}" class="btn" style="background:rgba(255,255,255,.18); color:#fff; font-weight:600;"><i class="fas fa-arrow-left"></i> {{ __('portal.crm.back_companies') }}</a>
+            <a href="{{ route('companies.edit', $company) }}" class="btn" style="background:#fff; color:var(--primary-color); font-weight:600;"><i class="fas fa-pen"></i> {{ __('portal.crm.edit') }}</a>
+        </div>
     </div>
 </div>
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
