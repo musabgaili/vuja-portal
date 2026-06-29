@@ -130,11 +130,11 @@ class StaffTaskController extends Controller
         $staffTask->status = $newStatus;
 
         if ($newStatus === 'done') {
-            $firstDone = $staffTask->getOriginal('status') !== 'done';
             $staffTask->completed_at = $staffTask->completed_at ?? now();
+            $firstAward = ! $staffTask->points_awarded;
 
             // Award the category's IP rate to the assignee, exactly once.
-            if (! $staffTask->points_awarded) {
+            if ($firstAward) {
                 $this->engagement->award(
                     $staffTask->assignee,
                     $staffTask->engagementAction(),
@@ -145,8 +145,9 @@ class StaffTaskController extends Controller
                 $staffTask->points_awarded = true;
             }
 
-            // Tell the assigner their task is done (once, and not when they did it themselves).
-            if ($firstDone && $staffTask->assigner && $staffTask->assigner->id !== $user->id) {
+            // Tell the assigner their task is done — once ever (same guard as the
+            // points award), and not when they completed it themselves.
+            if ($firstAward && $staffTask->assigner && $staffTask->assigner->id !== $user->id) {
                 app(\App\Services\Notifier::class)->email(
                     $staffTask->assigner, 'task_done',
                     __('portal.notif_prefs.mail.task_done_subject'),

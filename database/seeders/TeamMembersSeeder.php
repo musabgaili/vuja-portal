@@ -26,6 +26,7 @@ class TeamMembersSeeder extends Seeder
                 [
                     'display_name' => $user->name,
                     'weekly_capacity_hours' => (float) config('targets.default_weekly_capacity', 40),
+                    'min_weekly_hours' => (float) config('targets.default_weekly_capacity', 40),
                     'is_active' => true,
                 ],
             );

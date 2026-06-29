@@ -186,9 +186,12 @@ class NotificationService
                         ->orWhere('account_manager_id', $user->id)
                         ->orWhereHas('projectPeople', fn ($p) => $p->where('user_id', $user->id));
                 })->latest()->limit(5)->get() as $ms) {
-                $push($ms->created_at, 'fa-flag-checkered',
-                    __('portal.notif.milestone_set', ['title' => $ms->title, 'project' => $ms->project?->title ?? '—']),
-                    route('projects.manager.show', $ms->project_id));
+                // Pass the model (Project route-binds by uuid, not the integer id).
+                if ($ms->project) {
+                    $push($ms->created_at, 'fa-flag-checkered',
+                        __('portal.notif.milestone_set', ['title' => $ms->title, 'project' => $ms->project->title]),
+                        route('projects.manager.show', $ms->project));
+                }
             }
 
             // Direct tasks you assigned that the assignee finished.
@@ -200,11 +203,13 @@ class NotificationService
             }
 
             // Project tasks you created that were completed.
-            foreach (ProjectTask::where('created_by', $user->id)->where('status', 'completed')
+            foreach (ProjectTask::with('project')->where('created_by', $user->id)->where('status', 'completed')
                 ->whereNotNull('completed_at')->where('completed_at', '>=', now()->subDays(7))
                 ->latest('completed_at')->limit(5)->get() as $pt) {
-                $push($pt->completed_at, 'fa-circle-check',
-                    __('portal.notif.task_done', ['title' => $pt->title]), route('projects.manager.show', $pt->project_id));
+                if ($pt->project) {
+                    $push($pt->completed_at, 'fa-circle-check',
+                        __('portal.notif.task_done', ['title' => $pt->title]), route('projects.manager.show', $pt->project));
+                }
             }
         }
 

@@ -32,20 +32,24 @@ class SendMeetingReminders extends Command
         foreach ($meetings as $m) {
             $when = $m->scheduled_at->translatedFormat('l, M j, Y g:i A');
 
+            // Host + organiser/client + accepted attendees. The client is external,
+            // so don't gate them out — Notifier still respects email presence + prefs.
             $recipientIds = collect([$m->team_member_id, $m->client_id])
                 ->merge($m->attendees->where('status', 'accepted')->pluck('user_id'))
                 ->filter()->unique();
 
             foreach ($recipientIds as $uid) {
                 $user = User::find($uid);
-                if (! $user || ! $user->isInternal()) {
+                if (! $user) {
                     continue;
                 }
+                // Send each person to a page they can actually open.
+                $url = $user->isInternal() ? route('meetings.internal.my-meetings') : route('meetings.my-meetings');
                 $notifier->email($user, 'meeting_reminder',
                     __('portal.notif_prefs.mail.meeting_reminder_subject'),
                     __('portal.notif_prefs.mail.meeting_reminder_heading'),
                     __('portal.notif_prefs.mail.meeting_reminder_body', ['title' => $m->title, 'when' => $when]),
-                    route('meetings.internal.my-meetings'), __('portal.meetings.my_meetings'));
+                    $url, __('portal.meetings.my_meetings'));
             }
 
             $m->update(['reminded_at' => $now]);
