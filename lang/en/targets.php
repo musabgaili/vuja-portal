@@ -127,6 +127,7 @@ return [
         'save_hours' => 'Save',
         'hours_saved' => 'Your weekly hours were saved.',
         'min_floor_note' => 'Your manager set a minimum of :hours h/week. You can commit more, but not less.',
+        'allocation_from_planner' => 'Your weekly split now comes from the Weekly Planner — fill your timesheet there.',
         'specialization' => 'Specialization',
         'spec' => [
             'management' => 'Management',

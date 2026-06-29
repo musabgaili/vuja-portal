@@ -109,8 +109,9 @@ class CapacityController extends Controller
         $this->guard();
         $data = $request->validate([
             // The manager-set floor; the engineer's committed hours can't fall below it.
-            'min_weekly_hours' => 'required|numeric|min:0|max:168',
-            'weekly_capacity_hours' => 'required|numeric|min:0|max:168|gte:min_weekly_hours',
+            // Whole hours only (the planner timesheet grid is integer).
+            'min_weekly_hours' => 'required|integer|min:0|max:168',
+            'weekly_capacity_hours' => 'required|integer|min:0|max:168|gte:min_weekly_hours',
             'specialization' => ['nullable', Rule::in(config('targets.specializations'))],
             'skills' => 'nullable|array',
             // Skills are the DELIVERY categories an engineer covers (spec §7/§12).

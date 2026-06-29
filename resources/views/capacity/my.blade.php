@@ -31,9 +31,9 @@
                 @csrf @method('PUT')
                 <div class="col-7">
                     <label class="form-label" style="font-size:.82rem;">{{ __('targets.cap.weekly_hours') }}</label>
-                    <input type="number" step="0.5" min="{{ rtrim(rtrim(number_format($member->min_weekly_hours, 1), '0'), '.') }}" max="168"
+                    <input type="number" step="1" min="{{ (int) ceil($member->min_weekly_hours) }}" max="168"
                         name="weekly_capacity_hours" class="form-control"
-                        value="{{ rtrim(rtrim(number_format($member->weekly_capacity_hours, 1), '0'), '.') }}" required>
+                        value="{{ (int) round($member->weekly_capacity_hours) }}" required>
                 </div>
                 <div class="col-5">
                     <button class="btn btn-primary w-100">{{ __('targets.cap.save_hours') }}</button>
@@ -50,37 +50,8 @@
                     @if($allocation->isSubmitted())<span class="badge bg-success">{{ __('targets.cap.submitted_badge') }}</span>@else<span class="badge bg-secondary">{{ __('targets.cap.draft_badge') }}</span>@endif
                 </span>
             </div>
-            <form method="POST" action="{{ route('capacity.save') }}" id="alloc-form">
-                @csrf
-                <input type="hidden" name="week_start" value="{{ $week->toDateString() }}">
-                <table class="table table-sm align-middle mb-2">
-                    <tbody>
-                    @foreach($categories as $cat)
-                        <tr>
-                            <td style="font-size:.85rem;">{{ $cat->localizedName() }}</td>
-                            <td style="width:110px;">
-                                <div class="input-group input-group-sm">
-                                    <input type="number" min="0" max="100" step="1" name="allocations[{{ $cat->id }}]"
-                                        aria-label="{{ $cat->localizedName() }} %"
-                                        value="{{ optional($lineByCat->get($cat->id))->percent ? rtrim(rtrim(number_format($lineByCat->get($cat->id)->percent, 1), '0'), '.') : '' }}"
-                                        class="form-control alloc-pct" data-cat="{{ $cat->id }}">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr><td class="text-end fw-bold">{{ __('targets.cap.total') }}</td>
-                            <td><span id="alloc-sum" class="fw-bold">0</span>%</td></tr>
-                    </tfoot>
-                </table>
-                <div class="d-flex gap-2">
-                    <button name="submit" value="0" class="btn btn-outline-secondary flex-fill">{{ __('targets.cap.save_draft') }}</button>
-                    <button name="submit" value="1" class="btn btn-primary flex-fill">{{ __('targets.cap.submit') }}</button>
-                </div>
-                <small class="text-muted d-block mt-2">{{ __('targets.cap.must_sum') }}</small>
-            </form>
+            <p class="text-muted mb-0" style="font-size:.85rem;"><i class="fas fa-circle-info"></i> {{ __('targets.cap.allocation_from_planner') }}</p>
+            <a href="{{ route('weekly-planner.index') }}" class="btn btn-sm btn-outline-primary mt-2"><i class="fas fa-calendar-week"></i> {{ __('portal.nav.weekly_planner') }}</a>
         </div></div>
     </div>
 

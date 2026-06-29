@@ -51,8 +51,11 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::get('/my-targets', [\App\Http\Controllers\StaffTargetController::class, 'index'])->name('targets.my');
 
     // CAPACITY — my weekly allocation + monthly capacity (team members / engineers)
+    // Read-only "my capacity" view (no longer in the nav). The weekly split now
+    // comes from the Weekly Planner, so the allocation write path (capacity.save)
+    // is retired — the planner is the single source. capacity.hours stays (the
+    // planner reuses it to set committed hours).
     Route::get('/capacity', [\App\Http\Controllers\CapacityController::class, 'index'])->name('capacity.my');
-    Route::post('/capacity/week', [\App\Http\Controllers\CapacityController::class, 'save'])->name('capacity.save');
     Route::put('/capacity/hours', [\App\Http\Controllers\CapacityController::class, 'updateHours'])->name('capacity.hours');
 
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)

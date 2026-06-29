@@ -83,7 +83,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
      */
     public function plannerRequiredHours(): int
     {
-        $hours = (int) round((float) optional($this->teamMember)->weekly_capacity_hours);
+        $member = $this->teamMember;
+        $hours = ($member && $member->is_active)
+            ? (int) round((float) $member->weekly_capacity_hours)
+            : 0;
 
         return $hours > 0 ? $hours : (int) config('planner.required_hours', 40);
     }

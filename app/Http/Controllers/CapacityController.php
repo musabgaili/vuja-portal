@@ -56,10 +56,12 @@ class CapacityController extends Controller
     public function updateHours(Request $request)
     {
         $member = $this->member();
-        $floor = (float) $member->min_weekly_hours;
+        $floor = (int) ceil((float) $member->min_weekly_hours);
 
+        // Whole hours only — the planner timesheet grid is integer, so capacity
+        // must be too (keeps required total = committed hours = derived available).
         $validated = $request->validate([
-            'weekly_capacity_hours' => 'required|numeric|min:'.$floor.'|max:168',
+            'weekly_capacity_hours' => 'required|integer|min:'.$floor.'|max:168',
         ]);
 
         $member->update(['weekly_capacity_hours' => $validated['weekly_capacity_hours']]);

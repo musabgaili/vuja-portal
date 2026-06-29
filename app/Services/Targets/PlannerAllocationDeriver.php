@@ -50,7 +50,12 @@ class PlannerAllocationDeriver
         }
 
         $available = round($delivery + $presale + $internal, 2);
-        $weekStart = $plan->week_start->copy()->startOfDay();
+        // The capacity layer keys weekly_allocations on the ISO Monday. The planner
+        // week starts Sunday, and its working days (Mon–Thu) sit in the ISO week that
+        // begins the next day — so the matching Monday is plan.week_start + 1 day.
+        // Anchoring here makes updateOrCreate upsert the same row (no Sunday/Monday
+        // duplicate) and keeps month attribution aligned with CapacityActualsService.
+        $weekStart = $plan->week_start->copy()->addDay()->startOfWeek(\Carbon\Carbon::MONDAY)->startOfDay();
 
         DB::transaction(function () use ($member, $weekStart, $available, $delivery, $presale, $internal) {
             $allocation = WeeklyAllocation::updateOrCreate(
