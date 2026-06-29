@@ -99,8 +99,11 @@ return [
     'pdf_engine' => env('SCOPE_PDF_ENGINE', 'mpdf'),
 
     // Browsershot binary overrides (only needed if not auto-detected on PATH).
-    'node_binary'  => env('BROWSERSHOT_NODE_BINARY'),
-    'npm_binary'   => env('BROWSERSHOT_NPM_BINARY'),
-    'chrome_path'  => env('BROWSERSHOT_CHROME_PATH'),
-    'browsershot_no_sandbox' => (bool) env('BROWSERSHOT_NO_SANDBOX', true),
+    // Both SCOPE_* (server runbook) and the older BROWSERSHOT_* names are accepted.
+    'node_binary'  => env('SCOPE_NODE_BINARY', env('BROWSERSHOT_NODE_BINARY')),
+    'npm_binary'   => env('SCOPE_NPM_BINARY', env('BROWSERSHOT_NPM_BINARY')),
+    'chrome_path'  => env('SCOPE_CHROME_PATH', env('BROWSERSHOT_CHROME_PATH')),
+    'browsershot_no_sandbox' => (bool) env('SCOPE_BROWSERSHOT_NO_SANDBOX', env('BROWSERSHOT_NO_SANDBOX', true)),
+    // Seconds Chrome may take to render a document before timing out.
+    'browsershot_timeout' => (int) env('SCOPE_BROWSERSHOT_TIMEOUT', 120),
 ];

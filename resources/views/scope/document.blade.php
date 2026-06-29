@@ -8,6 +8,14 @@
 --}}
 @php
     $pdf    = $pdf ?? false;
+    // When rendered by Browsershot (headless Chrome) we embed the letterhead as a
+    // data URI so the brand image is guaranteed present even if Chrome can't fetch
+    // the asset() URL over the network. Online preview keeps the lightweight URL.
+    $embedAssets = $embedAssets ?? false;
+    $lhFile = public_path(config('scope.letterhead', 'images/scope-letterhead.png'));
+    $lhSrc  = ($embedAssets && is_file($lhFile))
+        ? 'data:image/png;base64,'.base64_encode((string) file_get_contents($lhFile))
+        : asset(config('scope.letterhead', 'images/scope-letterhead.png'));
     $brand  = config('scope.brand_color', '#1B565E');
     $ink    = '#1d2a2c'; $muted = '#5a6a6c';
     $brand2 = '#2c6e76'; $brand3 = '#3a7e86';
@@ -27,11 +35,17 @@
     html,body{margin:0;padding:0}
     body{font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;color:{{ $ink }};font-size:12.5px}
 
-    .lh{position:fixed;inset:0;z-index:-1;background:url('{{ asset(config('scope.letterhead', 'images/scope-letterhead.png')) }}') center/cover no-repeat;
+    .lh{position:fixed;inset:0;z-index:-1;background:url('{{ $lhSrc }}') center/cover no-repeat;
         -webkit-print-color-adjust:exact;print-color-adjust:exact}
     .docfoot{position:fixed;left:0;right:0;bottom:11mm;z-index:1;text-align:center;font-size:9.5px;color:{{ $muted }};letter-spacing:.2px}
 
     .pagebreak{page-break-before:always}
+    /* Natural pagination: keep each table/block and every heading with its
+       following content, instead of forcing one page per section (which left big
+       empty pages). Lets content flow and only break where it must. */
+    table.tbl,.note-block,.meta{break-inside:avoid}
+    table.tbl tr,ul.points li{break-inside:avoid}
+    .section h2,.section h3{break-after:avoid}
 
     .meta{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:12.5px}
     .meta td{border:1px solid {{ $rule }};padding:7px 11px;vertical-align:middle;background:#ffffff}
@@ -67,7 +81,11 @@
     @media screen{
       body{background:#e7ebe9;padding:32px 16px}
       .sheet{position:relative;width:8.5in;min-height:11in;margin:0 auto;background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.16);overflow:hidden}
-      .lh{position:absolute}
+      /* Online preview isn't truly paginated, so tile the letterhead once per
+         page-height (instead of stretching one copy over the whole tall sheet,
+         which made the branding look absent). The exact per-page layout is the
+         downloaded/Browsershot PDF. */
+      .lh{position:absolute;background-size:8.5in 11in;background-repeat:repeat-y;background-position:top center}
       .docfoot{position:absolute}
       .doc-body{position:relative;z-index:1;padding:40mm 18mm 24mm}
     }

@@ -40,6 +40,7 @@ class BrowsershotRenderer implements PdfRenderer
             ->showBackground()                 // print the letterhead background
             ->margins(0, 0, 0, 0)              // page geometry comes from the CSS @page
             ->format(strtolower((string) config('scope.page_size', 'letter')) === 'a4' ? 'A4' : 'Letter')
+            ->timeout((int) config('scope.browsershot_timeout', 120))
             ->waitUntilNetworkIdle();
 
         // Honour the document's own @page size/margins (the measured safe area).

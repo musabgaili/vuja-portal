@@ -41,7 +41,6 @@
 
   {{-- ===== Per-scope detail ===== --}}
   @foreach($quote->scopes as $s)
-    <div class="pagebreak"></div>
     <div class="section">
       <h2>{{ __('scope.scope') }} {{ $loop->iteration }} — {{ $s->title }}</h2>
       @if(!empty($s->objective))<h3>@lang('scope.objective')</h3><p class="para">{{ is_array($s->objective) ? implode(' ', $s->objective) : $s->objective }}</p>@endif
@@ -54,7 +53,6 @@
 
   {{-- ===== Commercial proposal (omitted on the technical offer) ===== --}}
   @unless($technical)
-    <div class="pagebreak"></div>
     <div class="section">
       <h2>@lang('scope.commercial_proposal')</h2>
 
@@ -96,7 +94,6 @@
   @endif
 
   {{-- ===== General terms ===== --}}
-  <div class="pagebreak"></div>
   <div class="section">
     <h2>@lang('scope.general_terms')</h2>
     <h3>@lang('scope.client_responsibilities')</h3>

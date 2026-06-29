@@ -66,7 +66,12 @@ class DocumentController extends Controller
      */
     private function engineFlags(): array
     {
-        return config('scope.pdf_engine', 'mpdf') === 'browsershot' ? [] : ['pdf' => true];
+        // Browsershot is Chrome → render the SAME HTML as the preview (pdf=false),
+        // but embed the letterhead as a data URI so it never depends on Chrome
+        // fetching the asset URL over the network. mPDF supplies its own letterhead.
+        return config('scope.pdf_engine', 'mpdf') === 'browsershot'
+            ? ['embedAssets' => true]
+            : ['pdf' => true];
     }
 
     /**

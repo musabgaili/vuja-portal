@@ -56,8 +56,11 @@ class DocxRenderer
         // Path is relative to public/ (git-tracked) so it ships with the repo.
         $letterhead = public_path(config('scope.letterhead', 'images/scope-letterhead.png'));
         if (is_file($letterhead)) {
+            // Full-page behind-text letterhead. PHPWord image dimensions are in
+            // POINTS, so a full page = page size in points (Letter 612x792, A4 595x842).
+            [$lhW, $lhH] = strtolower((string) config('scope.page_size', 'letter')) === 'a4' ? [595, 842] : [612, 792];
             $section->addHeader()->addImage($letterhead, [
-                'width' => 612, 'height' => 792, 'wrappingStyle' => 'behind',
+                'width' => $lhW, 'height' => $lhH, 'wrappingStyle' => 'behind',
                 'posHorizontal' => 'center', 'posHorizontalRelTo' => 'page',
                 'posVertical' => 'top', 'posVerticalRelTo' => 'page',
             ]);
