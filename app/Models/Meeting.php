@@ -28,6 +28,7 @@ class Meeting extends Model
         'confirmed_at',
         'completed_at',
         'cancelled_at',
+        'reminded_at',
     ];
 
     protected $casts = [
@@ -35,6 +36,7 @@ class Meeting extends Model
         'confirmed_at' => 'datetime',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'reminded_at' => 'datetime',
     ];
 
     public function timeSlot(): BelongsTo

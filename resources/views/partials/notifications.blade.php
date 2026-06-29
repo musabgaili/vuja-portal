@@ -24,6 +24,8 @@
         @empty
             <span class="dropdown-item text-muted">{{ __('portal.notif.empty') }}</span>
         @endforelse
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center fw-bold" href="{{ route('notifications.index') }}" style="color:var(--primary-color);">{{ __('portal.notif.view_all') }}</a>
     </div>
 </div>
 <script>

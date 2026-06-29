@@ -464,7 +464,7 @@ class MeetingController extends Controller
                     __('portal.meetings.invite_email_body', ['name' => $organizer->name, 'title' => $meeting->title, 'when' => $when]),
                     $url, __('portal.meetings.invitations_title'));
             } else {
-                $notifier->email($target, 'meeting_invitation',
+                $notifier->email($target, 'meeting_booked',
                     __('portal.meetings.booked_email_subject', ['name' => $organizer->name]),
                     __('portal.meetings.booked_email_heading'),
                     __('portal.meetings.booked_email_body', ['name' => $organizer->name, 'title' => $meeting->title, 'when' => $when]),

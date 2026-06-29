@@ -32,7 +32,24 @@ class MilestoneController extends Controller
         $validated['project_id'] = $project->id;
         $validated['milestone_order'] = $project->milestones()->max('milestone_order') + 1;
 
-        ProjectMilestone::create($validated);
+        $milestone = ProjectMilestone::create($validated);
+
+        // Tell the project team a new milestone was set.
+        $notifier = app(\App\Services\Notifier::class);
+        foreach ($project->teamUserIds() as $uid) {
+            if ((int) $uid === (int) $user->id) {
+                continue;
+            }
+            $target = \App\Models\User::find($uid);
+            if (! $target || ! $target->isInternal()) {
+                continue;
+            }
+            $notifier->email($target, 'milestone_set',
+                __('portal.notif_prefs.mail.milestone_subject'),
+                __('portal.notif_prefs.mail.milestone_heading'),
+                __('portal.notif_prefs.mail.milestone_body', ['title' => $milestone->title, 'project' => $project->title]),
+                route('projects.manager.show', $project));
+        }
 
         // Update project progress
         app(UpdateProjectProgressAction::class)->execute($project);

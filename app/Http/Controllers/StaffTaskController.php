@@ -130,6 +130,7 @@ class StaffTaskController extends Controller
         $staffTask->status = $newStatus;
 
         if ($newStatus === 'done') {
+            $firstDone = $staffTask->getOriginal('status') !== 'done';
             $staffTask->completed_at = $staffTask->completed_at ?? now();
 
             // Award the category's IP rate to the assignee, exactly once.
@@ -142,6 +143,17 @@ class StaffTaskController extends Controller
                     'Direct task completed: '.$staffTask->title,
                 );
                 $staffTask->points_awarded = true;
+            }
+
+            // Tell the assigner their task is done (once, and not when they did it themselves).
+            if ($firstDone && $staffTask->assigner && $staffTask->assigner->id !== $user->id) {
+                app(\App\Services\Notifier::class)->email(
+                    $staffTask->assigner, 'task_done',
+                    __('portal.notif_prefs.mail.task_done_subject'),
+                    __('portal.notif_prefs.mail.task_done_heading'),
+                    __('portal.notif_prefs.mail.task_done_body', ['title' => $staffTask->title, 'by' => $user->name]),
+                    route('staff-tasks.index'),
+                );
             }
         } elseif ($newStatus !== 'done') {
             $staffTask->completed_at = null;

@@ -56,6 +56,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     Route::put('/capacity/hours', [\App\Http\Controllers\CapacityController::class, 'updateHours'])->name('capacity.hours');
 
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');
 
     // Per-user email-notification preferences.

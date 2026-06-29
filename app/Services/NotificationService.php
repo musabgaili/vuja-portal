@@ -20,11 +20,17 @@ use Illuminate\Support\Facades\Cache;
  */
 class NotificationService
 {
-    /** Recent items for the bell dropdown, newest first. */
+    /** The full cached feed (one key per user so forget() keeps working). */
+    private function cached(User $user): array
+    {
+        // ~17 queries to rebuild; the bell is a passive feed, so a longer TTL is fine.
+        return Cache::remember('notif_feed:'.$user->id, 120, fn () => $this->build($user, 50));
+    }
+
+    /** Recent items, newest first (sliced to the caller's limit). */
     public function feed(User $user, int $limit = 12): array
     {
-        // ~13 queries to rebuild; the bell is a passive feed, so a longer TTL is fine.
-        return Cache::remember('notif_feed:'.$user->id, 120, fn () => $this->build($user, $limit));
+        return array_slice($this->cached($user), 0, $limit);
     }
 
     /** How many feed items are newer than the user's last "seen" time. */
@@ -32,7 +38,7 @@ class NotificationService
     {
         $seen = (int) Cache::get('notif_seen:'.$user->id, 0);
 
-        return collect($this->feed($user))->filter(fn ($i) => $i['at'] > $seen)->count();
+        return collect($this->cached($user))->filter(fn ($i) => $i['at'] > $seen)->count();
     }
 
     /** Mark the feed as seen up to now. */
@@ -156,6 +162,49 @@ class NotificationService
                 $push($inv->created_at, 'fa-calendar-plus',
                     __('portal.notif.meeting_invite', ['name' => $inv->meeting->client?->name ?? '—', 'title' => $inv->meeting->title]),
                     route('meetings.invitations'));
+            }
+        }
+
+        if ($user->isInternal()) {
+            // Projects you were added to, recently created.
+            foreach (\App\Models\Project::where('created_at', '>=', now()->subDays(14))
+                ->where(function ($q) use ($user) {
+                    $q->where('project_manager_id', $user->id)
+                        ->orWhere('account_manager_id', $user->id)
+                        ->orWhereHas('projectPeople', fn ($p) => $p->where('user_id', $user->id));
+                })->latest()->limit(5)->get() as $proj) {
+                $push($proj->created_at, 'fa-diagram-project',
+                    __('portal.notif.project_created', ['title' => $proj->title]),
+                    route('projects.manager.show', $proj));
+            }
+
+            // New milestones on your projects.
+            foreach (\App\Models\ProjectMilestone::with('project')
+                ->where('created_at', '>=', now()->subDays(14))
+                ->whereHas('project', function ($q) use ($user) {
+                    $q->where('project_manager_id', $user->id)
+                        ->orWhere('account_manager_id', $user->id)
+                        ->orWhereHas('projectPeople', fn ($p) => $p->where('user_id', $user->id));
+                })->latest()->limit(5)->get() as $ms) {
+                $push($ms->created_at, 'fa-flag-checkered',
+                    __('portal.notif.milestone_set', ['title' => $ms->title, 'project' => $ms->project?->title ?? '—']),
+                    route('projects.manager.show', $ms->project_id));
+            }
+
+            // Direct tasks you assigned that the assignee finished.
+            foreach (StaffTask::where('assigned_by', $user->id)->where('status', 'done')
+                ->whereNotNull('completed_at')->where('completed_at', '>=', now()->subDays(7))
+                ->latest('completed_at')->limit(5)->get() as $st) {
+                $push($st->completed_at, 'fa-circle-check',
+                    __('portal.notif.task_done', ['title' => $st->title]), route('staff-tasks.index'));
+            }
+
+            // Project tasks you created that were completed.
+            foreach (ProjectTask::where('created_by', $user->id)->where('status', 'completed')
+                ->whereNotNull('completed_at')->where('completed_at', '>=', now()->subDays(7))
+                ->latest('completed_at')->limit(5)->get() as $pt) {
+                $push($pt->completed_at, 'fa-circle-check',
+                    __('portal.notif.task_done', ['title' => $pt->title]), route('projects.manager.show', $pt->project_id));
             }
         }
 

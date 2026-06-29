@@ -221,8 +221,30 @@ class ProjectController extends Controller
 
         $project = $this->projectService->createProject($validated);
 
+        $this->notifyProjectCreated($project, $user);
+
         return redirect()->route('projects.manager.show', $project)
             ->with('success', 'Project created successfully!');
+    }
+
+    /** Tell the assigned team (PM, account manager, assigned staff) a project was created. */
+    private function notifyProjectCreated(Project $project, User $actor): void
+    {
+        $notifier = app(\App\Services\Notifier::class);
+        foreach ($project->teamUserIds() as $uid) {
+            if ((int) $uid === (int) $actor->id) {
+                continue;
+            }
+            $target = User::find($uid);
+            if (! $target || ! $target->isInternal()) {
+                continue;
+            }
+            $notifier->email($target, 'project_created',
+                __('portal.notif_prefs.mail.project_created_subject'),
+                __('portal.notif_prefs.mail.project_created_heading'),
+                __('portal.notif_prefs.mail.project_created_body', ['title' => $project->title, 'by' => $actor->name]),
+                route('projects.manager.show', $project));
+        }
     }
 
     // ============================================

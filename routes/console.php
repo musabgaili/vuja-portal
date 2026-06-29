@@ -16,3 +16,6 @@ Schedule::command('engagement:expire-points')->dailyAt('02:00');
 
 // Performance Targets: snapshot the just-ended month into the trend log (safety net).
 Schedule::command('targets:snapshot-month')->monthlyOn(1, '00:30');
+
+// Meetings: remind attendees shortly before a meeting starts (once per meeting).
+Schedule::command('meetings:send-reminders')->everyFifteenMinutes();

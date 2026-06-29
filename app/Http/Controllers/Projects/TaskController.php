@@ -83,6 +83,17 @@ class TaskController extends Controller
 
         $task = ProjectTask::create($validated);
 
+        // Tell the assignee they were given a task.
+        if ($task->assigned_to && (int) $task->assigned_to !== (int) $user->id) {
+            app(\App\Services\Notifier::class)->email(
+                \App\Models\User::find($task->assigned_to), 'task_assigned',
+                __('portal.notif_prefs.mail.task_subject'),
+                __('portal.notif_prefs.mail.task_heading'),
+                __('portal.notif_prefs.mail.task_body', ['title' => $task->title, 'by' => $user->name]),
+                route('projects.manager.show', $project),
+            );
+        }
+
         // Update milestone progress if task is linked to one
         if ($task->milestone_id) {
             $milestone = $task->milestone;
@@ -132,7 +143,34 @@ class TaskController extends Controller
             $validated['completed_at'] = now();
         }
 
+        $prevAssignee = (int) $task->assigned_to;
+        $prevStatus = $task->status;
+
         $task->update($validated);
+
+        $notifier = app(\App\Services\Notifier::class);
+        // Reassigned to someone new → tell the new assignee.
+        if (array_key_exists('assigned_to', $validated) && (int) $task->assigned_to !== $prevAssignee
+            && $task->assigned_to && (int) $task->assigned_to !== (int) $user->id) {
+            $notifier->email(
+                \App\Models\User::find($task->assigned_to), 'task_assigned',
+                __('portal.notif_prefs.mail.task_subject'),
+                __('portal.notif_prefs.mail.task_heading'),
+                __('portal.notif_prefs.mail.task_body', ['title' => $task->title, 'by' => $user->name]),
+                route('projects.manager.show', $task->project),
+            );
+        }
+        // First time it's completed → tell whoever created the task.
+        if (($validated['status'] ?? null) === 'completed' && $prevStatus !== 'completed'
+            && $task->created_by && (int) $task->created_by !== (int) $user->id) {
+            $notifier->email(
+                \App\Models\User::find($task->created_by), 'task_done',
+                __('portal.notif_prefs.mail.task_done_subject'),
+                __('portal.notif_prefs.mail.task_done_heading'),
+                __('portal.notif_prefs.mail.task_done_body', ['title' => $task->title, 'by' => $user->name]),
+                route('projects.manager.show', $task->project),
+            );
+        }
 
         // Update milestone progress if task belongs to one
         if ($task->milestone_id) {

@@ -146,6 +146,14 @@ class Project extends Model
         return $this->hasMany(ProjectPerson::class);
     }
 
+    /** Distinct internal user ids on this project: PM, account manager + assigned people. */
+    public function teamUserIds(): array
+    {
+        return collect([$this->project_manager_id, $this->account_manager_id])
+            ->merge($this->projectPeople()->pluck('user_id'))
+            ->filter()->unique()->values()->all();
+    }
+
     public function scopeChanges(): HasMany
     {
         return $this->hasMany(ProjectScopeChange::class);

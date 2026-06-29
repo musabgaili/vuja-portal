@@ -47,5 +47,30 @@ return [
             'default' => true,
             'audience' => 'internal',
         ],
+        'meeting_booked' => [
+            'label' => 'portal.notif_prefs.type.meeting_booked',
+            'default' => true,
+            'audience' => 'internal',
+        ],
+        'meeting_reminder' => [
+            'label' => 'portal.notif_prefs.type.meeting_reminder',
+            'default' => true,
+            'audience' => 'internal',
+        ],
+        'task_done' => [
+            'label' => 'portal.notif_prefs.type.task_done',
+            'default' => true,
+            'audience' => 'internal',
+        ],
+        'project_created' => [
+            'label' => 'portal.notif_prefs.type.project_created',
+            'default' => true,
+            'audience' => 'internal',
+        ],
+        'milestone_set' => [
+            'label' => 'portal.notif_prefs.type.milestone_set',
+            'default' => true,
+            'audience' => 'internal',
+        ],
     ],
 ];
