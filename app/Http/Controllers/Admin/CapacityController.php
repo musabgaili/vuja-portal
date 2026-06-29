@@ -216,16 +216,33 @@ class CapacityController extends Controller
 
     // ---- Weekly submission monitor ----
 
-    public function submissions()
+    /**
+     * Weekly-submission monitor — now driven by the Weekly Planner (the single
+     * weekly surface). Shows, per engineer, whether their plan for the week is
+     * submitted and whether it was on time or late.
+     */
+    public function submissions(Request $request)
     {
         $this->guard();
-        $week = $this->alloc->weekStartFor();
-        $submitted = WeeklyAllocation::where('week_start', $week)->get()->keyBy('team_member_id');
+
+        $week = \App\Http\Controllers\WeeklyPlannerController::currentWeekStart();
+        if ($request->filled('week')) {
+            try {
+                $week = Carbon::parse($request->get('week'))->startOfWeek(Carbon::SUNDAY);
+            } catch (\Throwable $e) {
+            }
+        }
+
+        $members = TeamMember::active()->with('user')->get();
+        $plans = \App\Models\WeeklyPlan::whereIn('user_id', $members->pluck('user_id'))
+            ->whereDate('week_start', $week->toDateString())
+            ->get()->keyBy('user_id');
 
         return view('capacity.admin.submissions', [
-            'members' => TeamMember::active()->with('user')->get(),
-            'submitted' => $submitted,
+            'members' => $members,
+            'plans' => $plans,
             'week' => $week,
+            'deadline' => \App\Http\Controllers\WeeklyPlannerController::deadlineFor($week),
         ]);
     }
 }
