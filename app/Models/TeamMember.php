@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TeamMember extends Model
 {
     protected $fillable = [
-        'user_id', 'display_name', 'specialization', 'weekly_capacity_hours', 'is_active',
+        'user_id', 'display_name', 'specialization', 'weekly_capacity_hours', 'min_weekly_hours', 'is_active',
     ];
 
     protected $casts = [
         'weekly_capacity_hours' => 'decimal:2',
+        'min_weekly_hours' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

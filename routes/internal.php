@@ -53,6 +53,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // CAPACITY — my weekly allocation + monthly capacity (team members / engineers)
     Route::get('/capacity', [\App\Http\Controllers\CapacityController::class, 'index'])->name('capacity.my');
     Route::post('/capacity/week', [\App\Http\Controllers\CapacityController::class, 'save'])->name('capacity.save');
+    Route::put('/capacity/hours', [\App\Http\Controllers\CapacityController::class, 'updateHours'])->name('capacity.hours');
 
     // NOTIFICATIONS — mark the bell feed as seen (all internal users)
     Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('notifications.seen');

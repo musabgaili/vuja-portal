@@ -97,6 +97,7 @@ class CapacityController extends Controller
         TeamMember::firstOrCreate(['user_id' => $user->id], [
             'display_name' => $user->name,
             'weekly_capacity_hours' => (float) config('targets.default_weekly_capacity', 40),
+            'min_weekly_hours' => (float) config('targets.default_weekly_capacity', 40),
             'is_active' => true,
         ]);
 
@@ -107,7 +108,9 @@ class CapacityController extends Controller
     {
         $this->guard();
         $data = $request->validate([
-            'weekly_capacity_hours' => 'required|numeric|min:0|max:168',
+            // The manager-set floor; the engineer's committed hours can't fall below it.
+            'min_weekly_hours' => 'required|numeric|min:0|max:168',
+            'weekly_capacity_hours' => 'required|numeric|min:0|max:168|gte:min_weekly_hours',
             'specialization' => 'nullable|in:design,electronics',
             'skills' => 'nullable|array',
             // Skills are the DELIVERY categories an engineer covers (spec §7/§12).
@@ -115,6 +118,7 @@ class CapacityController extends Controller
         ]);
 
         $teamMember->update([
+            'min_weekly_hours' => $data['min_weekly_hours'],
             'weekly_capacity_hours' => $data['weekly_capacity_hours'],
             'specialization' => $data['specialization'] ?? null,
             'is_active' => $request->boolean('is_active'),

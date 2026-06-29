@@ -18,10 +18,30 @@
     </div>
 </div>
 
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
 <div class="row g-3">
     {{-- Weekly allocation form --}}
     <div class="col-lg-5">
+        {{-- My committed working hours (>= the manager-set floor) --}}
+        <div class="card mb-3"><div class="card-header"><span class="card-title"><i class="fas fa-business-time"></i> {{ __('targets.cap.my_hours') }}</span></div>
+        <div class="card-content">
+            <form method="POST" action="{{ route('capacity.hours') }}" class="row g-2 align-items-end">
+                @csrf @method('PUT')
+                <div class="col-7">
+                    <label class="form-label" style="font-size:.82rem;">{{ __('targets.cap.weekly_hours') }}</label>
+                    <input type="number" step="0.5" min="{{ rtrim(rtrim(number_format($member->min_weekly_hours, 1), '0'), '.') }}" max="168"
+                        name="weekly_capacity_hours" class="form-control"
+                        value="{{ rtrim(rtrim(number_format($member->weekly_capacity_hours, 1), '0'), '.') }}" required>
+                </div>
+                <div class="col-5">
+                    <button class="btn btn-primary w-100">{{ __('targets.cap.save_hours') }}</button>
+                </div>
+            </form>
+            <small class="text-muted d-block mt-2">{{ __('targets.cap.min_floor_note', ['hours' => rtrim(rtrim(number_format($member->min_weekly_hours, 1), '0'), '.')]) }}</small>
+        </div></div>
+
         <div class="card"><div class="card-header"><span class="card-title"><i class="fas fa-calendar-week"></i> {{ __('targets.cap.this_week') }}</span></div>
         <div class="card-content">
             <div class="d-flex justify-content-between mb-2" style="font-size:.85rem;">

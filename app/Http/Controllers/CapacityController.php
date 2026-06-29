@@ -52,6 +52,21 @@ class CapacityController extends Controller
         ]);
     }
 
+    /** The engineer sets their own committed weekly hours — never below the manager floor. */
+    public function updateHours(Request $request)
+    {
+        $member = $this->member();
+        $floor = (float) $member->min_weekly_hours;
+
+        $validated = $request->validate([
+            'weekly_capacity_hours' => 'required|numeric|min:'.$floor.'|max:168',
+        ]);
+
+        $member->update(['weekly_capacity_hours' => $validated['weekly_capacity_hours']]);
+
+        return back()->with('success', __('targets.cap.hours_saved'));
+    }
+
     public function save(Request $request)
     {
         $member = $this->member();

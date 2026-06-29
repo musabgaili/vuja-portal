@@ -27,6 +27,7 @@
     <table class="table align-middle mb-0">
         <thead><tr>
             <th>{{ __('targets.cap.engineer') }}</th>
+            <th style="width:110px;">{{ __('targets.cap.min_h') }}</th>
             <th style="width:120px;">{{ __('targets.cap.capacity_h') }}</th>
             <th style="width:150px;">{{ __('targets.cap.specialization') }}</th>
             <th>{{ __('targets.cap.skills') }}</th>
@@ -38,6 +39,7 @@
             @php $f = 'eng-'.$m->id; $skillIds = $m->categories->pluck('id')->all(); @endphp
             <tr>
                 <td><strong>{{ $m->display_name }}</strong><div class="text-muted" style="font-size:.72rem;">{{ $m->user?->email }}</div></td>
+                <td><input form="{{ $f }}" type="number" step="0.5" min="0" max="168" name="min_weekly_hours" value="{{ rtrim(rtrim(number_format($m->min_weekly_hours,1),'0'),'.') }}" class="form-control form-control-sm" required title="{{ __('targets.cap.min_h_hint') }}"></td>
                 <td><input form="{{ $f }}" type="number" step="0.5" min="0" max="168" name="weekly_capacity_hours" value="{{ rtrim(rtrim(number_format($m->weekly_capacity_hours,1),'0'),'.') }}" class="form-control form-control-sm" required></td>
                 <td>
                     <select form="{{ $f }}" name="specialization" class="form-select form-select-sm">
@@ -57,7 +59,7 @@
                 <td class="text-end"><button form="{{ $f }}" class="btn btn-sm btn-primary">{{ __('targets.admin.save') }}</button></td>
             </tr>
         @empty
-            <tr><td colspan="6" class="text-muted text-center py-4">{{ __('targets.cap.no_engineers') }}</td></tr>
+            <tr><td colspan="7" class="text-muted text-center py-4">{{ __('targets.cap.no_engineers') }}</td></tr>
         @endforelse
         </tbody>
     </table>
