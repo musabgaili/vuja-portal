@@ -352,14 +352,21 @@
         var tplOk = @json(__('portal.planner.avail_ok'));
 
         function toMin(v) { var m = /^(\d{1,2}):(\d{2})$/.exec(v || ''); return m ? (parseInt(m[1], 10) * 60 + parseInt(m[2], 10)) : null; }
+        // End at/before start = crosses midnight (e.g. 16:00–00:00 = 8h), so a
+        // window ending at 12 AM is counted, not dropped.
+        function spanMin(sv, ev) {
+            var a = toMin(sv), b = toMin(ev);
+            if (a === null || b === null) return 0;
+            var d = b - a;
+            return d < 0 ? d + 1440 : d;
+        }
 
         function availMinutes() {
             var total = 0;
             days.forEach(function (day) {
                 var s = field('availability[' + day + '][start]');
                 var e = field('availability[' + day + '][end]');
-                var a = s ? toMin(s.value) : null, b = e ? toMin(e.value) : null;
-                if (a !== null && b !== null && b > a) total += (b - a);
+                if (s && e) total += spanMin(s.value, e.value);
             });
             return total;
         }

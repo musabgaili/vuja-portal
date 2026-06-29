@@ -309,12 +309,8 @@ class WeeklyPlannerController extends Controller
             $availMinutes = 0;
             foreach ($days as $day) {
                 $win = $availability[$day] ?? null;
-                if ($win && ! empty($win['start']) && ! empty($win['end'])) {
-                    $start = Carbon::createFromFormat('H:i', $win['start']);
-                    $end = Carbon::createFromFormat('H:i', $win['end']);
-                    if ($end->greaterThan($start)) {
-                        $availMinutes += $start->diffInMinutes($end);
-                    }
+                if ($win && isset($win['start'], $win['end']) && $win['start'] !== '' && $win['end'] !== '') {
+                    $availMinutes += $this->windowMinutes($win['start'], $win['end']);
                 }
             }
 
@@ -452,6 +448,20 @@ class WeeklyPlannerController extends Controller
         $value = trim((string) $value);
 
         return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $value) ? $value : null;
+    }
+
+    /**
+     * Minutes between two HH:MM times. An end at or before the start is treated
+     * as crossing midnight (e.g. 16:00–00:00 = 8h, 00:00 being "12 AM"), so a
+     * window that ends at midnight is counted instead of silently dropped.
+     */
+    private function windowMinutes(string $start, string $end): int
+    {
+        [$sh, $sm] = array_map('intval', array_pad(explode(':', $start), 2, 0));
+        [$eh, $em] = array_map('intval', array_pad(explode(':', $end), 2, 0));
+        $span = ($eh * 60 + $em) - ($sh * 60 + $sm);
+
+        return $span < 0 ? $span + 1440 : $span;
     }
 
     /** Manager review queue + category breakdown across submitted timesheets. */
