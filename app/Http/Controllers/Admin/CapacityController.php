@@ -111,7 +111,7 @@ class CapacityController extends Controller
             // The manager-set floor; the engineer's committed hours can't fall below it.
             'min_weekly_hours' => 'required|numeric|min:0|max:168',
             'weekly_capacity_hours' => 'required|numeric|min:0|max:168|gte:min_weekly_hours',
-            'specialization' => 'nullable|in:design,electronics',
+            'specialization' => ['nullable', Rule::in(config('targets.specializations'))],
             'skills' => 'nullable|array',
             // Skills are the DELIVERY categories an engineer covers (spec §7/§12).
             'skills.*' => ['integer', Rule::exists('activity_categories', 'id')->where('kind', 'delivery')->where('is_active', true)],

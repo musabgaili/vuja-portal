@@ -44,8 +44,9 @@
                 <td>
                     <select form="{{ $f }}" name="specialization" class="form-select form-select-sm">
                         <option value="">—</option>
-                        <option value="design" @selected($m->specialization==='design')>{{ __('targets.cap.design') }}</option>
-                        <option value="electronics" @selected($m->specialization==='electronics')>{{ __('targets.cap.electronics') }}</option>
+                        @foreach(config('targets.specializations') as $spec)
+                            <option value="{{ $spec }}" @selected($m->specialization===$spec)>{{ __('targets.cap.spec.'.$spec) }}</option>
+                        @endforeach
                     </select>
                 </td>
                 <td>

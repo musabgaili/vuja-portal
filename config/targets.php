@@ -31,4 +31,8 @@ return [
     'workday_hours' => 8,
     'default_utilization_pct' => 70,
     'default_split' => ['delivery' => 70, 'pre_sales' => 20, 'internal' => 10],
+
+    // Team member specialisations (machine values). Labels live in lang
+    // targets.cap.spec.*; the manager picks one per engineer.
+    'specializations' => ['management', 'programmer', 'designer', 'marketing', '3d_designer', 'electronics'],
 ];

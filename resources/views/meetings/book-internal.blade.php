@@ -11,7 +11,12 @@
 
 @php
     $allowedDurations = [30, 60, 90, 120];
-    $specLabel = fn ($k) => __('portal.meetings.spec.'.$k);
+    $specLabel = function ($k) {
+        $key = 'targets.cap.spec.'.$k;
+        $label = __($key);
+
+        return $label === $key ? ucfirst($k) : $label;
+    };
 @endphp
 
 <div class="row g-3">
