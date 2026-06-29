@@ -128,7 +128,8 @@ class WeeklyPlannerController extends Controller
             'member' => $user->teamMember,   // drives the "your weekly hours" control
             'defaults' => $user->planner_defaults,  // reusable per-day schedule, applied client-side
             'hasDefault' => ! empty($user->planner_defaults['availability'] ?? null)
-                || ! empty($user->planner_defaults['locations'] ?? null),
+                || ! empty($user->planner_defaults['locations'] ?? null)
+                || ! empty($user->planner_defaults['hours'] ?? null),
             'maxHoursPerDay' => (int) config('planner.max_hours_per_day', 24),
             'history' => WeeklyPlan::with('lines')->where('user_id', $user->id)
                 ->orderByDesc('week_start')->limit(8)->get(),
@@ -382,10 +383,11 @@ class WeeklyPlannerController extends Controller
     }
 
     /**
-     * Save the employee's reusable default weekly schedule (per-day availability
-     * windows + working location) so they can apply it each week with one click
-     * instead of re-entering the same timing. Posted via fetch from the planner;
-     * applying the default is a pure client-side fill (no round-trip).
+     * Save the employee's reusable default week — per-day availability + working
+     * location AND the project/task/activity hours grid — so they can apply it
+     * next week with one click instead of re-entering the same timing and hours.
+     * Posted via fetch from the planner; applying is a pure client-side fill that
+     * only touches rows still present that week (no round-trip).
      */
     public function saveDefaults(Request $request)
     {
@@ -395,6 +397,7 @@ class WeeklyPlannerController extends Controller
         $request->validate([
             'locations' => 'array',
             'availability' => 'array',
+            'hours' => 'array',
         ]);
 
         $days = config('planner.days');
@@ -416,8 +419,27 @@ class WeeklyPlannerController extends Controller
             }
         }
 
+        // Grid hours template, by kind. Project/task rows are keyed by id; an id
+        // that no longer exists next week is simply skipped when applying (the
+        // input won't be on the page). Activities use their fixed config keys.
+        $maxHpd = (int) config('planner.max_hours_per_day', 24);
+        $allowedActivities = array_keys(config('planner.activities'));
+        $grid = (array) $request->input('hours', []);
+        $hours = [];
+        foreach (['project', 'task', 'activity'] as $kind) {
+            foreach (($grid[$kind] ?? []) as $id => $byDay) {
+                if ($kind === 'activity' ? ! in_array($id, $allowedActivities, true) : ! ctype_digit((string) $id)) {
+                    continue;
+                }
+                $clean = $this->cleanHours((array) $byDay, $days, $maxHpd);
+                if (array_sum($clean) > 0) {
+                    $hours[$kind][(string) $id] = $clean;
+                }
+            }
+        }
+
         $user->update([
-            'planner_defaults' => ['locations' => $locations, 'availability' => $availability],
+            'planner_defaults' => ['locations' => $locations, 'availability' => $availability, 'hours' => $hours],
         ]);
 
         if ($request->wantsJson() || $request->ajax()) {

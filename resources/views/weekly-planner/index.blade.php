@@ -305,17 +305,31 @@
         if (applyBtn) applyBtn.addEventListener('click', function () {
             var loc = (defaults && defaults.locations) || {};
             var av = (defaults && defaults.availability) || {};
-            if (!Object.keys(loc).length && !Object.keys(av).length) { notify(msg.none); return; }
+            var hrs = (defaults && defaults.hours) || {};
+            if (!Object.keys(loc).length && !Object.keys(av).length && !Object.keys(hrs).length) { notify(msg.none); return; }
             days.forEach(function (day) {
                 var sel = field('locations[' + day + ']'); if (sel) sel.value = loc[day] || '';
                 var s = field('availability[' + day + '][start]'); if (s) s.value = (av[day] && av[day].start) || '';
                 var e = field('availability[' + day + '][end]'); if (e) e.value = (av[day] && av[day].end) || '';
             });
+            // Refill the hours grid for rows that still exist this week; fire
+            // 'input' so the row/column/grand totals recalculate.
+            ['project', 'task', 'activity'].forEach(function (kind) {
+                var byId = hrs[kind] || {};
+                Object.keys(byId).forEach(function (id) {
+                    var byDay = byId[id] || {};
+                    days.forEach(function (day) {
+                        var inp = field('hours[' + kind + '][' + id + '][' + day + ']');
+                        if (inp) { inp.value = byDay[day] || ''; inp.dispatchEvent(new Event('input', { bubbles: true })); }
+                    });
+                });
+            });
+            updateAvail();   // refresh the "Available this week" counter right away
             notify(msg.applied);
         });
 
         if (saveBtn) saveBtn.addEventListener('click', function () {
-            var payload = { locations: {}, availability: {} };
+            var payload = { locations: {}, availability: {}, hours: {} };
             var body = new URLSearchParams();
             days.forEach(function (day) {
                 var sel = field('locations[' + day + ']');
@@ -326,6 +340,18 @@
                 if (s && s.value) { win.start = s.value; body.append('availability[' + day + '][start]', s.value); }
                 if (e && e.value) { win.end = e.value; body.append('availability[' + day + '][end]', e.value); }
                 if (win.start || win.end) payload.availability[day] = win;
+            });
+            // Capture the hours grid too, so the default replays this week's work.
+            form.querySelectorAll('.ts-hours').forEach(function (i) {
+                var v = parseInt(i.value || 0, 10) || 0;
+                if (v <= 0 || !i.name) return;
+                body.append(i.name, v);
+                var mm = /^hours\[(\w+)\]\[([^\]]+)\]\[(\w+)\]$/.exec(i.name);
+                if (mm) {
+                    payload.hours[mm[1]] = payload.hours[mm[1]] || {};
+                    payload.hours[mm[1]][mm[2]] = payload.hours[mm[1]][mm[2]] || {};
+                    payload.hours[mm[1]][mm[2]][mm[3]] = v;
+                }
             });
             saveBtn.disabled = true;
             fetch(url, {
