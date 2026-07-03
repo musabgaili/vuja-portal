@@ -10,6 +10,7 @@ use App\Models\Meeting;
 use App\Models\Project;
 use App\Models\ResearchRequest;
 use App\Models\User;
+use App\Services\Dashboard\ClientDashboardService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -36,84 +37,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Calculate statistics using queries (not collections)
-        $stats = [
-            // Projects stats
-            'active_projects' => IdeaRequest::where('user_id', $user->id)
-                ->whereIn('status', ['approved', 'in_progress'])
-                ->count() +
-                                ResearchRequest::where('user_id', $user->id)
-                                    ->where('status', 'in_progress')
-                                    ->count(),
-
-            'pending_projects' => IdeaRequest::where('user_id', $user->id)
-                ->whereIn('status', ['submitted', 'negotiation', 'quoted'])
-                ->count() +
-                                 ConsultationRequest::where('user_id', $user->id)
-                                     ->whereIn('status', ['submitted', 'filtered'])
-                                     ->count() +
-                                 ResearchRequest::where('user_id', $user->id)
-                                     ->whereIn('status', ['submitted', 'nda_pending'])
-                                     ->count(),
-
-            'completed_projects' => IdeaRequest::where('user_id', $user->id)->where('status', 'completed')->count() +
-                                   ConsultationRequest::where('user_id', $user->id)->where('status', 'completed')->count() +
-                                   ResearchRequest::where('user_id', $user->id)->where('status', 'completed')->count() +
-                                   IpRegistration::where('user_id', $user->id)->where('status', 'completed')->count() +
-                                   CopyrightRegistration::where('user_id', $user->id)->where('status', 'completed')->count(),
-
-            // Service requests stats
-            'requests_in_review' => IdeaRequest::where('user_id', $user->id)
-                ->whereIn('status', ['submitted', 'negotiation'])
-                ->count() +
-                                   ConsultationRequest::where('user_id', $user->id)
-                                       ->whereIn('status', ['submitted', 'filtered', 'assigned'])
-                                       ->count() +
-                                   ResearchRequest::where('user_id', $user->id)
-                                       ->whereIn('status', ['submitted', 'nda_pending', 'nda_signed'])
-                                       ->count(),
-
-            'requests_approved' => IdeaRequest::where('user_id', $user->id)
-                ->whereIn('status', ['approved', 'in_progress'])
-                ->count() +
-                                  ConsultationRequest::where('user_id', $user->id)
-                                      ->where('status', 'meeting_sent')
-                                      ->count() +
-                                  ResearchRequest::where('user_id', $user->id)
-                                      ->where('status', 'in_progress')
-                                      ->count(),
-
-            // Meetings stats (using whereDate properly on queries)
-            'meetings_this_week' => ConsultationRequest::where('user_id', $user->id)
-                ->whereBetween('meeting_scheduled_at', [now()->startOfWeek(), now()->endOfWeek()])
-                ->count() +
-                                   ResearchRequest::where('user_id', $user->id)
-                                       ->whereBetween('meeting_scheduled_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                       ->count() +
-                                   IpRegistration::where('user_id', $user->id)
-                                       ->whereBetween('meeting_requested_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                       ->count() +
-                                   CopyrightRegistration::where('user_id', $user->id)
-                                       ->whereBetween('meeting_requested_at', [now()->startOfWeek(), now()->endOfWeek()])
-                                       ->count(),
-
-            'meetings_today' => ConsultationRequest::where('user_id', $user->id)
-                ->whereDate('meeting_scheduled_at', today())
-                ->count() +
-                               ResearchRequest::where('user_id', $user->id)
-                                   ->whereDate('meeting_scheduled_at', today())
-                                   ->count() +
-                               IpRegistration::where('user_id', $user->id)
-                                   ->whereDate('meeting_requested_at', today())
-                                   ->count() +
-                               CopyrightRegistration::where('user_id', $user->id)
-                                   ->whereDate('meeting_requested_at', today())
-                                   ->count(),
-
-            // AI tokens
-            'total_tokens' => IdeaRequest::where('user_id', $user->id)->sum('tokens_used'),
-            'ai_assessments' => IdeaRequest::where('user_id', $user->id)->whereNotNull('ai_assessment_data')->count(),
-        ];
+        // Headline counters (shared with the mobile API for identical numbers).
+        $stats = app(ClientDashboardService::class)->stats($user);
 
         // Get recent activities - now using queries
         $recentActivities = collect();
