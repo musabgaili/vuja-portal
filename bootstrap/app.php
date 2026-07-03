@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\Localization::class,
         ]);
 
+        // Mobile API: set locale from the Accept-Language header (stateless).
+        $middleware->api(append: [
+            \App\Http\Middleware\ApiLocalization::class,
+        ]);
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
