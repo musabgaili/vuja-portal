@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\EngagementController;
 use App\Http\Controllers\Api\V1\MeetingController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +23,14 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
+
+        // Profile (self-service account management)
+        Route::get('profile', [ProfileController::class, 'show']);
+        Route::put('profile', [ProfileController::class, 'update']);
+        Route::put('profile/email', [ProfileController::class, 'updateEmail']);
+        Route::put('profile/password', [ProfileController::class, 'updatePassword']);
+        Route::put('profile/phone', [ProfileController::class, 'updatePhone']);
+        Route::delete('profile', [ProfileController::class, 'destroy']);
 
         // Notifications
         Route::get('notifications', [NotificationController::class, 'index']);
