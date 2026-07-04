@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\EngagementController;
 use App\Http\Controllers\Api\V1\MeetingController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\RequestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,9 @@ Route::prefix('v1')->group(function () {
         Route::put('profile/password', [ProfileController::class, 'updatePassword']);
         Route::put('profile/phone', [ProfileController::class, 'updatePhone']);
         Route::delete('profile', [ProfileController::class, 'destroy']);
+
+        // My Requests — unified feed across the service lines (client only)
+        Route::get('requests', [RequestController::class, 'index']);
 
         // Notifications
         Route::get('notifications', [NotificationController::class, 'index']);
