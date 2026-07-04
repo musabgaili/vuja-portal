@@ -16,16 +16,15 @@ existing **Vuja Portal** Laravel web app. **One role-switched app** serves **bot
 additive backend mobile API** (`/api/v1`, Sanctum tokens). **Flutter (Phase 2) has not started**
 (blocked: Flutter SDK not installed).
 
-**Done so far on the `mobile-api` branch (4 commits ahead of `main`, not merged):**
+**Done so far on the `mobile-api` branch (pushed to `origin/mobile-api`, not merged to main):**
 - Phase 0 audit (`docs/mobile/AUDIT.md`, 1,571 lines).
 - Phase 1 foundation: Accept-Language locale middleware + 30-day Sanctum token TTL.
-- Phase 1 client endpoints: **Profile** (full CRUD) and **Client Dashboard**.
+- Phase 1 client endpoints: **Profile** (full CRUD), **Client Dashboard**, and **My Requests**
+  unified feed (`GET /api/v1/requests`) — the "My Requests" open decision was resolved to the
+  **single unified feed**; aggregation extracted to `ClientRequestsService` (shared web+API).
 
-**Next up:** the rest of the client-P0 queue — **My Requests → Create request → Projects →
-Quotes → Invoices → Meetings (book/cancel)** — then staff P0, then API docs/tests, then Flutter.
-
-**One open decision** (see §9): shape of "My Requests" — recommended default is a **single
-unified feed** across the 7 service-line models.
+**Next up:** the rest of the client-P0 queue — **Create request → Projects → Quotes → Invoices →
+Engagement ledger → Meetings (book/cancel)** — then staff P0, then API docs/tests, then Flutter.
 
 ---
 
@@ -236,8 +235,8 @@ Meetings read ✅. **Still to build (in this order):**
 
 | # | Feature | Web source | Notes |
 |---|---|---|---|
-| 3 | **My Requests** — list + status across the **7 service lines** | `client.requests` | ideas, consultations, research, prototypes, 3D, IP, copyright. **Open decision below.** |
-| 4 | **Create a service request** (core lines intake) | `ideas/consultations/...` controllers | reuse existing FormRequests/validation. |
+| 3 | ~~**My Requests** — unified feed~~ ✅ **DONE** | `client.requests` | `GET /api/v1/requests` — 6 lines merged (idea/consultation/research/ip/copyright/threed; **prototypes have their own list**, mirroring the web). Shared `ClientRequestsService`. |
+| 4 | **Create a service request** (core lines intake) | `ideas/consultations/...` controllers | reuse existing FormRequests/validation. **← next** |
 | 5 | **Projects** — list, detail, milestone approve, docs/deliverables, comments, feedback | `projects.client.*` | |
 | 6 | **Quotes** — list, view, accept/reject, download | `quotes.client.*` | |
 | 7 | **Invoices** — list, view, upload receipt | `invoices.client.*` | file upload. |
