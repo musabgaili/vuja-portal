@@ -22,6 +22,8 @@ Route::prefix('client')->middleware(['auth'])->group(function () {
 
     // Client Dashboard
     Route::get('/dashboard', [DashboardController::class, 'clientDashboard'])->name('client.dashboard');
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('client.notifications.index');
+    Route::post('/notifications/seen', [\App\Http\Controllers\NotificationController::class, 'seen'])->name('client.notifications.seen');
 
     // My Requests - Unified view of all requests
     Route::get('/my-requests', [\App\Http\Controllers\ClientRequestsController::class, 'index'])->name('client.requests');

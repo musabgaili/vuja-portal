@@ -118,6 +118,7 @@
                     <h1>@yield('title', __('portal.dashboard'))</h1>
                 </div>
                 <div class="header-right d-flex align-items-center gap-2">
+                    @include('partials.notifications')
                     @include('partials.theme-toggle')
                     @include('partials.locale-switcher')
                     <div class="user-menu">

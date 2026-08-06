@@ -2,6 +2,8 @@
     $notifSvc = app(\App\Services\NotificationService::class);
     $notifItems = $notifSvc->feed(auth()->user());
     $notifUnread = $notifSvc->unreadCount(auth()->user());
+    $notifIndexRoute = auth()->user()->isInternal() ? 'notifications.index' : 'client.notifications.index';
+    $notifSeenRoute = auth()->user()->isInternal() ? 'notifications.seen' : 'client.notifications.seen';
 @endphp
 <div class="dropdown notif-bell">
     <button type="button" id="notifBell" class="btn position-relative" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
@@ -25,7 +27,7 @@
             <span class="dropdown-item text-muted">{{ __('portal.notif.empty') }}</span>
         @endforelse
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item text-center fw-bold" href="{{ route('notifications.index') }}" style="color:var(--primary-color);">{{ __('portal.notif.view_all') }}</a>
+        <a class="dropdown-item text-center fw-bold" href="{{ route($notifIndexRoute) }}" style="color:var(--primary-color);">{{ __('portal.notif.view_all') }}</a>
     </div>
 </div>
 <script>
@@ -35,7 +37,7 @@
     bell.addEventListener('click', function () {
         var badge = document.getElementById('notifBadge');
         if (!badge || badge.style.display === 'none') return;
-        fetch("{{ route('notifications.seen') }}", {
+        fetch("{{ route($notifSeenRoute) }}", {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
         }).then(function () { badge.style.display = 'none'; }).catch(function () {});

@@ -1,4 +1,4 @@
-@extends('layouts.internal-dashboard')
+@extends(auth()->user()->isInternal() ? 'layouts.internal-dashboard' : 'layouts.dashboard')
 @section('title', __('portal.notif.title'))
 
 @section('breadcrumbs')
@@ -11,7 +11,9 @@
         <h1 style="margin:0;font-size:1.5rem;"><i class="fas fa-bell"></i> {{ __('portal.notif.title') }}</h1>
         <p style="margin:.25rem 0 0;opacity:.9;">{{ __('portal.notif.page_sub') }}</p>
     </div>
-    <a href="{{ route('notifications.preferences') }}" class="btn btn-light"><i class="fas fa-sliders"></i> {{ __('portal.notif.email_settings') }}</a>
+    @if(auth()->user()->isInternal())
+        <a href="{{ route('notifications.preferences') }}" class="btn btn-light"><i class="fas fa-sliders"></i> {{ __('portal.notif.email_settings') }}</a>
+    @endif
 </div>
 
 <div class="card">

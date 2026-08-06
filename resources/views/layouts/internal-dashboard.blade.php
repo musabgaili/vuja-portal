@@ -253,6 +253,10 @@
                     </a>
                     @endif
                     @if(auth()->user()->isManager())
+                    <a href="{{ route('payment-requests.index') }}" class="nav-item {{ request()->routeIs('payment-requests.*') ? 'active' : '' }}">
+                        <i class="fas fa-credit-card"></i>
+                        {{ __('portal.payments.title') }}
+                    </a>
                     <a href="{{ route('pricing.admin') }}" class="nav-item">
                         <i class="fas fa-cogs"></i>
                         {{ __('portal.nav.pricing_admin') }}

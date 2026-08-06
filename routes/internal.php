@@ -4,7 +4,6 @@ use App\Http\Controllers\ControlTowerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\FinancialReportController;
-use App\Http\Controllers\WeeklyPlannerController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ServiceRequestTypeController;
 use App\Http\Controllers\Services\ConsultationRequestController;
@@ -15,6 +14,7 @@ use App\Http\Controllers\Services\ResearchRequestController;
 use App\Http\Controllers\Services\ServiceWorkController;
 use App\Http\Controllers\StepFormFieldController;
 use App\Http\Controllers\StepperServiceRequestController;
+use App\Http\Controllers\WeeklyPlannerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -320,6 +320,13 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
     // MANAGER-ONLY ROUTES
     // ============================================
     Route::middleware(['is_manager'])->group(function () {
+
+        // Standalone Moyasar payment requests — manager-only until module links
+        // (invoice, quote, project, service request) are introduced deliberately.
+        Route::get('/payment-requests', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'index'])->name('payment-requests.index');
+        Route::post('/payment-requests', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'store'])->name('payment-requests.store');
+        Route::get('/payment-requests/{paymentRequest}', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'show'])->name('payment-requests.show');
+        Route::post('/payment-requests/{paymentRequest}/send', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'send'])->name('payment-requests.send');
 
         // ENGAGEMENT SETTINGS — manager-tunable Impact-Points rulebook
         Route::get('/engagement/settings', [\App\Http\Controllers\EngagementSettingsController::class, 'edit'])->name('engagement.settings.edit');

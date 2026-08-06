@@ -73,6 +73,24 @@ Route::get('/invite/{user}/accept', [\App\Http\Controllers\Auth\InviteController
 Route::post('/invite/{user}/accept', [\App\Http\Controllers\Auth\InviteController::class, 'store'])
     ->middleware('signed');
 
+// Public payment request: the emailed/copied page is signed and expires, while
+// billing/attempt posts are protected by the unguessable UUID, CSRF and DB expiry.
+Route::get('/pay/{paymentRequest}', [\App\Http\Controllers\PublicPaymentRequestController::class, 'show'])
+    ->middleware(['signed', 'throttle:60,1'])
+    ->name('payments.public.show');
+Route::post('/pay/{paymentRequest}/billing', [\App\Http\Controllers\PublicPaymentRequestController::class, 'billing'])
+    ->middleware('throttle:20,1')
+    ->name('payments.public.billing');
+Route::post('/pay/{paymentRequest}/attempts', [\App\Http\Controllers\PublicPaymentAttemptController::class, 'store'])
+    ->middleware('throttle:20,1')
+    ->name('payments.public.attempts.store');
+Route::get('/pay/{paymentRequest}/callback', \App\Http\Controllers\MoyasarCallbackController::class)
+    ->middleware('throttle:60,1')
+    ->name('payments.callback');
+Route::post('/webhooks/moyasar', \App\Http\Controllers\MoyasarWebhookController::class)
+    ->middleware('throttle:120,1')
+    ->name('webhooks.moyasar');
+
 // ============================================
 // AUTHENTICATED ROUTES
 // ============================================

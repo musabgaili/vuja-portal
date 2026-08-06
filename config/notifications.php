@@ -72,5 +72,10 @@ return [
             'default' => true,
             'audience' => 'internal',
         ],
+        'payment_request' => [
+            'label' => 'portal.notif_prefs.type.payment_request',
+            'default' => true,
+            'audience' => 'all',
+        ],
     ],
 ];

@@ -100,6 +100,22 @@ class NotificationService
             $push($l->created_at, 'fa-bolt', __('portal.notif.ip', ['points' => $sign.$l->points]), route('engagement.index'));
         }
 
+        // Active payment requests matched to this client's email/account.
+        foreach (\App\Models\PaymentRequest::where('client_id', $user->id)
+            ->where('expires_at', '>', now())
+            ->whereNotIn('status', ['paid', 'cancelled', 'refunded', 'voided'])
+            ->latest('sent_at')->limit(5)->get() as $paymentRequest) {
+            $push(
+                $paymentRequest->sent_at ?? $paymentRequest->created_at,
+                'fa-credit-card',
+                __('portal.notif.payment_request', [
+                    'title' => $paymentRequest->title,
+                    'amount' => $paymentRequest->amount().' '.$paymentRequest->currency,
+                ]),
+                \App\Actions\Payments\SendPaymentRequestAction::publicUrl($paymentRequest),
+            );
+        }
+
         // Outcomes on the user's own portal-improvement ideas (approved / rejected).
         foreach (ImprovementIdea::where('user_id', $user->id)
             ->whereIn('status', ['approved', 'rejected', 'implemented'])
