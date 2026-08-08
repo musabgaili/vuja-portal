@@ -30,6 +30,15 @@ class PaymentRequestTest extends TestCase
         ]);
     }
 
+    public function test_manager_internal_dashboard_renders_with_payment_nav(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+
+        $this->actingAs($manager)->get(route('internal.dashboard'))
+            ->assertOk()
+            ->assertSee(__('portal.payments.title'));
+    }
+
     public function test_only_manager_can_create_payment_request(): void
     {
         $employee = $this->user(UserRole::EMPLOYEE, 'employee');

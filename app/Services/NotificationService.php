@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\EngagementLog;
 use App\Models\ImprovementIdea;
+use App\Models\PaymentRequest;
 use App\Models\ProjectTask;
 use App\Models\Quote;
 use App\Models\SpendRequest;
@@ -11,6 +12,8 @@ use App\Models\StaffTask;
 use App\Models\User;
 use App\Models\WeeklyPlan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Lightweight notification feed computed from existing tables (no notifications
@@ -101,19 +104,21 @@ class NotificationService
         }
 
         // Active payment requests matched to this client's email/account.
-        foreach (\App\Models\PaymentRequest::where('client_id', $user->id)
-            ->where('expires_at', '>', now())
-            ->whereNotIn('status', ['paid', 'cancelled', 'refunded', 'voided'])
-            ->latest('sent_at')->limit(5)->get() as $paymentRequest) {
-            $push(
-                $paymentRequest->sent_at ?? $paymentRequest->created_at,
-                'fa-credit-card',
-                __('portal.notif.payment_request', [
-                    'title' => $paymentRequest->title,
-                    'amount' => $paymentRequest->amount().' '.$paymentRequest->currency,
-                ]),
-                \App\Actions\Payments\SendPaymentRequestAction::publicUrl($paymentRequest),
-            );
+        if (Schema::hasTable('payment_requests') && Route::has('payments.public.show')) {
+            foreach (PaymentRequest::where('client_id', $user->id)
+                ->where('expires_at', '>', now())
+                ->whereNotIn('status', ['paid', 'cancelled', 'refunded', 'voided'])
+                ->latest('sent_at')->limit(5)->get() as $paymentRequest) {
+                $push(
+                    $paymentRequest->sent_at ?? $paymentRequest->created_at,
+                    'fa-credit-card',
+                    __('portal.notif.payment_request', [
+                        'title' => $paymentRequest->title,
+                        'amount' => $paymentRequest->amount().' '.$paymentRequest->currency,
+                    ]),
+                    \App\Actions\Payments\SendPaymentRequestAction::publicUrl($paymentRequest),
+                );
+            }
         }
 
         // Outcomes on the user's own portal-improvement ideas (approved / rejected).
