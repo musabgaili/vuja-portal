@@ -6,6 +6,7 @@ use App\Models\PaymentRequest;
 use App\Services\Scope\Render\PdfRenderer;
 use App\Services\Scope\Render\QuoteDocumentRenderer;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicPaymentQuoteController extends Controller
@@ -17,6 +18,10 @@ class PublicPaymentQuoteController extends Controller
     ): Response {
         abort_if($paymentRequest->isExpired() && $paymentRequest->status !== 'paid', 410, __('portal.payments.expired'));
         abort_if(in_array($paymentRequest->status, ['cancelled', 'refunded', 'voided'], true), 410);
+
+        if ($paymentRequest->hasQuoteFile() && Storage::disk('private')->exists($paymentRequest->quote_file)) {
+            return Storage::disk('private')->download($paymentRequest->quote_file, $paymentRequest->quoteFileName());
+        }
 
         $quote = $paymentRequest->quote();
         abort_unless($quote, 404, __('portal.payments.quote_missing'));

@@ -8,13 +8,13 @@ use App\Enums\UserStatus;
 use App\Jobs\ProcessMoyasarWebhook;
 use App\Mail\GenericNotification;
 use App\Models\PaymentRequest;
-use App\Models\Quote;
 use App\Models\User;
-use App\Services\Scope\Render\PdfRenderer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -162,35 +162,40 @@ class PaymentRequestTest extends TestCase
         $this->assertDatabaseHas('payment_attempts', ['moyasar_payment_id' => $paymentId]);
     }
 
-    public function test_manager_can_attach_quote_and_public_page_shows_pricing(): void
+    public function test_manager_can_attach_quote_number_and_file(): void
     {
+        Storage::fake('private');
         $manager = $this->user(UserRole::MANAGER, 'manager');
-        $quote = $this->quote();
+        $file = UploadedFile::fake()->create('quotation.pdf', 120, 'application/pdf');
 
         $this->actingAs($manager)->get(route('payment-requests.create'))
             ->assertOk()
             ->assertSee(__('portal.payments.quote_optional'))
-            ->assertSee('Q0001');
+            ->assertSee(__('portal.payments.quote_file_button'))
+            ->assertDontSee('Q0001');
 
         $this->actingAs($manager)->post(route('payment-requests.store'), [
             ...$this->payload(),
-            'quote_id' => $quote->id,
+            'quote_number' => 'Q0001',
+            'quote_file' => $file,
         ])->assertRedirect();
 
         $paymentRequest = PaymentRequest::firstOrFail();
-        $this->assertTrue($paymentRequest->quote()->is($quote));
+        $this->assertSame('Q0001', $paymentRequest->quote_number);
+        $this->assertNotNull($paymentRequest->quote_file);
+        Storage::disk('private')->assertExists($paymentRequest->quote_file);
 
         $this->get(SendPaymentRequestAction::publicUrl($paymentRequest))
             ->assertOk()
             ->assertSee('Q0001')
-            ->assertSee('Hardware design')
             ->assertSee(__('portal.payments.download_quote'))
             ->assertSee(__('portal.payments.brand'))
             ->assertDontSee('Laravel');
     }
 
-    public function test_signed_quote_download_requires_attached_quote_and_signature(): void
+    public function test_signed_quote_download_requires_file_and_signature(): void
     {
+        Storage::fake('private');
         $paymentRequest = $this->paymentRequest();
 
         $this->get(route('payments.public.quote', $paymentRequest))->assertForbidden();
@@ -201,22 +206,15 @@ class PaymentRequestTest extends TestCase
             ['paymentRequest' => $paymentRequest],
         ))->assertNotFound();
 
-        $quote = $this->quote();
+        $path = UploadedFile::fake()->create('quotation.pdf', 80, 'application/pdf')->store('payment-quotes', 'private');
         $paymentRequest->update([
-            'payable_type' => $quote->getMorphClass(),
-            'payable_id' => $quote->id,
+            'quote_number' => 'Q0001',
+            'quote_file' => $path,
         ]);
-
-        $this->mock(PdfRenderer::class, function ($mock) {
-            $mock->shouldReceive('download')->once()->andReturn(response('%PDF-1.4', 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="Q0001.pdf"',
-            ]));
-        });
 
         $this->get(SendPaymentRequestAction::quoteDownloadUrl($paymentRequest->fresh()))
             ->assertOk()
-            ->assertHeader('content-type', 'application/pdf');
+            ->assertDownload('Q0001.pdf');
     }
 
     public function test_manager_index_is_searchable_and_sortable(): void
@@ -368,34 +366,5 @@ class PaymentRequestTest extends TestCase
             'amount' => '125.50',
             'send' => '0',
         ];
-    }
-
-    private function quote(): Quote
-    {
-        $quote = Quote::query()->create([
-            'title' => 'Smart kiosk prototype',
-            'quote_number' => 'Q0001',
-            'status' => 'approved',
-            'language' => 'en',
-            'customer_category' => 'entrepreneur',
-            'total_client' => 1500,
-            'subtotal' => 1500,
-            'vat_rate' => 15,
-            'vat_amount' => 225,
-            'grand_total' => 1725,
-            'validity_days' => 30,
-        ]);
-
-        $quote->items()->create([
-            'name' => 'Hardware design',
-            'category' => 'services',
-            'type' => 'service',
-            'qty' => 1,
-            'unit_price' => 1500,
-            'line_client' => 1500,
-            'line_internal' => 800,
-        ]);
-
-        return $quote;
     }
 }

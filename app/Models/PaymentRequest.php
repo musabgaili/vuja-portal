@@ -19,9 +19,10 @@ class PaymentRequest extends Model
 
     protected $fillable = [
         'uuid', 'client_id', 'created_by', 'payable_type', 'payable_id',
-        'name', 'email', 'phone', 'title', 'description', 'quantity',
-        'unit_amount_minor', 'total_amount_minor', 'currency', 'tax_id',
-        'billing_address', 'status', 'expires_at', 'sent_at', 'paid_at',
+        'name', 'email', 'phone', 'title', 'description', 'quote_number',
+        'quote_file', 'quantity', 'unit_amount_minor', 'total_amount_minor',
+        'currency', 'tax_id', 'billing_address', 'status', 'expires_at',
+        'sent_at', 'paid_at',
     ];
 
     protected function casts(): array
@@ -56,6 +57,30 @@ class PaymentRequest extends Model
         $this->loadMissing('payable');
 
         return $this->payable instanceof Quote ? $this->payable : null;
+    }
+
+    public function displayedQuoteNumber(): ?string
+    {
+        $number = trim((string) ($this->quote_number ?: $this->quote()?->quote_number));
+
+        return $number !== '' ? $number : null;
+    }
+
+    public function hasQuoteFile(): bool
+    {
+        return filled($this->quote_file);
+    }
+
+    public function hasQuoteDownload(): bool
+    {
+        return $this->hasQuoteFile() || $this->quote() !== null;
+    }
+
+    public function quoteFileName(): string
+    {
+        $extension = pathinfo((string) $this->quote_file, PATHINFO_EXTENSION) ?: 'pdf';
+
+        return ($this->displayedQuoteNumber() ?: 'quotation').'.'.$extension;
     }
 
     public function attempts(): HasMany

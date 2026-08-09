@@ -327,6 +327,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         Route::get('/payment-requests/create', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'create'])->name('payment-requests.create');
         Route::post('/payment-requests', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'store'])->name('payment-requests.store');
         Route::get('/payment-requests/{paymentRequest}', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'show'])->name('payment-requests.show');
+        Route::get('/payment-requests/{paymentRequest}/quote', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'quote'])->name('payment-requests.quote');
         Route::post('/payment-requests/{paymentRequest}/send', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'send'])->name('payment-requests.send');
 
         // ENGAGEMENT SETTINGS — manager-tunable Impact-Points rulebook

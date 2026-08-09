@@ -3,8 +3,8 @@
 namespace App\Actions\Payments;
 
 use App\Models\PaymentRequest;
-use App\Models\Quote;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 class CreatePaymentRequestAction
@@ -22,18 +22,22 @@ class CreatePaymentRequestAction
 
             $unitAmountMinor = $this->toMinorUnits((string) $data['amount']);
             $quantity = (int) $data['quantity'];
-            $quote = ! empty($data['quote_id']) ? Quote::query()->findOrFail($data['quote_id']) : null;
+            $quoteNumber = filled($data['quote_number'] ?? null) ? trim((string) $data['quote_number']) : null;
+            $quoteFile = $data['quote_file'] ?? null;
+            $quoteFilePath = $quoteFile instanceof UploadedFile
+                ? $quoteFile->store('payment-quotes', 'private')
+                : null;
 
             $paymentRequest = PaymentRequest::create([
                 'client_id' => $client?->id,
                 'created_by' => $creator->id,
-                'payable_type' => $quote ? $quote->getMorphClass() : null,
-                'payable_id' => $quote?->id,
                 'name' => trim($data['name']),
                 'email' => $email,
                 'phone' => $data['phone'] ?? null,
                 'title' => trim($data['title']),
                 'description' => $data['description'] ?? null,
+                'quote_number' => $quoteNumber,
+                'quote_file' => $quoteFilePath,
                 'quantity' => $quantity,
                 'unit_amount_minor' => $unitAmountMinor,
                 'total_amount_minor' => $unitAmountMinor * $quantity,
@@ -47,13 +51,13 @@ class CreatePaymentRequestAction
                 'created',
                 payload: [
                     'created_by' => $creator->id,
-                    'quote_id' => $quote?->id,
-                    'quote_number' => $quote?->quote_number,
+                    'quote_number' => $quoteNumber,
+                    'quote_file' => filled($quoteFilePath),
                 ],
                 outcome: 'created',
             );
 
-            return $paymentRequest->fresh(['client', 'creator', 'payable']);
+            return $paymentRequest->fresh(['client', 'creator']);
         });
     }
 

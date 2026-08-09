@@ -52,7 +52,7 @@ class MoyasarCallbackController extends Controller
         return view('payment-requests.public', [
             'paymentRequest' => $paymentRequest,
             'quote' => $paymentRequest->quote(),
-            'quoteDownloadUrl' => $paymentRequest->quote() ? SendPaymentRequestAction::quoteDownloadUrl($paymentRequest) : null,
+            'quoteDownloadUrl' => $paymentRequest->hasQuoteDownload() ? SendPaymentRequestAction::quoteDownloadUrl($paymentRequest) : null,
             'paymentReady' => filled($paymentRequest->tax_id) && filled($paymentRequest->billing_address),
             'result' => $result,
         ]);

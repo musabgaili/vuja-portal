@@ -84,7 +84,8 @@
         ? 'images/vd-logo-dark-trimmed.png'
         : 'images/vd-logo-dark.png';
     $quote = $quote ?? $paymentRequest->quote();
-    $quoteDownloadUrl = $quoteDownloadUrl ?? ($quote ? \App\Actions\Payments\SendPaymentRequestAction::quoteDownloadUrl($paymentRequest) : null);
+    $quoteNumber = $paymentRequest->displayedQuoteNumber();
+    $quoteDownloadUrl = $quoteDownloadUrl ?? ($paymentRequest->hasQuoteDownload() ? \App\Actions\Payments\SendPaymentRequestAction::quoteDownloadUrl($paymentRequest) : null);
     $quoteItems = $quote?->clientVisibleItems() ?? collect();
 @endphp
 <main class="pay-shell">
@@ -106,15 +107,15 @@
     <div class="pay-layout">
         <aside class="pay-docket">
             <div class="docket-label">{{ __('portal.payments.pay_securely') }}</div>
-            @if($quote)
-                <div class="quote-chip">{{ __('portal.payments.quote_number') }} · {{ $quote->quote_number ?: '#'.$quote->id }}</div>
+            @if($quoteNumber)
+                <div class="quote-chip">{{ __('portal.payments.quote_number') }} · {{ $quoteNumber }}</div>
             @endif
             <h1>{{ $paymentRequest->title }}</h1>
             <p class="docket-desc">{{ $paymentRequest->description ?: __('portal.payments.public_intro') }}</p>
 
-            @if($quote)
+            @if($quote || $quoteDownloadUrl)
                 <div class="docket-label" style="margin-bottom:.55rem">{{ __('portal.payments.quote_details') }}</div>
-                @if($quoteItems->isNotEmpty())
+                @if($quote && $quoteItems->isNotEmpty())
                     <table class="quote-table">
                         <thead>
                             <tr>
@@ -133,14 +134,14 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="quote-totals">
+                        @if((float) $quote->subtotal > 0 || (float) $quote->vat_amount > 0)
+                            <div><span>{{ __('scope.subtotal') }}</span><strong>{{ number_format((float) $quote->subtotal, 2) }} {{ $paymentRequest->currency }}</strong></div>
+                            <div><span>{{ __('scope.vat', ['rate' => rtrim(rtrim(number_format((float) $quote->vat_rate, 2), '0'), '.')]) }}</span><strong>{{ number_format((float) $quote->vat_amount, 2) }} {{ $paymentRequest->currency }}</strong></div>
+                        @endif
+                        <div><span>{{ __('portal.payments.quote_total') }}</span><strong>{{ number_format($quote->invoiceTotal(), 2) }} {{ $paymentRequest->currency }}</strong></div>
+                    </div>
                 @endif
-                <div class="quote-totals">
-                    @if((float) $quote->subtotal > 0 || (float) $quote->vat_amount > 0)
-                        <div><span>{{ __('scope.subtotal') }}</span><strong>{{ number_format((float) $quote->subtotal, 2) }} {{ $paymentRequest->currency }}</strong></div>
-                        <div><span>{{ __('scope.vat', ['rate' => rtrim(rtrim(number_format((float) $quote->vat_rate, 2), '0'), '.')]) }}</span><strong>{{ number_format((float) $quote->vat_amount, 2) }} {{ $paymentRequest->currency }}</strong></div>
-                    @endif
-                    <div><span>{{ __('portal.payments.quote_total') }}</span><strong>{{ number_format($quote->invoiceTotal(), 2) }} {{ $paymentRequest->currency }}</strong></div>
-                </div>
                 @if($quoteDownloadUrl)
                     <a class="quote-download" href="{{ $quoteDownloadUrl }}">{{ __('portal.payments.download_quote') }}</a>
                 @endif

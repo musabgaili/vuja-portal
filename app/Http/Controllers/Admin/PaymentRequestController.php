@@ -7,10 +7,11 @@ use App\Actions\Payments\SendPaymentRequestAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePaymentRequestRequest;
 use App\Models\PaymentRequest;
-use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentRequestController extends Controller
 {
@@ -29,7 +30,8 @@ class PaymentRequestController extends Controller
             $term = trim((string) $request->input('q'));
             $query->where(function ($builder) use ($term) {
                 $builder->where('name', 'like', '%'.$term.'%')
-                    ->orWhere('email', 'like', '%'.$term.'%');
+                    ->orWhere('email', 'like', '%'.$term.'%')
+                    ->orWhere('quote_number', 'like', '%'.$term.'%');
             });
         }
 
@@ -65,16 +67,9 @@ class PaymentRequestController extends Controller
         ]);
     }
 
-    public function create(Request $request): View
+    public function create(): View
     {
-        $quote = $request->filled('quote')
-            ? Quote::query()->with(['client:id,name,email', 'company:id,name', 'contact:id,name,email'])->find($request->input('quote'))
-            : null;
-
-        return view('payment-requests.create', [
-            'quotes' => $this->quotes(),
-            'quote' => $quote,
-        ]);
+        return view('payment-requests.create');
     }
 
     public function show(PaymentRequest $paymentRequest): View
@@ -114,12 +109,14 @@ class PaymentRequestController extends Controller
         return back()->with('success', __('portal.payments.sent'));
     }
 
-    private function quotes()
+    public function quote(PaymentRequest $paymentRequest): StreamedResponse
     {
-        return Quote::query()
-            ->with(['client:id,name,email', 'company:id,name', 'contact:id,name,email'])
-            ->latest('id')
-            ->limit(200)
-            ->get(['id', 'quote_number', 'title', 'grand_total', 'total_client', 'status', 'client_id', 'company_id', 'contact_id']);
+        abort_unless(
+            $paymentRequest->hasQuoteFile() && Storage::disk('private')->exists($paymentRequest->quote_file),
+            404,
+            __('portal.payments.quote_missing'),
+        );
+
+        return Storage::disk('private')->download($paymentRequest->quote_file, $paymentRequest->quoteFileName());
     }
 }
