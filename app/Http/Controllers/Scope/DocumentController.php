@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Services\Scope\Render\DocxRenderer;
 use App\Services\Scope\Render\PdfRenderer;
+use App\Services\Scope\Render\QuoteDocumentRenderer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as SfResponse;
@@ -17,12 +18,14 @@ use Symfony\Component\HttpFoundation\Response as SfResponse;
  */
 class DocumentController extends Controller
 {
+    public function __construct(private QuoteDocumentRenderer $documents) {}
+
     /** Full-page online document viewer (also the PDF source). */
     public function document(Quote $quote)
     {
         $this->guard($quote);
 
-        return response($this->renderHtml($quote));
+        return response($this->documents->html($quote));
     }
 
     /** PDF download. */
@@ -30,7 +33,10 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, $this->engineFlags()), $this->filename($quote)));
+        return $this->safeExport($quote, fn () => $renderer->download(
+            $this->documents->html($quote, $this->documents->engineFlags()),
+            $this->documents->filename($quote),
+        ));
     }
 
     /** PDF streamed inline (view in the browser before downloading). */
@@ -38,7 +44,10 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $this->safeExport($quote, fn () => $renderer->stream($this->renderHtml($quote, $this->engineFlags()), $this->filename($quote)));
+        return $this->safeExport($quote, fn () => $renderer->stream(
+            $this->documents->html($quote, $this->documents->engineFlags()),
+            $this->documents->filename($quote),
+        ));
     }
 
     /** DOCX download (branded equivalent). */
@@ -46,7 +55,7 @@ class DocumentController extends Controller
     {
         $this->guard($quote);
 
-        return $this->safeExport($quote, fn () => $renderer->download($quote, $this->filename($quote, 'docx')));
+        return $this->safeExport($quote, fn () => $renderer->download($quote, $this->documents->filename($quote, 'docx')));
     }
 
     /** Company technical offer (technical sections only, no commercial tables). */
@@ -55,23 +64,10 @@ class DocumentController extends Controller
         $this->guard($quote);
         abort_unless($quote->customer_category === 'company', 404);
 
-        return $this->safeExport($quote, fn () => $renderer->download($this->renderHtml($quote, ['technical' => true] + $this->engineFlags()), $this->filename($quote, 'pdf', '-technical')));
-    }
-
-    /**
-     * HTML-mode flags per PDF engine. mPDF needs the pdf-mode HTML (it supplies
-     * the letterhead watermark + margins). Browsershot is Chrome, so it renders
-     * the SAME HTML as the online preview (pdf=false) — letterhead + RTL come out
-     * exactly as previewed.
-     */
-    private function engineFlags(): array
-    {
-        // Browsershot is Chrome → render the SAME HTML as the preview (pdf=false),
-        // but embed the letterhead as a data URI so it never depends on Chrome
-        // fetching the asset URL over the network. mPDF supplies its own letterhead.
-        return config('scope.pdf_engine', 'mpdf') === 'browsershot'
-            ? ['embedAssets' => true]
-            : ['pdf' => true];
+        return $this->safeExport($quote, fn () => $renderer->download(
+            $this->documents->html($quote, ['technical' => true] + $this->documents->engineFlags()),
+            $this->documents->filename($quote, 'pdf', '-technical'),
+        ));
     }
 
     /**
@@ -95,44 +91,6 @@ class DocumentController extends Controller
             return redirect()->route('scope-planner.show', $quote)
                 ->with('error', __('portal.scope_planner.export_failed'));
         }
-    }
-
-    /** Render the tier document to HTML in the quote's OWN language (not the UI locale). */
-    private function renderHtml(Quote $quote, array $extra = []): string
-    {
-        $previous = app()->getLocale();
-        app()->setLocale($quote->language ?: $previous);
-
-        try {
-            // $extra MUST win over the defaults: the array `+` operator keeps the
-            // LEFT operand on key collisions, so caller flags (e.g. technicalPdf's
-            // 'technical' => true) have to be the left side or they are silently
-            // discarded — which previously made the technical offer leak pricing.
-            return view($this->tierView($quote), $extra + $this->viewData($quote))->render();
-        } finally {
-            app()->setLocale($previous);
-        }
-    }
-
-    private function viewData(Quote $quote): array
-    {
-        $quote->loadMissing(['items', 'scopes', 'milestones', 'client', 'creator']);
-
-        return ['quote' => $quote, 'technical' => false];
-    }
-
-    private function tierView(Quote $quote): string
-    {
-        return 'scope.'.match ($quote->customer_category) {
-            'student' => 'student',
-            'entrepreneur' => 'entrepreneur',
-            default => 'company',
-        };
-    }
-
-    private function filename(Quote $quote, string $ext = 'pdf', string $suffix = ''): string
-    {
-        return ($quote->quote_number ?: 'quote-'.$quote->id).$suffix.'.'.$ext;
     }
 
     private function guard(Quote $quote): void

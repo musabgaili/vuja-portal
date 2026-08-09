@@ -324,6 +324,7 @@ Route::prefix('internal')->middleware(['auth', 'is_internal'])->group(function (
         // Standalone Moyasar payment requests — manager-only until module links
         // (invoice, quote, project, service request) are introduced deliberately.
         Route::get('/payment-requests', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'index'])->name('payment-requests.index');
+        Route::get('/payment-requests/create', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'create'])->name('payment-requests.create');
         Route::post('/payment-requests', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'store'])->name('payment-requests.store');
         Route::get('/payment-requests/{paymentRequest}', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'show'])->name('payment-requests.show');
         Route::post('/payment-requests/{paymentRequest}/send', [\App\Http\Controllers\Admin\PaymentRequestController::class, 'send'])->name('payment-requests.send');

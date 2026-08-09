@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Payments\RecordPaymentRequestEventAction;
+use App\Actions\Payments\SendPaymentRequestAction;
 use App\Models\PaymentRequest;
 use App\Services\Payments\MoyasarClient;
 use App\Services\Payments\PaymentStatusSynchronizer;
@@ -46,8 +47,12 @@ class MoyasarCallbackController extends Controller
             );
         }
 
+        $paymentRequest = $paymentRequest->fresh(['attempts', 'payable.items']);
+
         return view('payment-requests.public', [
-            'paymentRequest' => $paymentRequest->fresh(['attempts']),
+            'paymentRequest' => $paymentRequest,
+            'quote' => $paymentRequest->quote(),
+            'quoteDownloadUrl' => $paymentRequest->quote() ? SendPaymentRequestAction::quoteDownloadUrl($paymentRequest) : null,
             'paymentReady' => filled($paymentRequest->tax_id) && filled($paymentRequest->billing_address),
             'result' => $result,
         ]);

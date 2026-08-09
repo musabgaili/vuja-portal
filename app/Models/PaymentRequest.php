@@ -12,6 +12,11 @@ class PaymentRequest extends Model
 {
     use HasFactory, HasUuidRouteKey;
 
+    public const STATUSES = [
+        'pending', 'sent', 'opened', 'authorized', 'paid',
+        'failed', 'expired', 'cancelled', 'refunded', 'voided',
+    ];
+
     protected $fillable = [
         'uuid', 'client_id', 'created_by', 'payable_type', 'payable_id',
         'name', 'email', 'phone', 'title', 'description', 'quantity',
@@ -46,6 +51,13 @@ class PaymentRequest extends Model
         return $this->morphTo();
     }
 
+    public function quote(): ?Quote
+    {
+        $this->loadMissing('payable');
+
+        return $this->payable instanceof Quote ? $this->payable : null;
+    }
+
     public function attempts(): HasMany
     {
         return $this->hasMany(PaymentAttempt::class);
@@ -76,6 +88,11 @@ class PaymentRequest extends Model
         return $this->isExpired() && ! in_array($this->status, ['paid', 'refunded', 'voided', 'cancelled'], true)
             ? 'expired'
             : $this->status;
+    }
+
+    public function statusLabel(): string
+    {
+        return __('portal.payments.status.'.$this->displayStatus());
     }
 
     public function statusColor(): string

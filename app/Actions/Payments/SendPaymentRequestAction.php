@@ -45,4 +45,13 @@ class SendPaymentRequestAction
             ['paymentRequest' => $paymentRequest],
         );
     }
+
+    public static function quoteDownloadUrl(PaymentRequest $paymentRequest): string
+    {
+        return URL::temporarySignedRoute(
+            'payments.public.quote',
+            $paymentRequest->expires_at,
+            ['paymentRequest' => $paymentRequest],
+        );
+    }
 }

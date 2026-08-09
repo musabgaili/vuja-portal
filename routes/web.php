@@ -78,6 +78,9 @@ Route::post('/invite/{user}/accept', [\App\Http\Controllers\Auth\InviteControlle
 Route::get('/pay/{paymentRequest}', [\App\Http\Controllers\PublicPaymentRequestController::class, 'show'])
     ->middleware(['signed', 'throttle:60,1'])
     ->name('payments.public.show');
+Route::get('/pay/{paymentRequest}/quote.pdf', \App\Http\Controllers\PublicPaymentQuoteController::class)
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('payments.public.quote');
 Route::post('/pay/{paymentRequest}/billing', [\App\Http\Controllers\PublicPaymentRequestController::class, 'billing'])
     ->middleware('throttle:20,1')
     ->name('payments.public.billing');

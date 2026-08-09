@@ -21,6 +21,7 @@ class CreatePaymentRequestRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:3000'],
             'quantity' => ['required', 'integer', 'min:1', 'max:10000'],
             'amount' => ['required', 'decimal:0,2', 'min:1', 'max:99999999.99'],
+            'quote_id' => ['nullable', 'integer', 'exists:quotes,id'],
             'send' => ['nullable', 'boolean'],
         ];
     }

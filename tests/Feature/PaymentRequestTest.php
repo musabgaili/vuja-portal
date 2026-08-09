@@ -8,11 +8,14 @@ use App\Enums\UserStatus;
 use App\Jobs\ProcessMoyasarWebhook;
 use App\Mail\GenericNotification;
 use App\Models\PaymentRequest;
+use App\Models\Quote;
 use App\Models\User;
+use App\Services\Scope\Render\PdfRenderer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class PaymentRequestTest extends TestCase
@@ -43,6 +46,8 @@ class PaymentRequestTest extends TestCase
     {
         $employee = $this->user(UserRole::EMPLOYEE, 'employee');
 
+        $this->actingAs($employee)->get(route('payment-requests.index'))->assertForbidden();
+        $this->actingAs($employee)->get(route('payment-requests.create'))->assertForbidden();
         $this->actingAs($employee)->post(route('payment-requests.store'), $this->payload())
             ->assertForbidden();
 
@@ -157,6 +162,127 @@ class PaymentRequestTest extends TestCase
         $this->assertDatabaseHas('payment_attempts', ['moyasar_payment_id' => $paymentId]);
     }
 
+    public function test_manager_can_attach_quote_and_public_page_shows_pricing(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+        $quote = $this->quote();
+
+        $this->actingAs($manager)->get(route('payment-requests.create'))
+            ->assertOk()
+            ->assertSee(__('portal.payments.quote_optional'))
+            ->assertSee('Q0001');
+
+        $this->actingAs($manager)->post(route('payment-requests.store'), [
+            ...$this->payload(),
+            'quote_id' => $quote->id,
+        ])->assertRedirect();
+
+        $paymentRequest = PaymentRequest::firstOrFail();
+        $this->assertTrue($paymentRequest->quote()->is($quote));
+
+        $this->get(SendPaymentRequestAction::publicUrl($paymentRequest))
+            ->assertOk()
+            ->assertSee('Q0001')
+            ->assertSee('Hardware design')
+            ->assertSee(__('portal.payments.download_quote'))
+            ->assertSee(__('portal.payments.brand'))
+            ->assertDontSee('Laravel');
+    }
+
+    public function test_signed_quote_download_requires_attached_quote_and_signature(): void
+    {
+        $paymentRequest = $this->paymentRequest();
+
+        $this->get(route('payments.public.quote', $paymentRequest))->assertForbidden();
+
+        $this->get(URL::temporarySignedRoute(
+            'payments.public.quote',
+            $paymentRequest->expires_at,
+            ['paymentRequest' => $paymentRequest],
+        ))->assertNotFound();
+
+        $quote = $this->quote();
+        $paymentRequest->update([
+            'payable_type' => $quote->getMorphClass(),
+            'payable_id' => $quote->id,
+        ]);
+
+        $this->mock(PdfRenderer::class, function ($mock) {
+            $mock->shouldReceive('download')->once()->andReturn(response('%PDF-1.4', 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="Q0001.pdf"',
+            ]));
+        });
+
+        $this->get(SendPaymentRequestAction::quoteDownloadUrl($paymentRequest->fresh()))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_manager_index_is_searchable_and_sortable(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+        $this->paymentRequest([
+            'name' => 'Alpha Client',
+            'email' => 'alpha@example.test',
+            'status' => 'paid',
+            'created_at' => now()->subDay(),
+        ]);
+        $this->paymentRequest([
+            'name' => 'Beta Client',
+            'email' => 'beta@example.test',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        $this->actingAs($manager)->get(route('payment-requests.index'))
+            ->assertOk()
+            ->assertSee(__('portal.payments.new'))
+            ->assertSee('Alpha Client')
+            ->assertSee('Beta Client')
+            ->assertDontSee(__('portal.payments.quote_optional'));
+
+        $this->actingAs($manager)->get(route('payment-requests.index', ['q' => 'alpha@example.test']))
+            ->assertOk()
+            ->assertSee('Alpha Client')
+            ->assertDontSee('Beta Client');
+
+        $this->actingAs($manager)->get(route('payment-requests.index', ['q' => 'Beta']))
+            ->assertOk()
+            ->assertSee('Beta Client')
+            ->assertDontSee('Alpha Client');
+
+        $this->actingAs($manager)->get(route('payment-requests.index', ['status' => 'paid']))
+            ->assertOk()
+            ->assertSee('Alpha Client')
+            ->assertDontSee('Beta Client');
+
+        $byDate = $this->actingAs($manager)
+            ->get(route('payment-requests.index', ['sort' => 'date', 'direction' => 'desc']))
+            ->assertOk()
+            ->getContent();
+        $this->assertTrue(strpos($byDate, 'Beta Client') < strpos($byDate, 'Alpha Client'));
+
+        $byStatus = $this->actingAs($manager)
+            ->get(route('payment-requests.index', ['sort' => 'status', 'direction' => 'asc']))
+            ->assertOk()
+            ->getContent();
+        $this->assertTrue(strpos($byStatus, 'Alpha Client') < strpos($byStatus, 'Beta Client'));
+    }
+
+    public function test_manager_show_page_includes_copy_link_and_timeline(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+        $paymentRequest = $this->paymentRequest();
+
+        $this->actingAs($manager)->get(route('payment-requests.show', $paymentRequest))
+            ->assertOk()
+            ->assertSee($paymentRequest->title)
+            ->assertSee(__('portal.payments.copy_link'))
+            ->assertSee(__('portal.payments.timeline'))
+            ->assertSee('Created');
+    }
+
     public function test_webhook_authenticates_logs_and_dispatches_processing(): void
     {
         Queue::fake();
@@ -197,9 +323,12 @@ class PaymentRequestTest extends TestCase
         return $user;
     }
 
-    private function paymentRequest(): PaymentRequest
+    private function paymentRequest(array $overrides = []): PaymentRequest
     {
         $manager = $this->user(UserRole::MANAGER, 'manager');
+
+        $createdAt = $overrides['created_at'] ?? null;
+        unset($overrides['created_at']);
 
         $paymentRequest = PaymentRequest::create([
             'created_by' => $manager->id,
@@ -214,12 +343,17 @@ class PaymentRequestTest extends TestCase
             'currency' => 'SAR',
             'status' => 'sent',
             'expires_at' => now()->addHours(48),
+            ...$overrides,
         ]);
+
+        if ($createdAt) {
+            $paymentRequest->forceFill(['created_at' => $createdAt])->saveQuietly();
+        }
 
         app(\App\Actions\Payments\RecordPaymentRequestEventAction::class)
             ->execute($paymentRequest, 'created');
 
-        return $paymentRequest;
+        return $paymentRequest->fresh();
     }
 
     private function payload(): array
@@ -234,5 +368,34 @@ class PaymentRequestTest extends TestCase
             'amount' => '125.50',
             'send' => '0',
         ];
+    }
+
+    private function quote(): Quote
+    {
+        $quote = Quote::query()->create([
+            'title' => 'Smart kiosk prototype',
+            'quote_number' => 'Q0001',
+            'status' => 'approved',
+            'language' => 'en',
+            'customer_category' => 'entrepreneur',
+            'total_client' => 1500,
+            'subtotal' => 1500,
+            'vat_rate' => 15,
+            'vat_amount' => 225,
+            'grand_total' => 1725,
+            'validity_days' => 30,
+        ]);
+
+        $quote->items()->create([
+            'name' => 'Hardware design',
+            'category' => 'services',
+            'type' => 'service',
+            'qty' => 1,
+            'unit_price' => 1500,
+            'line_client' => 1500,
+            'line_internal' => 800,
+        ]);
+
+        return $quote;
     }
 }

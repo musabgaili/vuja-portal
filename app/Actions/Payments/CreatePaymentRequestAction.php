@@ -3,6 +3,7 @@
 namespace App\Actions\Payments;
 
 use App\Models\PaymentRequest;
+use App\Models\Quote;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -21,10 +22,13 @@ class CreatePaymentRequestAction
 
             $unitAmountMinor = $this->toMinorUnits((string) $data['amount']);
             $quantity = (int) $data['quantity'];
+            $quote = ! empty($data['quote_id']) ? Quote::query()->findOrFail($data['quote_id']) : null;
 
             $paymentRequest = PaymentRequest::create([
                 'client_id' => $client?->id,
                 'created_by' => $creator->id,
+                'payable_type' => $quote ? $quote->getMorphClass() : null,
+                'payable_id' => $quote?->id,
                 'name' => trim($data['name']),
                 'email' => $email,
                 'phone' => $data['phone'] ?? null,
@@ -41,11 +45,15 @@ class CreatePaymentRequestAction
             $this->recordEvent->execute(
                 $paymentRequest,
                 'created',
-                payload: ['created_by' => $creator->id],
+                payload: [
+                    'created_by' => $creator->id,
+                    'quote_id' => $quote?->id,
+                    'quote_number' => $quote?->quote_number,
+                ],
                 outcome: 'created',
             );
 
-            return $paymentRequest->fresh(['client', 'creator']);
+            return $paymentRequest->fresh(['client', 'creator', 'payable']);
         });
     }
 

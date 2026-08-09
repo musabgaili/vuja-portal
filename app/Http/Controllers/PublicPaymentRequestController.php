@@ -33,8 +33,12 @@ class PublicPaymentRequestController extends Controller
             ], outcome: 'viewed');
         });
 
+        $paymentRequest = $paymentRequest->fresh(['attempts', 'payable.items']);
+
         return view('payment-requests.public', [
-            'paymentRequest' => $paymentRequest->fresh(['attempts']),
+            'paymentRequest' => $paymentRequest,
+            'quote' => $paymentRequest->quote(),
+            'quoteDownloadUrl' => $paymentRequest->quote() ? SendPaymentRequestAction::quoteDownloadUrl($paymentRequest) : null,
             'paymentReady' => filled($paymentRequest->tax_id) && filled($paymentRequest->billing_address),
             'result' => null,
         ]);
