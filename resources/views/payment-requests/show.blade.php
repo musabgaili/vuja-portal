@@ -1,9 +1,9 @@
 @extends('layouts.internal-dashboard')
-@section('title', $paymentRequest->title)
+@section('title', $paymentRequest->localizedTitle())
 
 @section('breadcrumbs')
 <li class="breadcrumb-item"><a href="{{ route('payment-requests.index') }}">{{ __('portal.payments.title') }}</a></li>
-<li class="breadcrumb-item active">{{ $paymentRequest->title }}</li>
+<li class="breadcrumb-item active">{{ $paymentRequest->localizedTitle() }}</li>
 @endsection
 
 @push('styles')
@@ -29,7 +29,7 @@
     <div class="pay-hero">
         <div>
             <div class="paydesk-kicker">{{ __('portal.payments.details') }}</div>
-            <h2>{{ $paymentRequest->title }}</h2>
+            <h2>{{ $paymentRequest->localizedTitle() }}</h2>
             <p>{{ $paymentRequest->name }} · {{ $paymentRequest->email }}</p>
             @if($paymentRequest->displayedQuoteNumber())
                 <span class="pay-chip">{{ $paymentRequest->displayedQuoteNumber() }}</span>
@@ -45,6 +45,8 @@
                 <div class="body">
                     <div class="pay-amount mb-3">{{ $paymentRequest->amount() }} <small class="fs-6 fw-bold">{{ $paymentRequest->currency }}</small></div>
                     <table class="pay-kv">
+                        <tr><td>{{ __('portal.payments.title_en') }}</td><td class="text-end" dir="ltr">{{ $paymentRequest->title_en ?: $paymentRequest->title }}</td></tr>
+                        <tr><td>{{ __('portal.payments.title_ar') }}</td><td class="text-end" dir="rtl">{{ $paymentRequest->title_ar ?: '—' }}</td></tr>
                         <tr><td>{{ __('portal.payments.phone') }}</td><td class="text-end">{{ $paymentRequest->phone ?: '—' }}</td></tr>
                         <tr><td>{{ __('portal.payments.quantity') }}</td><td class="text-end">{{ $paymentRequest->quantity }} × {{ number_format($paymentRequest->unit_amount_minor / 100, 2) }} {{ $paymentRequest->currency }}</td></tr>
                         @if($paymentRequest->displayedQuoteNumber())
@@ -59,8 +61,62 @@
                             <tr><td>{{ __('portal.payments.address') }}</td><td class="text-end">{{ $paymentRequest->billing_address }}</td></tr>
                         @endif
                     </table>
-                    @if($paymentRequest->description)
-                        <p class="text-muted mt-3 mb-0">{{ $paymentRequest->description }}</p>
+                    @if($paymentRequest->description_en || $paymentRequest->description)
+                        <p class="text-muted mt-3 mb-1" dir="ltr"><strong>{{ __('portal.payments.description_en') }}:</strong> {{ $paymentRequest->description_en ?: $paymentRequest->description }}</p>
+                    @endif
+                    @if($paymentRequest->description_ar)
+                        <p class="text-muted mb-0" dir="rtl"><strong>{{ __('portal.payments.description_ar') }}:</strong> {{ $paymentRequest->description_ar }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="pay-sheet">
+                <h3>{{ __('portal.payments.moyasar') }}</h3>
+                <div class="body">
+                    @php
+                        $paidAttempt = $paymentRequest->attempts
+                            ->sortByDesc(fn ($a) => $a->provider_updated_at ?? $a->updated_at)
+                            ->first(fn ($a) => in_array($a->status, ['paid', 'captured'], true))
+                            ?? $paymentRequest->attempts->sortByDesc('id')->first();
+                        $provider = $paidAttempt?->provider_data ?? [];
+                        $source = is_array($provider['source'] ?? null) ? $provider['source'] : [];
+                    @endphp
+                    @if(!$paidAttempt)
+                        <p class="text-muted mb-0">{{ __('portal.payments.moyasar_empty') }}</p>
+                    @else
+                        <table class="pay-kv">
+                            <tr><td>{{ __('portal.payments.moyasar_id') }}</td><td class="text-end"><code>{{ $paidAttempt->moyasar_payment_id }}</code></td></tr>
+                            <tr><td>{{ __('portal.payments.moyasar_status') }}</td><td class="text-end"><span class="badge bg-{{ $paymentRequest->statusColor() }}">{{ $paidAttempt->status }}</span></td></tr>
+                            <tr><td>{{ __('portal.payments.total') }}</td><td class="text-end">{{ number_format($paidAttempt->amount_minor / 100, 2) }} {{ $paidAttempt->currency }}</td></tr>
+                            @if(!empty($source['type']))
+                                <tr><td>{{ __('portal.payments.moyasar_method') }}</td><td class="text-end">{{ $source['type'] }}</td></tr>
+                            @endif
+                            @if(!empty($source['company']))
+                                <tr><td>{{ __('portal.payments.moyasar_network') }}</td><td class="text-end">{{ $source['company'] }}</td></tr>
+                            @endif
+                            @if(!empty($source['name']))
+                                <tr><td>{{ __('portal.payments.name') }}</td><td class="text-end">{{ $source['name'] }}</td></tr>
+                            @endif
+                            <tr>
+                                <td>{{ __('portal.payments.moyasar_paid_at') }}</td>
+                                <td class="text-end">
+                                    {{ optional($paymentRequest->paid_at ?? $paidAttempt->provider_updated_at ?? $paidAttempt->updated_at)->translatedFormat('M j, Y g:i A') }} UTC
+                                </td>
+                            </tr>
+                        </table>
+
+                        @if($paymentRequest->attempts->count() > 1)
+                            <h4 class="h6 fw-bold mt-3 mb-2">{{ __('portal.payments.attempts') }}</h4>
+                            @foreach($paymentRequest->attempts->sortByDesc('id') as $attempt)
+                                <div class="d-flex justify-content-between gap-2 py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                    <div>
+                                        <code class="small">{{ $attempt->moyasar_payment_id }}</code>
+                                        <div class="small text-muted">{{ $attempt->status }} · {{ number_format($attempt->amount_minor / 100, 2) }} {{ $attempt->currency }}</div>
+                                    </div>
+                                    <small class="text-muted text-nowrap">{{ optional($attempt->provider_created_at ?? $attempt->created_at)->translatedFormat('M j, g:i A') }}</small>
+                                </div>
+                            @endforeach
+                        @endif
                     @endif
                 </div>
             </div>

@@ -8,7 +8,7 @@
 
 @push('styles')
 <style>
-    .paydesk { --ink: var(--gray-900, #142b4a); --muted: var(--gray-600, #607086); --line: var(--gray-200, #d9e2eb); --teal: #1B565E; --cyan: #22aebf; color: var(--ink); }
+    .paydesk { --ink: var(--gray-900, #142b4a); --muted: var(--gray-600, #607086); --line: var(--gray-200, #d9e2eb); --teal: #0C7075; color: var(--ink); }
     .paydesk-kicker { font-size:.72rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color: var(--teal); }
     .paydesk h2 { margin:.2rem 0 .85rem; font-size:1.35rem; font-weight:800; }
     .pay-sheet { border:1px solid var(--line); border-radius:18px; background: var(--bg-primary, #fff); overflow:hidden; }
@@ -19,13 +19,14 @@
     @media (min-width:720px) { .pay-grid { grid-template-columns:1fr 1fr; } .pay-grid .span-2 { grid-column:1 / -1; } }
     .pay-grid label { display:block; font-size:.76rem; font-weight:750; margin-bottom:.35rem; }
     .pay-grid .form-control, .pay-grid .form-select { min-height:46px; border-radius:11px; }
+    .pay-lang-hint { font-size:.72rem; color: var(--muted); margin:-.35rem 0 .75rem; }
     .pay-quote { display:grid; gap:.85rem; grid-template-columns:1fr; }
     @media (min-width:720px) { .pay-quote { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); } }
     .pay-upload { display:flex; align-items:center; justify-content:space-between; gap:.75rem; min-height:46px; padding:.55rem .7rem; border:1px dashed var(--line); border-radius:11px; background: color-mix(in srgb, var(--teal) 4%, transparent); cursor:pointer; }
     .pay-upload:hover { border-color: var(--teal); }
     .pay-upload-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .75rem; border-radius:9px; background: var(--teal); color:#fff; font-size:.8rem; font-weight:750; white-space:nowrap; }
     .pay-upload-name { color: var(--muted); font-size:.8rem; overflow:hidden; text-overflow:ellipsis; }
-    .pay-total { display:flex; justify-content:space-between; align-items:end; gap:1rem; padding:1.1rem 1.2rem; background: linear-gradient(135deg, #142b4a, var(--teal)); color:#fff; }
+    .pay-total { display:flex; justify-content:space-between; align-items:end; gap:1rem; padding:1.1rem 1.2rem; background: var(--grad-header, linear-gradient(135deg, #0F969C, #0C7075 55%, #294D61)); color:#fff; }
     .pay-total small { display:block; opacity:.75; text-transform:uppercase; letter-spacing:.08em; font-size:.68rem; }
     .pay-total strong { font-size:2rem; line-height:1; font-variant-numeric: tabular-nums; }
     .pay-actions { display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap; padding:1rem 1.2rem; }
@@ -61,15 +62,27 @@
 
         <section class="pay-block">
             <h3>{{ __('portal.payments.payment_title') }}</h3>
+            <p class="pay-lang-hint">{{ __('portal.payments.bilingual_hint') }}</p>
             <div class="pay-grid">
-                <div class="span-2">
-                    <label for="pay-title">{{ __('portal.payments.payment_title') }} *</label>
-                    <input id="pay-title" name="title" class="form-control" value="{{ old('title') }}" required maxlength="180">
-                    @error('title')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                <div>
+                    <label for="pay-title-en">{{ __('portal.payments.title_en') }} *</label>
+                    <input id="pay-title-en" name="title_en" class="form-control" value="{{ old('title_en') }}" required maxlength="180" dir="ltr" lang="en">
+                    @error('title_en')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
-                <div class="span-2">
-                    <label for="pay-description">{{ __('portal.payments.description') }}</label>
-                    <textarea id="pay-description" name="description" rows="3" class="form-control" maxlength="3000">{{ old('description') }}</textarea>
+                <div>
+                    <label for="pay-title-ar">{{ __('portal.payments.title_ar') }} *</label>
+                    <input id="pay-title-ar" name="title_ar" class="form-control" value="{{ old('title_ar') }}" required maxlength="180" dir="rtl" lang="ar">
+                    @error('title_ar')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                </div>
+                <div>
+                    <label for="pay-description-en">{{ __('portal.payments.description_en') }} *</label>
+                    <textarea id="pay-description-en" name="description_en" rows="3" class="form-control" required maxlength="3000" dir="ltr" lang="en">{{ old('description_en') }}</textarea>
+                    @error('description_en')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                </div>
+                <div>
+                    <label for="pay-description-ar">{{ __('portal.payments.description_ar') }} *</label>
+                    <textarea id="pay-description-ar" name="description_ar" rows="3" class="form-control" required maxlength="3000" dir="rtl" lang="ar">{{ old('description_ar') }}</textarea>
+                    @error('description_ar')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
                 <div>
                     <label for="pay-quantity">{{ __('portal.payments.quantity') }} *</label>

@@ -112,7 +112,7 @@
             @foreach($requests as $item)
                 <a href="{{ route('payment-requests.show', $item) }}" class="pay-row">
                     <span>
-                        <strong>{{ $item->title }}</strong>
+                        <strong>{{ $item->localizedTitle() }}</strong>
                         @if($item->displayedQuoteNumber())
                             <span class="pay-chip">{{ $item->displayedQuoteNumber() }}</span>
                         @endif

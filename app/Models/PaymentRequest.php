@@ -19,7 +19,8 @@ class PaymentRequest extends Model
 
     protected $fillable = [
         'uuid', 'client_id', 'created_by', 'payable_type', 'payable_id',
-        'name', 'email', 'phone', 'title', 'description', 'quote_number',
+        'name', 'email', 'phone', 'title', 'title_en', 'title_ar',
+        'description', 'description_en', 'description_ar', 'quote_number',
         'quote_file', 'quantity', 'unit_amount_minor', 'total_amount_minor',
         'currency', 'tax_id', 'billing_address', 'status', 'expires_at',
         'sent_at', 'paid_at',
@@ -81,6 +82,26 @@ class PaymentRequest extends Model
         $extension = pathinfo((string) $this->quote_file, PATHINFO_EXTENSION) ?: 'pdf';
 
         return ($this->displayedQuoteNumber() ?: 'quotation').'.'.$extension;
+    }
+
+    public function localizedTitle(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $value = $locale === 'ar'
+            ? ($this->title_ar ?: $this->title_en ?: $this->title)
+            : ($this->title_en ?: $this->title_ar ?: $this->title);
+
+        return (string) $value;
+    }
+
+    public function localizedDescription(?string $locale = null): ?string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $value = $locale === 'ar'
+            ? ($this->description_ar ?: $this->description_en ?: $this->description)
+            : ($this->description_en ?: $this->description_ar ?: $this->description);
+
+        return filled($value) ? (string) $value : null;
     }
 
     public function attempts(): HasMany

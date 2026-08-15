@@ -6,7 +6,7 @@ use App\Actions\Payments\SendPaymentRequestAction;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Jobs\ProcessMoyasarWebhook;
-use App\Mail\GenericNotification;
+use App\Mail\PaymentRequestMail;
 use App\Models\PaymentRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -76,7 +76,7 @@ class PaymentRequestTest extends TestCase
         $paymentRequest = $this->paymentRequest();
         $url = SendPaymentRequestAction::publicUrl($paymentRequest);
 
-        $this->get($url)->assertOk()->assertSee($paymentRequest->title);
+        $this->get($url)->assertOk()->assertSee($paymentRequest->localizedTitle());
         $this->get($url)->assertOk();
 
         $this->assertDatabaseCount('payment_request_events', 3); // created + two opens
@@ -93,7 +93,7 @@ class PaymentRequestTest extends TestCase
         ]);
     }
 
-    public function test_save_and_send_queues_email_to_entered_address(): void
+    public function test_save_and_send_emails_entered_address(): void
     {
         Mail::fake();
         $manager = $this->user(UserRole::MANAGER, 'manager');
@@ -103,10 +103,34 @@ class PaymentRequestTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame('sent', PaymentRequest::firstOrFail()->status);
-        Mail::assertQueued(GenericNotification::class, function (GenericNotification $mail) {
+        Mail::assertSent(PaymentRequestMail::class, function (PaymentRequestMail $mail) {
             return $mail->hasTo('guest@example.test')
                 && str_contains((string) $mail->actionUrl, '/pay/');
         });
+    }
+
+    public function test_public_page_switches_localized_title_with_locale(): void
+    {
+        $paymentRequest = $this->paymentRequest([
+            'title_en' => 'English deposit title',
+            'title_ar' => 'عنوان الدفعة العربي',
+            'description_en' => 'English description body',
+            'description_ar' => 'وصف عربي للدفعة',
+        ]);
+        $url = SendPaymentRequestAction::publicUrl($paymentRequest);
+
+        $this->withSession(['locale' => 'en'])->get($url)
+            ->assertOk()
+            ->assertSee('English deposit title')
+            ->assertSee('English description body')
+            ->assertDontSee('عنوان الدفعة العربي')
+            ->assertSee('images/vd-logo-light.png', false);
+
+        $this->withSession(['locale' => 'ar'])->get($url)
+            ->assertOk()
+            ->assertSee('عنوان الدفعة العربي')
+            ->assertSee('وصف عربي للدفعة')
+            ->assertDontSee('English deposit title');
     }
 
     public function test_existing_client_sees_payment_request_in_portal_notifications(): void
@@ -334,7 +358,11 @@ class PaymentRequestTest extends TestCase
             'email' => 'client@example.test',
             'phone' => '+966500000000',
             'title' => 'Prototype deposit',
+            'title_en' => 'Prototype deposit',
+            'title_ar' => 'دفعة النموذج الأولي',
             'description' => 'Initial payment',
+            'description_en' => 'Initial payment',
+            'description_ar' => 'دفعة أولية',
             'quantity' => 1,
             'unit_amount_minor' => 15000,
             'total_amount_minor' => 15000,
@@ -360,8 +388,10 @@ class PaymentRequestTest extends TestCase
             'name' => 'Client Name',
             'email' => 'CLIENT@example.test',
             'phone' => '+966500000000',
-            'title' => 'Prototype deposit',
-            'description' => 'Initial payment',
+            'title_en' => 'Prototype deposit',
+            'title_ar' => 'دفعة النموذج الأولي',
+            'description_en' => 'Initial payment',
+            'description_ar' => 'دفعة أولية',
             'quantity' => 3,
             'amount' => '125.50',
             'send' => '0',

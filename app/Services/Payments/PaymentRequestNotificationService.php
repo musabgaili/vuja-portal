@@ -2,7 +2,7 @@
 
 namespace App\Services\Payments;
 
-use App\Mail\GenericNotification;
+use App\Mail\PaymentRequestMail;
 use App\Models\PaymentRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -13,8 +13,8 @@ class PaymentRequestNotificationService
     public function send(PaymentRequest $paymentRequest, string $url): void
     {
         try {
-            $mail = new GenericNotification(
-                __('portal.payments.email.subject', ['title' => $paymentRequest->title]),
+            Mail::to($paymentRequest->email)->send(new PaymentRequestMail(
+                __('portal.payments.email.subject', ['title' => $paymentRequest->localizedTitle()]),
                 __('portal.payments.email.heading'),
                 __('portal.payments.email.body', [
                     'name' => $paymentRequest->name,
@@ -24,15 +24,13 @@ class PaymentRequestNotificationService
                 $url,
                 __('portal.payments.email.action'),
                 app()->getLocale() === 'ar' ? 'ar' : 'en',
-            );
-            $mail->afterCommit();
-            Mail::to($paymentRequest->email)->queue($mail);
+            ));
 
             if ($paymentRequest->client_id) {
                 Cache::forget('notif_feed:'.$paymentRequest->client_id);
             }
         } catch (\Throwable $e) {
-            Log::warning('Payment request email could not be queued', [
+            Log::warning('Payment request email could not be sent', [
                 'payment_request_id' => $paymentRequest->id,
                 'error' => $e->getMessage(),
             ]);

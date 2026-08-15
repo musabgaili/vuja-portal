@@ -22,6 +22,10 @@ class CreatePaymentRequestAction
 
             $unitAmountMinor = $this->toMinorUnits((string) $data['amount']);
             $quantity = (int) $data['quantity'];
+            $titleEn = trim((string) $data['title_en']);
+            $titleAr = trim((string) $data['title_ar']);
+            $descriptionEn = trim((string) $data['description_en']);
+            $descriptionAr = trim((string) $data['description_ar']);
             $quoteNumber = filled($data['quote_number'] ?? null) ? trim((string) $data['quote_number']) : null;
             $quoteFile = $data['quote_file'] ?? null;
             $quoteFilePath = $quoteFile instanceof UploadedFile
@@ -34,8 +38,12 @@ class CreatePaymentRequestAction
                 'name' => trim($data['name']),
                 'email' => $email,
                 'phone' => $data['phone'] ?? null,
-                'title' => trim($data['title']),
-                'description' => $data['description'] ?? null,
+                'title' => $titleEn,
+                'title_en' => $titleEn,
+                'title_ar' => $titleAr,
+                'description' => $descriptionEn,
+                'description_en' => $descriptionEn,
+                'description_ar' => $descriptionAr,
                 'quote_number' => $quoteNumber,
                 'quote_file' => $quoteFilePath,
                 'quantity' => $quantity,
