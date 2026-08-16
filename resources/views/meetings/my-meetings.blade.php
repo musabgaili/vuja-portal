@@ -61,10 +61,17 @@
                             $other = $meUser->isClient()
                                 ? $meeting->teamMember
                                 : ($meeting->team_member_id === $meUser->id ? $meeting->client : $meeting->teamMember);
+                            $otherName = $other?->name ?? '—';
+                            $otherEmail = $other?->email;
+                            $otherPhone = $other?->phone;
                         @endphp
-                        <strong>{{ $other?->name ?? '—' }}</strong>
-                        @if($other?->email)<br><small class="text-muted">{{ $other->email }}</small>@endif
-                        @if($other?->phone)<br><small class="text-muted"><i class="fas fa-phone"></i> {{ $other->phone }}</small>@endif
+                        <strong>{{ $otherName }}</strong>
+                        @if($otherEmail)
+                            <br><small class="text-muted">{{ $otherEmail }}</small>
+                        @endif
+                        @if($otherPhone)
+                            <br><small class="text-muted"><i class="fas fa-phone"></i> {{ $otherPhone }}</small>
+                        @endif
                     </td>
                     <td>
                         {{ $meeting->scheduled_at->translatedFormat('M d, Y') }}
@@ -119,6 +126,9 @@
                 $other = $meUser->isClient()
                     ? $meeting->teamMember
                     : ($meeting->team_member_id === $meUser->id ? $meeting->client : $meeting->teamMember);
+                $otherName = $other?->name ?? '—';
+                $otherEmail = $other?->email;
+                $otherPhone = $other?->phone;
             @endphp
             <div class="d-none meeting-detail-src" id="mdet-{{ $meeting->getRouteKey() }}">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
@@ -127,7 +137,15 @@
                 </div>
                 <dl class="row mb-0" style="font-size:.9rem;">
                     <dt class="col-sm-4">{{ __('portal.meetings.with') }}</dt>
-                    <dd class="col-sm-8">{{ $other?->name ?? '—' }}@if($other?->email)<br><span class="text-muted">{{ $other->email }}</span>@endif@if($other?->phone)<br><span class="text-muted"><i class="fas fa-phone"></i> {{ $other->phone }}</span>@endif</dd>
+                    <dd class="col-sm-8">
+                        {{ $otherName }}
+                        @if($otherEmail)
+                            <br><span class="text-muted">{{ $otherEmail }}</span>
+                        @endif
+                        @if($otherPhone)
+                            <br><span class="text-muted"><i class="fas fa-phone"></i> {{ $otherPhone }}</span>
+                        @endif
+                    </dd>
 
                     <dt class="col-sm-4">{{ __('portal.meetings.date_time') }}</dt>
                     <dd class="col-sm-8">{{ $meeting->scheduled_at->translatedFormat('l, M d, Y') }}<br>{{ $meeting->scheduled_at->translatedFormat('g:i A') }} – {{ $meeting->getEndTime()->translatedFormat('g:i A') }} <span class="text-muted">({{ $meeting->duration_minutes }} {{ __('portal.meetings.min') }})</span></dd>

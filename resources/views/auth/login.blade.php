@@ -206,6 +206,11 @@
                 </div>
             @endif
 
+            @php
+                $demoLogin = app()->environment(['local', 'testing']);
+                $loginEmail = old('email', $demoLogin ? 'manager@vujade.com' : '');
+                $loginPassword = $demoLogin ? '12345678' : '';
+            @endphp
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 
@@ -214,7 +219,7 @@
                         <i class="fas fa-envelope me-2"></i>{{ __('portal.email_address') }}
                     </label>
                     <input type="email" class="form-control @error('email') is-invalid @enderror"
-                           id="email" name="email" value="{{ old('email') }}"
+                           id="email" name="email" value="{{ $loginEmail }}"
                            placeholder="{{ __('portal.email_address') }}" required autofocus>
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -226,7 +231,8 @@
                         <i class="fas fa-lock me-2"></i>{{ __('portal.password') }}
                     </label>
                     <input type="password" class="form-control @error('password') is-invalid @enderror"
-                           id="password" name="password" placeholder="{{ __('portal.password') }}" required>
+                           id="password" name="password" value="{{ $loginPassword }}"
+                           placeholder="{{ __('portal.password') }}" required>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

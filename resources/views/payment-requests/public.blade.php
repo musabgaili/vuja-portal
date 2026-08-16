@@ -91,7 +91,7 @@
         .notice-warning { color:#7b5103; background:#fff4d8; border:1px solid #f2dc9e; }
         .notice-danger { color:#902e37; background:#fde7e9; border:1px solid #f3bdc2; }
         .billing-form { display:grid; gap:.9rem; }
-        .billing-form label { display:block; margin-bottom:.35rem; color: var(--text-color, #35465b); font-size:.78rem; font-weight:800; }
+        .billing-form label { display:block; margin-bottom:.35rem; color: var(--text-color, #95aecc); font-size:.78rem; font-weight:800; }
         .billing-form input, .billing-form textarea {
             width:100%; border:1px solid var(--border-color, #d9e2eb); border-radius:11px; padding:.85rem;
             font:inherit; background: var(--bg-primary, #fff); color: var(--text-color, #142b4a);
@@ -115,6 +115,30 @@
         .secure-note { display:flex; align-items:flex-start; gap:.55rem; color: var(--text-muted, #607086); font-size:.72rem; line-height:1.5; margin-top:.8rem; }
         .mysr-form { min-height:210px; }
         .mysr-form .mysr-form-button { background: var(--primary-color, #0C7075) !important; }
+        [data-bs-theme="dark"] .pay-logo strong { color: #fff; }
+        [data-bs-theme="dark"] .pay-stage h2,
+        [data-bs-theme="dark"] .card-head h3,
+        [data-bs-theme="dark"] .billing-form label,
+        [data-bs-theme="dark"] #pay-countdown { color: #fff; }
+        [data-bs-theme="dark"] .secure-pill,
+        [data-bs-theme="dark"] .brand-download {
+            color: #fff;
+            background: color-mix(in srgb, var(--primary-color) 28%, transparent);
+        }
+        [data-bs-theme="dark"] .mysr-form,
+        [data-bs-theme="dark"] .mysr-form label,
+        [data-bs-theme="dark"] .mysr-form .mysr-label,
+        [data-bs-theme="dark"] .mysr-form .mysr-form-label,
+        [data-bs-theme="dark"] .mysr-form input,
+        [data-bs-theme="dark"] .mysr-form .mysr-input,
+        [data-bs-theme="dark"] .mysr-form .mysr-text,
+        [data-bs-theme="dark"] .mysr-form p,
+        [data-bs-theme="dark"] .mysr-form span { color: #fff !important; }
+        [data-bs-theme="dark"] .mysr-form input,
+        [data-bs-theme="dark"] .mysr-form .mysr-input {
+            background: var(--bg-tertiary, #0b3a40) !important;
+            border-color: var(--border-color, #15454c) !important;
+        }
         @media (min-width:720px) {
             .pay-shell { padding:2rem; }
             .pay-layout { grid-template-columns:minmax(300px,.9fr) minmax(390px,1.1fr); min-height:650px; }

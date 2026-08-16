@@ -47,7 +47,7 @@ class MoyasarCallbackController extends Controller
             );
         }
 
-        $paymentRequest = $paymentRequest->fresh(['attempts', 'payable.items']);
+        $paymentRequest = $paymentRequest->fresh(['attempts', 'payable']);
 
         return view('payment-requests.public', [
             'paymentRequest' => $paymentRequest,

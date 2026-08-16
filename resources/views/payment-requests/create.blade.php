@@ -8,7 +8,10 @@
 
 @push('styles')
 <style>
-    .paydesk { --ink: var(--gray-900, #142b4a); --muted: var(--gray-600, #607086); --line: var(--gray-200, #d9e2eb); --teal: #0C7075; color: var(--ink); }
+    .paydesk { --ink: var(--text-color, var(--gray-900, #142b4a)); --muted: var(--text-muted, var(--gray-600, #607086)); --line: var(--border-color, var(--gray-200, #d9e2eb)); --teal: var(--primary-color, #0C7075); color: var(--ink); }
+    [data-bs-theme="dark"] .paydesk { --teal: #ffffff; }
+    [data-bs-theme="dark"] .paydesk h2,
+    [data-bs-theme="dark"] .pay-grid label { color: #fff; }
     .paydesk-kicker { font-size:.72rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color: var(--teal); }
     .paydesk h2 { margin:.2rem 0 .85rem; font-size:1.35rem; font-weight:800; }
     .pay-sheet { border:1px solid var(--line); border-radius:18px; background: var(--bg-primary, #fff); overflow:hidden; }
@@ -38,7 +41,18 @@
     <div class="paydesk-kicker">48h card desk</div>
     <h2>{{ __('portal.payments.new') }}</h2>
 
-    <form method="POST" action="{{ route('payment-requests.store') }}" enctype="multipart/form-data" class="pay-sheet">
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <strong>{{ __('portal.payments.validation.fix_error') }}</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('payment-requests.store') }}" enctype="multipart/form-data" class="pay-sheet" novalidate>
         @csrf
         <section class="pay-block">
             <h3>{{ __('portal.payments.recipient') }}</h3>
@@ -50,7 +64,7 @@
                 </div>
                 <div>
                     <label for="pay-email">{{ __('portal.payments.email') }} *</label>
-                    <input id="pay-email" name="email" type="email" class="form-control" value="{{ old('email') }}" required autocomplete="email">
+                    <input id="pay-email" name="email" type="text" inputmode="email" class="form-control" value="{{ old('email') }}" required maxlength="255" autocomplete="email">
                     @error('email')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
                 <div class="span-2">

@@ -60,6 +60,13 @@ class PaymentRequest extends Model
         return $this->payable instanceof Quote ? $this->payable : null;
     }
 
+    public function invoice(): ?Invoice
+    {
+        $this->loadMissing('payable');
+
+        return $this->payable instanceof Invoice ? $this->payable : null;
+    }
+
     public function displayedQuoteNumber(): ?string
     {
         $number = trim((string) ($this->quote_number ?: $this->quote()?->quote_number));

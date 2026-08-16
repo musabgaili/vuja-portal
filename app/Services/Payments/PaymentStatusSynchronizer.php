@@ -10,11 +10,16 @@ use Illuminate\Validation\ValidationException;
 
 class PaymentStatusSynchronizer
 {
-    public function __construct(private RecordPaymentRequestEventAction $recordEvent) {}
+    public function __construct(
+        private RecordPaymentRequestEventAction $recordEvent,
+        private PaymentRequestNotificationService $notifications,
+    ) {}
 
     public function sync(PaymentRequest $paymentRequest, array $payment, string $source): PaymentRequest
     {
-        return DB::transaction(function () use ($paymentRequest, $payment, $source) {
+        $becamePaid = false;
+
+        $result = DB::transaction(function () use ($paymentRequest, $payment, $source, &$becamePaid) {
             $locked = PaymentRequest::query()->lockForUpdate()->findOrFail($paymentRequest->id);
             $this->verify($locked, $payment);
 
@@ -41,6 +46,7 @@ class PaymentStatusSynchronizer
                 $locked->status = $nextStatus;
                 if ($nextStatus === 'paid' && ! $locked->paid_at) {
                     $locked->paid_at = now();
+                    $becamePaid = true;
                 }
                 $locked->save();
             }
@@ -56,8 +62,14 @@ class PaymentStatusSynchronizer
                 );
             }
 
-            return $locked->fresh(['attempts', 'events']);
+            return $locked->fresh(['attempts', 'events', 'payable']);
         });
+
+        if ($becamePaid) {
+            $this->notifications->sendConfirmation($result);
+        }
+
+        return $result;
     }
 
     private function verify(PaymentRequest $request, array $payment): void

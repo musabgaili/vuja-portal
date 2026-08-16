@@ -8,7 +8,13 @@
 
 @push('styles')
 <style>
-    .paydesk { --ink: var(--gray-900, #142b4a); --muted: var(--gray-600, #607086); --line: var(--gray-200, #d9e2eb); --teal: #1B565E; color: var(--ink); }
+    .paydesk { --ink: var(--text-color, var(--gray-900, #142b4a)); --muted: var(--text-muted, var(--gray-600, #607086)); --line: var(--border-color, var(--gray-200, #d9e2eb)); --teal: var(--primary-color, #1B565E); color: var(--ink); }
+    [data-bs-theme="dark"] .paydesk { --teal: #ffffff; }
+    [data-bs-theme="dark"] .pay-hero h2,
+    [data-bs-theme="dark"] .pay-sheet h3,
+    [data-bs-theme="dark"] .pay-amount,
+    [data-bs-theme="dark"] .pay-kv td,
+    [data-bs-theme="dark"] .pay-chip { color: #fff; }
     .pay-hero { display:flex; justify-content:space-between; gap:1rem; align-items:flex-start; flex-wrap:wrap; margin-bottom:1rem; }
     .paydesk-kicker { font-size:.72rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color: var(--teal); }
     .pay-hero h2 { margin:.2rem 0 .25rem; font-size:1.35rem; font-weight:800; }
@@ -51,6 +57,17 @@
                         <tr><td>{{ __('portal.payments.quantity') }}</td><td class="text-end">{{ $paymentRequest->quantity }} × {{ number_format($paymentRequest->unit_amount_minor / 100, 2) }} {{ $paymentRequest->currency }}</td></tr>
                         @if($paymentRequest->displayedQuoteNumber())
                             <tr><td>{{ __('portal.payments.quote_number') }}</td><td class="text-end">{{ $paymentRequest->displayedQuoteNumber() }}</td></tr>
+                        @endif
+                        @if($paymentRequest->invoice())
+                            <tr>
+                                <td>{{ __('portal.payments.invoice') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ route('invoices.show', $paymentRequest->invoice()) }}">
+                                        {{ $paymentRequest->invoice()->invoice_number }}
+                                    </a>
+                                    <span class="badge bg-{{ $paymentRequest->invoice()->statusColor() }} ms-1">{{ $paymentRequest->invoice()->statusLabel() }}</span>
+                                </td>
+                            </tr>
                         @endif
                         <tr><td>{{ __('portal.payments.expires') }}</td><td class="text-end">{{ $paymentRequest->expires_at->translatedFormat('M j, Y g:i A') }} UTC</td></tr>
                         <tr><td>{{ __('portal.payments.created_by') }}</td><td class="text-end">{{ $paymentRequest->creator?->name ?: '—' }} · {{ $paymentRequest->created_at->translatedFormat('M j, Y g:i A') }}</td></tr>

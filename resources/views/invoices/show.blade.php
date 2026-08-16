@@ -22,7 +22,16 @@
             <div class="card-header"><span class="card-title">{{ __('portal.invoices.details') }}</span></div>
             <div class="card-content" style="overflow-x:auto;">
                 <table class="table mb-0">
-                    <tr><td>{{ __('portal.invoices.client') }}</td><td class="text-end">{{ $invoice->client?->name }} <small class="text-muted">{{ $invoice->client?->email }}</small></td></tr>
+                    <tr>
+                        <td>{{ __('portal.invoices.client') }}</td>
+                        <td class="text-end">
+                            {{ $invoice->recipientName() }}
+                            <small class="text-muted d-block">{{ $invoice->recipientEmail() ?: '—' }}</small>
+                            @if($invoice->isGuest())
+                                <span class="badge bg-secondary mt-1">{{ __('portal.invoices.guest_badge') }}</span>
+                            @endif
+                        </td>
+                    </tr>
                     <tr><td>{{ __('portal.invoices.project') }}</td><td class="text-end">@if($invoice->project)<a href="{{ route('projects.manager.show', $invoice->project) }}">{{ $invoice->project->title }}</a>@else — @endif</td></tr>
                     <tr><td>{{ __('portal.invoices.amount') }}</td><td class="text-end"><strong>{{ number_format($invoice->amount, 2) }} {{ $invoice->currency }}</strong></td></tr>
                     @if($invoice->due_date)<tr><td>{{ __('portal.invoices.due_date') }}</td><td class="text-end">{{ $invoice->due_date->translatedFormat('M d, Y') }}</td></tr>@endif
@@ -34,6 +43,23 @@
                 @endif
             </div>
         </div>
+
+        @if($invoice->paymentRequests->isNotEmpty())
+        <div class="card mb-3">
+            <div class="card-header"><span class="card-title"><i class="fas fa-credit-card"></i> {{ __('portal.payments.linked_requests') }}</span></div>
+            <div class="card-content">
+                @foreach($invoice->paymentRequests as $paymentRequest)
+                    <div class="d-flex justify-content-between align-items-center gap-2 py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
+                        <div>
+                            <a href="{{ route('payment-requests.show', $paymentRequest) }}">{{ $paymentRequest->localizedTitle() }}</a>
+                            <div class="small text-muted">{{ $paymentRequest->amount() }} {{ $paymentRequest->currency }}</div>
+                        </div>
+                        <span class="badge bg-{{ $paymentRequest->statusColor() }}">{{ $paymentRequest->statusLabel() }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
 
         {{-- Client payment proof --}}
         <div class="card">

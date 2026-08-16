@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * A customer invoice raised by a manager/PM. The client uploads a payment
@@ -15,7 +16,8 @@ class Invoice extends Model
     use HasFactory, HasUuidRouteKey;
 
     protected $fillable = [
-        'uuid', 'invoice_number', 'client_id', 'project_id', 'quote_id', 'created_by',
+        'uuid', 'invoice_number', 'client_id', 'recipient_name', 'recipient_email',
+        'project_id', 'quote_id', 'created_by',
         'title', 'description', 'amount', 'currency', 'status', 'due_date',
         'invoice_file', 'receipt_path', 'receipt_uploaded_at', 'paid_at', 'note',
     ];
@@ -45,6 +47,28 @@ class Invoice extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function paymentRequests(): MorphMany
+    {
+        return $this->morphMany(PaymentRequest::class, 'payable');
+    }
+
+    public function recipientName(): string
+    {
+        return (string) ($this->recipient_name ?: $this->client?->name ?: '—');
+    }
+
+    public function recipientEmail(): ?string
+    {
+        $email = $this->recipient_email ?: $this->client?->email;
+
+        return filled($email) ? mb_strtolower((string) $email) : null;
+    }
+
+    public function isGuest(): bool
+    {
+        return blank($this->client_id);
     }
 
     public function isUnpaid(): bool

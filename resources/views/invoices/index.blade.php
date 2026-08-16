@@ -43,7 +43,7 @@
                 @foreach($invoices as $inv)
                     <tr>
                         <td><strong>{{ $inv->invoice_number }}</strong><br><small class="text-muted">{{ $inv->title }}</small></td>
-                        <td>{{ $inv->client?->name ?? '—' }}</td>
+                        <td>{{ $inv->recipientName() }}<br><small class="text-muted">{{ $inv->recipientEmail() ?: '—' }}</small></td>
                         <td>{{ $inv->project?->title ?? '—' }}</td>
                         <td class="text-end">{{ number_format($inv->amount, 2) }}</td>
                         <td>

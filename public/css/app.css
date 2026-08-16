@@ -38,6 +38,11 @@
     --bg-dark: #05161A;
     --bg-glass: rgba(255, 255, 255, 0.95);
 
+    /* Semantic text / borders (used across portal + payment views) */
+    --text-color: #0f172a;
+    --text-muted: #475569;
+    --border-color: #e2e8f0;
+
     /* Shadows (soft) */
     --shadow-sm: 0 1px 2px 0 rgba(16, 24, 40, 0.06);
     --shadow-md: 0 4px 16px rgba(16, 24, 40, 0.08);
@@ -126,6 +131,12 @@
     --bg-secondary: #05161A;      /* app background (palette darkest) */
     --bg-tertiary: #0b3a40;       /* hover / elevated */
     --bg-glass: rgba(7, 46, 51, 0.95);
+
+    /* Keep body/labels readable on dark surfaces */
+    --text-color: #ffffff;
+    --text-muted: #c2d8db;
+    --border-color: #15454c;
+    --primary-slate: #c2d8db;
 
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
     --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.50);

@@ -7,7 +7,12 @@
 
 @push('styles')
 <style>
-    .paydesk { --ink: var(--gray-900, #142b4a); --muted: var(--gray-600, #607086); --line: var(--gray-200, #d9e2eb); --teal: #1B565E; --cyan: #22aebf; color: var(--ink); }
+    .paydesk { --ink: var(--text-color, var(--gray-900, #142b4a)); --muted: var(--text-muted, var(--gray-600, #607086)); --line: var(--border-color, var(--gray-200, #d9e2eb)); --teal: var(--primary-color, #1B565E); --cyan: var(--primary-bright, #22aebf); color: var(--ink); }
+    [data-bs-theme="dark"] .paydesk { --teal: #ffffff; }
+    [data-bs-theme="dark"] .paydesk-top h2,
+    [data-bs-theme="dark"] .pay-row strong,
+    [data-bs-theme="dark"] .pay-amount,
+    [data-bs-theme="dark"] .pay-chip { color: #fff; }
     .paydesk-top { display:flex; justify-content:space-between; gap:1rem; align-items:flex-end; margin-bottom:1rem; flex-wrap:wrap; }
     .paydesk-kicker { font-size:.72rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color: var(--teal); }
     .paydesk-top h2 { margin:.2rem 0 0; font-size:1.35rem; font-weight:800; }

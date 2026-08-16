@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\PaymentRequest;
 use App\Models\Project;
 use App\Models\Quote;
 use App\Models\User;
@@ -45,11 +46,30 @@ class InvoiceController extends Controller
         $this->guardManage();
 
         $quote = $request->filled('quote') ? Quote::find($request->input('quote')) : null;
+        $clients = User::where('role', 'client')->orderBy('name')->get(['id', 'name', 'email']);
+
+        $paymentRequests = PaymentRequest::query()
+            ->whereNull('payable_id')
+            ->latest()
+            ->limit(200)
+            ->get(['id', 'uuid', 'name', 'email', 'title', 'title_en', 'title_ar', 'status', 'total_amount_minor', 'currency', 'paid_at', 'created_at'])
+            ->map(fn (PaymentRequest $p) => [
+                'id' => $p->id,
+                'email' => mb_strtolower((string) $p->email),
+                'title' => $p->localizedTitle('en'),
+                'status' => $p->status,
+                'amount' => number_format($p->total_amount_minor / 100, 2, '.', ''),
+                'currency' => $p->currency,
+                'paid_at' => optional($p->paid_at)?->toDateString(),
+                'created_at' => optional($p->created_at)?->toDateString(),
+            ])
+            ->values();
 
         return view('invoices.create', [
-            'clients' => User::where('role', 'client')->orderBy('name')->get(),
+            'clients' => $clients,
             'projects' => Project::orderBy('title')->get(),
             'quote' => $quote,
+            'paymentRequestsJson' => $paymentRequests,
         ]);
     }
 
@@ -58,7 +78,9 @@ class InvoiceController extends Controller
         $this->guardManage();
 
         $data = $request->validate([
-            'client_id' => 'required|exists:users,id',
+            'client_id' => 'nullable|exists:users,id',
+            'recipient_name' => 'required|string|max:160',
+            'recipient_email' => 'required|email:filter|max:255',
             'project_id' => 'nullable|exists:projects,id',
             'quote_id' => 'nullable|exists:quotes,id',
             'title' => 'required|string|max:200',
@@ -66,27 +88,72 @@ class InvoiceController extends Controller
             'amount' => 'required|numeric|min:0',
             'due_date' => 'nullable|date',
             'invoice_file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'payment_request_ids' => 'nullable|array',
+            'payment_request_ids.*' => 'integer|exists:payment_requests,id',
         ]);
+
+        $email = mb_strtolower(trim($data['recipient_email']));
+        $name = trim($data['recipient_name']);
+        $clientId = filled($data['client_id'] ?? null) ? (int) $data['client_id'] : null;
+
+        // If no client chosen, attach a matching registered client by email when one exists.
+        if (! $clientId) {
+            $clientId = User::query()
+                ->where('role', 'client')
+                ->whereRaw('LOWER(email) = ?', [$email])
+                ->value('id');
+        } else {
+            $client = User::query()->find($clientId);
+            if ($client && mb_strtolower((string) $client->email) !== $email) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['recipient_email' => __('portal.invoices.email_client_mismatch')]);
+            }
+        }
+
+        $paymentIds = collect($data['payment_request_ids'] ?? [])->unique()->values();
+        $payments = PaymentRequest::query()
+            ->whereIn('id', $paymentIds)
+            ->whereNull('payable_id')
+            ->whereRaw('LOWER(email) = ?', [$email])
+            ->get();
+
+        if ($paymentIds->isNotEmpty() && $payments->count() !== $paymentIds->count()) {
+            return back()
+                ->withInput()
+                ->withErrors(['payment_request_ids' => __('portal.invoices.payments_invalid')]);
+        }
 
         $path = null;
         if ($request->hasFile('invoice_file')) {
             $path = $request->file('invoice_file')->store('invoices', 'private');
         }
 
-        $invoice = Invoice::create([
-            'invoice_number' => $this->nextInvoiceNumber(),
-            'client_id' => $data['client_id'],
-            'project_id' => $data['project_id'] ?? null,
-            'quote_id' => $data['quote_id'] ?? null,
-            'created_by' => Auth::id(),
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'amount' => $data['amount'],
-            'currency' => config('scope.currency', 'SAR'),
-            'status' => 'unpaid',
-            'due_date' => $data['due_date'] ?? null,
-            'invoice_file' => $path,
-        ]);
+        $invoice = DB::transaction(function () use ($data, $path, $payments, $clientId, $name, $email) {
+            $invoice = Invoice::create([
+                'invoice_number' => $this->nextInvoiceNumber(),
+                'client_id' => $clientId,
+                'recipient_name' => $name,
+                'recipient_email' => $email,
+                'project_id' => $data['project_id'] ?? null,
+                'quote_id' => $data['quote_id'] ?? null,
+                'created_by' => Auth::id(),
+                'title' => $data['title'],
+                'description' => $data['description'] ?? null,
+                'amount' => $data['amount'],
+                'currency' => config('scope.currency', 'SAR'),
+                'status' => 'unpaid',
+                'due_date' => $data['due_date'] ?? null,
+                'invoice_file' => $path,
+            ]);
+
+            foreach ($payments as $payment) {
+                $payment->payable()->associate($invoice);
+                $payment->save();
+            }
+
+            return $invoice;
+        });
 
         return redirect()->route('invoices.show', $invoice)->with('success', __('portal.invoices.created'));
     }
@@ -95,7 +162,9 @@ class InvoiceController extends Controller
     {
         $this->guardManage();
 
-        return view('invoices.show', ['invoice' => $invoice->load(['client', 'project', 'quote', 'creator'])]);
+        return view('invoices.show', [
+            'invoice' => $invoice->load(['client', 'project', 'quote', 'creator', 'paymentRequests']),
+        ]);
     }
 
     /** Confirm payment after reviewing the client's receipt. */
@@ -156,9 +225,16 @@ class InvoiceController extends Controller
         $user = Auth::user();
         abort_unless($user->canUseClientProjectPortal(), 403);
 
-        $invoices = Invoice::where('client_id', $user->id)
+        $email = mb_strtolower((string) $user->email);
+        $invoices = Invoice::query()
+            ->where(function ($query) use ($user, $email) {
+                $query->where('client_id', $user->id)
+                    ->orWhereRaw('LOWER(recipient_email) = ?', [$email]);
+            })
             ->where('status', '!=', 'cancelled')
-            ->with('project')->latest()->get();
+            ->with('project')
+            ->latest()
+            ->get();
 
         $outstanding = (float) $invoices->whereIn('status', ['unpaid', 'proof_submitted'])->sum('amount');
 
@@ -237,7 +313,7 @@ class InvoiceController extends Controller
     /** Only the owning client may act on (upload to) their invoice. */
     private function guardClientOwner(Invoice $invoice): void
     {
-        abort_unless(Auth::id() === $invoice->client_id, 403);
+        abort_unless($this->userOwnsInvoice(Auth::user(), $invoice), 403);
     }
 
     /** The owning client OR an internal manager/PM may view/download files. */
@@ -245,6 +321,22 @@ class InvoiceController extends Controller
     {
         $user = Auth::user();
         $isManage = $user && $user->isInternal() && ($user->isManager() || $user->isProjectManager());
-        abort_unless($isManage || Auth::id() === $invoice->client_id, 403);
+        abort_unless($isManage || $this->userOwnsInvoice($user, $invoice), 403);
+    }
+
+    private function userOwnsInvoice(?User $user, Invoice $invoice): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ((int) $invoice->client_id === (int) $user->id) {
+            return true;
+        }
+
+        $email = mb_strtolower((string) $user->email);
+
+        return filled($invoice->recipient_email)
+            && mb_strtolower((string) $invoice->recipient_email) === $email;
     }
 }

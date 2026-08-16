@@ -6,7 +6,9 @@ use App\Actions\Payments\SendPaymentRequestAction;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Jobs\ProcessMoyasarWebhook;
+use App\Mail\PaymentConfirmationMail;
 use App\Mail\PaymentRequestMail;
+use App\Models\Invoice;
 use App\Models\PaymentRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -93,6 +95,35 @@ class PaymentRequestTest extends TestCase
         ]);
     }
 
+    public function test_public_billing_validation_messages_follow_locale(): void
+    {
+        $paymentRequest = $this->paymentRequest();
+
+        $this->withSession(['locale' => 'ar'])
+            ->from(SendPaymentRequestAction::publicUrl($paymentRequest))
+            ->post(route('payments.public.billing', $paymentRequest), [
+                'tax_id' => '',
+                'billing_address' => 'short',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasErrors([
+                'tax_id' => __('portal.payments.validation.tax_id_required', [], 'ar'),
+                'billing_address' => __('portal.payments.validation.address_min', ['min' => 10], 'ar'),
+            ]);
+
+        $this->withSession(['locale' => 'en'])
+            ->from(SendPaymentRequestAction::publicUrl($paymentRequest))
+            ->post(route('payments.public.billing', $paymentRequest), [
+                'tax_id' => '123',
+                'billing_address' => '',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasErrors([
+                'tax_id' => __('portal.payments.tax_id_invalid', [], 'en'),
+                'billing_address' => __('portal.payments.validation.address_required', [], 'en'),
+            ]);
+    }
+
     public function test_save_and_send_emails_entered_address(): void
     {
         Mail::fake();
@@ -105,7 +136,9 @@ class PaymentRequestTest extends TestCase
         $this->assertSame('sent', PaymentRequest::firstOrFail()->status);
         Mail::assertSent(PaymentRequestMail::class, function (PaymentRequestMail $mail) {
             return $mail->hasTo('guest@example.test')
-                && str_contains((string) $mail->actionUrl, '/pay/');
+                && str_contains((string) $mail->actionUrl, '/pay/')
+                && str_contains($mail->bodyEn, 'payment')
+                && filled($mail->bodyAr);
         });
     }
 
@@ -161,6 +194,7 @@ class PaymentRequestTest extends TestCase
 
     public function test_callback_verifies_amount_currency_and_metadata_before_paid(): void
     {
+        Mail::fake();
         $paymentRequest = $this->paymentRequest();
         $paymentId = '79cced57-9deb-4c4b-8f48-59c124f79688';
 
@@ -184,6 +218,12 @@ class PaymentRequestTest extends TestCase
         $this->assertSame('paid', $paymentRequest->fresh()->status);
         $this->assertNotNull($paymentRequest->fresh()->paid_at);
         $this->assertDatabaseHas('payment_attempts', ['moyasar_payment_id' => $paymentId]);
+        Mail::assertSent(PaymentConfirmationMail::class, function (PaymentConfirmationMail $mail) use ($paymentRequest) {
+            return $mail->hasTo($paymentRequest->email)
+                && str_contains($mail->bodyEn, 'invoice')
+                && filled($mail->bodyAr)
+                && str_contains((string) $mail->actionUrl, '/register');
+        });
     }
 
     public function test_manager_can_attach_quote_number_and_file(): void
@@ -343,6 +383,88 @@ class PaymentRequestTest extends TestCase
         $user->assignRole($spatieRole);
 
         return $user;
+    }
+
+    public function test_manager_can_create_payment_with_long_email(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+        $longLocal = str_repeat('a', 64);
+        $email = $longLocal.'@example.test';
+
+        $this->actingAs($manager)->post(route('payment-requests.store'), [
+            ...$this->payload(),
+            'email' => $email,
+            'quantity' => 1,
+            'amount' => '50.00',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('payment_requests', [
+            'email' => strtolower($email),
+            'total_amount_minor' => 5000,
+        ]);
+    }
+
+    public function test_invoice_can_manually_link_payments_by_client_email(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+        $client = User::factory()->create([
+            'email' => 'payer@example.test',
+            'role' => UserRole::CLIENT,
+            'type' => 'client',
+            'status' => UserStatus::ACTIVE,
+        ]);
+
+        $paymentRequest = $this->paymentRequest([
+            'client_id' => $client->id,
+            'email' => 'payer@example.test',
+            'status' => 'paid',
+            'paid_at' => now(),
+            'unit_amount_minor' => 20000,
+            'total_amount_minor' => 20000,
+        ]);
+
+        $this->actingAs($manager)->post(route('invoices.store'), [
+            'client_id' => $client->id,
+            'recipient_name' => $client->name,
+            'recipient_email' => 'payer@example.test',
+            'title' => 'Manual link invoice',
+            'amount' => '200.00',
+            'payment_request_ids' => [$paymentRequest->id],
+        ])->assertRedirect();
+
+        $invoice = Invoice::query()->latest('id')->first();
+        $this->assertNotNull($invoice);
+        $this->assertSame('unpaid', $invoice->status);
+        $this->assertTrue($paymentRequest->fresh()->payable()->is($invoice));
+    }
+
+    public function test_invoice_can_be_created_for_guest_email_without_client_account(): void
+    {
+        $manager = $this->user(UserRole::MANAGER, 'manager');
+        $paymentRequest = $this->paymentRequest([
+            'client_id' => null,
+            'email' => 'guest.payer@example.test',
+            'status' => 'paid',
+            'paid_at' => now(),
+            'unit_amount_minor' => 9900,
+            'total_amount_minor' => 9900,
+        ]);
+
+        $this->actingAs($manager)->post(route('invoices.store'), [
+            'client_id' => null,
+            'recipient_name' => 'Guest Payer',
+            'recipient_email' => 'Guest.Payer@example.test',
+            'title' => 'Guest invoice',
+            'amount' => '99.00',
+            'payment_request_ids' => [$paymentRequest->id],
+        ])->assertRedirect();
+
+        $invoice = Invoice::query()->latest('id')->first();
+        $this->assertNotNull($invoice);
+        $this->assertNull($invoice->client_id);
+        $this->assertSame('Guest Payer', $invoice->recipient_name);
+        $this->assertSame('guest.payer@example.test', $invoice->recipient_email);
+        $this->assertTrue($paymentRequest->fresh()->payable()->is($invoice));
     }
 
     private function paymentRequest(array $overrides = []): PaymentRequest
