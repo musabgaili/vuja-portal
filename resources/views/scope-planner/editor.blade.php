@@ -28,6 +28,12 @@
         'student' => ['scope.scope_of_work', 'scope.pricing', 'scope.description', 'scope.unit', 'scope.qty', 'scope.unit_price', 'scope.total', 'scope.out_of_scope', 'scope.notes'],
         default => ['scope.introduction', 'scope.proposed_scope', 'scope.technical_specs', 'scope.mechanical_specs', 'scope.operational_logic', 'scope.implementation_phases', 'scope.pricing', 'scope.payment_schedule', 'scope.out_of_scope', 'scope.notes'],
     };
+    $advDefaultCols = [
+        'timeline' => [
+            $quote->label('scope.period', __('scope.period')),
+            $quote->label('scope.activity', __('scope.activity')),
+        ],
+    ];
 @endphp
 
 @section('content')
@@ -503,7 +509,7 @@ function sumPct() {
 document.addEventListener('DOMContentLoaded', sumPct);
 
 // ---- Advanced grid editor (Phase 2B): generic table with merge cells ----
-const ADV_DEFAULT_COLS = @json(['timeline' => [$quote->label('scope.period', __('scope.period')), $quote->label('scope.activity', __('scope.activity'))]]);
+const ADV_DEFAULT_COLS = @json($advDefaultCols);
 const ADV_T = { unmerge: @json(__('portal.scope_planner.adv_unmerge')), mright: @json(__('portal.scope_planner.adv_merge_right')), mdown: @json(__('portal.scope_planner.adv_merge_down')), up: @json(__('portal.scope_planner.adv_move_up')), down: @json(__('portal.scope_planner.adv_move_down')) };
 let advTables = (function () { var el = document.getElementById('custom_tables_json'); if (!el) return {}; try { return JSON.parse(el.value || '{}') || {}; } catch (e) { return {}; } })();
 let advCur = null, advGrid = null;
