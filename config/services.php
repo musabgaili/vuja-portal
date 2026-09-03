@@ -49,4 +49,38 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', rtrim((string) env('APP_URL', 'http://localhost'), '/').'/auth/google/callback'),
+        // Comma-separated: web + Android + iOS OAuth client IDs accepted as ID-token `aud`.
+        'client_ids' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('GOOGLE_CLIENT_IDS', env('GOOGLE_CLIENT_ID', '')))
+        ))),
+    ],
+
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+    ],
+
+    'linkedin' => [
+        'client_id' => env('LINKEDIN_CLIENT_ID'),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+        'redirect' => env('LINKEDIN_REDIRECT_URI'),
+    ],
+
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_ids' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('APPLE_CLIENT_IDS', env('APPLE_CLIENT_ID', '')))
+        ))),
+        'team_id' => env('APPLE_TEAM_ID'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'private_key' => env('APPLE_PRIVATE_KEY'),
+    ],
+
 ];

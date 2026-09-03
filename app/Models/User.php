@@ -29,6 +29,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'name',
         'email',
         'phone',
+        'locale',
         'password',
         'role',
         'type',
@@ -65,7 +66,14 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             'impact_points' => 'integer',
             'notification_preferences' => 'array',
             'planner_defaults' => 'array',
+            'locale' => 'string',
         ];
+    }
+
+    /** FCM device tokens registered by the Flutter (or web) client. */
+    public function fcmTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FcmToken::class);
     }
 
     /** Whether this user wants email for a given notification type (default per config). */
