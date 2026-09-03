@@ -1,6 +1,10 @@
 # VujaDe Portal API
 
-Laravel backend for the **VujaDe Flutter app** (internal team first: managers, PMs, employees). This repo is a mirror of `vuja-portal` with API-first development — the old portal repo stays untouched.
+Laravel backend for the **VujaDe Flutter app** (internal team first: managers, PMs, employees).
+
+**Primary repository:** [github.com/musabgaili/vuja-portal-api](https://github.com/musabgaili/vuja-portal-api)
+
+The legacy web portal lives in `vuja-portal` and is not modified by API work here.
 
 ## Quick start
 
@@ -15,41 +19,22 @@ php artisan serve
 
 API base: `http://localhost:8000/api/v1`
 
-## Mirror from vuja-portal (one-time)
+## Push to GitHub (first time)
 
-1. Create an **empty** private repo: `musabgaili/vuja-portal-api` on GitHub.
-2. Run:
+After creating the empty `vuja-portal-api` repo and granting this Cloud Agent access to it:
 
 ```bash
-chmod +x scripts/mirror-to-vuja-portal-api.sh
 ./scripts/mirror-to-vuja-portal-api.sh
 ```
 
-## Mobile auth
-
-- `POST /api/v1/login` — email + password
-- `POST /api/v1/auth/google` — native Google ID token
-- `POST /api/v1/auth/apple` — native Apple identity token
-
-Staff accounts are **invite-only** via social login (no auto-create). Set `MOBILE_SOCIAL_AUTO_REGISTER=true` when client self-serve is ready.
-
 ## Sprint status
-
-See `docs/API_BACKLOG_AND_SPRINT_PLAN.md` for the full backlog.
 
 | Sprint | Status | Highlights |
 |--------|--------|------------|
-| 1 | Done | Auth, Google/Apple, FCM token registration, deep links |
-| 2 | In progress | Dashboard, notifications, my-tasks inbox |
-| 3+ | Planned | Projects, chat, meetings, approvals |
+| 1 | Done | Auth, Google/Apple, FCM tokens, deep links |
+| 2 | Done | Dashboard, notifications, my-tasks |
+| 3 | Done | Projects list/detail, milestones, tasks, kanban |
+| 4 | Done | Chat channels, DMs, messages, reactions, mentions |
+| 5+ | Planned | Meetings, approvals, financials |
 
-## Key env vars
-
-| Variable | Purpose |
-|----------|---------|
-| `GOOGLE_CLIENT_IDS` | Allowed Google ID token audiences (web + Android + iOS) |
-| `APPLE_CLIENT_IDS` | Allowed Apple identity token audiences |
-| `MOBILE_APP_SCHEME` | Custom scheme (`vujade://`) |
-| `MOBILE_ANDROID_SHA256` | Release cert fingerprint for App Links |
-| `FIREBASE_PROJECT_ID` | FCM push |
-| `FIREBASE_SERVICE_ACCOUNT_JSON` | FCM service account |
+Full backlog: `docs/API_BACKLOG_AND_SPRINT_PLAN.md`
