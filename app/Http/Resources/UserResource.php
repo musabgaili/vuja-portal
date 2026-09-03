@@ -18,6 +18,9 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'locale' => $this->locale ?: 'en',
+            'avatar_url' => $this->getFirstMediaUrl('avatar') ?: null,
+            'provider' => $this->provider,
             'role' => $this->role instanceof \BackedEnum ? $this->role->value : (string) $this->role,
             'type' => $this->type,                                     // internal | client
             'status' => $this->status instanceof \BackedEnum ? $this->status->value : (string) $this->status,

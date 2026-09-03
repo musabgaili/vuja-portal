@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DeepLinkController;
 use App\Http\Controllers\ServiceRequestController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,14 @@ Auth::routes(['verify' => true]);
 
 // Referral share link (spec §10): <APP_URL>/r/<code> remembers the code for the
 // next registration, then sends the visitor to sign up.
+Route::get('/.well-known/apple-app-site-association', [DeepLinkController::class, 'appleAppSiteAssociation'])
+    ->name('deeplink.apple');
+Route::get('/.well-known/assetlinks.json', [DeepLinkController::class, 'assetLinks'])
+    ->name('deeplink.android');
+Route::get('/app/{path}', [DeepLinkController::class, 'open'])
+    ->where('path', '.*')
+    ->name('deeplink.open');
+
 Route::get('/r/{code}', function (string $code) {
     app(\App\Services\Engagement\ReferralService::class)->rememberCode($code);
 

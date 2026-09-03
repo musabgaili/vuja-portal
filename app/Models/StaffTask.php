@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StaffTask extends Model
 {
+    /** @use HasFactory<\Database\Factories\StaffTaskFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'title', 'description', 'category', 'priority', 'status',
         'assigned_to', 'assigned_by', 'project_id', 'opportunity_id',
@@ -20,7 +24,9 @@ class StaffTask extends Model
     ];
 
     public const CATEGORIES = ['project', 'sales', 'presale', 'management'];
+
     public const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
+
     public const STATUSES = ['open', 'in_progress', 'done', 'cancelled'];
 
     /** Engagement action key (and IP rate) for each category. */

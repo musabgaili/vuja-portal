@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'is_internal' => \App\Http\Middleware\IsInternal::class,
+            'api.internal' => \App\Http\Middleware\EnsureApiInternal::class,
             'is_manager' => \App\Http\Middleware\IsManager::class,
             'can_manage_projects' => \App\Http\Middleware\CanManageProjects::class,
         ]);
