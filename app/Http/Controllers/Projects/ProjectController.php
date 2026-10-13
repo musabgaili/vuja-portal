@@ -517,7 +517,7 @@ class ProjectController extends Controller
         $this->authorize('view', $project);
 
         $project->load([
-            'client', 'projectPeople.user',
+            'client', 'creator', 'projectPeople.user',
             'milestones.tasks.assignedTo', 'milestones.comments.user',
             'tasks.assignedTo', 'tasks.comments.user',
             'comments.user', 'scopeChanges', 'expenses.loggedBy',

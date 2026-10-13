@@ -2548,6 +2548,7 @@
     "portal.projects_manager.show.overall_rating": "التقييم العام",
     "portal.projects_manager.show.overview": "نظرة عامة",
     "portal.projects_manager.show.pm": "مدير المشروع",
+    "portal.projects_manager.show.created_by": "أنشأه",
     "portal.projects_manager.show.progress": "التقدم",
     "portal.projects_manager.show.project_comments": "تعليقات المشروع",
     "portal.projects_manager.show.project_deliverables": "تسليمات المشروع",

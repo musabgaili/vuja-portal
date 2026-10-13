@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\Concerns\HasAutoTranslations;
 
 use App\Exceptions\BudgetLockedException;
+use App\Observers\ProjectObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[ObservedBy([ProjectObserver::class])]
 class Project extends Model
 {
     use HasAutoTranslations;
@@ -57,7 +60,7 @@ class Project extends Model
     }
 
     protected $fillable = [
-        'client_id', 'title', 'description', 'scope', 'source_type', 'source_id',
+        'client_id', 'created_by', 'title', 'description', 'scope', 'source_type', 'source_id',
         'status', 'budget', 'spent', 'completion_percentage',
         'start_date', 'end_date', 'actual_end_date',
         'project_manager_id', 'account_manager_id', 'team_members',
@@ -88,6 +91,12 @@ class Project extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
+    }
+
+    /** The internal user who created this project. */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**

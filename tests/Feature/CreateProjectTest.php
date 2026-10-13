@@ -31,7 +31,10 @@ class CreateProjectTest extends TestCase
         $this->assertSame(1, ProjectPerson::where('user_id', $colleague->id)->count());
 
         $project = ProjectPerson::where('user_id', $colleague->id)->first()->project;
-        $this->actingAs($pm)->get(route('projects.manager.show', $project))->assertOk();
+        $this->assertSame($pm->id, $project->created_by);
+        $this->actingAs($pm)->get(route('projects.manager.show', $project))
+            ->assertOk()
+            ->assertSee($pm->name, false);
     }
 
     private function internal(UserRole $role, string $type = 'internal'): User

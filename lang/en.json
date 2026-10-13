@@ -2548,6 +2548,7 @@
     "portal.projects_manager.show.overall_rating": "Overall Rating",
     "portal.projects_manager.show.overview": "Overview",
     "portal.projects_manager.show.pm": "PM",
+    "portal.projects_manager.show.created_by": "Created by",
     "portal.projects_manager.show.progress": "Progress",
     "portal.projects_manager.show.project_comments": "Project Comments",
     "portal.projects_manager.show.project_deliverables": "Project Deliverables",

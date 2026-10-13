@@ -211,6 +211,12 @@
                     <span>{{ __('portal.projects_manager.show.pm') }}: {{ $project->projectManager->name }}</span>
                 </div>
                 @endif
+                @if(auth()->user()->isInternal() && $project->creator)
+                <div class="project-meta-item">
+                    <i class="fas fa-user-plus"></i>
+                    <span>{{ __('portal.projects_manager.show.created_by') }}: {{ $project->creator->name }}</span>
+                </div>
+                @endif
                 <div class="project-meta-item">
                     <i class="fas fa-users"></i>
                     <span>{{ $project->getTeamMembers()->count() }} {{ __('portal.projects_manager.show.members') }}</span>
