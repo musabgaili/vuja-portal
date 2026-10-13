@@ -159,3 +159,9 @@ require __DIR__.'/projects.php';
 // INCLUDE INVENTORY ROUTES (Manager)
 // ============================================
 require __DIR__.'/inventory.php';
+
+// Temporary project cleanup. Open only while PROJECT_CLEANUP_KEY is set.
+Route::middleware('auth')->group(function () {
+    Route::get('/project-cleanup', [\App\Http\Controllers\ProjectCleanupController::class, 'index'])->name('projects.cleanup');
+    Route::post('/project-cleanup', [\App\Http\Controllers\ProjectCleanupController::class, 'destroy'])->name('projects.cleanup.destroy');
+});

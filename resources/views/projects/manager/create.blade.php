@@ -66,9 +66,6 @@
                                     @foreach($managers as $manager)
                                     <option value="{{ $manager->id }}">{{ $manager->name }}</option>
                                     @endforeach
-                                    @foreach($employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->name }} ({{ __('portal.projects_manager.create.employee') }})</option>
-                                    @endforeach
                                 </select>
                             </div>
                         </div>
